@@ -8,8 +8,8 @@ local action = wezterm.action
 
 config = {
 	color_scheme = "Fairyfloss",
-	default_prog = { "pwsh.exe", "-NoLogo" },
 	window_decorations = "RESIZE",
+	default_prog = { "pwsh.exe", "-NoLogo" },
 	automatically_reload_config = true,
 	hide_tab_bar_if_only_one_tab = true,
 	font = wezterm.font("JetBrains Mono"),
@@ -55,6 +55,12 @@ config = {
 		},
 	},
 }
+
+local os_env = os.getenv("OS")
+
+if os_env == "MAC" then
+	config.default_prog({ "/bin/zsh", "-1" })
+end
 
 for i = 1, 9 do
 	table.insert(config.keys, {
