@@ -4,6 +4,7 @@ $dotfiles = Join-Path $home "dotfiles"
 
 $symlinks = @(
     @{ Source = "core\nvim"; Destination = Join-Path $env:LOCALAPPDATA "nvim" }
+    @{ Source = "dist\windows\Microsoft.PowerShell_profile.ps1"; Destination = $profile }
 )
 
 
