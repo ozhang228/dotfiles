@@ -11,6 +11,7 @@
   - [Starship](https://starship.rs/)
   - [Zoxide](https://github.com/ajeetdsouza/zoxide)
   - [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/)
+  - [Fzf](https://github.com/junegunn/fzf)
 
 ## Dist
 
@@ -20,6 +21,7 @@
 
 - [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5)
   - [PSReadLine](https://github.com/PowerShell/PSReadLine)
+  - [PowerShellget](https://learn.microsoft.com/en-us/powershell/gallery/powershellget/install-powershellget?view=powershellget-3.x)
   - [PSFzf](https://github.com/kelleyma49/PSFzf.git)
 - [GlazeWM](https://github.com/glzr-io/glazewm)
 
@@ -33,6 +35,7 @@
     - **People Page**
     - write down important information about people following how the People Page is currently done
 - [Desktop Background](https://drive.google.com/file/d/149UO6TqLvFNDMKaQ65xfXnjIW9FV3Wxc/view)
+- Set terminal font to downloaded JetBrains Mono Font
 
 ### Windows
 
