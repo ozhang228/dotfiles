@@ -15,15 +15,21 @@ if not pcall(require, "lazy") then
   vim.cmd.quit()
 end
 
--- Powershell config
+-- Dist Specific
+local os_env = vim.fn.getenv "OS"
 
-vim.opt.shell = vim.fn.executable "pwsh" and "pwsh" or "powershell"
-vim.opt.shellcmdflag =
-  "-ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; "
-vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
-vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
-vim.opt.shellquote = ""
-vim.opt.shellxquote = ""
+if os_env == "Windows" then
+  local shell = vim.fn.executable "pwsh" == 1 and "pwsh" or "powershell"
+  vim.opt.shell = shell
+  vim.opt.shellcmdflag =
+    "-ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; "
+  vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
+  vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
+  vim.opt.shellquote = ""
+  vim.opt.shellxquote = ""
+else
+  vim.opt.shell = "/bin/zsh"
+end
 
 require "lazy_setup"
 require "polish"
