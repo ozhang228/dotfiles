@@ -25,6 +25,8 @@
 
 ## Manual Setup
 
+### Dist Agnostic
+
 - Notion
   - **To-Do List & Project Management**
     - Organize tasks into projects with todos for each project following how it is done for personal tasks
