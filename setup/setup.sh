@@ -36,6 +36,7 @@ if ! command -v brew &> /dev/null; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
   echo "Homebrew installed. Skipping..." 
+fi
 
 brew_apps=(
     neovim
