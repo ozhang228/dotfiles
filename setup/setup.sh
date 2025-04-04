@@ -48,6 +48,7 @@ brew_apps=(
     zoxide
     jetbrainsmono-nerd-font
     fzf
+    nikitabobko/tap/aerospace
 )
 
 echo "🔧 Installing packages via brew..."
