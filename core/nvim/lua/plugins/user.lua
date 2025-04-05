@@ -1,4 +1,3 @@
----@type LazySpec
 return {
   {
     "kylechui/nvim-surround",
@@ -30,16 +29,12 @@ return {
   {
     "L3MON4D3/LuaSnip",
     config = function(plugin, opts)
-      -- include the default astronvim config that calls the setup call
       require "astronvim.plugins.configs.luasnip"(plugin, opts)
-
-      -- load snippets paths
       require("luasnip.loaders.from_vscode").lazy_load {
         paths = { vim.fn.stdpath "config" .. "/snippets" },
       }
     end,
   },
-
   {
     "folke/snacks.nvim",
     priority = 1000,
@@ -83,7 +78,7 @@ return {
     opts = {
       view_options = {
         show_hidden = true,
-        is_hidden_file = function(name, bufnr)
+        is_hidden_file = function(name, _)
           local m = name:match "^%."
           return m ~= nil
         end,
@@ -98,5 +93,15 @@ return {
     },
     dependencies = { { "echasnovski/mini.icons", opts = {} } },
     lazy = false,
+  },
+  {
+    "smjonas/inc-rename.nvim",
+    opts = {},
+  },
+  {
+    "folke/noice.nvim",
+    opts = {
+      presets = { inc_rename = true },
+    },
   },
 }

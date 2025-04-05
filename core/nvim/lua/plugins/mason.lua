@@ -8,11 +8,10 @@ return {
         -- install language servers
         "lua-language-server",
 
-        "typescript-language-server",
+        "vtsls",
         "html-lsp",
         "emmet-language-server",
         "eslint-lsp",
-
         "jdtls",
 
         -- install formatters

@@ -69,12 +69,24 @@ return {
           desc = "Go to previous Harpoon mark",
         },
         -- END Harpoon
+
+        -- Git
+        ["<Leader>gt"] = false,
+        ["<Leader>gb"] = false,
+        ["<Leader>gc"] = false,
+        ["<Leader>gC"] = false,
+        ["<Leader>gT"] = false,
+        -- END Git
+
+        -- Misc
         ["n"] = {
           [[nzz]],
         },
         ["N"] = {
           [[Nzz]],
         },
+        ["<Leader>R"] = false,
+        -- End Misc
       },
 
       t = {

@@ -63,7 +63,6 @@ return {
         properties = {},
       },
       highlight_overrides = {
-        ---@param cp palette
         all = function(cp)
           return {
             LineNr = { fg = cp.blue },
