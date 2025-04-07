@@ -12,6 +12,7 @@ $symlinks = @(
     @{ Source = "core\starship"; Destination = Join-Path $home ".config\starship"}
     @{ Source = "core\lazygit"; Destination = Join-Path $env:LOCALAPPDATA "lazygit"}
     @{ Source = "dist\windows\Microsoft.PowerShell_profile.ps1"; Destination = $profile }
+    @{ Source = "dist\windows\clangd"; Destination = Join-Path $env:LOCALAPPDATA "clangd"}
 )
 
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)

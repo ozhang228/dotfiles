@@ -24,6 +24,9 @@
   - [PowerShellget](https://learn.microsoft.com/en-us/powershell/gallery/powershellget/install-powershellget?view=powershellget-3.x)
   - [PSFzf](https://github.com/kelleyma49/PSFzf.git)
 - [GlazeWM](https://github.com/glzr-io/glazewm)
+- Languages
+  - C++
+    - clangd (point the clangd target to the MinGW installation)
 
 ## Manual Setup
 
@@ -41,4 +44,8 @@
 
 - PowerToys
   - Remap Caps Lock -> Esc
+  - Remap <C-Shift-Caps Lock> -> Caps Lock
   - Powertoys Run: Win + Space for open
+- Languages
+  - C++
+    - MinGW thorugh Msys2 + Add to path (should be something like C:/msys64/mingw64/bin)
