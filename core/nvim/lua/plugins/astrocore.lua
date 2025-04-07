@@ -85,6 +85,10 @@ return {
         ["N"] = {
           [[Nzz]],
         },
+        ["<Leader>P"] = {
+          [["0p]],
+          desc = "Paste from last yanked",
+        },
         ["<Leader>R"] = false,
         -- End Misc
       },

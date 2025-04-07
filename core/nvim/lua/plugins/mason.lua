@@ -7,8 +7,7 @@ return {
       ensure_installed = {
         -- install language servers
         "lua-language-server",
-
-        "vtsls",
+        "typescript-language-server",
         "html-lsp",
         "emmet-language-server",
         "eslint-lsp",
