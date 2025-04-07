@@ -9,7 +9,6 @@ return {
   { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.pack.python" },
   { import = "astrocommunity.pack.markdown" },
-  { import = "astrocommunity.pack.cpp" },
 
   -- import/override with your plugins folder
 }
