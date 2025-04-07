@@ -12,6 +12,7 @@ return {
         "emmet-language-server",
         "eslint-lsp",
         "jdtls",
+        "clangd",
 
         -- install formatters
         "stylua",
