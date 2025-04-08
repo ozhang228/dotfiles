@@ -31,10 +31,15 @@ return {
       theme = "auto",
       sections = {
         lualine_a = { "mode" },
-        lualine_b = { "branch" },
-        lualine_c = { "filename" },
-        lualine_x = { "progress" },
-        lualine_y = {},
+        lualine_b = { "filename" },
+        lualine_c = {
+          {
+            require("noice").api.status.mode.get,
+            cond = require("noice").api.status.mode.has,
+          },
+        },
+        lualine_x = { "branch" },
+        lualine_y = { "progress" },
         lualine_z = {},
       },
     },
