@@ -11,12 +11,10 @@ return {
       highlighturl = true, -- highlight URLs at start
       notifications = true, -- enable notifications at start
     },
-    -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
     diagnostics = {
       virtual_text = true,
       underline = true,
     },
-    -- vim options can be configured here
     options = {
       opt = { -- vim.opt.<key>
         relativenumber = true, -- sets vim.opt.relativenumber
@@ -26,9 +24,6 @@ return {
         wrap = true, -- sets vim.opt.wrap
       },
       g = { -- vim.g.<key>
-        -- configure global vim variables (vim.g)
-        -- NOTE: `mapleader` and `maplocalleader` must be set in the AstroNvim opts or before `lazy.setup`
-        -- This can be found in the `lua/lazy_setup.lua` file
       },
     },
     mappings = {
@@ -38,14 +33,61 @@ return {
           nowait = true,
           desc = "Find references",
         },
-        ["<Leader>fd"] = { function() require("snacks.picker").files { cmd = "fd" } end, desc = "Find directories" },
+        ["<Leader>fd"] = {
+          function()
+            local Snacks = require "snacks"
+            local dirs = {}
+
+            local handle = io.popen "fd . --type directory"
+            if handle then
+              for line in handle:lines() do
+                table.insert(dirs, line)
+              end
+              handle:close()
+            else
+              print "Failed to execute fd command"
+            end
+
+            return Snacks.picker {
+              finder = function()
+                local items = {}
+                for i, item in ipairs(dirs) do
+                  table.insert(items, {
+                    idx = i,
+                    file = item,
+                    text = item,
+                  })
+                end
+                return items
+              end,
+              format = function(item, _)
+                local file = item.file
+                local ret = {}
+                local a = Snacks.picker.util.align
+                local icon, icon_hl = Snacks.util.icon(file.ft, "directory")
+                ret[#ret + 1] = { a(icon, 3), icon_hl }
+                ret[#ret + 1] = { " " }
+                ret[#ret + 1] = { a(file, 20) }
+
+                return ret
+              end,
+              confirm = function(picker, item)
+                picker:close()
+                Snacks.picker.pick("files", {
+                  dirs = { item.file },
+                })
+              end,
+            }
+          end,
+          desc = "Find directories",
+        },
         ["<Leader>o"] = {
           [[<CMD>Oil<CR>]],
-          desc = "Open Oil in Parent Directory",
+          desc = "Open Oil",
         },
         ["<Leader>x"] = {
           "Nop",
-          desc = "Trouble / Qflist",
+          desc = "Trouble / QFlist",
         },
         -- Harpoon
         ["<Leader>h"] = {
@@ -87,10 +129,15 @@ return {
         },
         ["<Leader>P"] = {
           [["0p]],
-          desc = "Paste from last yanked",
+          desc = "Paste last yanked",
         },
-        ["<Leader>R"] = false,
         -- End Misc
+
+        -- Use oil instead
+        ["<Leader>n"] = false,
+        ["<Leader>R"] = false,
+        -- Never used force close buffer
+        ["<Leader>C"] = false,
       },
 
       t = {

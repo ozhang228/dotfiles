@@ -94,14 +94,4 @@ return {
     dependencies = { { "echasnovski/mini.icons", opts = {} } },
     lazy = false,
   },
-  {
-    "smjonas/inc-rename.nvim",
-    opts = {},
-  },
-  {
-    "folke/noice.nvim",
-    opts = {
-      presets = { inc_rename = true },
-    },
-  },
 }

@@ -17,7 +17,6 @@ return {
     servers = {},
     ---@diagnostic disable: missing-fields
     config = {},
-    -- customize how language servers are attached
     handlers = {},
     autocmds = {
       lsp_codelens_refresh = {
