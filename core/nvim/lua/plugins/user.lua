@@ -1,10 +1,5 @@
 return {
-  {
-    "kylechui/nvim-surround",
-    version = "*", -- Use for stability; omit to use `main` branch for the latest features
-    event = "VeryLazy",
-    opts = {},
-  },
+  { "echasnovski/mini.surround", version = false, opts = {} },
   {
     "LunarVim/bigfile.nvim",
     opts = {
@@ -39,7 +34,6 @@ return {
     "folke/snacks.nvim",
     priority = 1000,
     lazy = false,
-    ---@type snacks.Config
     opts = {
       picker = {
         enabled = true,
@@ -50,7 +44,9 @@ return {
         style = "compact",
         top_down = "false",
       },
-      indent = false,
+      indent = {
+        enabled = false,
+      },
     },
     keys = {},
   },
@@ -75,7 +71,6 @@ return {
   {
     "stevearc/oil.nvim",
     ---@module 'oil'
-    ---@type oil.SetupOpts
     opts = {
       view_options = {
         show_hidden = true,

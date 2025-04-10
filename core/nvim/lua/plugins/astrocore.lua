@@ -28,58 +28,11 @@ return {
     },
     mappings = {
       n = {
+        -- File Utils
         ["<Leader>fr"] = {
           function() require("snacks.picker").lsp_references() end,
           nowait = true,
           desc = "Find references",
-        },
-        ["<Leader>fd"] = {
-          function()
-            local Snacks = require "snacks"
-            local dirs = {}
-
-            local handle = io.popen "fd . --type directory"
-            if handle then
-              for line in handle:lines() do
-                table.insert(dirs, line)
-              end
-              handle:close()
-            else
-              print "Failed to execute fd command"
-            end
-
-            return Snacks.picker {
-              finder = function()
-                local items = {}
-                for i, item in ipairs(dirs) do
-                  table.insert(items, {
-                    idx = i,
-                    file = item,
-                    text = item,
-                  })
-                end
-                return items
-              end,
-              format = function(item, _)
-                local file = item.file
-                local ret = {}
-                local a = Snacks.picker.util.align
-                local icon, icon_hl = Snacks.util.icon(file.ft, "directory")
-                ret[#ret + 1] = { a(icon, 3), icon_hl }
-                ret[#ret + 1] = { " " }
-                ret[#ret + 1] = { a(file, 20) }
-
-                return ret
-              end,
-              confirm = function(picker, item)
-                picker:close()
-                Snacks.picker.pick("files", {
-                  dirs = { item.file },
-                })
-              end,
-            }
-          end,
-          desc = "Find directories",
         },
         ["<Leader>o"] = {
           [[<CMD>Oil<CR>]],
@@ -89,6 +42,7 @@ return {
           "Nop",
           desc = "Trouble / QFlist",
         },
+
         -- Harpoon
         ["<Leader>h"] = {
           [["<Nop"]],
@@ -131,6 +85,8 @@ return {
           [["0p]],
           desc = "Paste last yanked",
         },
+        ["s"] = false,
+
         -- End Misc
 
         -- Use oil instead
