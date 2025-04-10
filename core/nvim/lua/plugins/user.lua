@@ -50,6 +50,7 @@ return {
         style = "compact",
         top_down = "false",
       },
+      indent = false,
     },
     keys = {},
   },
