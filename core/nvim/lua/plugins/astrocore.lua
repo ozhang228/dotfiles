@@ -39,15 +39,11 @@ return {
           desc = "Open Oil",
         },
         ["<Leader>x"] = {
-          "Nop",
-          desc = "Trouble / QFlist",
+          desc = require("mini.icons").get("filetype", "Trouble") .. " Trouble / QFlist",
         },
 
         -- Harpoon
-        ["<Leader>h"] = {
-          [["<Nop"]],
-          desc = "Harpoon",
-        },
+        ["<Leader>h"] = { desc = require("mini.icons").get("filetype", "Harpoon") .. " Harpoon" },
         ["<Leader>hm"] = {
           [[<CMD>lua require('harpoon.ui').toggle_quick_menu()<CR>]],
           desc = "Toggle Harpoon Quick Menu",

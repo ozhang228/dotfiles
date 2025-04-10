@@ -5,9 +5,7 @@ return {
     ---@type AstroUIOpts
     opts = {
       colorscheme = "catppuccin-mocha",
-      -- Icons can be configured throughout the interface
       icons = {
-        -- configure the loading of the lsp in the status line
         LSPLoading1 = "⠋",
         LSPLoading2 = "⠙",
         LSPLoading3 = "⠹",
@@ -46,7 +44,12 @@ return {
   },
   {
     "echasnovski/mini.icons",
-    opts = {},
+    opts = {
+      filetype = {
+        ["Harpoon"] = { glyph = "󱡀" },
+        ["Trouble"] = { glyph = "󱍼" },
+      },
+    },
   },
   {
     "catppuccin/nvim",
