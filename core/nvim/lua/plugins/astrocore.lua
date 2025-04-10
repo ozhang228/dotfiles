@@ -41,6 +41,17 @@ return {
         ["<Leader>x"] = {
           desc = require("mini.icons").get("filetype", "Trouble") .. " Trouble / QFlist",
         },
+        -- END File Utils
+
+        -- Terminal
+        ["<Leader>t2"] = {
+          desc = "ToggleTerm2",
+        },
+        ["<Leader>t2f"] = {
+          "<CMD>ToggleTerm2 direction=float<CR>",
+          desc = "ToggleTerm2 Float",
+        },
+        --
 
         -- Harpoon
         ["<Leader>h"] = { desc = require("mini.icons").get("filetype", "Harpoon") .. " Harpoon" },
