@@ -41,12 +41,12 @@ config = {
 		{
 			key = "l",
 			mods = "LEADER",
-			action = action.ActivateTabRelative(-1),
+			action = action.ActivateTabRelative(1),
 		},
 		{
 			key = "h",
 			mods = "LEADER",
-			action = action.ActivateTabRelative(1),
+			action = action.ActivateTabRelative(-1),
 		},
 		{
 			key = "q",
