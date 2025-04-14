@@ -1,0 +1,12 @@
+{
+  "Use State": {
+    "prefix": ["const ["],
+    "body": ["const [$1, $2] = useState<$3>($4);"],
+    "description": "Creates a useState hook with a type and initial value"
+  },
+  "Try Catch": {
+    "prefix": ["try"],
+    "body": ["try {", "$1", "} catch (e: unknown) {", "$2", "}"],
+    "dsecription": "Creates a try-catch block"
+  }
+}

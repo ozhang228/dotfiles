@@ -20,4 +20,10 @@ return {
     "rcarriga/nvim-dap-ui",
     enabled = false,
   },
+
+  -- Use my own snippets
+  {
+    "rafamadriz/friendly-snippets",
+    enabled = false,
+  },
 }

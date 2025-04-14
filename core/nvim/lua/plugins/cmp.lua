@@ -14,14 +14,14 @@ return {
       sources = {
         default = { "copilot" },
         providers = {
-          path = { score_offset = 3 },
-          snippets = { score_offset = 1 },
+          snippets = { score_offset = 9 },
+          path = { score_offset = 8 },
           lsp = { score_offset = 0 },
           buffer = { score_offset = 0 },
           copilot = {
             name = "copilot",
             module = "blink-copilot",
-            score_offset = 0,
+            score_offset = -1,
             async = true,
           },
         },

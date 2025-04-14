@@ -8,10 +8,25 @@
       {
         "language": [
           "js",
+          "javascriptreact"
+        ],
+        "path": "./js.json"
+      },
+      {
+        "language": [
           "typescript",
           "typescriptreact"
         ],
-        "path": "./javascript.json"
+        "path": "./ts.json"
+      },
+      {
+        "language": [
+          "js",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ],
+        "path": "js_ts.json"
       }
     ]
   }
