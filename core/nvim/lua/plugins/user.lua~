@@ -99,9 +99,9 @@ return {
     lazy = false,
   },
   {
-    "folke/noice.nvim",
+    "folke/noice",
     opts = {
-      presets = { bottom_search = false },
+      preset = { bottom_search = false },
     },
   },
 }
