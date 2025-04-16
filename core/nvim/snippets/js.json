@@ -1,6 +1,6 @@
 {
   "Use State": {
-    "prefix": ["const ["],
+    "prefix": ["const []"],
     "body": ["const [$1, $2] = useState($3);"],
     "description": "Creates a useState hook"
   },
