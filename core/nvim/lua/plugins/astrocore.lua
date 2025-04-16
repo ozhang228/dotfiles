@@ -88,6 +88,16 @@ return {
         ["N"] = {
           [[Nzz]],
         },
+        ["<C-D>"] = {
+          [[<C-D>zz]],
+        },
+        ["<C-U>"] = {
+          [[<C-U>zz]],
+        },
+        ["<Leader>p"] = {
+          [["0P]],
+          desc = "Paste last yanked",
+        },
         ["<Leader>P"] = {
           [["0p]],
           desc = "Paste last yanked",

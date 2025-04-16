@@ -1,12 +1,4 @@
 return {
-  {
-    "karb94/neoscroll.nvim",
-    opts = {
-      hide_cursor = false,
-      duration_multiplier = 0.5,
-      pre_hook = function(info) vim.cmd "normal! M" end,
-    },
-  },
   { "echasnovski/mini.surround", version = false, opts = {} },
   {
     "LunarVim/bigfile.nvim",
