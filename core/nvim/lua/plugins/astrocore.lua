@@ -54,22 +54,30 @@ return {
         --
 
         -- Harpoon
-        ["<Leader>h"] = { desc = require("mini.icons").get("filetype", "Harpoon") .. " Harpoon" },
+        ["<Leader>h"] = { "Nop", desc = require("mini.icons").get("filetype", "Harpoon") .. " Harpoon" },
         ["<Leader>hm"] = {
-          [[<CMD>lua require('harpoon.ui').toggle_quick_menu()<CR>]],
+          function() require("harpoon").ui:toggle_quick_menu(require("harpoon"):list()) end,
           desc = "Toggle Harpoon Quick Menu",
         },
         ["<Leader>ha"] = {
-          [[<CMD>lua require('harpoon.mark').add_file()<CR>]],
-          desc = "Add File to Harpoon",
+          function() require("harpoon"):list():add() end,
+          desc = "Add File",
         },
-        ["<Leader>hn"] = {
-          [[<CMD>lua require('harpoon.ui').nav_next()<CR>]],
+        ["<Leader>hh"] = {
+          function() require("harpoon"):list():prev() end,
           desc = "Go to next Harpoon mark",
         },
-        ["<Leader>hp"] = {
-          [[<CMD>lua require('harpoon.ui').nav_prev()<CR>]],
+        ["<Leader>hl"] = {
+          function() require("harpoon"):list():next() end,
           desc = "Go to previous Harpoon mark",
+        },
+        ["<Leader>hg"] = {
+          function()
+            vim.ui.input({ prompt = "Harpoon mark index: " }, function(input)
+              local num = tonumber(input)
+              if num then require("harpoon"):list():select(num) end
+            end)
+          end,
         },
         -- END Harpoon
 

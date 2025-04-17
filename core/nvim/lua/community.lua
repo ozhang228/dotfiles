@@ -2,7 +2,6 @@
 return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.utility.noice-nvim" },
-  { import = "astrocommunity.markdown-and-latex.markdown-preview-nvim" },
   { import = "astrocommunity.programming-language-support.rest-nvim" },
 
   -- language packs
