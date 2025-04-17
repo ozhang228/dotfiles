@@ -98,4 +98,8 @@ return {
       presets = { bottom_search = false },
     },
   },
+  {
+    "kevinhwang91/nvim-bqf",
+    opts = {},
+  },
 }
