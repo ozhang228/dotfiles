@@ -23,26 +23,6 @@ return {
     "HiPhish/rainbow-delimiters.nvim",
   },
   {
-    "nvim-lualine/lualine.nvim",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
-      theme = "auto",
-      sections = {
-        lualine_a = { "mode" },
-        lualine_b = { "filename" },
-        lualine_c = {
-          {
-            require("noice").api.status.mode.get,
-            cond = require("noice").api.status.mode.has,
-          },
-        },
-        lualine_x = { "branch" },
-        lualine_y = { "progress" },
-        lualine_z = {},
-      },
-    },
-  },
-  {
     "echasnovski/mini.icons",
     opts = {
       filetype = {
@@ -80,15 +60,26 @@ return {
         end,
       },
       transparent_background = true,
-      term_colors = true,
     },
   },
   {
-    "xiyaowong/transparent.nvim",
-    opts = function()
-      local transparent = require "transparent"
-      transparent.clear_prefix "heirline"
-      transparent.clear_prefix "lualine"
-    end,
+    "rebelot/heirline.nvim",
+    -- turn off for lualine
+    opts = {
+      statusline = nil,
+    },
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    opts = {
+      sections = {
+        lualine_a = { "mode" },
+        lualine_b = { "branch", "diagnostics" },
+        lualine_c = { "filename" },
+        lualine_x = { "diff" },
+        lualine_y = { "progress" },
+        lualine_z = { "location" },
+      },
+    },
   },
 }

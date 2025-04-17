@@ -3,6 +3,7 @@ return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.programming-language-support.rest-nvim" },
+  { import = "astrocommunity.bars-and-lines.lualine-nvim" },
 
   -- language packs
   { import = "astrocommunity.pack.java" },
