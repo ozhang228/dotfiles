@@ -35,7 +35,8 @@ end
 vim.api.nvim_set_option_value("shelltemp", false, {})
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "json",
-  callback = function(ev) vim.bo[ev.buf].formatprg = "jq ." end,
+  -- use the -b to convert to binary to fix the windows ^M issue
+  callback = function(ev) vim.bo[ev.buf].formatprg = "jq -b ." end,
 })
 
 require "lazy_setup"
