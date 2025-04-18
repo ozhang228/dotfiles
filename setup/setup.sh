@@ -46,7 +46,7 @@ brew_apps=(
     wezterm
     starship
     zoxide
-    jetbrainsmono-nerd-font
+    font-jetbrainsmono-nerd-font
     fzf
     nikitabobko/tap/aerospace
 )
