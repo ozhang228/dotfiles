@@ -56,7 +56,7 @@ format = '[─](fg:current_line)[](fg:purple)[$symbol](fg:primary bg:purple)[
 symbol = ' .NET'
 
 [python]
-format = '[─](fg:current_line)[](fg:green)[$symbol](fg:primary bg:green)[](fg:green bg:box)[ $version](fg:foreground bg:box)[](fg:box)'
+format = '[─](fg:current_line)[](fg:green)[$symbol](fg:primary bg:green)[](fg:green bg:box)[ $virtualenv](fg:foreground bg:box)[](fg:box)'
 symbol = ' python'
 
 [java]
