@@ -4,8 +4,9 @@
 
 - Configuration that is distribution agnostic
   - [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
-    - [fd](https://github.com/sharkdp/fd)
-    - [ripgrep](https://github.com/BurntSushi/ripgrep)
+    - [fd](https://github.com/sharkdp/fd): Find command for pickers
+    - [ripgrep](https://github.com/BurntSushi/ripgrep): Fast regex engine needed for pickers
+    - [jq](https://jqlang.org/): JSON Processing engine for rest-client and for general cli use
   - [LazyGit](https://github.com/jesseduffield/lazygit)
   - [Wezterm](https://wezterm.org/)
   - [Starship](https://starship.rs/)
@@ -27,6 +28,10 @@
 - Languages
   - C++
     - clangd (point the clangd target to the MinGW installation)
+
+### Mac
+
+- Currently have aerospace window manager but haven't tested
 
 ## Manual Setup
 

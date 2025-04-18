@@ -9,6 +9,7 @@ return {
       "python",
       "typescript",
       "javascript",
+      "http",
       "cpp",
       "java",
       "regex",

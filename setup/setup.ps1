@@ -45,11 +45,10 @@ $wingetApps = @(
     "wez.wezterm",
     "Starship.Starship",
     "ajeetdsouza.zoxide",
-    "DEVCOM.JetBrainsMonoNerdFont"
-    "fzf"
-
-    # Dist Specific
-    "GlazeWM"
+    "DEVCOM.JetBrainsMonoNerdFont",
+    "fzf",
+    "jqlang.jq",
+    "GlazeWM",
 )
 
 foreach ($appId in $wingetApps) {

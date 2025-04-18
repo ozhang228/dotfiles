@@ -49,6 +49,7 @@ brew_apps=(
     font-jetbrainsmono-nerd-font
     fzf
     nikitabobko/tap/aerospace
+    jq
 )
 
 echo "🔧 Installing packages via brew..."

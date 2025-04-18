@@ -31,5 +31,12 @@ else
   vim.opt.shell = "/bin/zsh"
 end
 
+-- for rest nvim formatting with jq. For powershell, if noshelltemp is not off, then tmp files make it so jq fails.
+vim.api.nvim_set_option_value("shelltemp", false, {})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "json",
+  callback = function(ev) vim.bo[ev.buf].formatprg = "jq ." end,
+})
+
 require "lazy_setup"
 require "polish"
