@@ -55,13 +55,6 @@ return {
         },
         -- END File Utils
 
-        -- RestNvim
-        ["<Leader>rs"] = {
-          function() require("snacks").scratch.open { ft = "http" } end,
-          desc = "Open HTTP scratch buffer",
-        },
-        -- END RestNvim
-
         -- Terminal
         ["<Leader>t2"] = {
           desc = "ToggleTerm2",
@@ -100,6 +93,20 @@ return {
           desc = "Go to Harpoon mark by index",
         },
         -- END Harpoon
+
+        -- Scratch
+        ["<Leader>s"] = {
+          desc = require("mini.icons").get("filetype", "Scratch") .. " Scratch",
+        },
+        ["<Leader>sh"] = {
+          function() require("snacks").scratch.open { ft = "http" } end,
+          desc = "Open HTTP scratch buffer",
+        },
+        ["<Leader>sm"] = {
+          function() require("snacks").scratch.open { ft = "markdown" } end,
+          desc = "Open markdown scratch buffer",
+        },
+        -- END Scratch
 
         -- Git
         ["<Leader>gt"] = false,
