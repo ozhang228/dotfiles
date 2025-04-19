@@ -1,22 +1,20 @@
-# Dotfiles and setup script
+# Symlinks + Package Install
 
 ## Core
 
-- Configuration that is distribution agnostic
-  - [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
-    - [fd](https://github.com/sharkdp/fd): Find command for pickers
-    - [ripgrep](https://github.com/BurntSushi/ripgrep): Fast regex engine needed for pickers
-    - [jq](https://jqlang.org/): JSON Processing engine for rest-client and for general cli use
-  - [LazyGit](https://github.com/jesseduffield/lazygit)
-  - [Wezterm](https://wezterm.org/)
-  - [Starship](https://starship.rs/)
-  - [Zoxide](https://github.com/ajeetdsouza/zoxide)
-  - [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/)
-  - [Fzf](https://github.com/junegunn/fzf)
+- [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
+  - [fd](https://github.com/sharkdp/fd): Find command for pickers
+  - [ripgrep](https://github.com/BurntSushi/ripgrep): Fast regex engine needed for pickers
+  - [jq](https://jqlang.org/): JSON Processing engine for rest-client and for general cli use
+  - [prettier](https://prettier.io/): HTML Processing engine for rest-client and general formatting
+- [LazyGit](https://github.com/jesseduffield/lazygit)
+- [Wezterm](https://wezterm.org/)
+- [Starship](https://starship.rs/)
+- [Zoxide](https://github.com/ajeetdsouza/zoxide)
+- [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/)
+- [Fzf](https://github.com/junegunn/fzf)
 
-## Dist
-
-- Configuration that is distribution specific
+## Distribution Specific
 
 ### Windows
 

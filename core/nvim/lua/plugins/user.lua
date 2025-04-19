@@ -46,9 +46,13 @@ return {
         style = "compact",
         top_down = "false",
       },
+      scratch = {
+        enabled = true,
+      },
       indent = {
         enabled = false,
       },
+      styles = {},
     },
     keys = {},
   },

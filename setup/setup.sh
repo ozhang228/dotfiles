@@ -50,6 +50,7 @@ brew_apps=(
     fzf
     nikitabobko/tap/aerospace
     jq
+    node
 )
 
 echo "🔧 Installing packages via brew..."
@@ -63,4 +64,17 @@ for app in "${brew_apps[@]}"; do
     fi
 done
 
+echo "🔧 Installing packages via npm..."
+npm_pkgs=(
+    prettier
+)
 
+for pkg in "${npm_pkgs[@]}"; do
+    npm list -g --depth=0 "$pkg" &>/dev/null
+    if [[ $? -eq 0 ]]; then
+        echo "✅ $pkg is already installed. Skipping…"
+    else
+        echo "📦 Installing $pkg…"
+        npm install -g "$pkg"
+    fi
+done

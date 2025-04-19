@@ -46,9 +46,10 @@ $wingetApps = @(
     "Starship.Starship",
     "ajeetdsouza.zoxide",
     "DEVCOM.JetBrainsMonoNerdFont",
-    "fzf",
+    "junegunn.fzf",
     "jqlang.jq",
-    "GlazeWM",
+    "glzr-io.glazewm"
+    "OpenJS.NodeJS"
 )
 
 foreach ($appId in $wingetApps) {
@@ -79,3 +80,20 @@ foreach ($module in $modules) {
     }
 }
 
+$npmPackages = @(
+    "prettier"
+)
+
+Write-Host "🔧 Installing global npm packages via npm…"
+
+foreach ($pkg in $npmPackages) {
+    # attempt to list; suppress stderr
+    npm list -g --depth=0 $pkg 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "✅ $pkg is already installed. Skipping…"
+    }
+    else {
+        Write-Host "📦 Installing $pkg…"
+        npm install -g $pkg
+    }
+}

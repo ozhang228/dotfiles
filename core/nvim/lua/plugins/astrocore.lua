@@ -23,7 +23,6 @@ return {
         signcolumn = "yes",
         wrap = true,
       },
-      g = {},
     },
     autocmds = {
       format = {
@@ -35,7 +34,7 @@ return {
         {
           event = "FileType",
           pattern = "html",
-          callback = function(ev) vim.bo[ev.buf].formatprg = "prettier --parser html --stdin-filepath ." end,
+          callback = function(ev) vim.bo[ev.buf].formatprg = "npx prettier --parser html --stdin-filepath ." end,
         },
       },
     },
@@ -55,6 +54,13 @@ return {
           desc = require("mini.icons").get("filetype", "Trouble") .. " Trouble / QFlist",
         },
         -- END File Utils
+
+        -- RestNvim
+        ["<Leader>rs"] = {
+          function() require("snacks").scratch.open { ft = "http" } end,
+          desc = "Open HTTP scratch buffer",
+        },
+        -- END RestNvim
 
         -- Terminal
         ["<Leader>t2"] = {
@@ -91,6 +97,7 @@ return {
               if num then require("harpoon"):list():select(num) end
             end)
           end,
+          desc = "Go to Harpoon mark by index",
         },
         -- END Harpoon
 
@@ -100,7 +107,7 @@ return {
         ["<Leader>gc"] = false,
         ["<Leader>gC"] = false,
         ["<Leader>gT"] = false,
-        -- END Git
+        -- END GiT
 
         -- Misc
         ["n"] = {
@@ -115,16 +122,9 @@ return {
         ["<C-U>"] = {
           [[<C-U>zz]],
         },
-        ["<Leader>p"] = {
-          [["0P]],
-          desc = "Paste last yanked",
-        },
-        ["<Leader>P"] = {
-          [["0p]],
-          desc = "Paste last yanked",
-        },
-        ["s"] = false,
-
+        -- Remove these keybinds to delete into register x because I never use it
+        ["s"] = { "<nop>" },
+        ["S"] = { "<nop>" },
         -- End Misc
 
         -- Use oil instead
