@@ -18,10 +18,15 @@ return {
     },
   },
   {
-    "ThePrimeagen/harpoon",
-    branch = "harpoon2",
-    opts = {},
-    dependencies = { "nvim-lua/plenary.nvim" },
+    "cbochs/grapple.nvim",
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons" },
+    },
+    opts = {
+      scope = "git_branch",
+      icons = true,
+      quick_select = "123456789",
+    },
   },
   {
     "L3MON4D3/LuaSnip",

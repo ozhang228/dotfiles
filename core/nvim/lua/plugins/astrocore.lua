@@ -63,36 +63,27 @@ return {
           "<CMD>ToggleTerm2 direction=float<CR>",
           desc = "ToggleTerm2 Float",
         },
-        --
+        -- END Terminal
 
-        -- Harpoon
-        ["<Leader>h"] = { "Nop", desc = require("mini.icons").get("filetype", "Harpoon") .. " Harpoon" },
+        -- Grapple (used to be harpoon)
+        ["<Leader>h"] = { "Nop", desc = require("mini.icons").get("filetype", "Harpoon") .. " Grapple" },
         ["<Leader>hm"] = {
-          function() require("harpoon").ui:toggle_quick_menu(require("harpoon"):list()) end,
-          desc = "Toggle Harpoon Quick Menu",
+          "<CMD>Grapple toggle_tags<CR>",
+          desc = "Toggle Grapple Quick Menu",
         },
         ["<Leader>ha"] = {
-          function() require("harpoon"):list():add() end,
+          "<CMD> Grapple toggle<CR>",
           desc = "Add File",
         },
         ["<Leader>hh"] = {
-          function() require("harpoon"):list():prev() end,
-          desc = "Go to next Harpoon mark",
+          "<CMD> Grapple cycle_tags prev<CR>",
+          desc = "Go to previous Grapple mark",
         },
         ["<Leader>hl"] = {
-          function() require("harpoon"):list():next() end,
-          desc = "Go to previous Harpoon mark",
+          "<CMD> Grapple cycle_tags next<CR>",
+          desc = "Go to next Grapple mark",
         },
-        ["<Leader>hg"] = {
-          function()
-            vim.ui.input({ prompt = "Harpoon mark index: " }, function(input)
-              local num = tonumber(input)
-              if num then require("harpoon"):list():select(num) end
-            end)
-          end,
-          desc = "Go to Harpoon mark by index",
-        },
-        -- END Harpoon
+        -- END Grapple
 
         -- Scratch
         ["<Leader>s"] = {
