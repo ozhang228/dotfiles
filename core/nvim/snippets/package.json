@@ -27,6 +27,12 @@
           "typescriptreact"
         ],
         "path": "js_ts.json"
+      },
+      {
+        "language": [
+          "python"
+        ],
+        "path": "py.json"
       }
     ]
   }
