@@ -63,6 +63,10 @@ return {
           "<CMD>ToggleTerm2 direction=float<CR>",
           desc = "ToggleTerm2 Float",
         },
+        ["<Leader>t2h"] = {
+          "<CMD>ToggleTerm2 direction=horizontal<CR>",
+          desc = "ToggleTerm2 Horizontal",
+        },
         -- END Terminal
 
         -- Grapple (used to be harpoon)
