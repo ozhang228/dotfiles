@@ -1,8 +1,6 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](surface0)\
-$username\
 [](bg:peach fg:surface0)\
 $directory\
 [](fg:peach bg:green)\
@@ -133,4 +131,3 @@ vimcmd_symbol = '[](bold fg:creen)'
 vimcmd_replace_one_symbol = '[](bold fg:purple)'
 vimcmd_replace_symbol = '[](bold fg:purple)'
 vimcmd_visual_symbol = '[](bold fg:lavender)'
-command_timeout = 2000  # Timeout in milliseconds (default is 500)
