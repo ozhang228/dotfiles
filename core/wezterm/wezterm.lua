@@ -56,7 +56,7 @@ config = {
 }
 
 if wezterm.target_triple == "x86_64-pc-windows-msvc" then
-	config.default_prog = { "powershell.exe", "-NoLogo" }
+	config.default_prog = { "pwsh", "-NoLogo" }
 else
 	config.default_prog = { "/bin/zsh", "-1" }
 end
