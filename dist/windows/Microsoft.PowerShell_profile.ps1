@@ -1,5 +1,3 @@
-$env:OS = "Windows"
-
 # Starship 
 Invoke-Expression (&starship init powershell)
 $ENV:STARSHIP_CONFIG = "$HOME\.config\Starship\starship.toml"
