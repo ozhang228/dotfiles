@@ -16,9 +16,9 @@ if not pcall(require, "lazy") then
 end
 
 -- Dist Specific
-local os_env = vim.fn.getenv "OS"
-
-if os_env == "Windows" then
+if vim.fn.has "macunix" == 1 then
+  vim.opt.shell = "/bin/zsh"
+else
   local shell = vim.fn.executable "pwsh" == 1 and "pwsh" or "powershell"
   vim.opt.shell = shell
   vim.opt.shellcmdflag =
@@ -27,8 +27,6 @@ if os_env == "Windows" then
   vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
   vim.opt.shellquote = ""
   vim.opt.shellxquote = ""
-else
-  vim.opt.shell = "/bin/zsh"
 end
 
 -- for rest nvim formatting with jq. For powershell, if noshelltemp is not off, then tmp files make it so jq fails.
