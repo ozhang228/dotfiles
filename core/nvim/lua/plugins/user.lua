@@ -53,6 +53,11 @@ return {
       },
       scratch = {
         enabled = true,
+        filekey = {
+          cwd = true,
+          count = false,
+          branch = false,
+        },
       },
       indent = {
         enabled = false,
