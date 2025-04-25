@@ -22,6 +22,7 @@ return {
         spell = false,
         signcolumn = "yes",
         wrap = true,
+        conceallevel = 1,
       },
     },
     autocmds = {
