@@ -22,7 +22,7 @@ return {
         spell = false,
         signcolumn = "yes",
         wrap = true,
-        conceallevel = 1,
+        conceallevel = 2,
       },
     },
     autocmds = {
