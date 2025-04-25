@@ -109,10 +109,7 @@ return {
     "obsidian-nvim/obsidian.nvim",
     version = "*",
     lazy = true,
-    event = {
-      "BufReadPre G:/My Drive",
-      "BufNewFile G:/My Drive",
-    },
+    ft = "markdown",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "Saghen/blink.cmp",
