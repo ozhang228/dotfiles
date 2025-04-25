@@ -1,23 +1,6 @@
 return {
   { "echasnovski/mini.surround", version = false, opts = {} },
   {
-    "LunarVim/bigfile.nvim",
-    opts = {
-      filesize = 2, -- size of the file in MiB, the plugin round file sizes to the closest MiB
-      pattern = { "*" }, -- autocmd pattern or function see <### Overriding the detection of big files>
-      features = { -- features to disable
-        "snacks.indent",
-        "illuminate",
-        "lsp",
-        "treesitter",
-        "syntax",
-        "matchparen",
-        "vimopts",
-        "filetype",
-      },
-    },
-  },
-  {
     "cbochs/grapple.nvim",
     dependencies = {
       { "nvim-tree/nvim-web-devicons" },
@@ -59,10 +42,15 @@ return {
           branch = false,
         },
       },
+      bigfile = {
+        enabled = true,
+      },
+      quickfile = {
+        enabled = true,
+      },
       indent = {
         enabled = false,
       },
-      styles = {},
     },
     keys = {},
   },
@@ -115,5 +103,36 @@ return {
   {
     "kevinhwang91/nvim-bqf",
     opts = {},
+  },
+
+  {
+    "obsidian-nvim/obsidian.nvim",
+    version = "*",
+    lazy = true,
+    event = {
+      "BufReadPre G:/My Drive",
+      "BufNewFile G:/My Drive",
+    },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "Saghen/blink.cmp",
+      "folke/snacks.nvim",
+    },
+    opts = {
+      workspaces = {
+        {
+          name = "Career Notes",
+          path = "G:/My Drive/Career Notes",
+        },
+        {
+          name = "Archive",
+          path = "G:/My Drive/Archive",
+        },
+      },
+      completion = {
+        blink = true,
+        nvim_cmp = false,
+      },
+    },
   },
 }
