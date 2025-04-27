@@ -1,4 +1,4 @@
-if vim.fn.has "win32" then
+if vim.fn.has "win32" == 1 then
   return {
     "obsidian-nvim/obsidian.nvim",
     version = "*",
@@ -26,4 +26,6 @@ if vim.fn.has "win32" then
       },
     },
   }
+else
+  return {}
 end
