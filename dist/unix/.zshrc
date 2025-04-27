@@ -18,4 +18,4 @@ setopt globdots
 cd $HOME
 
 # OS info
-fastfetch -c neofetch
+fastfetch --logo ~/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
