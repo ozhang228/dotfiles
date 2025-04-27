@@ -12,4 +12,4 @@ $PSStyle.FileInfo.Directory = ""
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t'
 
 # OS Info
-fastfetch
+fastfetch -c neofetch

@@ -1,6 +1,6 @@
 # Set up fzf key bindings and fuzzy completion
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-source <(fzf --zsh)
+. "$HOME/.local/bin/env"
 
 # Setup Starship Prompt
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
@@ -18,8 +18,4 @@ setopt globdots
 cd $HOME
 
 # OS info
-fastfetch
-
-
-
-. "$HOME/.local/bin/env"
+fastfetch -c neofetch
