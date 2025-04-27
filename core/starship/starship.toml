@@ -1,11 +1,11 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](red)\
+[](yellow)\
 $os\
-[](bg:peach fg:red)\
+[](bg:peach fg:yellow)\
 $directory\
-[](fg:red bg:red)\
+[](fg:peach bg:red)\
 $shell\
 [](fg:red bg:green)\
 $git_branch\
@@ -58,7 +58,7 @@ crust = "#11111b"
 
 [os]
 disabled = false
-style = "bg:red fg:crust"
+style = "bg:yellow fg:crust"
 format = "[$symbol ]($style)"
 
 
