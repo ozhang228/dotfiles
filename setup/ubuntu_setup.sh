@@ -60,6 +60,10 @@ done
 # have to do something special for fd to alias it
 ln -s $(which fdfind) ~/.local/bin/fd
 
+# -- Install Fzf
+git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+~/.fzf/install
+
 # -- Install Neovim
 if ! command -v nvim &>/dev/null; then
   echo "🔄 Neovim not found. Installing latest from GitHub…"

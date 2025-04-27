@@ -1,5 +1,5 @@
 # Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Setup Starship Prompt
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
@@ -12,3 +12,4 @@ eval "$(zoxide init zsh)"
 
 # see hidden files
 setopt globdots
+
