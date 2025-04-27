@@ -3,12 +3,12 @@
 format = """
 [](red)\
 $os\
+$shell\
 [](bg:peach fg:red)\
 $directory\
 [](fg:peach bg:yellow)\
-$shell\
-[](fg:yellow bg:green)\
 $git_branch\
+[](fg:yellow bg:green)\
 [](fg:green bg:teal)\
 $c\
 $rust\
@@ -59,7 +59,7 @@ crust = "#11111b"
 [os]
 disabled = false
 style = "bg:red fg:crust"
-format = "[$symbol ]($style)"
+format = "[$symbol]($style)"
 
 
 [os.symbols]
@@ -91,8 +91,7 @@ truncation_symbol = "…/"
 
 [git_branch]
 symbol = ""
-style = "bg:teal"
-format = '[[ $symbol $branch ](fg:base bg:green)]($style)'
+format = '[[ $symbol $branch ](fg:base bg:yellow)]($style)'
 
 
 [nodejs]
@@ -165,5 +164,5 @@ vimcmd_visual_symbol = '[](bold fg:lavender)'
 
 [shell]
 disabled = false
-style = "fg:mantle bg:yellow"
-format = '[[  $indicator ](fg:base bg:yellow)]($style)'
+style = "fg:mantle bg:red"
+format = '[[ $indicator ](fg:base bg:red)]($style)'
