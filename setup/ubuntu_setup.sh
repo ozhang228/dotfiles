@@ -46,6 +46,8 @@ apt_apps=(
   # languages
   build-essential
   python3-pip
+  # this is necessary because of a bug in mason 
+  python3-venv
 )
 
 echo "📦 Installing apt packages..."
