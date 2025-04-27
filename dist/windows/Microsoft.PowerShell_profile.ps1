@@ -10,6 +10,3 @@ $PSStyle.FileInfo.Directory = ""
 
 # set <C-t> as the keybinding for fzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t'
-
-# OS Info
-fastfetch -c neofetch
