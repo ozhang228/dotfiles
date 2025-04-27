@@ -1,10 +1,19 @@
 # Symlinks + Package Install
 
-## Supported Distributions
+## Supported
+
+### Distributions
 
 - **Windows**
 - **Mac**
 - **Ubuntu**
+
+### Languages (by default)
+
+- Python (pip / uv)
+- JavaScript (Node.js / npm)
+- C++ (gcc)
+  - Windows needs to do it manually
 
 ## Config
 

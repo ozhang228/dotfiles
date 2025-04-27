@@ -50,8 +50,12 @@ brew_apps=(
     zoxide
     fzf
     jq
-    node
     gh
+    # languages
+    node
+    gcc
+    python
+    uv
 )
 
 echo "🔧 Installing packages via brew..."

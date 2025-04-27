@@ -43,7 +43,9 @@ apt_apps=(
   jq
   luarocks
   gh
+  # languages
   build-essential
+  python3-pip
 )
 
 echo "📦 Installing apt packages..."
@@ -89,6 +91,13 @@ else
   sudo install lazygit -D -t /usr/local/bin/
   rm lazygit lazygit.tar.gz
   echo "✅ lazygit v${LAZYGIT_VERSION} installed"
+fi
+
+## -- Install uv package manager for Python
+if command -v uv &>/dev/null; then
+  echo "✅ UV already installed. Skipping…"
+else
+  curl -LsSf https://astral.sh/uv/install.sh | sh
 fi
 
 # -- Install Starship

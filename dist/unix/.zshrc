@@ -13,3 +13,7 @@ eval "$(zoxide init zsh)"
 # see hidden files
 setopt globdots
 
+# go to root on startup for wsl (might remove if its annoying in the future)
+cd $HOME
+
+

@@ -48,8 +48,11 @@ $wingetApps = @(
     "junegunn.fzf",
     "jqlang.jq",
     "glzr-io.glazewm",
+    "GitHub.cli",
+    # Languages
+    "Python.Python.3.12",
+    "astral-sh.uv",
     "OpenJS.NodeJS",
-    "GitHub.cli"
 )
 
 foreach ($appId in $wingetApps) {
