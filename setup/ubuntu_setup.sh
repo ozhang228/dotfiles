@@ -39,7 +39,6 @@ apt_apps=(
   fd-find
   ripgrep
   zoxide
-  fzf
   jq
   luarocks
   gh
@@ -72,11 +71,19 @@ for pkg in "${apt_apps[@]}"; do
 done
 
 # have to do something special for fd to alias it
-ln -s $(which fdfind) ~/.local/bin/fd
+if [ ! -e "$HOME/.local/bin/fd" ]; then
+  ln -s "$(command -v fdfind)" "$HOME/.local/bin/fd"
+  echo "Linked fdfind → $HOME/.local/bin/fd"
+else
+  echo "$HOME/.local/bin/fd already exists, skipping"
+fi
 
 # -- Install Fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
+
+if [ ! -e "$HOME/.fzf" ]; then
+  git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+  ~/.fzf/install
+fi
 
 # -- Install Neovim
 if ! command -v nvim &>/dev/null; then
