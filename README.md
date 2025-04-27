@@ -1,50 +1,72 @@
 # Symlinks + Package Install
 
-## Core
+## Supported Distributions
+
+- **Windows**
+- **Mac**
+- **Ubuntu**
+
+## Config
+
+### Core
 
 - [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
-  - [fd](https://github.com/sharkdp/fd): Find command for pickers
-  - [ripgrep](https://github.com/BurntSushi/ripgrep): Fast regex engine needed for pickers
-  - [jq](https://jqlang.org/): JSON Processing engine for rest-client and for general cli use
-  - [prettier](https://prettier.io/): HTML Processing engine for rest-client and general formatting
 - [LazyGit](https://github.com/jesseduffield/lazygit)
 - [Wezterm](https://wezterm.org/)
 - [Starship](https://starship.rs/)
-- [Zoxide](https://github.com/ajeetdsouza/zoxide)
-- [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/)
-- [Fzf](https://github.com/junegunn/fzf)
 
-## Distribution Specific
+### Distribution Specific
 
-### Windows
+#### Windows
+
+- [ClangD](https://clangd.llvm.org/)
+
+## Packages
+
+### Core
+
+- [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
+  - [fd](https://github.com/sharkdp/fd): Find command for pickers
+  - [fzf](https://github.com/junegunn/fzf): Fuzzy finding and a dependency for nvim and other cli tools
+  - [ripgrep](https://github.com/BurntSushi/ripgrep): Fast regex engine needed for pickers
+  - [jq](https://jqlang.org/): JSON Processing engine for rest-client and for general cli use
+  - [prettier](https://prettier.io/): HTML Processing engine for rest-client and general formatting
+- [LazyGit](https://github.com/jesseduffield/lazygit): Easier git management
+- [Wezterm](https://wezterm.org/): Terminal
+- [Starship](https://starship.rs/): Prompt
+- [Zoxide](https://github.com/ajeetdsouza/zoxide): Magic file navigation
+- [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/): Font
+- [Github CLI (gh)](https://github.com/cli/cli): GitHub CLI for auth
+
+### Distribution Specific
+
+#### Windows
 
 - [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5)
   - [PSReadLine](https://github.com/PowerShell/PSReadLine)
   - [PowerShellget](https://learn.microsoft.com/en-us/powershell/gallery/powershellget/install-powershellget?view=powershellget-3.x)
   - [PSFzf](https://github.com/kelleyma49/PSFzf.git)
 - [GlazeWM](https://github.com/glzr-io/glazewm)
-- Languages
-  - C++
-    - clangd (point the clangd target to the MinGW installation)
 
-### Ubuntu
+#### Ubuntu
 
-- build-essentials for c++ tools
+- [build-essentials](https://packages.debian.org/sid/build-essential): C++ compilers
+- [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html): necessary for rest-client in nvim and doesn't autoinstall in Ubuntu
+- [curl](https://curl.se/download.html): call APIs
 
-## Manual Setup
-
-### Dist Agnostic
+### Manual Setup
 
 - Notion
   - **To-Do List & Project Management**
     - Organize tasks into projects with todos for each project following how it is done for personal tasks
-    - **People Page**
-    - write down important information about people following how the People Page is currently done
-- [Desktop Background](https://drive.google.com/file/d/149UO6TqLvFNDMKaQ65xfXnjIW9FV3Wxc/view)
+    - Generally organize personal wiki through scratch buffers
+  - **People**
+    - organize meeting notes and general things people are known for
+- [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
 - Set terminal font to downloaded JetBrains Mono Font
-- Github setup through gh
+- gh auth login to get into GitHub
 
-### Windows
+#### Windows
 
 - PowerToys
   - Remap Caps Lock -> Esc
@@ -53,3 +75,4 @@
 - Languages
   - C++
     - MinGW thorugh Msys2 + Add to path (should be something like C:/msys64/mingw64/bin)
+- WSL

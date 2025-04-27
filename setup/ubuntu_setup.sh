@@ -43,7 +43,6 @@ apt_apps=(
   jq
   luarocks
   gh
-  # gcc / g++
   build-essential
 )
 
