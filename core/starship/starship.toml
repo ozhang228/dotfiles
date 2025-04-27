@@ -3,7 +3,9 @@
 format = """
 [](bg:peach fg:surface0)\
 $directory\
-[](fg:peach bg:green)\
+[](fg:peach bg:red)\
+$shell\
+[](fg:red bg:green)\
 $git_branch\
 [](fg:green bg:teal)\
 $c\
@@ -131,3 +133,8 @@ vimcmd_symbol = '[](bold fg:creen)'
 vimcmd_replace_one_symbol = '[](bold fg:purple)'
 vimcmd_replace_symbol = '[](bold fg:purple)'
 vimcmd_visual_symbol = '[](bold fg:lavender)'
+
+[shell]
+disabled = false
+style = "fg:mantle bg:red"
+format = '[[  $indicator ](fg:base bg:red)]($style)'
