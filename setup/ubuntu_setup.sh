@@ -36,6 +36,7 @@ sudo apt-get update -qq
 
 apt_apps=(
   curl
+  fd-find
   ripgrep
   zoxide
   fzf
@@ -56,6 +57,8 @@ for pkg in "${apt_apps[@]}"; do
   fi
 done
 
+# have to do something special for fd to alias it
+ln -s $(which fdfind) ~/.local/bin/fd
 
 # -- Install Neovim
 if ! command -v nvim &>/dev/null; then

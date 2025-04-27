@@ -3,7 +3,6 @@ $env:OS = "Windows"
 Write-Host "Environment variable set: OS=$($env:OS)"
 
 # -- Setup Dotfiles --
-
 $dotfiles = Join-Path $home "dotfiles"
 
 $symlinks = @(
@@ -48,8 +47,9 @@ $wingetApps = @(
     "DEVCOM.JetBrainsMonoNerdFont",
     "junegunn.fzf",
     "jqlang.jq",
-    "glzr-io.glazewm"
-    "OpenJS.NodeJS"
+    "glzr-io.glazewm",
+    "OpenJS.NodeJS",
+    "GitHub.cli"
 )
 
 foreach ($appId in $wingetApps) {
@@ -97,3 +97,9 @@ foreach ($pkg in $npmPackages) {
         npm install -g $pkg
     }
 }
+
+# -- Git 
+git config --global user.name "Oscar Zhang"
+git config --global user.email "oscarzhang228@gmail.com"
+
+echo "🎉 Windows terminal setup complete!"

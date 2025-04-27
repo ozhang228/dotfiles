@@ -8,6 +8,8 @@ declare -A symlinks=(
   ["core/wezterm"]="$HOME/.config/wezterm"
   ["core/starship"]="$HOME/.config/starship"
   ["core/lazygit"]="$HOME/.config/lazygit"
+  ["dist/unix/.zshrc"]="$HOME/.zshrc"
+  ["dist/unix/.bashrc"]="$HOME/.bashrc"
 )
 
 echo "🔗 Creating symlinks from $dotfiles..."
@@ -46,11 +48,10 @@ brew_apps=(
     wezterm
     starship
     zoxide
-    font-jetbrainsmono-nerd-font
     fzf
-    nikitabobko/tap/aerospace
     jq
     node
+    gh
 )
 
 echo "🔧 Installing packages via brew..."
@@ -75,6 +76,12 @@ for pkg in "${npm_pkgs[@]}"; do
         echo "✅ $pkg is already installed. Skipping…"
     else
         echo "📦 Installing $pkg…"
-        npm install -g "$pkg"
+        sudo npm install -g "$pkg"
     fi
 done
+
+# -- Git 
+git config --global user.name "Oscar Zhang"
+git config --global user.email "oscarzhang228@gmail.com"
+
+echo "🎉 Mac terminal setup complete!"
