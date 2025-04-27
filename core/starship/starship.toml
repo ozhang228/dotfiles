@@ -1,13 +1,13 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 format = """
-[](yellow)\
+[](red)\
 $os\
-[](bg:peach fg:yellow)\
+[](bg:peach fg:red)\
 $directory\
-[](fg:peach bg:red)\
+[](fg:peach bg:yellow)\
 $shell\
-[](fg:red bg:green)\
+[](fg:yellow bg:green)\
 $git_branch\
 [](fg:green bg:teal)\
 $c\
@@ -58,7 +58,7 @@ crust = "#11111b"
 
 [os]
 disabled = false
-style = "bg:yellow fg:crust"
+style = "bg:red fg:crust"
 format = "[$symbol ]($style)"
 
 
@@ -165,5 +165,5 @@ vimcmd_visual_symbol = '[](bold fg:lavender)'
 
 [shell]
 disabled = false
-style = "fg:mantle bg:red"
-format = '[[  $indicator ](fg:base bg:red)]($style)'
+style = "fg:mantle bg:yellow"
+format = '[[  $indicator ](fg:base bg:yellow)]($style)'
