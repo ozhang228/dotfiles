@@ -32,7 +32,7 @@ done
 
 # -- Install CLI dependencies via apt
 echo "🔄 Updating package lists..."
-sudo apt-get update -qq
+sudo apt update
 
 apt_apps=(
   curl
@@ -56,7 +56,7 @@ for pkg in "${apt_apps[@]}"; do
     echo "✅ $pkg already installed"
   else
     echo "⏬ Installing $pkg..."
-    sudo apt-get install -y "$pkg"
+    sudo apt install "$pkg"
   fi
 done
 
