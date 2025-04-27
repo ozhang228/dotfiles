@@ -43,12 +43,23 @@ apt_apps=(
   jq
   luarocks
   gh
+  fastfetch
   # languages
   build-essential
   python3-pip
   # this is necessary because of a bug in mason 
   python3-venv
 )
+
+apt_ppas=(
+  ppa:zhangsongcui3371/fastfetch 
+)
+
+echo "📦 Installing apt ppas..."
+for ppa in "${apt_ppas[@]}"; do
+  echo "⏬ Installing $ppa..."
+  sudo add-apt-repository "$ppa"
+done
 
 echo "📦 Installing apt packages..."
 for pkg in "${apt_apps[@]}"; do

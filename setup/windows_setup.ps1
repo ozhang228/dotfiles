@@ -49,6 +49,7 @@ $wingetApps = @(
     "jqlang.jq",
     "glzr-io.glazewm",
     "GitHub.cli",
+    "fastfetch",
     # Languages
     "Python.Python.3.12",
     "astral-sh.uv",

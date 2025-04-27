@@ -51,6 +51,7 @@ brew_apps=(
     fzf
     jq
     gh
+    fastfetch
     # languages
     node
     gcc

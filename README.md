@@ -46,6 +46,7 @@
 - [Zoxide](https://github.com/ajeetdsouza/zoxide): Magic file navigation
 - [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/): Font
 - [Github CLI (gh)](https://github.com/cli/cli): GitHub CLI for auth
+- [fastfetch](https://github.com/fastfetch-cli/fastfetch): OS information
 
 ### Distribution Specific
 
