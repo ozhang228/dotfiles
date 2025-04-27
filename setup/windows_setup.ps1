@@ -53,7 +53,7 @@ $wingetApps = @(
     # Languages
     "Python.Python.3.12",
     "astral-sh.uv",
-    "OpenJS.NodeJS",
+    "OpenJS.NodeJS"
 )
 
 foreach ($appId in $wingetApps) {
