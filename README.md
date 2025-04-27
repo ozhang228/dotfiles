@@ -27,9 +27,9 @@
   - C++
     - clangd (point the clangd target to the MinGW installation)
 
-### Mac
+### Ubuntu
 
-- Currently have aerospace window manager but haven't tested
+- build-essentials for c++ tools
 
 ## Manual Setup
 
@@ -42,6 +42,7 @@
     - write down important information about people following how the People Page is currently done
 - [Desktop Background](https://drive.google.com/file/d/149UO6TqLvFNDMKaQ65xfXnjIW9FV3Wxc/view)
 - Set terminal font to downloaded JetBrains Mono Font
+- Github setup through gh
 
 ### Windows
 

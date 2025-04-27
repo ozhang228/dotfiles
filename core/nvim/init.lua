@@ -18,6 +18,8 @@ end
 -- Dist Specific
 if vim.fn.has "macunix" == 1 then
   vim.opt.shell = "/bin/zsh"
+elseif vim.fn.has "unix" == 1 then
+  vim.opt.shell = "/bin/zsh"
 else
   local shell = vim.fn.executable "pwsh" == 1 and "pwsh" or "powershell"
   vim.opt.shell = shell
