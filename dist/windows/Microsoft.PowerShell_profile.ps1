@@ -8,8 +8,6 @@ Invoke-Expression (& { (zoxide init powershell | Out-String) })
 # -- fzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t'
 
-# -- Aliases
-Set-Alias -Name wsl -Value wsl ~
 
 # -- PSReadLine
 # turn file directory highlighting off
@@ -37,5 +35,6 @@ Set-PSReadLineOption @PSReadLineOptions
 
 Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
 
-
-
+# Clear host and display fast-fetch
+Clear-Host
+fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
