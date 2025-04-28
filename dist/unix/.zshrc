@@ -16,3 +16,6 @@ setopt globdots
 # Clear screen and show os info 
 clear
 fastfetch --logo ~/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
+
+# Turn on Vi mode
+bindkey -v
