@@ -1,8 +1,5 @@
 # fzf key bindings and fuzzy completion
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# UV shell completion
-eval "$(uv generate-shell-completion zsh)"
+source <(fzf --zsh)
 
 # Starship Prompt
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"

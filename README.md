@@ -92,4 +92,4 @@
 - WSL
 
 #### Arch Linux
-- Git and sudo through pacman to pull the dotfiles repository
+- Pacman install git and sudo to pull and use setup scripts
