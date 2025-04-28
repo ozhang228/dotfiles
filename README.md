@@ -5,10 +5,10 @@
 ### Distributions
 
 - **Windows**
-- **Arch Linux (WSL)**:
+- **Arch Linux**
 - **Mac**: untested but should work
   - no tiling manager but want to try aerospace
-- **Ubuntu (WSL)**: Don't really use this anymore but keeping the setup file around
+- **Ubuntu (deprecated)**:
 
 ### Languages (by default)
 

@@ -1,20 +1,23 @@
-# Set up fzf key bindings and fuzzy completion
+# fzf key bindings and fuzzy completion
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Setup Starship Prompt
+# UV shell completion
+eval "$(uv generate-shell-completion zsh)"
+
+# Starship Prompt
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
-# Setup Zoxide
+# Zoxide
 eval "$(zoxide init zsh)"
 
 # see hidden files
 setopt globdots
 
-# go to root on startup for wsl (might remove if its annoying in the future)
+# Go to ~ on startup
 cd $HOME
 
-# OS info
+# OS Info Startup screen
 fastfetch --logo ~/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
