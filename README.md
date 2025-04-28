@@ -1,5 +1,10 @@
 # Symlinks + Package Install
 
+Basic setup for my dotfiles and packages I generally want on every machine.
+Some things missing that I don't need on every machine but generally use:
+
+- [bat](https://github.com/sharkdp/bat): cat with syntax highlighting
+
 ## Supported
 
 ### Distributions
@@ -65,6 +70,7 @@
 - [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html)
 - [curl](https://curl.se/download.html): call APIs
 - [zsh](https://www.zsh.org/)
+- [zsh-vi-mode](https://github.com/jeffreytse/zsh-vi-mode): better vi mode for zsh
 
 ### Manual Setup
 
@@ -84,10 +90,25 @@
   - Remap Caps Lock -> Esc
   - Remap <C-Shift-Caps Lock> -> Caps Lock
   - Powertoys Run: Win + Space for open
-- Languages
-  - C++
-    - MinGW thorugh Msys2 + Add to path (should be something like C:/msys64/mingw64/bin)
-- WSL
+- Msys2
+  - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
+  - WSL
 
 #### Arch Linux
-- Pacman install git and sudo to pull and use setup scripts
+
+##### User Setup
+
+- `useradd -m -G wheel oscar`
+- `passwd root` / `passwd oscar` to set some passwords
+- `EDITOR=vim visudo` and uncomment out `%wheel ALL=(ALL) ALL` to give wheel user group sudo permissions with password
+
+##### WSL Setup (if applicable)
+
+```bash
+wsl --set-default archlinux # default distro
+wsl --manage archlinux --set-default-user oscar # set default user (might need to update wsl)
+```
+
+##### Use This Repo
+
+- `pacman -S git sudo` to pull and use setup scripts
