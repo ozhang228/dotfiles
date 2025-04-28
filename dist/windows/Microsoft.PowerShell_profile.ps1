@@ -8,6 +8,8 @@ Invoke-Expression (& { (zoxide init powershell | Out-String) })
 # -- fzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t'
 
+# -- Aliases
+Set-Alias -Name wsl -Value wsl ~
 
 # -- PSReadLine
 # turn file directory highlighting off
@@ -34,4 +36,6 @@ $PSReadLineOptions = @{
 Set-PSReadLineOption @PSReadLineOptions
 
 Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
+
+
 
