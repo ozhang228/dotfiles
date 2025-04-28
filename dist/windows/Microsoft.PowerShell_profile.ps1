@@ -10,3 +10,6 @@ $PSStyle.FileInfo.Directory = ""
 
 # set <C-t> as the keybinding for fzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t'
+
+# Put Vi Mode on
+Set-PSREadlineOption -EditMode Vi
