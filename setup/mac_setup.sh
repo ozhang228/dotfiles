@@ -41,12 +41,14 @@ else
 fi
 
 brew_apps=(
+    # Core
     neovim
-    fd
-    ripgrep
     lazygit
     wezterm
     starship
+    # CLI 
+    fd
+    ripgrep
     zoxide
     fzf
     jq

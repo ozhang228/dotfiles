@@ -5,15 +5,18 @@
 ### Distributions
 
 - **Windows**
+- **Ubuntu (WSL)**
+  - since its WSL, no DE, file opener, or tiling manager setup
 - **Mac**
-- **Ubuntu**
+  - untested but should work
+  - no tiling manager but want to try aerospace
 
 ### Languages (by default)
 
 - Python (pip / uv)
 - JavaScript (Node.js / npm)
 - C++ (gcc)
-  - Windows needs to do it manually
+  - Windows needs to do it manually through msys2
 
 ## Config
 
@@ -73,7 +76,6 @@
   - **People**
     - organize meeting notes and general things people are known for
 - [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
-- Set terminal font to downloaded JetBrains Mono Font
 - gh auth login to get into GitHub
 
 #### Windows

@@ -35,17 +35,18 @@ echo "🔄 Updating package lists..."
 sudo apt update
 
 apt_apps=(
+  # CLI
   curl
   fd-find
   ripgrep
   zoxide
   jq
-  luarocks
   gh
   fastfetch
   # languages
   build-essential
   python3-pip
+  luarocks
   # this is necessary because of a bug in mason 
   python3-venv
 )
@@ -70,7 +71,7 @@ for pkg in "${apt_apps[@]}"; do
   fi
 done
 
-# have to do something special for fd to alias it
+# Alias fd-find to fd with a symlink
 if [ ! -e "$HOME/.local/bin/fd" ]; then
   ln -s "$(command -v fdfind)" "$HOME/.local/bin/fd"
   echo "Linked fdfind → $HOME/.local/bin/fd"
@@ -79,7 +80,6 @@ else
 fi
 
 # -- Install Fzf
-
 if [ ! -e "$HOME/.fzf" ]; then
   git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
   ~/.fzf/install
@@ -113,13 +113,6 @@ else
   echo "✅ lazygit v${LAZYGIT_VERSION} installed"
 fi
 
-## -- Install uv package manager for Python
-if command -v uv &>/dev/null; then
-  echo "✅ UV already installed. Skipping…"
-else
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-fi
-
 # -- Install Starship
 if ! command -v starship &>/dev/null; then
   echo "⏬ Installing Starship prompt..."
@@ -127,6 +120,14 @@ if ! command -v starship &>/dev/null; then
 else
   echo "✅ Starship already installed"
 fi
+
+## -- Install uv package manager for Python
+if command -v uv &>/dev/null; then
+  echo "✅ UV already installed. Skipping…"
+else
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+
 # -- Install Node.js & npm (via NodeSource)
 if ! command -v node &>/dev/null; then
   echo "⏬ Setting up Node.js 20.x repository..."
