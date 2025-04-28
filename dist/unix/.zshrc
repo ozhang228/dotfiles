@@ -18,4 +18,4 @@ clear
 fastfetch --logo ~/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
 
 # Turn on Vi mode
-bindkey -v
+source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
