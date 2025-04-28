@@ -37,18 +37,20 @@ if ($isAdmin) {
 
 # -- Install Dependencies --
 $wingetApps = @(
+    # Core
     "Neovim.Neovim",
-    "sharkdp.fd",
-    "BurntSushi.ripgrep.MSVC",
     "JesseDuffield.lazygit",
     "wez.wezterm",
     "Starship.Starship",
+    # CLI
+    "sharkdp.fd",
+    "BurntSushi.ripgrep.MSVC",
     "ajeetdsouza.zoxide",
-    "DEVCOM.JetBrainsMonoNerdFont",
     "junegunn.fzf",
     "jqlang.jq",
-    "glzr-io.glazewm",
     "GitHub.cli",
+    # Tiling Manager
+    "glzr-io.glazewm",
     # Languages
     "Python.Python.3.12",
     "astral-sh.uv",
