@@ -76,6 +76,7 @@
     - organize meeting notes and general things people are known for
 - [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
 - gh auth login to get into GitHub
+- <CMD>Copilot auth</CMD> in nvim to get it setup
 
 #### Windows
 

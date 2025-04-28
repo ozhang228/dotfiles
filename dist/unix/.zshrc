@@ -13,7 +13,8 @@ eval "$(zoxide init zsh)"
 # see hidden files
 setopt globdots
 
-# Go to ~ on startup
+# Go to ~ on startup and clear the screen
+clear
 cd $HOME
 
 # OS Info Startup screen
