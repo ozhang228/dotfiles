@@ -69,6 +69,29 @@ for pkg in "${pacman_apps[@]}"; do
   fi
 done
 
+# -- Setup AUR with yay
+git clone https://aur.archlinux.org/yay.git ~/
+cd yay
+makepkg -si
+
+# -- Install CLI dependencies via yay
+aur_apps=(
+  zsh-vi-mode
+)
+
+# update package list
+sudo yay -Sy
+
+echo "📦 Installing AUR packages..."
+for pkg in "${aur_apps[@]}"; do
+  if yay -Qk "$pkg" &>/dev/null; then
+    echo "✅ $pkg already installed"
+  else
+    echo "⏬ Installing $pkg..."
+    sudo yay -S "$pkg"
+  fi
+done
+
 # -- Install global npm packages
 npm_pkgs=(
   prettier
