@@ -5,11 +5,10 @@
 ### Distributions
 
 - **Windows**
-- **Ubuntu (WSL)**
-  - since its WSL, no DE, file opener, or tiling manager setup
-- **Mac**
-  - untested but should work
+- **Arch Linux (WSL)**:
+- **Mac**: untested but should work
   - no tiling manager but want to try aerospace
+- **Ubuntu (WSL)**: Don't really use this anymore but keeping the setup file around
 
 ### Languages (by default)
 
@@ -61,11 +60,14 @@
   - [PSFzf](https://github.com/kelleyma49/PSFzf.git)
 - [GlazeWM](https://github.com/glzr-io/glazewm)
 
-#### Ubuntu
+#### Linux
 
-- [build-essentials](https://packages.debian.org/sid/build-essential): C++ compilers
-- [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html): necessary for rest-client in nvim and doesn't autoinstall in Ubuntu
+- C++ Compilers
+  - [build-essentials](https://packages.debian.org/sid/build-essential)
+  - [base-devel](https://archlinux.org/packages/core/any/base-devel/)
+- [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html)
 - [curl](https://curl.se/download.html): call APIs
+- [zsh](https://www.zsh.org/)
 
 ### Manual Setup
 
@@ -88,3 +90,6 @@
   - C++
     - MinGW thorugh Msys2 + Add to path (should be something like C:/msys64/mingw64/bin)
 - WSL
+
+#### Arch Linux
+- Git and sudo through pacman to pull the dotfiles repository

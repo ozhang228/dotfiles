@@ -37,22 +37,23 @@ pacman_apps=(
   lazygit
   starship
   # CLI
+  zsh
   curl
   fd
   ripgrep
   zoxide
   jq
   fzf
-  gh
+  github-cli
   fastfetch
   # languages
   luarocks
-  build-essential
-  python3-pip
+  base-devel
+  python
+  python-pip
+  uv
   nodejs
   npm
-  # this is necessary because of a bug in mason 
-  python3-venv
 )
 
 # update package list
@@ -60,20 +61,13 @@ sudo pacman -Sy
 
 echo "📦 Installing packages..."
 for pkg in "${pacman_apps[@]}"; do
-  if dpkg -s "$pkg" &>/dev/null; then
+  if pacman -Qk "$pkg" &>/dev/null; then
     echo "✅ $pkg already installed"
   else
     echo "⏬ Installing $pkg..."
     sudo pacman -S "$pkg"
   fi
 done
-
-## -- Install uv package manager for Python
-if command -v uv &>/dev/null; then
-  echo "✅ UV already installed. Skipping…"
-else
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-fi
 
 # -- Install global npm packages
 npm_pkgs=(
