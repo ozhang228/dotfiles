@@ -13,9 +13,6 @@ eval "$(zoxide init zsh)"
 # see hidden files
 setopt globdots
 
-# Go to ~ on startup and clear the screen
+# Clear screen and show os info 
 clear
-cd $HOME
-
-# OS Info Startup screen
 fastfetch --logo ~/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
