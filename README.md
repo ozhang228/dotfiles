@@ -6,9 +6,6 @@
 
 - **Windows**
 - **Arch Linux**
-- **Mac**: untested but should work
-  - no tiling manager but want to try aerospace
-- **Ubuntu (deprecated)**:
 
 ### Languages (by default)
 
