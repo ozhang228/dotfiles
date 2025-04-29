@@ -15,7 +15,7 @@ setopt globdots
 
 # Clear screen and show os info 
 clear
-fastfetch --logo ~/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
+fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc
 
 # Turn on Vi mode
 source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh

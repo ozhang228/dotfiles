@@ -37,4 +37,4 @@ Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
 
 # Clear host and display fast-fetch
 Clear-Host
-fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c paleofetch
+fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc

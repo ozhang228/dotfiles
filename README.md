@@ -27,6 +27,7 @@ Some things missing that I don't need on every machine but generally use:
 - [LazyGit](https://github.com/jesseduffield/lazygit)
 - [Wezterm](https://wezterm.org/)
 - [Starship](https://starship.rs/)
+- [fastfetch](https://github.com/fastfetch-cli/fastfetch): Custom preset and logo
 
 ### Distribution Specific
 
@@ -50,7 +51,7 @@ Some things missing that I don't need on every machine but generally use:
 - [Zoxide](https://github.com/ajeetdsouza/zoxide): Magic file navigation
 - [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/): Font
 - [Github CLI (gh)](https://github.com/cli/cli): GitHub CLI for auth
-- [fastfetch](https://github.com/fastfetch-cli/fastfetch): OS information (currently don't use on windows but could incorporate)
+- [fastfetch](https://github.com/fastfetch-cli/fastfetch): OS Info
 
 ### Distribution Specific
 
