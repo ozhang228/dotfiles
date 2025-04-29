@@ -47,6 +47,7 @@ pacman_apps=(
   github-cli
   fastfetch
   # languages
+  lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
   base-devel
   python
