@@ -55,30 +55,6 @@ return {
     keys = {},
   },
   {
-    "folke/trouble.nvim",
-    opts = {
-      win = {
-        wo = {
-          wrap = true,
-        },
-      },
-    },
-    cmd = "Trouble",
-    keys = {
-      {
-        "<leader>xX",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<leader>xx",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-    },
-  },
-
-  {
     "stevearc/oil.nvim",
     ---@module 'oil'
     opts = {
@@ -108,6 +84,10 @@ return {
   },
   {
     "kevinhwang91/nvim-bqf",
+    opts = {},
+  },
+  {
+    "danymat/neogen",
     opts = {},
   },
 }
