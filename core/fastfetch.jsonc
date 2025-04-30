@@ -7,13 +7,16 @@
     "os",
     {
       "type": "host",
-      "format": "{/2}{-}{/}{2}{?3} {3}{?}",
+      "format": "{/2}{-}{/}{2}{?3}",
     },
     "kernel",
     "break",
     "packages",
     "shell",
-    "terminal",
+    {
+      "type": "terminal",
+      "format": "{1}",
+    },
     "break",
     "memory",
     "break",
