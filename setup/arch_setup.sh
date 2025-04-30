@@ -47,6 +47,7 @@ pacman_apps=(
   github-cli
   fastfetch
   # languages
+  lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
   base-devel
   python
@@ -70,9 +71,11 @@ for pkg in "${pacman_apps[@]}"; do
 done
 
 # -- Setup AUR with yay
-git clone https://aur.archlinux.org/yay.git ~/
-cd yay
+git clone https://aur.archlinux.org/yay.git ~/yay
+cd ~/yay
 makepkg -si
+cd ~
+rm -rf ~/yay
 
 # -- Install CLI dependencies via yay
 aur_apps=(
