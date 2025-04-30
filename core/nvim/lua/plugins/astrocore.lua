@@ -58,7 +58,7 @@ return {
 
         -- Overwriting find symbols that I don't use
         ["<Leader>ls"] = {
-          [[<CMD>Neogen]],
+          [[<CMD>Neogen<CR>]],
           desc = "Generate docstring",
         },
 
