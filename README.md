@@ -88,8 +88,9 @@ Some things missing that I don't need on every machine but generally use:
 #### Windows
 
 - PowerToys
-  - Remap Caps Lock -> Esc
-  - Remap <C-Shift-Caps Lock> -> Caps Lock
+  - Keyboard Manager
+    - Remap Caps Lock -> Esc
+    - Remap <C-Shift-Caps Lock> -> Caps Lock
   - Powertoys Run: Win + Space for open
 - Msys2
   - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
