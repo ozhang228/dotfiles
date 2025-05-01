@@ -52,9 +52,15 @@ return {
           desc = "Open Oil",
         },
         ["<Leader>x"] = {
-          desc = require("mini.icons").get("filetype", "Trouble") .. " Trouble / QFlist",
+          desc = require("mini.icons").get("filetype", "Trouble") .. "QFL",
         },
         -- END File Utils
+
+        -- Overwriting find symbols that I don't use
+        ["<Leader>ls"] = {
+          [[<CMD>Neogen<CR>]],
+          desc = "Generate docstring",
+        },
 
         -- Terminal
         ["<Leader>t2"] = {
@@ -111,6 +117,8 @@ return {
         ["<Leader>gC"] = false,
         ["<Leader>gT"] = false,
         -- END GiT
+
+        -- Docstring
 
         -- Misc
         ["n"] = {
