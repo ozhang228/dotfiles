@@ -52,7 +52,7 @@ return {
           desc = "Open Oil",
         },
         ["<Leader>x"] = {
-          desc = require("mini.icons").get("filetype", "Trouble") .. "QFL",
+          desc = require("mini.icons").get("filetype", "Trouble") .. " QFL",
         },
         -- END File Utils
 
