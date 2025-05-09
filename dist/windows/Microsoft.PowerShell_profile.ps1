@@ -35,6 +35,10 @@ Set-PSReadLineOption @PSReadLineOptions
 
 Set-PSReadlineKeyHandler -Chord Tab -Function MenuComplete
 
-# Clear host and display fast-fetch
-Clear-Host
+# Aliases
+Set-Alias -Name ls -Value dir
+Set-Alias -Name grep -Value findstr
+
+# Logo
+clear
 fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc
