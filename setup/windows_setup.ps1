@@ -13,6 +13,7 @@ $symlinks = @(
     @{ Source = "dist\windows\Microsoft.PowerShell_profile.ps1"; Destination = $profile }
     @{ Source = "dist\windows\clangd"; Destination = Join-Path $env:LOCALAPPDATA "clangd"}
     @{ Source = "dist\windows\glazewm\config.yaml"; Destination = Join-Path $home ".glzr\glazewm\config.yaml"}
+    @{ Source = "dist\windows\zebar"; Destination = Join-Path $home ".glzr\zebar"}
 )
 
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
