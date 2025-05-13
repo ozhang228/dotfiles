@@ -140,7 +140,7 @@ window_rules:
       - window_process: { regex: "pwsh|wezterm-gui" }
   - commands: ["move --workspace 2", "focus --workspace 2"]
     match:
-      - window_process: { regex: "msedge|chrome" }
+      - window_process: { regex: "msedge|chrome|vivaldi" }
 
   - commands: ["ignore"]
     match:
