@@ -31,8 +31,8 @@ bars:
       right: 9
     widgets:
       left: ["home", "glazewm_workspaces", "cpu", "memory"]
-      center: ["active_window"]
-      right: ["clock", "volume", "wifi", "power_menu"]
+      center: ["clock", "battery"]
+      right: ["wifi", "volume", "power_menu"]
 widgets:
   home:
     type: "yasb.home.HomeWidget"
@@ -109,22 +109,13 @@ widgets:
         sleep: ["\udb82\udd04", "Sleep"]
         lock: ["\uf023", "Lock"]
         cancel: ["\udb81\udf3a", "Cancel"]
-  active_window:
-    type: "yasb.active_window.ActiveWindowWidget"
+  battery:
+    type: "yasb.battery.BatteryWidget"
     options:
-      label: "{win[title]}"
-      label_alt: "[class_name='{win[class_name]}' exe='{win[process][name]}' hwnd={win[hwnd]}]"
-      label_no_window: ""
-      label_icon: true
-      label_icon_size: 16
-      max_length: 56
-      max_length_ellipsis: "..."
-      monitor_exclusive: true
-      label_shadow:
-        enabled: true
-        color: "black"
-        radius: 3
-        offset: [1, 1]
+      label: "<span>{icon}</span> {percent}%"
+      label_alt: "<span>{icon}</span> {percent}% | {time_remaining}"
+      charging_options:
+        icon_format: "{charging_icon}"
   cpu:
     type: "yasb.cpu.CpuWidget"
     options:

@@ -51,6 +51,7 @@ $wingetApps = @(
     "junegunn.fzf",
     "jqlang.jq",
     "GitHub.cli",
+    "Git.Git",
     # Tiling Manager
     "glzr-io.glazewm",
     # Languages
