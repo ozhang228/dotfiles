@@ -82,6 +82,7 @@
 
 .glazewm-workspaces {
     margin: 0;
+    padding: 0;
 }
 
 .glazewm-workspaces .offline-status {
@@ -109,7 +110,7 @@
 .glazewm-workspaces .ws-btn.active {
     color: rgba(0, 68, 255, 0);
     background-color: var(--mauve);
-    width: 28px;
+    width: 50px;
     height: 10px;
     border-radius: 5px;
 }
