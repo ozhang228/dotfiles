@@ -45,9 +45,9 @@
 }
 
 .yasb-bar {
-    padding: 0 8px;
+    padding: 0 10px;
     margin: 0;
-    background-color: #1e1e2e;
+    opacity: 0;
     border-radius: 15px;
 }
 
