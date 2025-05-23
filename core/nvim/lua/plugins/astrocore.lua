@@ -26,18 +26,7 @@ return {
       },
     },
     autocmds = {
-      format = {
-        {
-          event = "FileType",
-          pattern = "json",
-          callback = function(ev) vim.bo[ev.buf].formatprg = "jq -b ." end,
-        },
-        {
-          event = "FileType",
-          pattern = "html",
-          callback = function(ev) vim.bo[ev.buf].formatprg = "npx prettier --parser html --stdin-filepath ." end,
-        },
-      },
+      format = {},
     },
     mappings = {
       n = {
