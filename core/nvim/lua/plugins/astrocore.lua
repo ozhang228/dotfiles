@@ -56,7 +56,6 @@ return {
         },
         -- END File Utils
 
-        -- Overwriting find symbols that I don't use
         ["<Leader>ls"] = {
           [[<CMD>Neogen<CR>]],
           desc = "Generate docstring",
@@ -96,6 +95,17 @@ return {
         },
         -- END Grapple
 
+        -- Kulala Rest Client
+        ["<Leader>r"] = {
+          "Nop",
+          desc = require("mini.icons").get("lsp", "file") .. " Kulala Rest Client",
+        },
+        ["<Leader>rr"] = {
+          function() require("kulala").run() end,
+          desc = "Run http request",
+        },
+        -- END Kulala Rest Client
+
         -- Scratch
         ["<Leader>s"] = {
           desc = require("mini.icons").get("filetype", "Scratch") .. " Scratch",
@@ -116,9 +126,7 @@ return {
         ["<Leader>gc"] = false,
         ["<Leader>gC"] = false,
         ["<Leader>gT"] = false,
-        -- END GiT
-
-        -- Docstring
+        -- END Git
 
         -- Misc
         ["n"] = {
