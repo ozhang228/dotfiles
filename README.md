@@ -76,6 +76,7 @@ Some things missing that I don't need on every machine but generally use:
 ### Manual Setup
 
 - Vivaldi Browser
+- Google Drive App (for my obisidan vaults)
 - gh auth login to get into GitHub
 - <CMD>Copilot auth</CMD> in nvim to get it setup
 - [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
