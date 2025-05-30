@@ -8,7 +8,6 @@ Invoke-Expression (& { (zoxide init powershell | Out-String) })
 # -- fzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t'
 
-
 # -- PSReadLine
 # turn file directory highlighting off
 $PSStyle.FileInfo.Directory = ""

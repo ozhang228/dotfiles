@@ -76,6 +76,7 @@ Some things missing that I don't need on every machine but generally use:
 ### Manual Setup
 
 - Vivaldi Browser
+- Delete Unnecessary Apps
 - Google Drive App (for my obisidan vaults)
 - gh auth login to get into GitHub
 - <CMD>Copilot auth</CMD> in nvim to get it setup
@@ -97,6 +98,7 @@ Some things missing that I don't need on every machine but generally use:
 - Msys2
   - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
   - WSL
+- GlazeWM add to startup / Delete Zebar
 
 #### Arch Linux
 
