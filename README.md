@@ -75,17 +75,23 @@ Some things missing that I don't need on every machine but generally use:
 
 ### Manual Setup
 
-- Vivaldi Browser
-- Google Drive App (for my obisidan vaults)
-- gh auth login to get into GitHub
-- <CMD>Copilot auth</CMD> in nvim to get it setup
-- [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
-- Notion
-  - **To-Do List & Project Management**
-    - Organize tasks into projects with todos for each project following how it is done for personal tasks
-    - Generally organize personal wiki through scratch buffers
-  - **People**
-    - organize meeting notes and general things people are known for
+- Install
+  - Vivaldi Browser
+  - Google Drive App (for my obisidan vaults)
+  - [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
+- Setup
+  - gh auth login to get into GitHub
+  - <CMD>Copilot auth</CMD> in nvim to get it setup
+  - Notion
+    - **To-Do List & Project Management**
+      - Organize tasks into projects with todos for each project following how it is done for personal tasks
+      - Generally organize personal wiki through scratch buffers
+    - **People**
+      - organize meeting notes and general things people are known for
+- Settings
+  - disable mouse acceleration
+  - night light (or any reduce blue light setting)
+  - shut down computer on laptop lid close and set reasonable sleep timers
 
 #### Windows
 
@@ -94,9 +100,9 @@ Some things missing that I don't need on every machine but generally use:
     - Remap Caps Lock -> Esc
     - Remap <C-Shift-Caps Lock> -> Caps Lock
   - Powertoys Run: Win + Space for open
-- Msys2
+- WSL (wsl --install archlinux)
+- Msys2 (if doing dev without WSl)
   - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
-  - WSL
 - GlazeWM add to startup / Delete Zebar
 
 #### Arch Linux
@@ -105,7 +111,8 @@ Some things missing that I don't need on every machine but generally use:
 
 - `useradd -m -G wheel oscar`
 - `passwd root` / `passwd oscar` to set some passwords
-- `EDITOR=vim visudo` and uncomment out `%wheel ALL=(ALL) ALL` to give wheel user group sudo permissions with password
+- `pacman -Sy sudo nvim git` so I can access sudo in user, nvim to edit wheel group, and git to pull repo
+- `EDITOR=nvim visudo` and uncomment out `%wheel ALL=(ALL) ALL` to give wheel user group sudo permissions with password
 
 ##### WSL Setup (if applicable)
 
@@ -113,7 +120,3 @@ Some things missing that I don't need on every machine but generally use:
 wsl --set-default archlinux # default distro
 wsl --manage archlinux --set-default-user oscar # set default user (might need to update wsl)
 ```
-
-##### Use This Repo
-
-- `pacman -S git sudo` to pull and use setup scripts
