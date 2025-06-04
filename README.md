@@ -114,6 +114,11 @@ Some things missing that I don't need on every machine but generally use:
 - `pacman -Sy sudo nvim git` so I can access sudo in user, nvim to edit wheel group, and git to pull repo
 - `EDITOR=nvim visudo` and uncomment out `%wheel ALL=(ALL) ALL` to give wheel user group sudo permissions with password
 
+##### Set Locale to en_US
+
+- uncomment the locale in etc/locale.gen
+- run `locale-gen` and then `locale`
+
 ##### WSL Setup (if applicable)
 
 ```bash
