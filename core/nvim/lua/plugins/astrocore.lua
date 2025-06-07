@@ -133,6 +133,14 @@ return {
         -- Remove these keybinds to delete into register x because I never use it
         ["s"] = { "<nop>" },
         ["S"] = { "<nop>" },
+        ["<Leader>fm"] = {
+          function()
+            vim.ui.input({ prompt = "Manual page for: " }, function(input)
+              if input and input ~= "" then vim.cmd("vert Man " .. input) end
+            end)
+          end,
+          desc = "Find man page",
+        },
         -- End Misc
 
         -- Use oil instead
