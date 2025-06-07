@@ -24,6 +24,9 @@ if vim.fn.has "win32" == 1 then
         blink = true,
         nvim_cmp = false,
       },
+      ui = {
+        enable = false,
+      },
     },
   }
 else

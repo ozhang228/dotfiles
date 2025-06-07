@@ -61,7 +61,21 @@ return {
         enabled = true,
       },
       indent = {
-        enabled = false,
+        enabled = true,
+        current_scope = true,
+        indent = {
+          enabled = false,
+        },
+        chunk = {
+          enabled = true,
+          char = {
+            corner_top = "╭",
+            corner_bottom = "╰",
+            horizontal = "─",
+            vertical = "│",
+            arrow = ">",
+          },
+        },
       },
     },
     keys = {},

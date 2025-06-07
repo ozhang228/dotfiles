@@ -7,6 +7,12 @@
     "snippets": [
       {
         "language": [
+          "markdown"
+        ],
+        "path": "./md.json"
+      },
+      {
+        "language": [
           "js",
           "javascriptreact"
         ],
