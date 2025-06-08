@@ -25,9 +25,7 @@ return {
         conceallevel = 0,
       },
     },
-    autocmds = {
-      format = {},
-    },
+    autocmds = {},
     mappings = {
       n = {
         -- File Utils

@@ -11,6 +11,7 @@ return {
     formatting = {
       format_on_save = {
         enabled = true,
+        ignore_filetypes = { "markdown", "text" },
       },
       timeout_ms = 20000, -- default format timeout
     },
