@@ -19,3 +19,5 @@ fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fa
 
 # Turn on Vi mode
 source /usr/share/zsh/plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+
+export MANPAGER='nvim +Man!'
