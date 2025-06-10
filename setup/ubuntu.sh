@@ -11,6 +11,7 @@ declare -A symlinks=(
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/i3"]="$HOME/.config/i3"
+  ["dist/unix/rofi"]="$HOME/.config/rofi"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
 )
 
@@ -48,6 +49,7 @@ apt_apps=(
   fastfetch
   # tiling
   i3
+  rofi
   # languages
   build-essential
   python3-pip

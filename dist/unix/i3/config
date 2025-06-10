@@ -16,7 +16,7 @@ set $wm_setting_key_right            l
 
 set $wm_setting_app_terminal         wezterm
 set $wm_setting_app_browser          chromium
-set $wm_setting_app_launcher         rofi
+set $wm_setting_app_launcher         rofi -show drun
 set $wm_setting_app_compositor       picom
 
 set $wm_color_border_active_bg       #81A1C1
