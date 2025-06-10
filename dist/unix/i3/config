@@ -3,6 +3,7 @@
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 
 ### Variables for settings (This makes changing them WAY easyer!) ###
+# Mod1 is alt, Mod4 is windows key
 set $mod                             Mod1
 set $smod                            Shift
 set $wm_setting_font                 pango:Source Sans Pro, Semibold 12
@@ -54,7 +55,7 @@ bindsym $mod+Return exec $wm_setting_app_terminal
 bindsym $mod+$smod+Return exec $wm_setting_app_browser
 
 # Start a program launcher
-bindsym $mod+space exec $wm_setting_app_launcher
+bindsym Mod4+space exec $wm_setting_app_launcher
 
 # Run a window compositor (for effects like transparency or full VSync)
 exec_always --no-startup-id $wm_setting_app_compositor
