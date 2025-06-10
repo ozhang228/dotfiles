@@ -10,7 +10,8 @@ Some things missing that I don't need on every machine but generally use:
 ### Distributions
 
 - **Windows**
-- **Arch Linux**
+- **Arch Linux (term)**
+- **Ubuntu**
 
 ### Languages (by default)
 
@@ -71,18 +72,17 @@ Some things missing that I don't need on every machine but generally use:
 - [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html)
 - [curl](https://curl.se/download.html): call APIs
 - [zsh](https://www.zsh.org/)
-- [zsh-vi-mode](https://github.com/jeffreytse/zsh-vi-mode): better vi mode for zsh
 
 ### Manual Setup
 
 - Install
   - Vivaldi Browser
-  - Google Drive App (for my obisidan vaults)
+  - Google Drive App (for my obisidan vaults) 
   - [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
 - Setup
   - gh auth login to get into GitHub
   - <CMD>Copilot auth</CMD> in nvim to get it setup
-  - Notion
+  - Markdown Notes
     - **To-Do List & Project Management**
       - Organize tasks into projects with todos for each project following how it is done for personal tasks
       - Generally organize personal wiki through scratch buffers
@@ -105,7 +105,7 @@ Some things missing that I don't need on every machine but generally use:
   - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
 - GlazeWM add to startup / Delete Zebar
 
-#### Arch Linux
+#### Arch Linux (term)
 
 ##### User Setup
 
@@ -125,3 +125,7 @@ Some things missing that I don't need on every machine but generally use:
 wsl --set-default archlinux # default distro
 wsl --manage archlinux --set-default-user oscar # set default user (might need to update wsl)
 ```
+
+#### Ubuntu
+
+

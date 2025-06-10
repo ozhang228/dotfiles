@@ -7,8 +7,10 @@ dotfiles="$HOME/dotfiles"
 declare -A symlinks=(
   ["core/nvim"]="$HOME/.config/nvim"
   ["core/starship"]="$HOME/.config/starship"
+  ["core/wezterm"]="$HOME/.config/wezterm"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
+  ["dist/unix/i3"]="$HOME/.config/i3"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
 )
 
@@ -36,6 +38,7 @@ sudo apt update
 
 apt_apps=(
   # CLI
+  zsh
   curl
   fd-find
   ripgrep
@@ -43,6 +46,8 @@ apt_apps=(
   jq
   gh
   fastfetch
+  # tiling
+  i3
   # languages
   build-essential
   python3-pip
@@ -73,6 +78,7 @@ done
 
 # Alias fd-find to fd with a symlink
 if [ ! -e "$HOME/.local/bin/fd" ]; then
+  mkdir $HOME/.local/bin/fd
   ln -s "$(command -v fdfind)" "$HOME/.local/bin/fd"
   echo "Linked fdfind → $HOME/.local/bin/fd"
 else
@@ -152,9 +158,5 @@ for pkg in "${npm_pkgs[@]}"; do
     sudo npm install -g "$pkg"
   fi
 done
-
-# -- Git 
-git config --global user.name "Oscar Zhang"
-git config --global user.email "oscarzhang228@gmail.com"
 
 echo "🎉 Ubuntu terminal setup complete!"
