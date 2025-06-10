@@ -137,15 +137,10 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-### Gaps ###
-gaps horizontal $wm_setting_gap_width
-gaps vertical   $wm_setting_gap_heigth
-smart_gaps on
 
 ### Borders ###
 default_border pixel $wm_setting_border_size
 default_floating_border pixel $wm_setting_border_size
-smart_borders on
 
 ### Colors ###
 # class                 border                       background                   text                         indicator                    child_border
