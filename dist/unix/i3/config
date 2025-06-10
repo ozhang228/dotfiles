@@ -54,7 +54,7 @@ bindsym $mod+Return exec $wm_setting_app_terminal
 bindsym $mod+$smod+Return exec $wm_setting_app_browser
 
 # Start a program launcher
-bindsym $mod+Space exec $wm_setting_app_launcher
+bindsym $mod+space exec $wm_setting_app_launcher
 
 # Run a window compositor (for effects like transparency or full VSync)
 exec_always --no-startup-id $wm_setting_app_compositor
