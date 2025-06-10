@@ -47,6 +47,7 @@ apt_apps=(
   jq
   gh
   fastfetch
+  xsel
   # tiling
   i3
   rofi
@@ -56,6 +57,8 @@ apt_apps=(
   luarocks
   # this is necessary because of a bug in mason 
   python3-venv
+  # font
+  fonts-jetbrains-mono
 )
 
 apt_ppas=(
