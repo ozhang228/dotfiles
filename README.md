@@ -72,6 +72,8 @@ Some things missing that I don't need on every machine but generally use:
 - [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html)
 - [curl](https://curl.se/download.html): call APIs
 - [zsh](https://www.zsh.org/)
+- [i3](https://i3wm.org)
+- [rofi](https://github.com/davatorium/rofi)
 
 ### Manual Setup
 
@@ -88,10 +90,6 @@ Some things missing that I don't need on every machine but generally use:
       - Generally organize personal wiki through scratch buffers
     - **People**
       - organize meeting notes and general things people are known for
-- Settings
-  - disable mouse acceleration
-  - night light (or any reduce blue light setting)
-  - shut down computer on laptop lid close and set reasonable sleep timers
 
 #### Windows
 
@@ -104,6 +102,10 @@ Some things missing that I don't need on every machine but generally use:
 - Msys2 (if doing dev without WSl)
   - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
 - GlazeWM add to startup / Delete Zebar
+- In Settings
+  - disable mouse acceleration
+  - night light (or any reduce blue light setting)
+  - shut down computer on laptop lid close and set reasonable sleep timers
 
 #### Arch Linux (term)
 
@@ -128,4 +130,7 @@ wsl --manage archlinux --set-default-user oscar # set default user (might need t
 
 #### Ubuntu
 
+- Install Wezterm manually through cli
+- Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
+- Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to poweroff, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
 
