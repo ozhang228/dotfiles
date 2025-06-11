@@ -133,4 +133,5 @@ wsl --manage archlinux --set-default-user oscar # set default user (might need t
 - Install Wezterm manually through cli
 - Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to poweroff, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
+- solaar for unifying receivers
 
