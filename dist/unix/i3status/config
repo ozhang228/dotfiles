@@ -1,0 +1,29 @@
+general {
+  colors = false
+  interval = 5
+}
+
+order += "wireless"
+order += "battery"
+order += "time"
+
+wireless {
+  format_up = "Wi-Fi: %essid% (%quality%)"
+  format_down = "Wi-Fi: down"
+  format_unknown = "Wi-Fi: unknown"
+  interface = "wlan0"
+}
+
+battery {
+  format = "Battery: %percentage%% (%status%)"
+  format_down = "Battery: not charging"
+  format_unknown = "Battery: unknown"
+  battery = "BAT0"
+}
+
+tztime {
+  format = "%Y-%m-%d %H:%M:%S"
+  timezone = "UTC"
+}
+
+
