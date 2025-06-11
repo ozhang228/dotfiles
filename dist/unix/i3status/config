@@ -3,27 +3,21 @@ general {
   interval = 5
 }
 
-order += "wireless"
-order += "battery"
-order += "time"
+order += "wireless _first_"
+order += "battery all"
+order += "tztime local"
 
-wireless {
-  format_up = "Wi-Fi: %essid% (%quality%)"
+wireless _first_ {
+  format_up = "Wi-Fi: %ip"
   format_down = "Wi-Fi: down"
-  format_unknown = "Wi-Fi: unknown"
-  interface = "wlan0"
 }
 
-battery {
-  format = "Battery: %percentage%% (%status%)"
-  format_down = "Battery: not charging"
-  format_unknown = "Battery: unknown"
-  battery = "BAT0"
+battery all {
+  format = "Battery: %percentage %remaining"
 }
 
-tztime {
+tztime local {
   format = "%Y-%m-%d %H:%M:%S"
-  timezone = "UTC"
 }
 
 
