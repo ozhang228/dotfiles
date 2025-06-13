@@ -56,9 +56,9 @@ apt_apps=(
   build-essential
   python3-pip
   luarocks
-  # this is necessary because of a bug in mason 
-  python3-venv
-  # font
+  # Misc
+  python3-venv # this is necessary because of a bug in mason 
+  amixer # for dealing with sound
   fonts-jetbrains-mono
 )
 
