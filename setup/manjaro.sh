@@ -8,6 +8,7 @@ declare -A symlinks=(
   ["core/nvim"]="$HOME/.config/nvim"
   ["core/starship"]="$HOME/.config/starship"
   ["core/lazygit"]="$HOME/.config/lazygit"
+  ["core/kitty"]="$HOME/.config/kitty"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
   ["dist/unix/hypr"]="$HOME/.config/hypr"
@@ -37,7 +38,8 @@ pacman_apps=(
   neovim
   lazygit
   starship
-  wezterm
+  kitty
+  hyprland
   # CLI
   zsh
   curl

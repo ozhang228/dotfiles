@@ -6,8 +6,8 @@ local action = wezterm.action
 
 config = {
 	color_scheme = "Catppuccin Macchiato",
-	wayland_enable = 1,
 	window_decorations = "RESIZE",
+	enable_wayland = false,
 	automatically_reload_config = true,
 	hide_tab_bar_if_only_one_tab = true,
 	font = wezterm.font("JetBrains Mono"),
