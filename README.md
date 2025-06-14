@@ -135,3 +135,5 @@ wsl --manage archlinux --set-default-user oscar # set default user (might need t
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to poweroff, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
 - solaar for unifying receivers
 
+#### Manjaro
+

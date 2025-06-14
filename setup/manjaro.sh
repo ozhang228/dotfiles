@@ -10,6 +10,7 @@ declare -A symlinks=(
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
+  ["dist/unix/hypr"]="$HOME/.config/hypr"
 )
 
 echo "🔗 Creating symlinks from $dotfiles..."
@@ -36,6 +37,7 @@ pacman_apps=(
   neovim
   lazygit
   starship
+  wezterm
   # CLI
   zsh
   curl
@@ -46,6 +48,7 @@ pacman_apps=(
   fzf
   github-cli
   fastfetch
+  xsel
   # languages
   lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
@@ -78,9 +81,7 @@ cd ~
 rm -rf ~/yay
 
 # -- Install CLI dependencies via yay
-aur_apps=(
-  zsh-vi-mode
-)
+aur_apps=()
 
 # update package list
 sudo yay -Sy
