@@ -10,7 +10,6 @@
   // ──────────────────────────────────────────────────────────┤ positions ├───
 
   "modules-left": [
-    "custom/theme",         // theme switcher
     "custom/left1",
 
     "hyprland/workspaces",  // workspaces
@@ -37,7 +36,6 @@
     "custom/right2",
 
     "custom/rightin1",
-    "idle_inhibitor",       // idle inhibitor
     "clock#time",           // time
     "custom/right3",
 
@@ -100,7 +98,7 @@
     "rewrite": {
       // ────────────────────────────────────────────────────────── desktop ───
       "": 
-        "<span foreground='#89b4fa'> </span> Hyprland",
+        "<span foreground='#89b4fa'> </span>Hyprland",
 
       // ───────────────────────────────────────────────────────── terminal ───
 
@@ -188,35 +186,20 @@
     "tooltip": false
   },
 
-  // ─────────────────────────────────────────────────────┤ idle inhibitor ├───
-
-  "idle_inhibitor": {
-    "format": "{icon}",
-
-    "format-icons": {
-      "activated": "󰈈 ",
-      "deactivated": "󰈉 "
-    },
-
-    "tooltip-format-activated": "Presentation Mode",
-    "tooltip-format-deactivated": "Idle Mode",
-    "start-activated": false
-  },
-
   // ───────────────────────────────────────────────────────────────┤ time ├───
 
   "clock#time": {
-    "format": "{:%H:%M}",
+    "format": " \udb82\udd54 {:%H:%M} ",
     "tooltip": false,
     // "tooltip-format": "Standard Time: {:%I:%M %p}",
-    "min-length": 6,
-    "max-length": 6
+    "min-length": 9,
+    "max-length": 9
   },
 
   // ───────────────────────────────────────────────────────────────┤ date ├───
 
   "clock#date": {
-    "format": "󰸗 {:%m-%d}",
+    "format": " 󰸗 {:%m-%d} ",
     "tooltip-format": "<tt>{calendar}</tt>",
 
     "calendar": {
@@ -239,8 +222,8 @@
       "on-click-right": "mode"
     },
 
-    "min-length": 8,
-    "max-length": 8
+    "min-length": 9,
+    "max-length": 9
   },
 
   // ──────────────────────────────────────────────────────────────┤ wi-fi ├───
