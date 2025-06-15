@@ -60,6 +60,8 @@ pacman_apps=(
   ttf-jetbrains-mono-nerd
   wireplumber
   rofi-wayland
+  hyprcursor
+  hyprpaper
   # languages
   lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
@@ -97,6 +99,7 @@ rm -rf ~/yay
 # -- Install CLI dependencies via yay
 aur_apps=(
   bluetui
+  bibata-cursor-theme
 )
 
 # update package list
