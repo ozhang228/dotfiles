@@ -10,7 +10,7 @@ declare -A symlinks=(
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/kitty"]="$HOME/.config/kitty"
   ["dist/unix/rofi"]="$HOME/.config/rofi"
-  ["dist/unix/waybar"]="$HOME/.config/waybar"
+  ["dist/unix/hyprpanel"]="$HOME/.config/hyprpanel"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
   ["dist/unix/hypr"]="$HOME/.config/hypr"
@@ -29,7 +29,7 @@ for src in "${!symlinks[@]}"; do
   fi
 
   mkdir -p "$(dirname "$dst_path")"
-  sudo ln -s "$src_path" "$dst_path"
+  ln -s "$src_path" "$dst_path"
   echo "✅ Symlink: $dst_path → $src_path"
 done
 
@@ -53,8 +53,6 @@ pacman_apps=(
   github-cli
   fastfetch
   wl-clipboard
-  bluez-utils
-  brightnessctl
   ttf-jetbrains-mono-nerd
   rofi-wayland
   hyprcursor
@@ -98,6 +96,7 @@ fi
 aur_apps=(
   ags-hyprpanel-git
   bibata-cursor-theme
+  hyprshot
 )
 
 # update package list

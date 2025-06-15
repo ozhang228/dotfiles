@@ -1,0 +1,109 @@
+{
+  "bar.customModules.storage.paths": [
+    "/"
+  ],
+  "theme.font.size": "1.4rem",
+  "theme.font.weight": 500,
+  "bar.layouts": {
+    "0": {
+      "left": [
+        "dashboard",
+        "workspaces",
+        "windowtitle",
+        "network",
+        "bluetooth"
+      ],
+      "middle": [
+        "clock"
+      ],
+      "right": [
+        "systray",
+        "cpu",
+        "ram",
+        "volume",
+        "battery",
+        "notifications",
+        "power"
+      ]
+    },
+    "1": {
+      "left": [
+        "dashboard",
+        "workspaces",
+        "windowtitle"
+      ],
+      "middle": [
+        "media"
+      ],
+      "right": [
+        "volume",
+        "clock",
+        "notifications"
+      ]
+    },
+    "2": {
+      "left": [
+        "dashboard",
+        "workspaces",
+        "windowtitle"
+      ],
+      "middle": [
+        "media"
+      ],
+      "right": [
+        "volume",
+        "clock",
+        "notifications"
+      ]
+    }
+  },
+  "theme.bar.floating": false,
+  "theme.bar.buttons.enableBorders": false,
+  "bar.launcher.autoDetectIcon": true,
+  "theme.bar.buttons.dashboard.enableBorder": false,
+  "bar.workspaces.workspaceMask": false,
+  "bar.workspaces.showWsIcons": true,
+  "bar.workspaces.showApplicationIcons": true,
+  "bar.workspaces.show_numbered": false,
+  "bar.workspaces.show_icons": false,
+  "bar.clock.format": "%a %m/%d  - %H:%M:%S",
+  "bar.clock.icon": "󰸗",
+  "menus.clock.time.military": true,
+  "menus.clock.time.hideSeconds": true,
+  "menus.clock.weather.enabled": false,
+  "menus.dashboard.shortcuts.left.shortcut1.tooltip": "vivaldi",
+  "menus.dashboard.shortcuts.left.shortcut1.command": "vivaldi",
+  "menus.dashboard.shortcuts.left.shortcut1.icon": "",
+  "menus.dashboard.shortcuts.left.shortcut2.command": "kitty",
+  "menus.dashboard.shortcuts.left.shortcut2.icon": "󰄛",
+  "menus.dashboard.shortcuts.left.shortcut2.tooltip": "Kitty Terminal",
+  "menus.dashboard.shortcuts.left.shortcut3.icon": "",
+  "menus.dashboard.shortcuts.left.shortcut3.command": "rofi -show drun",
+  "menus.dashboard.shortcuts.left.shortcut3.tooltip": "",
+  "menus.dashboard.shortcuts.left.shortcut4.tooltip": "",
+  "menus.dashboard.shortcuts.left.shortcut4.command": "",
+  "menus.dashboard.shortcuts.left.shortcut4.icon": "",
+  "menus.dashboard.shortcuts.right.shortcut1.icon": "󰄀",
+  "menus.dashboard.shortcuts.right.shortcut3.icon": "",
+  "menus.dashboard.shortcuts.right.shortcut3.command": "",
+  "menus.dashboard.shortcuts.right.shortcut1.tooltip": "Screenshot (hyprshot)",
+  "menus.dashboard.shortcuts.right.shortcut3.tooltip": "",
+  "menus.dashboard.shortcuts.right.shortcut1.command": "hyprshot -m region --clipboard-only",
+  "menus.dashboard.directories.left.directory1.label": "󰉍  Downloads",
+  "menus.dashboard.directories.left.directory2.label": "󰉏  Videos",
+  "menus.dashboard.directories.enabled": false,
+  "menus.dashboard.directories.left.directory3.label": "󰚝  Projects",
+  "menus.dashboard.directories.right.directory1.label": "󱧶  Documents",
+  "menus.dashboard.directories.right.directory2.label": "󰉏  Pictures",
+  "menus.dashboard.directories.right.directory3.label": "󱂵  Home",
+  "bar.customModules.cpu.pollingInterval": 5000,
+  "bar.customModules.ram.pollingInterval": 5000,
+  "menus.power.lowBatteryNotification": true,
+  "menus.power.lowBatteryThreshold": 50,
+  "theme.bar.outer_spacing": ".5em",
+  "menus.dashboard.powermenu.avatar.name": "Oscar",
+  "menus.dashboard.powermenu.confirmation": true,
+  "theme.bar.menus.menu.dashboard.profile.radius": "0.4em",
+  "theme.bar.menus.menu.dashboard.profile.size": "8.5em",
+  "menus.dashboard.powermenu.avatar.image": "/home/ozhang/dotfiles/imgs/catppuccin_cat.png"
+}
