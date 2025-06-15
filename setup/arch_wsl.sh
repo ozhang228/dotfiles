@@ -72,15 +72,19 @@ for pkg in "${pacman_apps[@]}"; do
 done
 
 # -- Setup AUR with yay
-git clone https://aur.archlinux.org/yay.git ~/yay
-cd ~/yay
-makepkg -si
-cd ~
-rm -rf ~/yay
+if ! command -v yay &>/dev/null; then
+  git clone https://aur.archlinux.org/yay.git ~/yay
+  cd ~/yay
+  makepkg -si
+  cd ~
+  rm -rf ~/yay
+fi
 
+# -- Install CLI dependencies via yay
+aur_apps=(
+)
 
-# update package list
-sudo yay -Sy
+yay -Sy
 
 echo "📦 Installing AUR packages..."
 for pkg in "${aur_apps[@]}"; do
@@ -88,9 +92,10 @@ for pkg in "${aur_apps[@]}"; do
     echo "✅ $pkg already installed"
   else
     echo "⏬ Installing $pkg..."
-    sudo yay -S "$pkg"
+    yay -S "$pkg"
   fi
 done
+
 
 # -- Install global npm packages
 npm_pkgs=(

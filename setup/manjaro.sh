@@ -29,7 +29,7 @@ for src in "${!symlinks[@]}"; do
   fi
 
   mkdir -p "$(dirname "$dst_path")"
-  ln -s "$src_path" "$dst_path"
+  sudo ln -s "$src_path" "$dst_path"
   echo "✅ Symlink: $dst_path → $src_path"
 done
 
@@ -101,7 +101,7 @@ aur_apps=(
 )
 
 # update package list
-sudo yay -Sy
+yay -Sy
 
 echo "📦 Installing AUR packages..."
 for pkg in "${aur_apps[@]}"; do
@@ -109,7 +109,7 @@ for pkg in "${aur_apps[@]}"; do
     echo "✅ $pkg already installed"
   else
     echo "⏬ Installing $pkg..."
-    sudo yay -S "$pkg"
+    yay -S "$pkg"
   fi
 done
 
