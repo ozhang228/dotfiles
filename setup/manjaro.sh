@@ -55,10 +55,7 @@ pacman_apps=(
   wl-clipboard
   bluez-utils
   brightnessctl
-  pipewire
-  pipewire-pulse
   ttf-jetbrains-mono-nerd
-  wireplumber
   rofi-wayland
   hyprcursor
   hyprpaper
@@ -72,7 +69,6 @@ pacman_apps=(
   nodejs
   npm
   # GUIs
-  waybar
   vivaldi
 )
 
@@ -90,15 +86,17 @@ for pkg in "${pacman_apps[@]}"; do
 done
 
 # -- Setup AUR with yay
-git clone https://aur.archlinux.org/yay.git ~/yay
-cd ~/yay
-makepkg -si
-cd ~
-rm -rf ~/yay
+if ! command -v yay &>/dev/null; then
+  git clone https://aur.archlinux.org/yay.git ~/yay
+  cd ~/yay
+  makepkg -si
+  cd ~
+  rm -rf ~/yay
+fi
 
 # -- Install CLI dependencies via yay
 aur_apps=(
-  bluetui
+  ags-hyprpanel-git
   bibata-cursor-theme
 )
 
