@@ -94,8 +94,6 @@ $symlinks = @(
     @{ Source = "dist\windows\yasb"; Destination = Join-Path $home ".config\yasb"}
 )
 
-$isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
 if ($isAdmin) {
     foreach ($link in $symlinks) {
         $sourcePath = Join-Path $dotfiles $link.Source
@@ -107,9 +105,9 @@ if ($isAdmin) {
 	        Write-Host "Removed existing: $destinationPath"
         }
 
-    # Create symlink
-    New-Item -ItemType SymbolicLink -Path $destinationPath -Target $sourcePath
-    Write-Host "Symlink created: $destinationPath -> $sourcePath"
+        # Create symlink
+        sudo New-Item -ItemType SymbolicLink -Path $destinationPath -Target $sourcePath
+        Write-Host "Symlink created: $destinationPath -> $sourcePath"
     }
 } else {
     Write-Host "Detected not in administrator mode, symlinks skipped"
