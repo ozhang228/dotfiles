@@ -20,4 +20,4 @@ fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fa
 export MANPAGER='nvim +Man!'
 
 alias pm="sudo pacman"
-alias dot="cd ~/dotfiles"
+alias dot="cd ~/dotfiles; nvim ."
