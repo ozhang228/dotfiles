@@ -139,3 +139,5 @@ wsl --manage archlinux --set-default-user oscar # set default user (might need t
 
 - using kitty because of bad support in wezterm for hyprland
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
+- might need to do vivaldi:flags and set preferred ozone platform to wayland
+

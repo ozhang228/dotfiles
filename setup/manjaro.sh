@@ -9,6 +9,8 @@ declare -A symlinks=(
   ["core/starship"]="$HOME/.config/starship"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/kitty"]="$HOME/.config/kitty"
+  ["dist/unix/rofi"]="$HOME/.config/rofi"
+  ["dist/unix/waybar"]="$HOME/.config/waybar"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
   ["dist/unix/hypr"]="$HOME/.config/hypr"
@@ -51,6 +53,13 @@ pacman_apps=(
   github-cli
   fastfetch
   wl-clipboard
+  bluez-utils
+  brightnessctl
+  pipewire
+  pipewire-pulse
+  ttf-jetbrains-mono-nerd
+  wireplumber
+  rofi-wayland
   # languages
   lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
@@ -60,6 +69,9 @@ pacman_apps=(
   uv
   nodejs
   npm
+  # GUIs
+  waybar
+  vivaldi
 )
 
 # update package list
@@ -83,7 +95,9 @@ cd ~
 rm -rf ~/yay
 
 # -- Install CLI dependencies via yay
-aur_apps=()
+aur_apps=(
+  bluetui
+)
 
 # update package list
 sudo yay -Sy

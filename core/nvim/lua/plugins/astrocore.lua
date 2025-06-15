@@ -152,6 +152,12 @@ return {
         -- terminal escape
         ["<Esc>"] = [[<C-\><C-n>]],
       },
+      i = {
+        ["<Tab>"] = "<Tab>",
+      },
+      c = {
+        ["<Tab>"] = "<Tab>",
+      },
     },
   },
 }
