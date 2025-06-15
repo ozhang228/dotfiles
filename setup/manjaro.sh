@@ -50,7 +50,7 @@ pacman_apps=(
   fzf
   github-cli
   fastfetch
-  xsel
+  wl-clipboard
   # languages
   lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks

@@ -131,13 +131,11 @@ wsl --manage archlinux --set-default-user oscar # set default user (might need t
 #### Ubuntu
 
 - Install Wezterm manually through cli
-- setup keyd for swapping capslock to escape and ctrl
+- Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
 - solaar for unifying receivers
 
 #### Manjaro
 
 - using kitty because of bad support in wezterm for hyprland
-- setup keyd for swapping capslock to escape and ctrl
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
-

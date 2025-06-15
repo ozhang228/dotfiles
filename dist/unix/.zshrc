@@ -18,3 +18,5 @@ clear
 fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc
 
 export MANPAGER='nvim +Man!'
+
+alias pm="sudo pacman"
