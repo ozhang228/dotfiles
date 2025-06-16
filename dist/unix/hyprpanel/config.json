@@ -105,5 +105,6 @@
   "menus.dashboard.powermenu.confirmation": true,
   "theme.bar.menus.menu.dashboard.profile.radius": "0.4em",
   "theme.bar.menus.menu.dashboard.profile.size": "8.5em",
-  "menus.dashboard.powermenu.avatar.image": "/home/ozhang/dotfiles/imgs/catppuccin_cat.png"
+  "menus.dashboard.powermenu.avatar.image": "/home/ozhang/dotfiles/imgs/catppuccin_cat.png",
+  "theme.bar.transparent": true
 }
