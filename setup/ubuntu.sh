@@ -64,7 +64,7 @@ apt_apps=(
   # Misc
   python3-venv # this is necessary because of a bug in mason 
   amixer # for dealing with sound
-  fonts-jetbrains-mono
+  feh # wallpaper
 )
 
 apt_ppas=(
