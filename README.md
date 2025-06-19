@@ -79,17 +79,12 @@ Some things missing that I don't need on every machine but generally use:
 
 - Install
   - Vivaldi Browser
-  - Google Drive App (for my obisidan vaults) 
-  - [Desktop Background](https://drive.google.com/drive/folders/1AR-AnlCRXYyG7CBdxvlHCFGqA6IRxXQi)
 - Setup
   - gh auth login to get into GitHub
   - <CMD>Copilot auth</CMD> in nvim to get it setup
-  - Markdown Notes
-    - **To-Do List & Project Management**
-      - Organize tasks into projects with todos for each project following how it is done for personal tasks
-      - Generally organize personal wiki through scratch buffers
-    - **People**
-      - organize meeting notes and general things people are known for
+- Test
+  - audio, camera, screen share
+  - bluetooth, wifi 
 
 #### Windows
 
