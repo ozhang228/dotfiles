@@ -145,4 +145,4 @@ bindsym $mod+$smod+f fullscreen toggle
 bindsym $mod+$smod+q kill
 
 bindsym $mod+$smod+r restart 
-bindsym $mod+$smod+l exec --no-startup-id i3-msg exit # logout
+bindsym $mod+$smod+e exec --no-startup-id i3-msg exit # logout
