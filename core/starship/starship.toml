@@ -141,9 +141,9 @@ style = "bg:teal"
 format = '[[ $symbol( $virtualenv) ](fg:base bg:teal)]($style)'
 
 [conda]
-symbol = "🅒" 
+symbol = "" 
 style = "bg:teal fg:crust"
-format = '[$symbol$environment]($style)'
+format = '[ $environment ]($style)'
 
 [docker_context]
 symbol = ""
