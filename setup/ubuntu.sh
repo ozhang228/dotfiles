@@ -7,7 +7,7 @@ dotfiles="$HOME/dotfiles"
 declare -A symlinks=(
   ["core/nvim"]="$HOME/.config/nvim"
   ["core/starship"]="$HOME/.config/starship"
-  ["core/wezterm"]="$HOME/.config/wezterm"
+  ["core/kitty"]="$HOME/.config/kitty"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/i3"]="$HOME/.config/i3"
@@ -49,6 +49,7 @@ apt_apps=(
   gh
   fastfetch
   xsel
+  kitty
   # tiling
   i3
   rofi
