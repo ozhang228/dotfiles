@@ -61,7 +61,10 @@ apt_apps=(
   luarocks
   # Misc
   python3-venv # this is necessary because of a bug in mason 
-  amixer # for dealing with sound
+  pavucontrol # Pulseaudio controls
+  amixer # sound for alsa
+  blueman # bluetooth
+  dunst # notifications
   feh # wallpaper
 )
 
