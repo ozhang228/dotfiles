@@ -10,11 +10,15 @@ declare -A symlinks=(
   ["core/kitty"]="$HOME/.config/kitty"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
+  ["dist/unix/.fonts"]="$HOME/.fonts"
   ["dist/unix/i3"]="$HOME/.config/i3"
   ["dist/unix/i3status"]="$HOME/.config/i3status"
   ["dist/unix/rofi"]="$HOME/.config/rofi"
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
 )
+
+# reset font cache
+fc-cache -fv
 
 echo "🔗 Creating symlinks from $dotfiles..."
 
