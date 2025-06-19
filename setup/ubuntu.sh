@@ -17,6 +17,9 @@ declare -A symlinks=(
   ["dist/unix/.bashrc"]="$HOME/.bashrc"
 )
 
+# reset font cache
+fc-cache -fv
+
 echo "🔗 Creating symlinks from $dotfiles..."
 
 for src in "${!symlinks[@]}"; do
