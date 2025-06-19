@@ -49,7 +49,7 @@ bindsym $mod+$smod+Return exec $wm_setting_app_browser
 bindsym Mod4+space exec $wm_setting_app_launcher
 
 exec_always --no-startup-id $wm_setting_app_compositor
-exec_always --no-startup-id feh --bg-scale ~/dotfiles/imgs/garden.jpg
+exec_always --no-startup-id "feh --bg-scale ~/dotfiles/imgs/wallpapers/garden.jpg"
 
 ### Workspaces ###
 set $ws1  "    1    "
@@ -146,4 +146,6 @@ bindsym $mod+$smod+f fullscreen toggle
 bindsym $mod+$smod+q kill
 
 bindsym $mod+$smod+r restart 
-bindsym $mod+$smod+e exec --no-startup-id i3-msg exit # logout
+
+ # logout
+bindsym $mod+$smod+e exec "i3-msg exit"
