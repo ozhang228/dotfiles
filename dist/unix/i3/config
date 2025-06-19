@@ -49,7 +49,7 @@ bindsym $mod+$smod+Return exec $wm_setting_app_browser
 bindsym Mod4+space exec $wm_setting_app_launcher
 
 exec_always --no-startup-id $wm_setting_app_compositor
-exec_always --no-startup-id feh --bg-scale ~/dotfiles/imgs/garden.jpg
+exec_always --no-startup-id "feh --bg-scale ~/dotfiles/imgs/wallpapers/garden.jpg"
 
 ### Workspaces ###
 set $ws1  "    1    "
