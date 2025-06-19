@@ -1,138 +1,93 @@
-# Symlinks + Package Install
+# Dots and Setup Scripts
 
-Basic setup for my dotfiles and packages I generally want on every machine.
-Some things missing that I don't need on every machine but generally use:
+My dots and setup scripts for linux and windows
 
-- [bat](https://github.com/sharkdp/bat): cat with syntax highlighting
+# Currently Updated
 
-## Supported
-
-### Distributions
-
-- **Windows**
-- **Arch Linux (term)**
+- **Windows + Arch WSL**
+- **Manjaro**
 - **Ubuntu**
 
-### Languages (by default)
+# Config
 
-- Python (pip / uv)
-- JavaScript (Node.js / npm)
-- C++ (gcc)
-  - Windows needs to do it manually through msys2
+- **Terminals**
+  - Wezterm + ZShell
+  - Kitty *Main* + ZShell
+- **CLI Tools**
+  - Starship Prompt
+  - Neovim
+  - FastFetch
+  - fd, fzf, ripgrep, jq, prettier
+  - Zoxide
+  - LazyGit
+  - Github CLI
+  - C Compilers
+- **Misc**
+  - JetbrainsNerdFont Mono
+- **Window Managers**
+  - GlazeWM + Yasb (Windows)
+  - Hyprland + Hyprpanel (Manjaro)
+  - I3 + Polybar (Ubuntu)
+- **App Launcher**
+  - Powertoys Run (Windows)
+  - Rofi (Linux)
+- **Browsers**
+  - Vivaldi
+  - Google-Chrome
+- **Windows Specific**
+  - Powershell 7
+  - PSReadLine
+  - PowerShellGet
+  - PSFzf
 
-## Config
+# Manual Setup Needed
 
-### Core
+## General
 
-- [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
-- [LazyGit](https://github.com/jesseduffield/lazygit)
-- [Wezterm](https://wezterm.org/)
-- [Starship](https://starship.rs/)
-- [fastfetch](https://github.com/fastfetch-cli/fastfetch): Custom preset and logo
-
-### Distribution Specific
-
-#### Windows
-
-- [ClangD](https://clangd.llvm.org/)
-
-## Packages
-
-### Core
-
-- [Neovim](https://github.com/neovim/neovim/blob/master/INSTALL.md)
-  - [fd](https://github.com/sharkdp/fd): Find command for pickers
-  - [fzf](https://github.com/junegunn/fzf): Fuzzy finding and a dependency for nvim and other cli tools
-  - [ripgrep](https://github.com/BurntSushi/ripgrep): Fast regex engine needed for pickers
-  - [jq](https://jqlang.org/): JSON Processing engine for rest-client and for general cli use
-  - [prettier](https://prettier.io/): HTML Processing engine for rest-client and general formatting
-- [LazyGit](https://github.com/jesseduffield/lazygit): Easier git management
-- [Wezterm](https://wezterm.org/): Terminal
-- [Starship](https://starship.rs/): Prompt
-- [Zoxide](https://github.com/ajeetdsouza/zoxide): Magic file navigation
-- [JetBrains Mono Font](https://www.jetbrains.com/lp/mono/): Font
-- [Github CLI (gh)](https://github.com/cli/cli): GitHub CLI for auth
-- [fastfetch](https://github.com/fastfetch-cli/fastfetch): OS Info
-
-### Distribution Specific
-
-#### Windows
-
-- [Powershell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5)
-  - [PSReadLine](https://github.com/PowerShell/PSReadLine)
-  - [PowerShellget](https://learn.microsoft.com/en-us/powershell/gallery/powershellget/install-powershellget?view=powershellget-3.x)
-  - [PSFzf](https://github.com/kelleyma49/PSFzf.git)
-- [GlazeWM](https://github.com/glzr-io/glazewm)
-
-#### Linux
-
-- C++ Compilers
-  - [build-essentials](https://packages.debian.org/sid/build-essential)
-  - [base-devel](https://archlinux.org/packages/core/any/base-devel/)
-- [luarocks](https://innovativeinnovation.github.io/ubuntu-setup/lua/luarocks.html)
-- [curl](https://curl.se/download.html): call APIs
-- [zsh](https://www.zsh.org/)
-- [i3](https://i3wm.org)
-- [rofi](https://github.com/davatorium/rofi)
-
-### Manual Setup
-
-- Install
-  - Vivaldi Browser
-- Setup
-  - gh auth login to get into GitHub
-  - <CMD>Copilot auth</CMD> in nvim to get it setup
-- Test
+- Downloading Vivaldi Browser
+- Github setup (gh auth login)
+- Copilot Setup (Copilot auth in nvim)
+- Run Tests
   - audio, camera, screen share
   - bluetooth, wifi 
+- Disable mouse acceleration
+- Setup Reasonable Defaults for Shutting Down Laptop on lid close
 
-#### Windows
+## Windows
 
-- PowerToys
+- Powertoys Setup 
   - Keyboard Manager
     - Remap Caps Lock -> Esc
     - Remap <C-Shift-Caps Lock> -> Caps Lock
   - Powertoys Run: Win + Space for open
-- WSL (wsl --install archlinux)
-- Msys2 (if doing dev without WSl)
-  - C++ (MinGW) / Add to path (C:/msys64/mingw64/bin)
-- GlazeWM add to startup / Delete Zebar
-- In Settings
-  - disable mouse acceleration
-  - night light (or any reduce blue light setting)
-  - shut down computer on laptop lid close and set reasonable sleep timers
+- WSL (wsl --install archlinux) 
+- GlazeWM 
+  - add to startup and delete Zebar
 
-#### Arch Linux (term)
+## Arch WSL
 
-##### User Setup
+- User Setup 
+  - `useradd -m -G wheel oscar`
+  - `passwd root` / `passwd oscar` to set some passwords
+  - `pacman -Sy sudo nvim git` so I can access sudo in user, nvim to edit wheel group, and git to pull repo
+  - `EDITOR=nvim visudo` and uncomment out `%wheel ALL=(ALL) ALL` to give wheel user group sudo permissions with password
+- Setup Locale to be en_US 
+  - uncomment the locale in etc/locale.gen
+  - run `locale-gen` and then `locale`
+- Setup WSL Defaults
+  ```bash
+  wsl --set-default archlinux # default distro
+  wsl --manage archlinux --set-default-user oscar # set default user (might need to update wsl)
+  ```
 
-- `useradd -m -G wheel oscar`
-- `passwd root` / `passwd oscar` to set some passwords
-- `pacman -Sy sudo nvim git` so I can access sudo in user, nvim to edit wheel group, and git to pull repo
-- `EDITOR=nvim visudo` and uncomment out `%wheel ALL=(ALL) ALL` to give wheel user group sudo permissions with password
+## Ubuntu
 
-##### Set Locale to en_US
-
-- uncomment the locale in etc/locale.gen
-- run `locale-gen` and then `locale`
-
-##### WSL Setup (if applicable)
-
-```bash
-wsl --set-default archlinux # default distro
-wsl --manage archlinux --set-default-user oscar # set default user (might need to update wsl)
-```
-
-#### Ubuntu
-
-- Install Wezterm manually through cli
 - Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
-- solaar for unifying receivers
+- solaar for unifying receivers if needed
 
-#### Manjaro
+## Manjaro
 
-- using kitty because of bad support in wezterm for hyprland
 - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
-- might need to do vivaldi:flags and set preferred ozone platform to wayland
+- might need to do vivaldi:flags and set preferred ozone platform to wayland and disabling ui scaling
 
