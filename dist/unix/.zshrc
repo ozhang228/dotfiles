@@ -21,3 +21,6 @@ export MANPAGER='nvim +Man!'
 
 alias pm="sudo pacman"
 alias dot="cd ~/dotfiles; nvim ."
+
+# Conda
+export PATH="$HOME/miniconda3/bin:$PATH"
