@@ -57,8 +57,7 @@ My dots and setup scripts for linux and windows
 
 - Powertoys Setup 
   - Keyboard Manager
-    - Remap Caps Lock -> Esc
-    - Remap <C-Shift-Caps Lock> -> Caps Lock
+    - Swap Caps Lock & Esc
   - Powertoys Run: Win + Space for open
 - WSL (wsl --install archlinux) 
 - GlazeWM 
