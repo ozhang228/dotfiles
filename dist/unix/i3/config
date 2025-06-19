@@ -1,8 +1,3 @@
-# SkyyySi's Nordic i3 config file
-#
-# Please see https://i3wm.org/docs/userguide.html for a complete reference!
-
-### Variables for settings (This makes changing them WAY easyer!) ###
 # Mod1 is alt, Mod4 is windows key
 set $mod                             Mod1
 set $smod                            Shift
@@ -15,7 +10,7 @@ set $wm_setting_key_down             j
 set $wm_setting_key_up               k
 set $wm_setting_key_right            l
 
-set $wm_setting_app_terminal         wezterm
+set $wm_setting_app_terminal  	 		 kitty
 set $wm_setting_app_browser          google-chrome
 set $wm_setting_app_launcher         rofi -show drun
 set $wm_setting_app_compositor       picom
@@ -25,13 +20,6 @@ set $wm_color_border_active_fg       #3B4252
 set $wm_color_border_inactive_bg     #3B4252
 set $wm_color_border_inactive_fg     #D8DEE9
 set $wm_color_background             #2E3440
-
-set $bar_setting_position            bottom
-set $bar_setting_mode                dock
-set $bar_setting_font                pango:JetBrains Mono 14
-set $bar_setting_separator           " - "
-set $bar_setting_statusCommand       i3status
-set $bar_setting_trayoutput          full
 
 set $bar_color_background            #3B4252
 set $bar_color_foreground            #D8DEE9
@@ -56,21 +44,13 @@ bindsym XF86AudioRaiseVolume exec "amix -D pulse set Master 5%+"
 bindsym --release Mod4+S exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
 
 ### Applications ###
-# Start a terminal emulator
 bindsym $mod+Return exec $wm_setting_app_terminal
-
-# Start a web browser
 bindsym $mod+$smod+Return exec $wm_setting_app_browser
-
-# Start a program launcher
 bindsym Mod4+space exec $wm_setting_app_launcher
 
-# Run a window compositor (for effects like transparency or full VSync)
 exec_always --no-startup-id $wm_setting_app_compositor
 
 ### Workspaces ###
-# Define names for default workspaces for which we configure key bindings later on.
-# We use variables to avoid repeating the names in multiple places.
 set $ws1  "    1    "
 set $ws2  "    2    "
 set $ws3  "    3    "
@@ -107,7 +87,6 @@ bindsym $mod+$smod+9 move container to workspace $ws9, workspace $ws9
 bindsym $mod+$smod+0 move container to workspace $ws10, workspace $ws10
 
 ### Window sizes and positions ###
-# Cange focus
 bindsym $mod+$wm_setting_key_left        focus left
 bindsym $mod+$wm_setting_key_down        focus down
 bindsym $mod+$wm_setting_key_up          focus up
@@ -119,21 +98,13 @@ bindsym $mod+$smod+$wm_setting_key_down  move down
 bindsym $mod+$smod+$wm_setting_key_up    move up
 bindsym $mod+$smod+$wm_setting_key_right move right
 
-# Resize window (you can also use the mouse for that)
 mode "resize" {
-#	These bindings trigger as soon as you enter the resize mode
-
-#	Pressing left will shrink the window’s width.
-#	Pressing right will grow the window’s width.
-#	Pressing up will shrink the window’s height.
-#	Pressing down will grow the window’s height.
 	bindsym $wm_setting_key_left  resize shrink width 10 px or 10 ppt
 	bindsym $wm_setting_key_down  resize grow height 10 px or 10 ppt
 	bindsym $wm_setting_key_up    resize shrink height 10 px or 10 ppt
 	bindsym $wm_setting_key_right resize grow width 10 px or 10 ppt
-
-#	Resize the gap width and height
 	bindsym $smod+$wm_setting_key_left  gaps horizontal minus 5
+
 	bindsym $smod+$wm_setting_key_down  gaps horizontal plus 5
 	bindsym $smod+$wm_setting_key_up    gaps vertical minus 5
 	bindsym $smod+$wm_setting_key_right gaps vertical plus 5
@@ -160,27 +131,6 @@ client.urgent           $wm_color_border_inactive_bg $wm_color_border_inactive_b
 client.placeholder      $wm_color_border_inactive_bg $wm_color_border_inactive_bg $wm_color_border_inactive_fg $wm_color_border_inactive_bg $wm_color_border_inactive_bg
 client.background       $wm_color_background
 
-### i3bar ###
-bar {
-	position         $bar_setting_position
-	mode             $bar_setting_mode
-	font             $bar_setting_font
-	separator_symbol $bar_setting_separator
-	status_command   $bar_setting_statusCommand
-	tray_output      $bar_setting_trayoutput
-
-	colors {
-		background   $bar_color_background
-		statusline   $bar_color_statusline
-		separator    $bar_color_separator
-
-		focused_workspace  $bar_color_workspace_focused_bg  $bar_color_workspace_focused_bg  $bar_color_workspace_focused_fg
-		active_workspace   $bar_color_workspace_active_bg   $bar_color_workspace_active_bg   $bar_color_workspace_active_fg
-		inactive_workspace $bar_color_workspace_inactive_bg $bar_color_workspace_inactive_bg $bar_color_workspace_inactive_fg
-		urgent_workspace   $bar_color_workspace_urgent_bg   $bar_color_workspace_urgent_bg   $bar_color_workspace_urgent_fg
-	}
-}
-
 ### Miscellaneous settings ###
 # Set the font used for titlebars (which are hidden here)
 font $wm_setting_font
@@ -189,16 +139,10 @@ font $wm_setting_font
 floating_modifier $mod
 
 # Enter fullscreen mode for the focused window
-bindsym $mod+f fullscreen toggle
-
-# Toggle between tiling and floating
-bindsym $mod+$smod+f floating toggle
+bindsym $mod+$smod+f fullscreen toggle
 
 # Kill the focused window
 bindsym $mod+$smod+q kill
 
-# Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+$smod+r restart
-
-# Exit i3 (logs you out of your X session)
-bindsym $mod+$smod+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+$smod+r restart 
+bindsym $mod+$smod+l exec --no-startup-id i3-msg exit # logout
