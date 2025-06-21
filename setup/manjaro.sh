@@ -59,6 +59,8 @@ pacman_apps=(
   hyprpaper
   xdg-desktop-portal-hyprland # screen sharing
   xdg-desktop-portal-gtk
+  hypridle # close screen on idle
+  hyprlock # for lock screen
   # languages
   lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
