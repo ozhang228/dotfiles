@@ -20,6 +20,7 @@ fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fa
 export MANPAGER='nvim +Man!'
 
 alias pm="sudo pacman"
+alias p3="python3"
 alias dot="cd ~/dotfiles; nvim ."
 
 # Conda
