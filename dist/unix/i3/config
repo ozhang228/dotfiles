@@ -49,8 +49,10 @@ bindsym $mod+$smod+Return exec $wm_setting_app_browser
 bindsym Mod4+space exec $wm_setting_app_launcher
 
 exec_always --no-startup-id $wm_setting_app_compositor
-exec_always --no-startup-id "feh --bg-scale ~/dotfiles/imgs/wallpapers/garden.jpg"
-exec_always --no-startup-id "bash $HOME/dotfiles/dist/unix/polybar/launch.sh"
+
+# monitor setup then wallpaper and polybar
+exec_always --no-startup-id "autorandr -c;feh --bg-scale ~/dotfiles/imgs/wallpapers/garden.jpg;bash $HOME/dotfiles/dist/unix/polybar/launch.sh"
+
 
 ### AutoStart Apps ###
 exec_always --no-startup-id $wm_setting_app_browser
