@@ -139,6 +139,10 @@ return {
           end,
           desc = "Find man page",
         },
+        ["<Leader>lI"] = {
+          "<CMD>Conform<CR>",
+          desc = "Conform formatter information",
+        },
         -- End Misc
 
         -- Use oil instead

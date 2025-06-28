@@ -4,35 +4,45 @@ return {
   ---@type AstroLSPOpts
   opts = {
     features = {
-      codelens = true, -- enable/disable codelens refresh on start
-      inlay_hints = false, -- enable/disable inlay hints on start
-      semantic_tokens = true, -- enable/disable semantic token highlighting
+      codelens = true,
+      inlay_hints = false,
+      semantic_tokens = true,
     },
     formatting = {
       format_on_save = {
         enabled = true,
         ignore_filetypes = { "markdown", "text" },
       },
-      timeout_ms = 20000, -- default format timeout
+      disabled = {
+        "basedpyright",
+      },
+      timeout_ms = 20000,
     },
     servers = {},
     ---@diagnostic disable: missing-fields
-    config = {},
-    handlers = {},
-    autocmds = {
-      lsp_codelens_refresh = {
-        cond = "textDocument/codeLens",
-        {
-          -- events to trigger
-          event = { "InsertLeave", "BufEnter" },
-          -- the rest of the autocmd options (:h nvim_create_autocmd)
-          desc = "Refresh codelens (buffer)",
-          callback = function(args)
-            if require("astrolsp").config.features.codelens then vim.lsp.codelens.refresh { bufnr = args.buf } end
-          end,
+    config = {
+      ruff = {
+        settings = {
+        }
+      },
+      basedpyright = {
+        settings = {
+          basedpyright = {
+            disableOrganizeImports = true, -- Using Ruff
+            analysis = {
+              typeCheckingMode = "standard",
+            },
+          },
+          python = {
+            analysis = {
+              ignore = { "*" }, -- Using Ruff
+            },
+          },
         },
       },
     },
+    handlers = {},
+    autocmds = {},
     mappings = {
       n = {},
     },
