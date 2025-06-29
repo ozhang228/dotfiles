@@ -7,7 +7,4 @@ return {
   -- language packs
   { import = "astrocommunity.pack.java" },
   { import = "astrocommunity.pack.typescript" },
-  { import = "astrocommunity.pack.markdown" },
-
-  -- import/override with your plugins folder
 }
