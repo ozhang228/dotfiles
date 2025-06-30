@@ -11,8 +11,8 @@ My dots and setup scripts for linux and windows
 # Config
 
 - **Terminals**
-  - Wezterm + ZShell
-  - Kitty *Main* + ZShell
+  - Kitty + ZShell - All
+  - Wezterm - Windows
 - **CLI Tools**
   - Starship Prompt
   - Neovim
@@ -87,6 +87,5 @@ My dots and setup scripts for linux and windows
 
 ## Manjaro
 
-- Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
 - might need to do vivaldi:flags and set preferred ozone platform to wayland and disabling ui scaling
 

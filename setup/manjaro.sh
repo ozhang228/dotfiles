@@ -135,4 +135,4 @@ done
 git config --global user.name "Oscar Zhang"
 git config --global user.email "oscarzhang228@gmail.com"
 
-echo "🎉 Arch terminal setup complete!"
+echo "🎉 Manjaro setup complete!"
