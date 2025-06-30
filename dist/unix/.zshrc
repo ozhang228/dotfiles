@@ -22,7 +22,9 @@ export MANPAGER='nvim +Man!'
 alias pm="sudo pacman"
 alias p3="python3"
 alias npmr="npm run"
+
 alias dot="cd ~/dotfiles; nvim ."
+alias notes="cd ~/notes; nvim ."
 
 ### Work Aliases ###
 

@@ -1,7 +1,5 @@
----@type LazySpec
 return {
   "AstroNvim/astrolsp",
-  ---@type AstroLSPOpts
   opts = {
     features = {
       codelens = true,
@@ -19,12 +17,7 @@ return {
       timeout_ms = 20000,
     },
     servers = {},
-    ---@diagnostic disable: missing-fields
     config = {
-      ruff = {
-        settings = {
-        }
-      },
       basedpyright = {
         settings = {
           basedpyright = {

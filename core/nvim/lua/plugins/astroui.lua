@@ -1,4 +1,3 @@
----@type LazySpec
 return {
   {
     "AstroNvim/astroui",
@@ -21,15 +20,6 @@ return {
   },
   {
     "HiPhish/rainbow-delimiters.nvim",
-  },
-  {
-    "echasnovski/mini.icons",
-    opts = {
-      filetype = {
-        ["Harpoon"] = { glyph = "󱡀" },
-        ["Trouble"] = { glyph = "󱍼" },
-      },
-    },
   },
   {
     "catppuccin/nvim",

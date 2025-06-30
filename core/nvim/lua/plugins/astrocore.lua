@@ -1,7 +1,5 @@
----@type LazySpec
 return {
   "AstroNvim/astrocore",
-  ---@type AstroCoreOpts
   opts = {
     features = {
       large_buf = { size = 1024 * 256, lines = 10000 },
@@ -28,7 +26,6 @@ return {
     autocmds = {},
     mappings = {
       n = {
-        -- File Utils
         ["<Leader>fr"] = {
           function() require("snacks.picker").lsp_references() end,
           nowait = true,
@@ -41,14 +38,12 @@ return {
         ["<Leader>x"] = {
           desc = require("mini.icons").get("filetype", "Trouble") .. " QFL",
         },
-        -- END File Utils
 
         ["<Leader>ls"] = {
           [[<CMD>Neogen<CR>]],
           desc = "Generate docstring",
         },
 
-        -- Terminal
         ["<Leader>t2"] = {
           desc = "ToggleTerm2",
         },
@@ -60,9 +55,7 @@ return {
           "<CMD>ToggleTerm2 direction=horizontal<CR>",
           desc = "ToggleTerm2 Horizontal",
         },
-        -- END Terminal
 
-        -- Grapple (used to be harpoon)
         ["<Leader>h"] = { "Nop", desc = require("mini.icons").get("filetype", "Harpoon") .. " Grapple" },
         ["<Leader>hm"] = {
           "<CMD>Grapple toggle_tags<CR>",
@@ -80,9 +73,7 @@ return {
           "<CMD> Grapple cycle_tags next<CR>",
           desc = "Go to next Grapple mark",
         },
-        -- END Grapple
 
-        -- Kulala Rest Client
         ["<Leader>r"] = {
           "Nop",
           desc = require("mini.icons").get("lsp", "file") .. " Kulala Rest Client",
@@ -91,31 +82,15 @@ return {
           function() require("kulala").run() end,
           desc = "Run http request",
         },
-        -- END Kulala Rest Client
 
-        -- Scratch
         ["<Leader>s"] = {
           desc = require("mini.icons").get("filetype", "Scratch") .. " Scratch",
-        },
-        ["<Leader>sh"] = {
-          function() require("snacks").scratch.open { ft = "http" } end,
-          desc = "Open HTTP scratch buffer",
         },
         ["<Leader>sm"] = {
           function() require("snacks").scratch.open { ft = "markdown" } end,
           desc = "Open markdown scratch buffer",
         },
-        -- END Scratch
 
-        -- Git
-        ["<Leader>gt"] = false,
-        ["<Leader>gb"] = false,
-        ["<Leader>gc"] = false,
-        ["<Leader>gC"] = false,
-        ["<Leader>gT"] = false,
-        -- END Git
-
-        -- Misc
         ["n"] = {
           [[nzz]],
         },
@@ -128,9 +103,6 @@ return {
         ["<C-U>"] = {
           [[<C-U>zz]],
         },
-        -- Remove these keybinds to delete into register x because I never use it
-        ["s"] = { "<nop>" },
-        ["S"] = { "<nop>" },
         ["<Leader>fm"] = {
           function()
             vim.ui.input({ prompt = "Manual page for: " }, function(input)
@@ -143,18 +115,21 @@ return {
           "<CMD>Conform<CR>",
           desc = "Conform formatter information",
         },
-        -- End Misc
 
-        -- Use oil instead
+        ["s"] = false,
+        ["S"] = false,
         ["<Leader>n"] = false,
         ["<Leader>R"] = false,
-        -- Never used force close buffer
         ["<Leader>C"] = false,
+        ["<Leader>gt"] = false,
+        ["<Leader>gb"] = false,
+        ["<Leader>gc"] = false,
+        ["<Leader>gC"] = false,
+        ["<Leader>gT"] = false,
       },
 
       t = {
-        -- terminal escape
-        ["<Esc>"] = [[<C-\><C-n>]],
+        ["<Esc><Esc>"] = [[<C-\><C-n>]],
       },
       i = {
         ["<Tab>"] = "<Tab>",

@@ -1,5 +1,3 @@
---- @type LazySpec
-
 return {
   {
     "Saghen/blink.cmp",
@@ -35,7 +33,6 @@ return {
       },
     },
   },
-
   {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
@@ -44,5 +41,14 @@ return {
       suggestion = { enabled = false },
       panel = { enabled = false },
     },
+  },
+  {
+    "L3MON4D3/LuaSnip",
+    config = function(plugin, opts)
+      require "astronvim.plugins.configs.luasnip"(plugin, opts)
+      require("luasnip.loaders.from_vscode").lazy_load {
+        paths = { vim.fn.stdpath "config" .. "/snippets" },
+      }
+    end,
   },
 }
