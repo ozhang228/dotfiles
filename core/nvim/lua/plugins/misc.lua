@@ -39,6 +39,10 @@ return {
         },
       },
       watch_for_changes = false,
+      delete_to_trash = true,
+      lsp_file_methods = {
+        enabled = true,
+      },
     },
     dependencies = { { "echasnovski/mini.icons", opts = {} } },
     lazy = false,
