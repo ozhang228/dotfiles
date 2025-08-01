@@ -4,7 +4,7 @@ set $smod                            Shift
 set $wm_setting_font                 pango:JetBrains Mono 14
 set $wm_setting_gap_width            15
 set $wm_setting_gap_heigth           15
-set $wm_setting_border_size          2
+set $wm_setting_border_size          5
 set $wm_setting_key_left             h
 set $wm_setting_key_down             j
 set $wm_setting_key_up               k
@@ -15,7 +15,7 @@ set $wm_setting_app_browser          google-chrome
 set $wm_setting_app_launcher         rofi -show drun
 set $wm_setting_app_compositor       picom
 
-set $wm_color_border_active_bg       #81A1C1
+set $wm_color_border_active_bg       #BF616A
 set $wm_color_border_active_fg       #3B4252
 set $wm_color_border_inactive_bg     #3B4252
 set $wm_color_border_inactive_fg     #D8DEE9
@@ -42,6 +42,7 @@ bindsym XF86AudioRaiseVolume exec "amixer -D pulse set Master 5%+"
 
 ### Screenshot ###
 bindsym --release Mod4+S exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
+bindsym --release Mod4+Shift+S exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
 
 ### Applications ###
 bindsym $mod+Return exec $wm_setting_app_terminal
@@ -51,7 +52,12 @@ bindsym Mod4+space exec $wm_setting_app_launcher
 exec_always --no-startup-id $wm_setting_app_compositor
 
 # monitor setup then wallpaper and polybar
-exec_always --no-startup-id "autorandr -c;feh --bg-scale ~/dotfiles/imgs/wallpapers/garden.jpg;bash $HOME/dotfiles/dist/unix/polybar/launch.sh"
+exec_always --no-startup-id "autorandr docked;feh --bg-scale ~/dotfiles/imgs/wallpapers/garden.jpg;bash $HOME/dotfiles/dist/unix/polybar/launch.sh"
+
+
+workspace 1 output DP-1
+workspace 2 output DP-1
+workspace 3 output DP-2
 
 
 ### AutoStart Apps ###
