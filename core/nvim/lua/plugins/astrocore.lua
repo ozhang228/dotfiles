@@ -56,24 +56,6 @@ return {
           desc = "ToggleTerm2 Horizontal",
         },
 
-        ["<Leader>h"] = { "Nop", desc = require("mini.icons").get("filetype", "Harpoon") .. " Grapple" },
-        ["<Leader>hm"] = {
-          "<CMD>Grapple toggle_tags<CR>",
-          desc = "Toggle Grapple Quick Menu",
-        },
-        ["<Leader>ha"] = {
-          "<CMD> Grapple toggle<CR>",
-          desc = "Add File",
-        },
-        ["<Leader>hh"] = {
-          "<CMD> Grapple cycle_tags prev<CR>",
-          desc = "Go to previous Grapple mark",
-        },
-        ["<Leader>hl"] = {
-          "<CMD> Grapple cycle_tags next<CR>",
-          desc = "Go to next Grapple mark",
-        },
-
         ["<Leader>r"] = {
           "Nop",
           desc = require("mini.icons").get("lsp", "file") .. " Kulala Rest Client",
@@ -126,6 +108,8 @@ return {
         ["<Leader>gc"] = false,
         ["<Leader>gC"] = false,
         ["<Leader>gT"] = false,
+        ["<Leader>h"] = false,
+        ["<Leader>d"] = false,
       },
 
       t = {
