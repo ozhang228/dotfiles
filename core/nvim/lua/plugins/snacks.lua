@@ -43,6 +43,9 @@ return {
         },
       },
     },
+    lazygit = {
+      enabled = true,
+    },
   },
   keys = {},
 }

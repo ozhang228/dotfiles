@@ -44,16 +44,21 @@ return {
           desc = "Generate docstring",
         },
 
+        ["<Leader>t1"] = {
+          "<CMD>ToggleTerm1 direction=float<CR>",
+          desc = "ToggleTerm1",
+        },
         ["<Leader>t2"] = {
+          "<CMD>ToggleTerm2 direction=float<CR>",
           desc = "ToggleTerm2",
         },
-        ["<Leader>t2f"] = {
-          "<CMD>ToggleTerm2 direction=float<CR>",
-          desc = "ToggleTerm2 Float",
+        ["<Leader>t3"] = {
+          "<CMD>ToggleTerm3 direction=float<CR>",
+          desc = "ToggleTerm3",
         },
-        ["<Leader>t2h"] = {
-          "<CMD>ToggleTerm2 direction=horizontal<CR>",
-          desc = "ToggleTerm2 Horizontal",
+        ["<Leader>ts"] = {
+          "<CMD>TermSelect<CR>",
+          desc = "List terminals",
         },
 
         ["<Leader>r"] = {
@@ -71,6 +76,11 @@ return {
         ["<Leader>sm"] = {
           function() require("snacks").scratch.open { ft = "markdown" } end,
           desc = "Open markdown scratch buffer",
+        },
+
+        ["<Leader>gg"] = {
+          function() require("snacks").lazygit() end,
+          desc = "Open LazyGit",
         },
 
         ["n"] = {
@@ -110,6 +120,10 @@ return {
         ["<Leader>gT"] = false,
         ["<Leader>h"] = false,
         ["<Leader>d"] = false,
+        ["<Leader>tf"] = false,
+        ["<Leader>th"] = false,
+        ["<Leader>tp"] = false,
+        ["<Leader>tv"] = false,
       },
 
       t = {
