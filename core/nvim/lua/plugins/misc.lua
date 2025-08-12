@@ -70,10 +70,4 @@ return {
       default_mappings = false,
     },
   },
-  {
-    "lewis6991/gitsigns.nvim",
-    opts = {
-      default_mappings = false,
-    },
-  },
 }
