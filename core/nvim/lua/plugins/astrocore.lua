@@ -83,6 +83,27 @@ return {
           desc = "Open LazyGit",
         },
 
+        ["<Leader>gq"] = {
+          "<CMD>GitConflictListQf<CR>",
+          desc = "Diff QFList",
+        },
+        ["<Leader>gt"] = {
+          "<CMD>GitConflictChooseTheirs<CR>",
+          desc = "Choose theirs",
+        },
+        ["<Leader>go"] = {
+          "<CMD>GitConflictChooseOurs<CR>",
+          desc = "Choose ours",
+        },
+        ["<Leader>gb"] = {
+          "<CMD>GitConflictChooseBoth<CR>",
+          desc = "Choose ours",
+        },
+        ["<Leader>gO"] = {
+          function() require("snacks").gitbrowse() end,
+          desc = "Open git repository",
+        },
+
         ["n"] = {
           [[nzz]],
         },
@@ -113,8 +134,6 @@ return {
         ["<Leader>n"] = false,
         ["<Leader>R"] = false,
         ["<Leader>C"] = false,
-        ["<Leader>gt"] = false,
-        ["<Leader>gb"] = false,
         ["<Leader>gc"] = false,
         ["<Leader>gC"] = false,
         ["<Leader>gT"] = false,
