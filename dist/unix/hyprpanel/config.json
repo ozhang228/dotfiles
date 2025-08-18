@@ -99,7 +99,7 @@
   "bar.customModules.cpu.pollingInterval": 5000,
   "bar.customModules.ram.pollingInterval": 5000,
   "menus.power.lowBatteryNotification": true,
-  "menus.power.lowBatteryThreshold": 50,
+  "menus.power.lowBatteryThreshold": 20,
   "theme.bar.outer_spacing": ".5em",
   "menus.dashboard.powermenu.avatar.name": "Oscar",
   "menus.dashboard.powermenu.confirmation": true,
