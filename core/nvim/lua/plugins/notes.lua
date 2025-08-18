@@ -14,6 +14,10 @@ return {
         name = "Notes",
         path = "$HOME/notes",
       },
+      {
+        name = "Class",
+        path = "$HOME/class",
+      },
     },
     completion = {
       blink = true,
