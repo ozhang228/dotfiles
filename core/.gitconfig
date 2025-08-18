@@ -1,0 +1,6 @@
+[user]
+    name = Oscar Zhang
+    email = oscarzhang228@gmail.com
+
+[push]
+    autoSetupRemote = true

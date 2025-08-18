@@ -9,6 +9,7 @@ declare -A symlinks=(
   ["core/starship"]="$HOME/.config/starship"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/kitty"]="$HOME/.config/kitty"
+  ["core/.gitconfig"]="$HOME/.gitconfig"
   ["dist/unix/rofi"]="$HOME/.config/rofi"
   ["dist/unix/hyprpanel"]="$HOME/.config/hyprpanel"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
