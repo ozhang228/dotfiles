@@ -82,18 +82,21 @@ return {
           function() require("snacks").lazygit() end,
           desc = "Open LazyGit",
         },
-
         ["n"] = {
           [[nzz]],
+          desc = "Next search result with cursor centered",
         },
         ["N"] = {
           [[Nzz]],
+          desc = "Previous search result with cursor centered",
         },
         ["<C-D>"] = {
           [[<C-D>zz]],
+          desc = "Scroll down with cursor centered",
         },
         ["<C-U>"] = {
           [[<C-U>zz]],
+          desc = "Scroll up with cursor centered",
         },
         ["<Leader>fm"] = {
           function()
