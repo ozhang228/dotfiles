@@ -10,6 +10,7 @@ declare -A symlinks=(
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/kitty"]="$HOME/.config/kitty"
   ["core/.gitconfig"]="$HOME/.gitconfig"
+  ["core/lsd"]="$HOME/.config/lsd"
   ["dist/unix/rofi"]="$HOME/.config/rofi"
   ["dist/unix/hyprpanel"]="$HOME/.config/hyprpanel"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
@@ -45,6 +46,7 @@ pacman_apps=(
   hyprland
   # CLI
   zsh
+  lsd
   curl
   fd
   ripgrep

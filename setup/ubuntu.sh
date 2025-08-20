@@ -10,6 +10,7 @@ declare -A symlinks=(
   ["core/kitty"]="$HOME/.config/kitty"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/.gitconfig"]="$HOME/.gitconfig"
+  ["core/lsd"]="$HOME/.config/lsd"
   ["dist/unix/.zshrc"]="$HOME/.zshrc"
   ["dist/unix/.fonts"]="$HOME/.fonts"
   ["dist/unix/rofi"]="$HOME/.config/rofi"
@@ -50,6 +51,7 @@ apt_apps=(
   zoxide
   jq
   gh
+  lsd
   fastfetch
   xsel
   kitty

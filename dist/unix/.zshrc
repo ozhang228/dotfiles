@@ -18,7 +18,15 @@ clear
 fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc
 
 export MANPAGER='nvim +Man!'
+export EDITOR='nvim'
 
+# ignore duplicate commands and blank
+setopt hist_ignore_dups
+setopt hist_ignore_all_dups
+setopt hist_reduce_blanks
+setopt hist_verify
+
+alias ls="lsd"
 alias pm="sudo pacman"
 alias p3="python3"
 alias npmr="npm run"
