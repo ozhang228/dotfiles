@@ -10,6 +10,7 @@ declare -A symlinks=(
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/kitty"]="$HOME/.config/kitty"
   ["core/.gitconfig"]="$HOME/.gitconfig"
+  ["core/Dygma"]="$HOME/Dygma"
   ["core/lsd"]="$HOME/.config/lsd"
   ["dist/unix/rofi"]="$HOME/.config/rofi"
   ["dist/unix/hyprpanel"]="$HOME/.config/hyprpanel"
@@ -64,6 +65,7 @@ pacman_apps=(
   xdg-desktop-portal-gtk
   hypridle # close screen on idle
   hyprlock # for lock screen
+  hyprpolkit # polkit authentication
   # languages
   lua51 # 5.1 for rest.nvim but upgrade as needed
   luarocks
