@@ -1,5 +1,53 @@
+# -- Environment -- 
+export EDITOR='nvim'
+export MANPAGER='nvim +Man!'
+export PAGER='less'
+export LESS='-R'
+export CONDA_CHANGEPS1=false
+
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+setopt HIST_IGNORE_SPACE
+
+setopt INTERACTIVE_COMMENTS
+setopt PIPE_FAIL
+
+setopt PROMPT_SUBST # allow var substitution in prompt
+setopt globdots # hidden files
+
+path=("$HOME/.local/bin" $path) # base path 
+
+# history file setup
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+
+# emacs style shell bindings to not conflict with vim
+bindkey -e
+
+# zsh completions
+autoload -Uz compinit
+compinit -d ~/.zcompdump
+
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}" # Colors
+zstyle ':completion:*' matcher-list \
+  'm:{a-z}={A-Za-z}' \
+  'r:|[._-]=* r:|=*' # ignore case and separators
+
 # fzf key bindings and fuzzy completion
-source <(fzf --zsh)
+if [[ -r /usr/share/fzf/key-bindings.zsh ]]; then
+  source /usr/share/fzf/key-bindings.zsh
+  [[ -r /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
+elif command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh)
+fi
+
+fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc # OS info
 
 # Starship Prompt
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
@@ -7,41 +55,18 @@ if command -v starship >/dev/null 2>&1; then
   eval "$(starship init zsh)"
 fi
 
-# Zoxide
-eval "$(zoxide init zsh)"
-
-# see hidden files
-setopt globdots
-
-# Clear screen and show os info 
-clear
-fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc
-
-export MANPAGER='nvim +Man!'
-export EDITOR='nvim'
-
-# ignore duplicate commands and blank
-setopt hist_ignore_dups
-setopt hist_ignore_all_dups
-setopt hist_reduce_blanks
-setopt hist_verify
-
-alias ls="lsd"
+# Aliases
+if command -v lsd >/dev/null 2>&1; then
+  alias ls='lsd'
+fi
 alias pm="sudo pacman"
 alias p3="python3"
 alias npmr="npm run"
-alias pdf="zathura"
 
 alias dot="cd ~/dotfiles;nvim ."
 alias notes="cd ~/notes;nvim ."
 
-### Work Aliases ###
-
-alias dsbe="conda activate desk-tools;cd ~/projects/desk-tools/python/fio/desk_tools/apps/data_studio/;nvim ."
-alias dsfe="cd ~/projects/app-launcher/distinct-builds/data-studio/; nvim ."
-alias ca="conda activate"
-
-####################
+# Work Aliases
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -57,6 +82,3 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-
-
