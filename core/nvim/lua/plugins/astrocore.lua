@@ -21,6 +21,7 @@ return {
         signcolumn = "yes",
         wrap = true,
         conceallevel = 0,
+        swapfile = false,
       },
     },
     autocmds = {},
