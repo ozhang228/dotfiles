@@ -89,7 +89,6 @@ BREW_FORMULAS=(
 
 BREW_CASKS=(
   font-jetbrains-mono-nerd-font
-  vivaldi
 )
 
 # ── config: npm globals ──
