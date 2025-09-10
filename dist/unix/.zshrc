@@ -39,14 +39,6 @@ zstyle ':completion:*' matcher-list \
   'm:{a-z}={A-Za-z}' \
   'r:|[._-]=* r:|=*' # ignore case and separators
 
-# fzf key bindings and fuzzy completion
-if [[ -r /usr/share/fzf/key-bindings.zsh ]]; then
-  source /usr/share/fzf/key-bindings.zsh
-  [[ -r /usr/share/fzf/completion.zsh ]] && source /usr/share/fzf/completion.zsh
-elif command -v fzf >/dev/null 2>&1; then
-  source <(fzf --zsh)
-fi
-
 fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc # OS info
 
 # Starship Prompt
