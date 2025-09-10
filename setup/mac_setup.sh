@@ -62,6 +62,7 @@ SYMLINKS_LIST=(
   "core/kitty $HOME/.config/kitty"
   "core/.gitconfig $HOME/.gitconfig"
   "core/lsd $HOME/.config/lsd"
+  "dist/mac/.aerospace.toml $HOME/.aerospace.toml"
   "dist/unix/.zshrc $HOME/.zshrc"
   "dist/unix/.bashrc $HOME/.bashrc"
 )

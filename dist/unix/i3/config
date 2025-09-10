@@ -114,30 +114,9 @@ bindsym $mod+$smod+$wm_setting_key_down  move down
 bindsym $mod+$smod+$wm_setting_key_up    move up
 bindsym $mod+$smod+$wm_setting_key_right move right
 
-mode "resize" {
-	bindsym $wm_setting_key_left  resize shrink width 10 px or 10 ppt
-	bindsym $wm_setting_key_down  resize grow height 10 px or 10 ppt
-	bindsym $wm_setting_key_up    resize shrink height 10 px or 10 ppt
-	bindsym $wm_setting_key_right resize grow width 10 px or 10 ppt
-	bindsym $smod+$wm_setting_key_left  gaps horizontal minus 5
-
-	bindsym $smod+$wm_setting_key_down  gaps horizontal plus 5
-	bindsym $smod+$wm_setting_key_up    gaps vertical minus 5
-	bindsym $smod+$wm_setting_key_right gaps vertical plus 5
-
-#	Back to normal: Enter or Escape or $mod+r
-	bindsym Return mode "default"
-	bindsym Escape mode "default"
-	bindsym $mod+r mode "default"
-}
-
-bindsym $mod+r mode "resize"
-
-
 ### Borders ###
 default_border pixel $wm_setting_border_size
 default_floating_border pixel $wm_setting_border_size
-
 
 ### Colors ###
 # class                 border                       background                   text                         indicator                    child_border
