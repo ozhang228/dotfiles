@@ -59,7 +59,9 @@ fi
 if command -v lsd >/dev/null 2>&1; then
   alias ls='lsd'
 fi
+
 alias pm="sudo pacman"
+
 alias p3="python3"
 alias npmr="npm run"
 
