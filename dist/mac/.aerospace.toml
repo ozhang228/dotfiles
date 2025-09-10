@@ -1,5 +1,6 @@
 # Mouse follows focus when focused monitor changes
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+start-at-login = true
 
 [mode.main.binding]
     alt-j =         'focus --boundaries-action wrap-around-the-workspace left'
