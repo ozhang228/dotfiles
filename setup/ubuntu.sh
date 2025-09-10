@@ -110,7 +110,7 @@ APT_APPS=(
   # CLI
   kitty zsh curl fd-find ripgrep jq gh lsd fastfetch xsel
   # languages/build
-  build-essential python3-pip luarocks python3-venv
+  build-essential luarocks python3-venv
   # desktop utils
   pavucontrol alsa-utils blueman dunst feh
 )

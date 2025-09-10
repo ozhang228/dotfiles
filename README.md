@@ -6,12 +6,12 @@ Dots and setup script
 
   - Ubuntu
   - Manjaro
+  - Mac
 
 - Manual Setup Needed
 
   - **General**
 
-    - Downloading Vivaldi Browser
     - Github setup (gh auth login)
     - Copilot Setup (Copilot auth in nvim)
     - Run Tests
@@ -20,6 +20,8 @@ Dots and setup script
       - bluetooth, wifi 
 
     - Disable mouse acceleration
+    - wallpapers 
+    - remap caps to escape
 
   - **Ubuntu**
 
