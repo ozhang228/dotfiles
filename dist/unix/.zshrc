@@ -59,6 +59,7 @@ alias npmr="npm run"
 
 alias dot="cd ~/dotfiles;nvim ."
 alias notes="cd ~/notes;nvim ."
+alias newwp="bash $HOME/dotfiles/dist/unix/hypr/random_wp.sh & hyprpaper"
 
 # Work Aliases
 
