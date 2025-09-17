@@ -1,17 +1,5 @@
 return {
   {
-    "mistweaverco/kulala.nvim",
-    opts = {
-      ui = {
-        show_icons = "above_request",
-        formatter = true,
-        display_mode = "float",
-        winbar = false,
-      },
-    },
-    ft = { "http" },
-  },
-  {
     "folke/noice.nvim",
     opts = {
       presets = { bottom_search = false },

@@ -65,15 +65,6 @@ return {
           desc = "List terminals",
         },
 
-        ["<Leader>r"] = {
-          "Nop",
-          desc = require("mini.icons").get("lsp", "file") .. " Kulala Rest Client",
-        },
-        ["<Leader>rr"] = {
-          function() require("kulala").run() end,
-          desc = "Run http request",
-        },
-
         ["<Leader>s"] = {
           desc = require("mini.icons").get("filetype", "Scratch") .. " Scratch",
         },
