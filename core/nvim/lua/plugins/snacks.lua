@@ -6,6 +6,18 @@ return {
     picker = {
       enabled = true,
       hidden = true,
+      win = {
+        list = {
+          wo = {
+            relativenumber = true,
+          },
+        },
+      },
+      sources = {
+        noice = {
+          confirm = { "yank", "close" },
+        },
+      },
     },
     notifer = {
       enabled = true,
@@ -13,7 +25,7 @@ return {
       top_down = "false",
     },
     scratch = {
-      enabled = true,
+      enabled = false,
       filekey = {
         cwd = true,
         count = false,

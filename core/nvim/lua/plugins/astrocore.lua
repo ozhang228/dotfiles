@@ -33,8 +33,11 @@ return {
           desc = "Find references",
         },
         ["<Leader>o"] = {
-          [[<CMD>Oil<CR>]],
-          desc = "Open Oil",
+          function()
+            require("mini.files").open(vim.api.nvim_buf_get_name(0), false)
+            require("mini.files").reveal_cwd()
+          end,
+          desc = "Open Mini.files",
         },
         ["<Leader>x"] = {
           desc = require("mini.icons").get("filetype", "Trouble") .. " QFL",
@@ -60,23 +63,6 @@ return {
         ["<Leader>ts"] = {
           "<CMD>TermSelect<CR>",
           desc = "List terminals",
-        },
-
-        ["<Leader>r"] = {
-          "Nop",
-          desc = require("mini.icons").get("lsp", "file") .. " Kulala Rest Client",
-        },
-        ["<Leader>rr"] = {
-          function() require("kulala").run() end,
-          desc = "Run http request",
-        },
-
-        ["<Leader>s"] = {
-          desc = require("mini.icons").get("filetype", "Scratch") .. " Scratch",
-        },
-        ["<Leader>sm"] = {
-          function() require("snacks").scratch.open { ft = "markdown" } end,
-          desc = "Open markdown scratch buffer",
         },
 
         ["<Leader>gg"] = {
