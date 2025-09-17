@@ -33,8 +33,11 @@ return {
           desc = "Find references",
         },
         ["<Leader>o"] = {
-          [[<CMD>Oil<CR>]],
-          desc = "Open Oil",
+          function()
+            require("mini.files").open(vim.api.nvim_buf_get_name(0), false)
+            require("mini.files").reveal_cwd()
+          end,
+          desc = "Open Mini.files in current dir",
         },
         ["<Leader>x"] = {
           desc = require("mini.icons").get("filetype", "Trouble") .. " QFL",

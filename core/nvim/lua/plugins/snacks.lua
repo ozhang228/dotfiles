@@ -6,6 +6,18 @@ return {
     picker = {
       enabled = true,
       hidden = true,
+      win = {
+        list = {
+          wo = {
+            relativenumber = true,
+          },
+        },
+      },
+      sources = {
+        noice = {
+          confirm = { "yank", "close" },
+        },
+      },
     },
     notifer = {
       enabled = true,

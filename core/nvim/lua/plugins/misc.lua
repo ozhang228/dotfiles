@@ -12,31 +12,6 @@ return {
     ft = { "http" },
   },
   {
-    "stevearc/oil.nvim",
-    opts = {
-      view_options = {
-        show_hidden = true,
-        is_hidden_file = function(name, _)
-          local m = name:match "^%."
-          return m ~= nil
-        end,
-        natural_order = "fast",
-        case_insensitive = false,
-        sort = {
-          { "type", "asc" },
-          { "name", "asc" },
-        },
-      },
-      watch_for_changes = false,
-      delete_to_trash = true,
-      lsp_file_methods = {
-        enabled = true,
-      },
-    },
-    dependencies = { { "echasnovski/mini.icons", opts = {} } },
-    lazy = false,
-  },
-  {
     "folke/noice.nvim",
     opts = {
       presets = { bottom_search = false },
