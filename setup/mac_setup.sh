@@ -90,6 +90,7 @@ BREW_FORMULAS=(
 
 BREW_CASKS=(
   font-jetbrains-mono-nerd-font
+  nikitabobko/tap/aerospace
 )
 
 # ── config: npm globals ──
