@@ -25,7 +25,7 @@ return {
       top_down = "false",
     },
     scratch = {
-      enabled = true,
+      enabled = false,
       filekey = {
         cwd = true,
         count = false,
