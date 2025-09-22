@@ -20,7 +20,7 @@ return {
         spell = false,
         signcolumn = "yes",
         wrap = true,
-        conceallevel = 0,
+        conceallevel = 2,
         swapfile = false,
       },
     },
