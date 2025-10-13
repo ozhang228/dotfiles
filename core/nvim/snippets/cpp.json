@@ -1,0 +1,11 @@
+{
+  "For Loop": {
+    "prefix": [
+      "for"
+    ],
+    "body": [
+      "for (size_t i = 0;$1;++i) {",
+      "}"
+    ]
+  }
+}
