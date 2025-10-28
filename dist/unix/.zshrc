@@ -53,26 +53,14 @@ if command -v lsd >/dev/null 2>&1; then
 fi
 
 alias pm="sudo pacman"
-
 alias p3="python3"
 alias npmr="npm run"
-
 alias dot="cd ~/dotfiles;nvim"
 alias notes="cd ~/notes;nvim"
 
-# Work Aliases
+# Personal Aliases
+alias cf="cd ~/dev/dsa/codeforces/"
+alias cfcheck='f() { g++ "$1" -o a.out && ./a.out < input.txt; }; f'
+alias lc="cd ~/dev/dsa/leetcode/"
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/ozhang/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/ozhang/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/ozhang/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/ozhang/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
+# Work Aliases
