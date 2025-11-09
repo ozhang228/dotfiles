@@ -62,5 +62,8 @@ alias notes="cd ~/notes;nvim"
 alias cf="cd ~/dev/dsa/codeforces/"
 alias cfcheck='f() { g++ "$1" -o a.out && ./a.out < input.txt; }; f'
 alias lc="cd ~/dev/dsa/leetcode/"
+alias ga="git add"
+alias gc="git commit"
+alias gp="git push"
 
 # Work Aliases
