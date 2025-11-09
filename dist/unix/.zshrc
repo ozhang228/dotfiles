@@ -7,9 +7,10 @@ export LESS='-R'
 # colors in conda
 export CONDA_CHANGEPS1=false
 
-# C/C++ compiler 
+# C/C++ compiler and vcpkg
 export CC=/usr/bin/gcc
 export CXX=/usr/bin/g++
+export VCPKG_ROOT="$HOME/.local/vcpkg"
 
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
