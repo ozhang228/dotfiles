@@ -3,7 +3,13 @@ export EDITOR='nvim'
 export MANPAGER='nvim +Man!'
 export PAGER='less'
 export LESS='-R'
+
+# colors in conda
 export CONDA_CHANGEPS1=false
+
+# C/C++ compiler 
+export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
 
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
