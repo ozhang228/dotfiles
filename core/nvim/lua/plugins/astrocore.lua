@@ -20,7 +20,7 @@ return {
         spell = false,
         signcolumn = "yes",
         wrap = true,
-        conceallevel = 2,
+        conceallevel = 0,
         swapfile = false,
       },
     },
@@ -60,6 +60,14 @@ return {
           "<CMD>ToggleTerm3 direction=float<CR>",
           desc = "ToggleTerm3",
         },
+        ["<Leader>t4"] = {
+          "<CMD>ToggleTerm4 direction=float<CR>",
+          desc = "ToggleTerm4",
+        },
+        ["<Leader>t5"] = {
+          "<CMD>ToggleTerm5 direction=float<CR>",
+          desc = "ToggleTerm5",
+        },
         ["<Leader>ts"] = {
           "<CMD>TermSelect<CR>",
           desc = "List terminals",
@@ -69,6 +77,15 @@ return {
           function() require("snacks").lazygit() end,
           desc = "Open LazyGit",
         },
+        ["<Leader>gi"] = {
+          function() require("snacks").picker.gh_issue() end,
+          desc = "Github Issues",
+        },
+        ["<Leader>gp"] = {
+          function() require("snacks").picker.gh_pr() end,
+          desc = "Github Pull Requests",
+        },
+
         ["n"] = {
           [[nzz]],
           desc = "Next search result with cursor centered",

@@ -10,10 +10,9 @@ return {
         return true
       end,
       sources = {
-        default = { "copilot" },
         providers = {
-          snippets = { score_offset = 9 },
-          path = { score_offset = 8 },
+          snippets = { score_offset = 5 },
+          path = { score_offset = 0 },
           lsp = { score_offset = 0 },
           buffer = { score_offset = 0 },
           copilot = {
