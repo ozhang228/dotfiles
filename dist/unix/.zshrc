@@ -59,18 +59,24 @@ if command -v lsd >/dev/null 2>&1; then
   alias ls='lsd'
 fi
 
-alias pm="sudo pacman"
-alias p3="python3"
-alias npmr="npm run"
+# Path Aliases
 alias dot="cd ~/dotfiles;nvim"
 alias notes="cd ~/notes;nvim"
 
 # Personal Aliases
-alias cf="cd ~/dev/dsa/codeforces/"
-alias cfcheck='f() { g++ "$1" -o a.out && ./a.out < input.txt; }; f'
-alias lc="cd ~/dev/dsa/leetcode/"
+alias pm="sudo pacman"
+alias npmr="npm run"
+alias p3="python3"
+
 alias ga="git add"
 alias gc="git commit"
 alias gp="git push"
+
+alias xopen="xdg-open"
+
+alias cf="cd ~/dev/dsa/codeforces/"
+alias cfcheck='f() { g++ "$1" -o a.out && ./a.out < input.txt; }; f'
+alias lc="cd ~/dev/dsa/leetcode/"
+
 
 # Work Aliases

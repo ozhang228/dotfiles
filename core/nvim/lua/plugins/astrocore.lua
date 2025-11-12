@@ -114,6 +114,10 @@ return {
           "<CMD>Conform<CR>",
           desc = "Conform formatter information",
         },
+        ["<Leader>W"] = {
+          ":noa w<CR>",
+          desc = "Save without formatting",
+        },
 
         ["s"] = false,
         ["S"] = false,
