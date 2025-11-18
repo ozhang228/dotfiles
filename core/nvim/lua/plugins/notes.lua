@@ -1,9 +1,9 @@
 return {
   "obsidian-nvim/obsidian.nvim",
-  version = "*",
+  -- TODO: pinned because obsidian-lsp document symbols issue, when this gets fixed, unpin
+  version = "3.10.0",
   ft = "markdown",
   dependencies = {
-    "nvim-lua/plenary.nvim",
     "Saghen/blink.cmp",
     "folke/snacks.nvim",
   },
@@ -25,6 +25,11 @@ return {
     ui = {
       enable = false,
     },
+    open = {
+      use_advanced_uri = true,
+    },
+    finder = "snacks.pick",
+    follow_url_func = vim.ui.open,
     legacy_commands = false,
   },
 }

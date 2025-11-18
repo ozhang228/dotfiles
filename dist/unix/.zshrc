@@ -75,7 +75,7 @@ alias gp="git push"
 alias xopen="xdg-open"
 
 alias cf="cd ~/dev/dsa/codeforces/"
-alias cfcheck='f() { g++ "$1" -o a.out && ./a.out < input.txt; }; f'
+alias cfcheck='f() { g++ "$1" -g -o a.out && ./a.out < input.txt; }; f'
 alias lc="cd ~/dev/dsa/leetcode/"
 
 
