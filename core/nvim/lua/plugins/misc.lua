@@ -9,11 +9,6 @@ return {
     "kevinhwang91/nvim-bqf",
     opts = {},
   },
-  { -- docstrings
-    "danymat/neogen",
-    opts = {},
-  },
-
   {
     "akinsho/toggleterm.nvim",
     version = "*",

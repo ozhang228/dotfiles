@@ -43,11 +43,6 @@ return {
           desc = require("mini.icons").get("filetype", "Trouble") .. " QFL",
         },
 
-        ["<Leader>ls"] = {
-          [[<CMD>Neogen<CR>]],
-          desc = "Generate docstring",
-        },
-
         ["<Leader>t1"] = {
           "<CMD>ToggleTerm1 direction=float<CR>",
           desc = "ToggleTerm1",
