@@ -4,16 +4,20 @@ return {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = {
       ensure_installed = {
-        "lua-language-server",
+        -- HTML/CSS/JS
         "vtsls",
         "html-lsp",
         "emmet-language-server",
         "eslint-lsp",
-        "jdtls",
-        "clangd",
-        "stylua",
         "prettier",
+        -- C/C++
+        "clangd",
+        -- Lua
+        "stylua",
+        "lua-language-server",
+        -- Python
         "ruff",
+        "pyrefly",
       },
     },
   },
