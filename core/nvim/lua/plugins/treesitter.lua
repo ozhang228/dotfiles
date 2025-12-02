@@ -13,6 +13,7 @@ return {
       "cpp",
       "java",
       "regex",
+      "latex",
     },
     highlight = {
       enable = true,

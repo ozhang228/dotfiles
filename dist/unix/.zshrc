@@ -3,6 +3,8 @@ export EDITOR='nvim'
 export MANPAGER='nvim +Man!'
 export PAGER='less'
 export LESS='-R'
+export DEBUGINFOD_URLS="https://debuginfod.archlinux.org"
+
 
 # colors in conda
 export CONDA_CHANGEPS1=false

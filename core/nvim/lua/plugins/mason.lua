@@ -18,6 +18,8 @@ return {
         -- Python
         "ruff",
         "pyrefly",
+        -- Misc
+        "tree-sitter-cli",
       },
     },
   },

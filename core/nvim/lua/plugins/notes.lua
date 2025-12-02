@@ -28,4 +28,21 @@ return {
     follow_url_func = vim.ui.open,
     legacy_commands = false,
   },
+  {
+    "jbyuki/nabla.nvim",
+    dependencies = {
+      "nvim-neo-tree/neo-tree.nvim",
+      "williamboman/mason.nvim",
+    },
+    lazy = true,
+    keys = function()
+      return {
+        {
+          "<leader>m",
+          ':lua require("nabla").popup()<cr>',
+          desc = "Latex Popup",
+        },
+      }
+    end,
+  },
 }
