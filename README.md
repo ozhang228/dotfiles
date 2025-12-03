@@ -13,7 +13,7 @@ Dots and setup script
   - **General**
 
     - Github setup (gh auth login)
-    - Copilot Setup (Copilot auth in nvim)
+    - OpenCode Setup
     - Run Tests
 
       - audio, camera, screen share

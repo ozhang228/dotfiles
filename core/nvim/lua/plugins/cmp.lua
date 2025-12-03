@@ -1,7 +1,6 @@
 return {
   {
     "Saghen/blink.cmp",
-    dependencies = { "fang2hou/blink-copilot" },
     opts = {
       enabled = function()
         local filetype = vim.bo[0].filetype
@@ -15,12 +14,6 @@ return {
           path = { score_offset = 0 },
           lsp = { score_offset = 0 },
           buffer = { score_offset = 0 },
-          copilot = {
-            name = "copilot",
-            module = "blink-copilot",
-            score_offset = -1,
-            async = true,
-          },
         },
       },
       completion = {
@@ -30,15 +23,6 @@ return {
           },
         },
       },
-    },
-  },
-  {
-    "zbirenbaum/copilot.lua",
-    cmd = "Copilot",
-    event = "InsertEnter",
-    opts = {
-      suggestion = { enabled = false },
-      panel = { enabled = false },
     },
   },
   {
