@@ -13,7 +13,7 @@ Dots and setup script
   - **General**
 
     - Github setup (gh auth login)
-    - OpenCode Setup
+    - AI Coding Assistant Setup (Opencode, Codex, etc.)
     - Run Tests
 
       - audio, camera, screen share

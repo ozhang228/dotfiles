@@ -63,10 +63,6 @@ return {
           "<CMD>ToggleTerm5 direction=float<CR>",
           desc = "ToggleTerm5",
         },
-        ["<Leader>ts"] = {
-          "<CMD>TermSelect<CR>",
-          desc = "List terminals",
-        },
 
         ["<Leader>gg"] = {
           function() require("snacks").lazygit() end,
@@ -79,6 +75,29 @@ return {
         ["<Leader>gp"] = {
           function() require("snacks").picker.gh_pr() end,
           desc = "Github Pull Requests",
+        },
+
+        ["<Leader>ta"] = {
+          function()
+            local cmd = vim.fn.getenv "AI_CLI_CMD"
+
+            if cmd == nil or cmd == "" then
+              vim.notify("AI_CLI_CMD is not set in your shell environment.", vim.log.levels.ERROR)
+              return
+            end
+
+            local term = require("toggleterm.terminal").Terminal:new {
+              cmd = cmd,
+              direction = "float",
+              hidden = false,
+              close_on_exit = false,
+              -- to prevent it from colliding with my terminals
+              id = 100,
+            }
+
+            term:toggle()
+          end,
+          desc = "Open AI CLI",
         },
 
         ["n"] = {
@@ -128,6 +147,7 @@ return {
         ["<Leader>th"] = false,
         ["<Leader>tp"] = false,
         ["<Leader>tv"] = false,
+        ["<Leader>ts"] = false,
       },
 
       t = {
