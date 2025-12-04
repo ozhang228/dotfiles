@@ -49,7 +49,7 @@ zstyle ':completion:*' matcher-list \
   'm:{a-z}={A-Za-z}' \
   'r:|[._-]=* r:|=*' # ignore case and separators
 
-fastfetch --logo $HOME/dotfiles/imgs/pangoro_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc # OS info
+fastfetch --logo $HOME/dotfiles/imgs/conkeldurr_ascii.txt -c $HOME/dotfiles/core/fastfetch.jsonc # OS info
 
 # Starship Prompt
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"

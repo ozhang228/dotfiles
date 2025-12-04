@@ -69,14 +69,14 @@ return {
 ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝]],
       },
       sections = {
+        { section = "header" },
         {
           section = "terminal",
-          cmd = "cat ~/dotfiles/imgs/charizard_ascii.txt; sleep .1",
+          cmd = "cat ~/dotfiles/imgs/corviknight_ascii.txt; sleep .1",
           height = 22,
           padding = 1,
           indent = 6,
         },
-        { section = "header" },
       },
     },
   },
