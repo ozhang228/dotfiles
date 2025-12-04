@@ -1,0 +1,5 @@
+# Used in nvim to open up ai
+export AI_CLI_CMD="codex"
+
+# colors in conda
+export CONDA_CHANGEPS1=false

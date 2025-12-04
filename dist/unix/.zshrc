@@ -3,17 +3,6 @@ export EDITOR='nvim'
 export MANPAGER='nvim +Man!'
 export PAGER='less'
 export LESS='-R'
-export DEBUGINFOD_URLS="https://debuginfod.archlinux.org"
-# Used in nvim to open up ai
-export AI_CLI_CMD="codex"
-
-# colors in conda
-export CONDA_CHANGEPS1=false
-
-# C/C++ compiler and vcpkg
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
-export VCPKG_ROOT="$HOME/.local/vcpkg"
 
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
@@ -37,7 +26,7 @@ HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000
 SAVEHIST=10000
 
-# emacs style shell bindings to not conflict with vim
+# emacs style shell bindings to not conflict when in nvim terminal 
 bindkey -e
 
 # zsh completions
@@ -62,11 +51,6 @@ if command -v lsd >/dev/null 2>&1; then
   alias ls='lsd'
 fi
 
-# Path Aliases
-alias dot="cd ~/dotfiles;nvim"
-alias notes="cd ~/notes;nvim"
-
-# Personal Aliases
 alias pm="sudo pacman"
 alias npmr="npm run"
 alias p3="python3"
@@ -77,6 +61,8 @@ alias gp="git push"
 
 alias xdgo="xdg-open"
 
-alias check='f() { g++ "$1" -g -o a.out && ./a.out < input.txt; }; f'
+# Personal computer specific settings
+source "$HOME/dotfiles/dist/unix/.zshrc_personal"
 
-# Work Aliases
+# Work computer specific settings
+source "$HOME/dotfiles/dist/unix/.zshrc_work"

@@ -1,0 +1,12 @@
+# Used in nvim to open up ai
+export AI_CLI_CMD="codex"
+
+# C/C++ compiler and vcpkg
+export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
+export VCPKG_ROOT="$HOME/.local/vcpkg"
+
+alias dot="cd ~/dotfiles;nvim"
+alias notes="cd ~/notes;nvim"
+
+alias check='f() { g++ "$1" -g -o a.out && ./a.out < input.txt; }; f'
