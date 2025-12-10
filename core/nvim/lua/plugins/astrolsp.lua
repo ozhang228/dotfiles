@@ -33,6 +33,12 @@ return {
           },
         },
       },
+      clangd = {
+        cmd = {
+          "clangd",
+          "--fallback-style=Google",
+        },
+      },
     },
     handlers = {},
     autocmds = {},
