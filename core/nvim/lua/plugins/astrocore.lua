@@ -24,7 +24,16 @@ return {
         swapfile = false,
       },
     },
-    autocmds = {},
+    autocmds = {
+      open_last_edit = {
+        event = "BufReadPost",
+        desc = "Open file at the last position it was edited earlier",
+        callback = function()
+          local mark = vim.api.nvim_buf_get_mark(0, '"')
+          if mark[1] > 1 and mark[1] <= vim.api.nvim_buf_line_count(0) then vim.api.nvim_win_set_cursor(0, mark) end
+        end,
+      },
+    },
     mappings = {
       n = {
         ["<Leader>fr"] = {
@@ -131,6 +140,18 @@ return {
         ["<Leader>W"] = {
           ":noa w<CR>",
           desc = "Save without formatting",
+        },
+
+        ["dd"] = {
+          function()
+            if vim.api.nvim_get_current_line():match "^%s*$" then
+              return '"_dd'
+            else
+              return "dd"
+            end
+          end,
+          expr = true,
+          desc = "Smart dd (blackhole delete blank lines)",
         },
 
         ["s"] = false,
