@@ -9,4 +9,4 @@ export VCPKG_ROOT="$HOME/.local/vcpkg"
 alias dot="cd ~/dotfiles;nvim"
 alias notes="cd ~/notes;nvim"
 
-alias check='f() { g++ "$1" -g -o a.out && ./a.out < input.txt; }; f'
+alias cfcheck='f() { g++ "template.cpp" -g -o a.out && ./a.out < input.txt; }; f'
