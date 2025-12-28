@@ -4,6 +4,7 @@ return {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     opts = {
       ensure_installed = {
+        -- Core Languages: HTML/CSS/JS/TS, Python, C++, OCaml --
         -- HTML/CSS/JS
         "vtsls",
         "html-lsp",
@@ -12,14 +13,15 @@ return {
         "prettier",
         -- C/C++
         "clangd",
-        -- Lua
-        "stylua",
-        "lua-language-server",
         -- Python
         "ruff",
         "pyrefly",
+        -- OCaml
+        "ocaml-lsp",
         -- Misc
         "tree-sitter-cli",
+        "stylua",
+        "lua-language-server",
       },
     },
   },

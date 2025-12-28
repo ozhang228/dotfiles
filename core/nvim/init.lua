@@ -39,6 +39,9 @@ else
   vim.opt.shellxquote = ""
 end
 
+-- for ocp-indent (Ocaml)
+vim.opt.runtimepath:prepend(vim.fn.expand "~/.opam/ocaml_correct_efficient/share/ocp-indent/vim")
+
 vim.api.nvim_set_option_value("shelltemp", false, {})
 
 require "lazy_setup"
