@@ -14,7 +14,7 @@ return {
       disabled = {
         "basedpyright",
       },
-      timeout_ms = 20000,
+      timeout_ms = 1000,
     },
     servers = {},
     config = {
