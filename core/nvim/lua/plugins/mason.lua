@@ -17,7 +17,6 @@ return {
         "ruff",
         "pyrefly",
         -- OCaml
-        "ocaml-lsp",
         -- Misc
         "tree-sitter-cli",
         "stylua",
