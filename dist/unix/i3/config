@@ -42,7 +42,7 @@ bindsym XF86AudioRaiseVolume exec "amixer -D pulse set Master 5%+"
 
 ### Screenshot ###
 bindsym --release Mod4+S exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
-bindsym --release Mod4+Shift+S exec --no-startup-id maim --select | xclip -selection clipboard -t image/png
+bindsym --release Mod4+Shift+S exec --no-startup-id ssc
 
 ### Applications ###
 bindsym $mod+Return exec $wm_setting_app_terminal
@@ -54,9 +54,9 @@ exec_always --no-startup-id $wm_setting_app_compositor
 # monitor, wallpaper, polybar setup
 exec_always --no-startup-id "autorandr docked; bash $HOME/dotfiles/dist/unix/i3/wallpaper.sh; bash $HOME/dotfiles/dist/unix/polybar/launch.sh"
 
-workspace 1 output DP-1
-workspace 2 output DP-1
-workspace 3 output DP-2
+workspace 1 output DP-4
+workspace 2 output DP-6
+workspace 3 output DP-6
 
 ### AutoStart Apps ###
 exec_always --no-startup-id $wm_setting_app_browser
@@ -98,9 +98,6 @@ bindsym $mod+$smod+7 move container to workspace $ws7, workspace $ws7
 bindsym $mod+$smod+8 move container to workspace $ws8, workspace $ws8
 bindsym $mod+$smod+9 move container to workspace $ws9, workspace $ws9
 bindsym $mod+$smod+0 move container to workspace $ws10, workspace $ws10
-
-### Assign Workspaces ###
-assign [class="Slack"] $ws3
 
 ### Window sizes and positions ###
 bindsym $mod+$wm_setting_key_left        focus left

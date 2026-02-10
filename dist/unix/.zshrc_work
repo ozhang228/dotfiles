@@ -3,3 +3,5 @@ export AI_CLI_CMD="codex"
 
 # colors in conda
 export CONDA_CHANGEPS1=false
+
+alias ssc="maim --select | xclip -selection clipboard -t image/png"

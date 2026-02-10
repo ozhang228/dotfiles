@@ -75,3 +75,5 @@ source "$HOME/dotfiles/dist/unix/.zshrc_work"
 # This section can be safely removed at any time if needed.
 [[ ! -r '/home/ozhang/.opam/opam-init/init.zsh' ]] || source '/home/ozhang/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
 # END opam configuration
+
+[ -s "/home/ozhang/.scm_breeze/scm_breeze.sh" ] && source "/home/ozhang/.scm_breeze/scm_breeze.sh"
