@@ -9,4 +9,67 @@ export VCPKG_ROOT="$HOME/.local/vcpkg"
 alias dot="cd ~/dotfiles;nvim"
 alias notes="cd ~/notes;nvim"
 
+# password locking
+pdflock() {
+  if [ "$#" -ne 1 ]; then
+    echo 'Usage: pdflock <file.pdf | directory>'
+    return 1
+  fi
+
+  # prompt once
+  read -s "?Enter password: " pw
+  echo
+  read -s "?Confirm password: " pw2
+  echo
+
+  if [ "$pw" != "$pw2" ]; then
+    echo "Error: passwords do not match"
+    return 1
+  fi
+
+  _pdflock_one() {
+    local in="$1"
+    local out="${in%.pdf}.locked.pdf"
+    qpdf --encrypt "$pw" "$pw" 256 -- "$in" "$out" && rm -f -- "$in"
+  }
+
+  if [ -d "$1" ]; then
+    setopt local_options null_glob
+    for f in "$1"/*.pdf; do
+      [[ "$f" == *.locked.pdf ]] && continue
+      echo "Locking: $f"
+      _pdflock_one "$f" || return 1
+    done
+  else
+    [[ "$1" == *.pdf ]] || { echo "Error: not a PDF"; return 1; }
+    _pdflock_one "$1"
+  fi
+}
+pdfunlock() {
+  if [ "$#" -ne 1 ]; then
+    echo 'Usage: pdfunlock <file.locked.pdf | directory>'
+    return 1
+  fi
+
+  read -s "?Enter password: " pw
+  echo
+
+  _pdfunlock_one() {
+    local in="$1"
+    local out="${in%.locked.pdf}.pdf"
+    qpdf --decrypt --password="$pw" -- "$in" "$out" && rm -f -- "$in"
+  }
+
+  if [ -d "$1" ]; then
+    setopt local_options null_glob
+    for f in "$1"/*.locked.pdf; do
+      echo "Unlocking: $f"
+      _pdfunlock_one "$f" || return 1
+    done
+  else
+    [[ "$1" == *.locked.pdf ]] || { echo "Error: expected .locked.pdf"; return 1; }
+    _pdfunlock_one "$1"
+  fi
+}
+
 alias cfcheck='f() { g++ "template.cpp" -g -o a.out && ./a.out < input.txt; }; f'
