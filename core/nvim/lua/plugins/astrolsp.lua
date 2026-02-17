@@ -17,7 +17,7 @@ return {
         "vtsls",
         "eslint",
       },
-      timeout_ms = 5000,
+      timeout_ms = 2000,
     },
     servers = {},
     config = {

@@ -4,7 +4,7 @@ return {
     local null_ls = require "null-ls"
 
     opts.sources = {
-      null_ls.builtins.formatting.prettier.with {
+      null_ls.builtins.formatting.prettierd.with {
         filetypes = {
           "typescript",
           "typescriptreact",

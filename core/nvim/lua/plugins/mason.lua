@@ -7,7 +7,7 @@ return {
         -- TS/JS
         "vtsls",
         "eslint-lsp",
-        "prettier",
+        "prettierd",
         -- C/C++
         "clangd",
         -- Python
