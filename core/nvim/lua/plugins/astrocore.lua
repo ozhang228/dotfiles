@@ -151,6 +151,20 @@ return {
           desc = "Github Pull Requests",
         },
 
+        ["<Leader>gd"] = {
+          function()
+            vim.ui.input({ prompt = "Compare against branch: ", default = "master" }, function(base)
+              if base == nil or base == "" then return end
+              vim.cmd("DiffviewOpen " .. base .. "...HEAD")
+            end)
+          end,
+          desc = "Diffview PR (current branch vs base)",
+        },
+        ["<Leader>gm"] = {
+          function() vim.cmd "DiffviewOpen" end,
+          desc = "Diffview Merge Tool",
+        },
+
         ["<Leader>ta"] = {
           function()
             local cmd = vim.fn.getenv "AI_CLI_CMD"

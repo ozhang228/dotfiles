@@ -4,4 +4,5 @@ return {
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.pack.java" },
   { import = "astrocommunity.pack.typescript" },
+  { import = "astrocommunity.git.diffview-nvim" },
 }
