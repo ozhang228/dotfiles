@@ -68,6 +68,10 @@ return {
           desc = "Find references",
         },
 
+        ["<Leader>fb"] = {
+          "",
+          desc = "Branch changed files",
+        },
         ["<Leader>fbf"] = {
           function()
             local files = get_branch_changed_files()
