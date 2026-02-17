@@ -73,7 +73,6 @@ return {
         ["<Leader>d"] = false,
         ["<Leader>tf"] = false,
         ["<Leader>th"] = false,
-        ["<Leader>tp"] = false,
         ["<Leader>tv"] = false,
         ["<Leader>ts"] = false,
         ["<Leader>fr"] = {
@@ -183,13 +182,6 @@ return {
               return
             end
 
-            -- Get relative path (git root or cwd fallback)
-            local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-            if vim.v.shell_error ~= 0 or root == nil or root == "" then root = vim.fn.getcwd() end
-            root = root:gsub("/$", "") .. "/"
-            local absolute = vim.fn.expand "%:p"
-            local relative = absolute:gsub("^" .. vim.pesc(root), "")
-
             local Terminal = require("toggleterm.terminal").Terminal
             local term = Terminal:new {
               cmd = cmd,
@@ -197,20 +189,60 @@ return {
               hidden = false,
               close_on_exit = false,
               id = 100,
-              on_open = function(t)
-                -- Wait a bit for the CLI to initialize, then send the @path
-                vim.defer_fn(function()
-                  local file_ref = "@" .. relative .. " "
-                  vim.api.nvim_chan_send(t.job_id, file_ref)
-                end, 500)
-              end,
             }
 
             term:toggle()
           end,
           desc = "Open AI CLI with current file",
         },
+        ["<Leader>tp"] = {
+          function()
+            local chan = vim.b.terminal_job_id
+            if not chan then
+              vim.notify("Not in a terminal buffer", vim.log.levels.WARN)
+              return
+            end
 
+            local bufpath = ""
+            local alt = vim.fn.bufnr "#"
+            if alt ~= -1 and vim.bo[alt].buftype == "" then
+              bufpath = vim.api.nvim_buf_get_name(alt)
+            else
+              for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == "" then
+                  local name = vim.api.nvim_buf_get_name(buf)
+                  if name ~= "" then
+                    bufpath = name
+                    break
+                  end
+                end
+              end
+            end
+
+            if bufpath == "" then
+              vim.notify("No file buffer found", vim.log.levels.WARN)
+              return
+            end
+
+            bufpath = vim.fn.resolve(bufpath)
+            local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+            local relative
+            if vim.v.shell_error == 0 and git_root and git_root ~= "" then
+              git_root = vim.fn.resolve(git_root)
+              if bufpath:sub(1, #git_root) == git_root then
+                relative = bufpath:sub(#git_root + 2)
+              else
+                relative = vim.fn.fnamemodify(bufpath, ":t")
+              end
+            else
+              relative = vim.fn.fnamemodify(bufpath, ":.")
+            end
+
+            vim.api.nvim_chan_send(chan, relative)
+            vim.cmd "startinsert"
+          end,
+          desc = "Paste file path in terminal",
+        },
         ["n"] = {
           [[nzz]],
           desc = "Next search result with cursor centered",
