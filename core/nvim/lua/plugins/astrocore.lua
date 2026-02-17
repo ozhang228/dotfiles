@@ -159,10 +159,13 @@ return {
 
         ["<Leader>gc"] = {
           function()
-            vim.ui.input({ prompt = "Compare against branch: ", default = "master" }, function(base)
-              if base == nil or base == "" then return end
-              vim.cmd("DiffviewOpen " .. base .. "...HEAD")
-            end)
+            require("snacks.picker").git_branches {
+              title = "Diffview: compare against branch",
+              confirm = function(picker, item)
+                picker:close()
+                if item then vim.cmd("DiffviewOpen " .. item.branch .. "...HEAD") end
+              end,
+            }
           end,
           desc = "Diffview PR (current branch vs base)",
         },

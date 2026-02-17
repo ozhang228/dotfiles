@@ -5,3 +5,5 @@ export AI_CLI_CMD="agent"
 export CONDA_CHANGEPS1=false
 
 alias ssc="maim --select | xclip -selection clipboard -t image/png"
+alias dtc="cd typescript/packages/@desk-tools/common/"
+
