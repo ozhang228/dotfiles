@@ -95,18 +95,32 @@ return {
               return
             end
 
-            local term = require("toggleterm.terminal").Terminal:new {
+            -- Get relative path (git root or cwd fallback)
+            local root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+            if vim.v.shell_error ~= 0 or root == nil or root == "" then root = vim.fn.getcwd() end
+            root = root:gsub("/$", "") .. "/"
+            local absolute = vim.fn.expand "%:p"
+            local relative = absolute:gsub("^" .. vim.pesc(root), "")
+
+            local Terminal = require("toggleterm.terminal").Terminal
+            local term = Terminal:new {
               cmd = cmd,
               direction = "float",
               hidden = false,
               close_on_exit = false,
-              -- to prevent it from colliding with my terminals
               id = 100,
+              on_open = function(t)
+                -- Wait a bit for the CLI to initialize, then send the @path
+                vim.defer_fn(function()
+                  local file_ref = "@" .. relative .. " "
+                  vim.api.nvim_chan_send(t.job_id, file_ref)
+                end, 500)
+              end,
             }
 
             term:toggle()
           end,
-          desc = "Open AI CLI",
+          desc = "Open AI CLI with current file",
         },
 
         ["n"] = {
