@@ -4,15 +4,12 @@ return {
   "nvim-treesitter/nvim-treesitter",
   opts = {
     ensure_installed = {
-      "lua",
-      "vim",
-      "python",
       "typescript",
       "javascript",
-      "http",
+      "python",
+      "lua",
       "cpp",
       "java",
-      "regex",
     },
     highlight = {
       enable = true,

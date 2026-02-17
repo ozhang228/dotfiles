@@ -15,6 +15,9 @@
   "lspconfig": {
     "lua_ls": {
       "Lua.format.enable": false
+    },
+    "vtsls": {
+      "documentFormatting": false
     }
   }
 }

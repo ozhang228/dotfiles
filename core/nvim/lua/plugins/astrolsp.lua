@@ -10,9 +10,12 @@ return {
       format_on_save = {
         enabled = true,
         ignore_filetypes = { "markdown", "text" },
+        lsp_fallback = false,
       },
       disabled = {
         "basedpyright",
+        "vtsls",
+        "eslint",
       },
       timeout_ms = 1000,
     },
