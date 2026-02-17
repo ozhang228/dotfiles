@@ -1,3 +1,29 @@
+local function get_branch_changed_files(base)
+  base = base or "main"
+  local merge_base = vim.fn.systemlist("git merge-base " .. base .. " HEAD 2>/dev/null")
+  if vim.v.shell_error ~= 0 then merge_base = vim.fn.systemlist "git merge-base master HEAD 2>/dev/null" end
+  if vim.v.shell_error ~= 0 or #merge_base == 0 then
+    vim.notify("Could not determine merge base", vim.log.levels.ERROR)
+    return {}
+  end
+
+  local files = vim.fn.systemlist("git diff --name-only --diff-filter=ACMR " .. merge_base[1] .. "...HEAD")
+  local uncommitted = vim.fn.systemlist "git diff --name-only --diff-filter=ACMR HEAD"
+  local staged = vim.fn.systemlist "git diff --name-only --diff-filter=ACMR --cached"
+
+  local seen = {}
+  local result = {}
+  for _, list in ipairs { files, uncommitted, staged } do
+    for _, f in ipairs(list) do
+      if not seen[f] and f ~= "" then
+        seen[f] = true
+        table.insert(result, f)
+      end
+    end
+  end
+  return result
+end
+
 return {
   "AstroNvim/astrocore",
   opts = {
@@ -41,6 +67,41 @@ return {
           nowait = true,
           desc = "Find references",
         },
+
+        ["<Leader>fbf"] = {
+          function()
+            local files = get_branch_changed_files()
+            if #files == 0 then
+              vim.notify("No changed files in branch", vim.log.levels.INFO)
+              return
+            end
+            require "snacks.picker" {
+              title = "Branch Changed Files",
+              items = vim.tbl_map(function(f) return { text = f, file = f } end, files),
+              format = "file",
+              confirm = function(picker, item)
+                picker:close()
+                vim.cmd.edit(item.file)
+              end,
+            }
+          end,
+          nowait = true,
+          desc = "Find branch changed files",
+        },
+
+        ["<Leader>fbw"] = {
+          function()
+            local files = get_branch_changed_files()
+            if #files == 0 then
+              vim.notify("No changed files in branch", vim.log.levels.INFO)
+              return
+            end
+            require("snacks.picker").grep { dirs = files }
+          end,
+          nowait = true,
+          desc = "Grep in branch changed files",
+        },
+
         ["<Leader>o"] = {
           function()
             require("mini.files").open(vim.api.nvim_buf_get_name(0), false)
