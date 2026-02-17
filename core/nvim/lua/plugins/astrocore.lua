@@ -62,6 +62,20 @@ return {
     },
     mappings = {
       n = {
+        ["s"] = false,
+        ["S"] = false,
+        ["<Leader>n"] = false,
+        ["<Leader>R"] = false,
+        ["<Leader>C"] = false,
+        ["<Leader>gC"] = false,
+        ["<Leader>gT"] = false,
+        ["<Leader>h"] = false,
+        ["<Leader>d"] = false,
+        ["<Leader>tf"] = false,
+        ["<Leader>th"] = false,
+        ["<Leader>tp"] = false,
+        ["<Leader>tv"] = false,
+        ["<Leader>ts"] = false,
         ["<Leader>fr"] = {
           function() require("snacks.picker").lsp_references() end,
           nowait = true,
@@ -142,16 +156,8 @@ return {
           function() require("snacks").lazygit() end,
           desc = "Open LazyGit",
         },
-        ["<Leader>gi"] = {
-          function() require("snacks").picker.gh_issue() end,
-          desc = "Github Issues",
-        },
-        ["<Leader>gp"] = {
-          function() require("snacks").picker.gh_pr() end,
-          desc = "Github Pull Requests",
-        },
 
-        ["<Leader>gd"] = {
+        ["<Leader>gc"] = {
           function()
             vim.ui.input({ prompt = "Compare against branch: ", default = "master" }, function(base)
               if base == nil or base == "" then return end
@@ -246,22 +252,6 @@ return {
           expr = true,
           desc = "Smart dd (blackhole delete blank lines)",
         },
-
-        ["s"] = false,
-        ["S"] = false,
-        ["<Leader>n"] = false,
-        ["<Leader>R"] = false,
-        ["<Leader>C"] = false,
-        ["<Leader>gc"] = false,
-        ["<Leader>gC"] = false,
-        ["<Leader>gT"] = false,
-        ["<Leader>h"] = false,
-        ["<Leader>d"] = false,
-        ["<Leader>tf"] = false,
-        ["<Leader>th"] = false,
-        ["<Leader>tp"] = false,
-        ["<Leader>tv"] = false,
-        ["<Leader>ts"] = false,
       },
 
       t = {
