@@ -6,8 +6,9 @@ case ":$PATH:" in
 esac
 # pnpm end
 . "$HOME/.cargo/env"
+
 # >>> conda initialize >>> added by desk-tools bento
-. /home/ozhang/miniconda3/etc/profile.d/conda.sh
+# . /home/ozhang/miniconda3/etc/profile.d/conda.sh  # commented out by conda initialize  # commented out by conda initialize
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm

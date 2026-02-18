@@ -1,3 +1,5 @@
+conda activate desk-tools
+
 # Used in nvim to open up ai
 export AI_CLI_CMD="agent"
 
@@ -7,3 +9,44 @@ export CONDA_CHANGEPS1=false
 alias ssc="maim --select | xclip -selection clipboard -t image/png"
 alias dtc="cd typescript/packages/@desk-tools/common/"
 
+export PATH=~/.local/bin:~/.cargo/bin:/usr/local/bin:$PATH
+export CDPATH=.:~/src:~/src/opensource:~/src/fixed-income-options:~/src/ficc:~/src/cumberland:~/src/opensource:~/src/$(whoami)
+[ -s "$HOME/.scm_breeze/scm_breeze.sh" ] && source "$HOME/.scm_breeze/scm_breeze.sh"
+export PNPM_HOME="$HOME/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+function dev-ficco {
+    source ~/.ficcorc
+}
+
+function dev-cumberland {
+    source ~/.cumberlandrc
+}
+
+export JAVA11_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+export JAVA17_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64
+export JAVA21_HOME=/usr/lib/jvm/java-1.21.0-openjdk-amd64
+export JAVA25_HOME=/usr/lib/jvm/java-1.25.0-openjdk-amd64
+
+function jdk11 {
+  export JAVA_HOME=$JAVA11_HOME
+  export PATH=$JAVA_HOME/bin:$PATH
+}
+
+function jdk17 {
+  export JAVA_HOME=$JAVA17_HOME
+  export PATH=$JAVA_HOME/bin:$PATH
+}
+
+function jdk21 {
+  export JAVA_HOME=$JAVA21_HOME
+  export PATH=$JAVA_HOME/bin:$PATH
+}
+
+function jdk25 {
+  export JAVA_HOME=$JAVA25_HOME
+  export PATH=$JAVA_HOME/bin:$PATH
+}
