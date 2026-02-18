@@ -305,9 +305,9 @@ return {
             end
 
             if start_line == end_line then
-              relative = relative .. ":" .. start_line
+              relative = "@" .. relative .. ":" .. start_line
             else
-              relative = relative .. ":" .. start_line .. "-" .. end_line
+              relative = "@" .. relative .. ":" .. start_line .. "-" .. end_line
             end
 
             vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
