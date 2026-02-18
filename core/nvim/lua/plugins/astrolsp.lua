@@ -19,7 +19,7 @@ return {
       },
       timeout_ms = 2000,
     },
-    servers = {},
+    servers = { "basedpyright", "ruff" },
     config = {
       basedpyright = {
         settings = {
@@ -35,6 +35,11 @@ return {
             },
           },
         },
+      },
+      ruff = {
+        on_attach = function(client, _)
+          client.server_capabilities.hoverProvider = false
+        end,
       },
       clangd = {
         cmd = {

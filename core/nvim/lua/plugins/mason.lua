@@ -11,8 +11,8 @@ return {
         -- C/C++
         "clangd",
         -- Python
+        "basedpyright",
         "ruff",
-        "pyrefly",
         -- Misc
         "tree-sitter-cli",
         "stylua",
