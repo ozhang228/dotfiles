@@ -227,7 +227,7 @@ return {
               vim.notify("No file in current buffer", vim.log.levels.WARN)
               return
             end
-            send_to_ai_cli(relative)
+            send_to_ai_cli("@" .. relative)
           end,
           desc = "Send file to AI CLI chat box",
         },
@@ -238,7 +238,7 @@ return {
               vim.notify("No file in current buffer", vim.log.levels.WARN)
               return
             end
-            send_to_ai_cli(relative .. ":" .. vim.fn.line ".")
+            send_to_ai_cli("@" .. relative .. ":" .. vim.fn.line ".")
           end,
           desc = "Send file:line to AI CLI chat box",
         },
