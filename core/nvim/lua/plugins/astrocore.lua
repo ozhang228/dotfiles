@@ -24,6 +24,31 @@ local function get_branch_changed_files(base)
   return result
 end
 
+local function send_to_ai_cli(text)
+  local cmd = vim.fn.getenv "AI_CLI_CMD"
+  if cmd == nil or cmd == "" then
+    vim.notify("AI_CLI_CMD is not set in your shell environment.", vim.log.levels.ERROR)
+    return
+  end
+
+  local Terminal = require("toggleterm.terminal").Terminal
+  local term = Terminal:new {
+    cmd = cmd,
+    direction = "float",
+    hidden = false,
+    close_on_exit = false,
+    id = 100,
+  }
+
+  local was_open = term:is_open()
+  if not was_open then term:open() end
+
+  local delay = was_open and 50 or 500
+  vim.defer_fn(function()
+    if term.job_id then vim.fn.chansend(term.job_id, text) end
+  end, delay)
+end
+
 return {
   "AstroNvim/astrocore",
   opts = {
@@ -197,52 +222,27 @@ return {
         },
         ["<Leader>tp"] = {
           function()
-            local chan = vim.b.terminal_job_id
-            if not chan then
-              vim.notify("Not in a terminal buffer", vim.log.levels.WARN)
+            local relative = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
+            if relative == "" then
+              vim.notify("No file in current buffer", vim.log.levels.WARN)
               return
             end
-
-            local bufpath = ""
-            local alt = vim.fn.bufnr "#"
-            if alt ~= -1 and vim.bo[alt].buftype == "" then
-              bufpath = vim.api.nvim_buf_get_name(alt)
-            else
-              for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buftype == "" then
-                  local name = vim.api.nvim_buf_get_name(buf)
-                  if name ~= "" then
-                    bufpath = name
-                    break
-                  end
-                end
-              end
-            end
-
-            if bufpath == "" then
-              vim.notify("No file buffer found", vim.log.levels.WARN)
-              return
-            end
-
-            bufpath = vim.fn.resolve(bufpath)
-            local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
-            local relative
-            if vim.v.shell_error == 0 and git_root and git_root ~= "" then
-              git_root = vim.fn.resolve(git_root)
-              if bufpath:sub(1, #git_root) == git_root then
-                relative = bufpath:sub(#git_root + 2)
-              else
-                relative = vim.fn.fnamemodify(bufpath, ":t")
-              end
-            else
-              relative = vim.fn.fnamemodify(bufpath, ":.")
-            end
-
-            vim.api.nvim_chan_send(chan, relative)
-            vim.cmd "startinsert"
+            send_to_ai_cli(relative)
           end,
-          desc = "Paste file path in terminal",
+          desc = "Send file to AI CLI chat box",
         },
+        ["<Leader>tl"] = {
+          function()
+            local relative = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
+            if relative == "" then
+              vim.notify("No file in current buffer", vim.log.levels.WARN)
+              return
+            end
+            send_to_ai_cli(relative .. ":" .. vim.fn.line ".")
+          end,
+          desc = "Send file:line to AI CLI chat box",
+        },
+
         ["n"] = {
           [[nzz]],
           desc = "Next search result with cursor centered",
@@ -289,6 +289,33 @@ return {
         },
       },
 
+      v = {
+        ["<Leader>tl"] = {
+          function()
+            local start_line = vim.fn.line "v"
+            local end_line = vim.fn.line "."
+            if start_line > end_line then
+              start_line, end_line = end_line, start_line
+            end
+
+            local relative = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
+            if relative == "" then
+              vim.notify("No file in current buffer", vim.log.levels.WARN)
+              return
+            end
+
+            if start_line == end_line then
+              relative = relative .. ":" .. start_line
+            else
+              relative = relative .. ":" .. start_line .. "-" .. end_line
+            end
+
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "nx", false)
+            send_to_ai_cli(relative)
+          end,
+          desc = "Send file:lines to AI CLI chat box",
+        },
+      },
       t = {
         ["<Esc><Esc>"] = [[<C-\><C-n>]],
       },
