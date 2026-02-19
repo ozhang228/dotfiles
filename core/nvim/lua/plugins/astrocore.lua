@@ -53,6 +53,7 @@ local function send_to_ai_cli(text)
   local delay = was_open and 50 or 500
   vim.defer_fn(function()
     if term.job_id then vim.fn.chansend(term.job_id, text) end
+    term:focus()
   end, delay)
 end
 
