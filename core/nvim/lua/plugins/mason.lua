@@ -13,6 +13,7 @@ return {
         -- Python
         "basedpyright",
         "ruff",
+        "mypy",
         -- Misc
         "tree-sitter-cli",
         "stylua",

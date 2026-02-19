@@ -13,7 +13,8 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-conda activate desk-tools
+alias ca="conda activate desk-tools"
+alias sdr="p3 fio/desk_tools/apps/sdr_viz_server/main.py configs/sdr_viz_server/local.json "
 
 # Used in nvim to open up ai
 export AI_CLI_CMD="agent"

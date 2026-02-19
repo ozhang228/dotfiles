@@ -24,24 +24,31 @@ local function get_branch_changed_files(base)
   return result
 end
 
-local function send_to_ai_cli(text)
+local function ai_term_size() return math.floor(vim.o.columns * 0.5) end
+
+local function get_ai_terminal()
   local cmd = vim.fn.getenv "AI_CLI_CMD"
   if cmd == nil or cmd == "" then
     vim.notify("AI_CLI_CMD is not set in your shell environment.", vim.log.levels.ERROR)
-    return
+    return nil
   end
 
   local Terminal = require("toggleterm.terminal").Terminal
-  local term = Terminal:new {
+  return Terminal:new {
     cmd = cmd,
-    direction = "float",
+    direction = "vertical",
     hidden = false,
     close_on_exit = false,
     id = 100,
   }
+end
+
+local function send_to_ai_cli(text)
+  local term = get_ai_terminal()
+  if not term then return end
 
   local was_open = term:is_open()
-  if not was_open then term:open() end
+  if not was_open then term:open(ai_term_size()) end
 
   local delay = was_open and 50 or 500
   vim.defer_fn(function()
@@ -200,25 +207,10 @@ return {
 
         ["<Leader>ta"] = {
           function()
-            local cmd = vim.fn.getenv "AI_CLI_CMD"
-
-            if cmd == nil or cmd == "" then
-              vim.notify("AI_CLI_CMD is not set in your shell environment.", vim.log.levels.ERROR)
-              return
-            end
-
-            local Terminal = require("toggleterm.terminal").Terminal
-            local term = Terminal:new {
-              cmd = cmd,
-              direction = "float",
-              hidden = false,
-              close_on_exit = false,
-              id = 100,
-            }
-
-            term:toggle()
+            local term = get_ai_terminal()
+            if term then term:toggle(ai_term_size()) end
           end,
-          desc = "Open AI CLI with current file",
+          desc = "Toggle AI CLI terminal",
         },
         ["<Leader>tp"] = {
           function()
