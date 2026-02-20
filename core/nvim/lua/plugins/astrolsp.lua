@@ -48,6 +48,9 @@ return {
       local null_ls = require "null-ls"
 
       opts.sources = {
+        null_ls.builtins.diagnostics.mypy.with {
+          extra_args = { "--ignore-missing-imports" },
+        },
         null_ls.builtins.formatting.prettierd.with {
           filetypes = {
             "typescript",
