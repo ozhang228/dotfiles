@@ -21,4 +21,33 @@ return {
       },
     },
   },
+  {
+    "obsidian-nvim/obsidian.nvim",
+    version = "*",
+    ft = "markdown",
+    dependencies = {
+      "Saghen/blink.cmp",
+      "folke/snacks.nvim",
+    },
+    opts = {
+      workspaces = {
+        {
+          name = "Notes",
+          path = "$HOME/notes",
+        },
+      },
+      completion = {
+        blink = true,
+        nvim_cmp = false,
+      },
+      ui = {
+        enable = false,
+      },
+      open = {
+        use_advanced_uri = true,
+      },
+      finder = "snacks.pick",
+      legacy_commands = false,
+    },
+  },
 }
