@@ -15,7 +15,6 @@ return {
         },
         disabled = {
           "basedpyright",
-          "vtsls",
           "eslint",
         },
         timeout_ms = 2000,
@@ -125,9 +124,9 @@ return {
     opts = {
       ensure_installed = {
         -- TS/JS
-        "vtsls",
         "eslint-lsp",
         "prettierd",
+        "vtsls",
         -- C/C++
         "clangd",
         -- Python

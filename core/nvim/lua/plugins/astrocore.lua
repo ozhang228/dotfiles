@@ -36,7 +36,7 @@ local function get_ai_terminal()
   local Terminal = require("toggleterm.terminal").Terminal
   return Terminal:new {
     cmd = cmd,
-    direction = "vertical",
+    direction = "float",
     hidden = false,
     close_on_exit = false,
     id = 100,
