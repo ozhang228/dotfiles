@@ -14,28 +14,11 @@ return {
           lsp_fallback = false,
         },
         disabled = {
-          "basedpyright",
           "eslint",
         },
         timeout_ms = 2000,
       },
-      servers = { "basedpyright", "ruff" },
       config = {
-        basedpyright = {
-          settings = {
-            basedpyright = {
-              disableOrganizeImports = true, -- Using Ruff
-              analysis = {
-                typeCheckingMode = "standard",
-              },
-            },
-            python = {
-              analysis = {
-                ignore = { "*" }, -- Using Ruff
-              },
-            },
-          },
-        },
         ruff = {
           on_attach = function(client, _)
             client.server_capabilities.hoverProvider = false
@@ -130,7 +113,7 @@ return {
         -- C/C++
         "clangd",
         -- Python
-        "basedpyright",
+        "jedi-language-server",
         "ruff",
         "mypy",
         -- Misc
