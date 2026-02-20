@@ -3,6 +3,8 @@ export EDITOR='nvim'
 export MANPAGER='nvim +Man!'
 export PAGER='less'
 export LESS='-R'
+# Used in nvim to open up ai
+export AI_CLI_CMD="claude"
 
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
