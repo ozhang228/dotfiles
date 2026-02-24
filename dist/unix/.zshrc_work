@@ -14,13 +14,13 @@ unset __conda_setup
 # <<< conda initialize <<<
 
 alias ca="conda activate desk-tools"
-alias sdr="p3 fio/desk_tools/apps/sdr_viz_server/main.py configs/sdr_viz_server/local.json "
+alias sdr="p3 ~/drw/desk-tools/python/fio/desk_tools/apps/sdr_viz_server/main.py ~/drw/desk-tools/python/configs/sdr_viz_server/local.json"
+alias dtc="cd ~/drw/desk-tools/typescript/packages/@desk-tools/common/"
 
 # colors in conda
 export CONDA_CHANGEPS1=false
 
 alias ssc="maim --select | xclip -selection clipboard -t image/png"
-alias dtc="cd typescript/packages/@desk-tools/common/"
 
 export PATH=~/.local/bin:~/.cargo/bin:/usr/local/bin:$PATH
 export CDPATH=.:~/src:~/src/opensource:~/src/fixed-income-options:~/src/ficc:~/src/cumberland:~/src/opensource:~/src/$(whoami)

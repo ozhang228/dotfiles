@@ -19,6 +19,22 @@ return {
         timeout_ms = 2000,
       },
       config = {
+        basedpyright = {
+          settings = {
+            basedpyright = {
+              analysis = {
+                autoImportCompletions = true,
+                useLibraryCodeForTypes = true,
+                disableOrganizeImports = true,
+                typeCheckingMode = "standard",
+              },
+            },
+            python = {
+              venvPath = vim.fn.expand "~/drw/desk-tools/python",
+              venv = ".venv",
+            },
+          },
+        },
         ruff = {
           on_attach = function(client, _)
             client.server_capabilities.hoverProvider = false
@@ -116,7 +132,7 @@ return {
         -- C/C++
         "clangd",
         -- Python
-        "jedi-language-server",
+        "basedpyright",
         "ruff",
         "mypy",
         -- Misc
