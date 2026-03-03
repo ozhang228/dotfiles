@@ -260,13 +260,13 @@ return {
           end,
           desc = "Find man page",
         },
-        ["<Leader>lI"] = {
-          "<CMD>Conform<CR>",
-          desc = "Conform formatter information",
-        },
         ["<Leader>W"] = {
           ":noa w<CR>",
           desc = "Save without formatting",
+        },
+        ["<Leader>lR"] = {
+          "<Cmd>LspRestart<CR>",
+          desc = "Restart LSP",
         },
 
         ["dd"] = {

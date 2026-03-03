@@ -10,9 +10,9 @@ return {
       end,
       sources = {
         providers = {
+          lsp = { score_offset = 10 },
           snippets = { score_offset = 5 },
-          path = { score_offset = 0 },
-          lsp = { score_offset = 0 },
+          path = { score_offset = 3 },
           buffer = { score_offset = 0 },
         },
       },

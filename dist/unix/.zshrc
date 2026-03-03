@@ -1,3 +1,18 @@
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# BEGIN opam configuration
+# This is useful if you're using opam as it adds:
+#   - the correct directories to the PATH
+#   - auto-completion for the opam binary
+# This section can be safely removed at any time if needed.
+[[ ! -r '/home/ozhang/.opam/opam-init/init.zsh' ]] || source '/home/ozhang/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
+# END opam configuration
+
+[ -s "/home/ozhang/.scm_breeze/scm_breeze.sh" ] && source "/home/ozhang/.scm_breeze/scm_breeze.sh"
+
+
 # -- Environment -- 
 export EDITOR='nvim'
 export MANPAGER='nvim +Man!'
@@ -70,13 +85,5 @@ source "$HOME/dotfiles/dist/unix/.zshrc_personal"
 source "$HOME/dotfiles/dist/unix/.zshrc_work"
 
 
-# BEGIN opam configuration
-# This is useful if you're using opam as it adds:
-#   - the correct directories to the PATH
-#   - auto-completion for the opam binary
-# This section can be safely removed at any time if needed.
-[[ ! -r '/home/ozhang/.opam/opam-init/init.zsh' ]] || source '/home/ozhang/.opam/opam-init/init.zsh' > /dev/null 2> /dev/null
-# END opam configuration
 
-[ -s "/home/ozhang/.scm_breeze/scm_breeze.sh" ] && source "/home/ozhang/.scm_breeze/scm_breeze.sh"
 
