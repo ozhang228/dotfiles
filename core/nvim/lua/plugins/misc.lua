@@ -62,8 +62,11 @@ return {
         mermaid = {
           background = "transparent",
           theme = "dark",
-          cli_args = { "-p", vim.fn.stdpath("config") .. "/puppeteer-config.json" },
+          cli_args = { "-p", vim.fn.stdpath "config" .. "/puppeteer-config.json" },
         },
+      },
+      events = {
+        render_buffer = { "InsertLeave", "BufWinEnter" },
       },
     },
     config = function(_, opts)
@@ -73,14 +76,5 @@ return {
         },
       }, opts))
     end,
-    keys = {
-      {
-        "<leader>dm",
-        function() require("diagram").show_diagram_hover() end,
-        mode = "n",
-        ft = { "markdown", "norg" },
-        desc = "Show diagram in new tab",
-      },
-    },
   },
 }
