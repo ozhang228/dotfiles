@@ -50,4 +50,37 @@ return {
       legacy_commands = false,
     },
   },
+  {
+    "3rd/image.nvim",
+    opts = {},
+  },
+  {
+    "3rd/diagram.nvim",
+    ft = { "markdown", "norg" },
+    opts = {
+      renderer_options = {
+        mermaid = {
+          background = "transparent",
+          theme = "dark",
+          cli_args = { "-p", vim.fn.stdpath("config") .. "/puppeteer-config.json" },
+        },
+      },
+    },
+    config = function(_, opts)
+      require("diagram").setup(vim.tbl_deep_extend("force", {
+        integrations = {
+          require "diagram.integrations.markdown",
+        },
+      }, opts))
+    end,
+    keys = {
+      {
+        "<leader>dm",
+        function() require("diagram").show_diagram_hover() end,
+        mode = "n",
+        ft = { "markdown", "norg" },
+        desc = "Show diagram in new tab",
+      },
+    },
+  },
 }

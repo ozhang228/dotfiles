@@ -108,7 +108,7 @@ APT_APPS=(
   # tiling
   i3 rofi
   # CLI
-  kitty zsh curl fd-find ripgrep jq gh lsd fastfetch xsel
+  kitty zsh curl fd-find ripgrep jq gh lsd fastfetch xsel imagemagick
   # languages/build
   build-essential luarocks python3-venv
   # desktop utils
