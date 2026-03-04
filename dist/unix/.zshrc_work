@@ -18,6 +18,7 @@ alias sdr="p3 ~/drw/desk-tools/python/fio/desk_tools/apps/sdr_viz_server/main.py
 alias dtc="cd ~/drw/desk-tools/typescript/packages/@desk-tools/common/"
 alias cdts="cd ~/drw/desk-tools/typescript/"
 alias cdpy="cd ~/drw/desk-tools/python/"
+alias cdk8="cd ~/drw/k8s/"
 
 # colors in conda
 export CONDA_CHANGEPS1=false

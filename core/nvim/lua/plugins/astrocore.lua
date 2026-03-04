@@ -184,6 +184,36 @@ return {
           desc = "ToggleTerm5",
         },
 
+        ["<Leader>tp"] = {
+          function()
+            local terms = require("toggleterm.terminal").get_all()
+            if #terms == 0 then
+              vim.notify("No open terminals", vim.log.levels.WARN)
+              return
+            end
+
+            local file_path = vim.fn.expand "%:p"
+            if file_path == "" then file_path = vim.fn.getcwd() end
+
+            require "snacks.picker" {
+              title = "Send file path to terminal",
+              items = vim.tbl_map(function(t)
+                local label = string.format("#%d: %s", t.id, t.name or t.cmd or "terminal")
+                return { text = label, label = label, terminal = t }
+              end, terms),
+              format = "text",
+              confirm = function(picker, item)
+                picker:close()
+                if item and item.terminal.job_id then
+                  vim.fn.chansend(item.terminal.job_id, " " .. vim.fn.shellescape(file_path))
+                  vim.notify("Sent path to terminal #" .. item.terminal.id)
+                end
+              end,
+            }
+          end,
+          desc = "Send file path to terminal",
+        },
+
         ["<Leader>gg"] = {
           function() require("snacks").lazygit() end,
           desc = "Open LazyGit",
@@ -212,17 +242,6 @@ return {
             if term then term:toggle(ai_term_size()) end
           end,
           desc = "Toggle AI CLI terminal",
-        },
-        ["<Leader>tp"] = {
-          function()
-            local relative = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ":.")
-            if relative == "" then
-              vim.notify("No file in current buffer", vim.log.levels.WARN)
-              return
-            end
-            send_to_ai_cli("@" .. relative)
-          end,
-          desc = "Send file to AI CLI chat box",
         },
         ["<Leader>tl"] = {
           function()
