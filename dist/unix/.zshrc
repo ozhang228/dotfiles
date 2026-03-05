@@ -75,6 +75,7 @@ alias p3="python3"
 alias ga="git add"
 alias gc="git commit"
 alias gp="git push"
+alias aic="~/ai/copy.zsh"
 
 alias xdgo="xdg-open"
 

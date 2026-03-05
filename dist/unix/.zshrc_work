@@ -19,6 +19,7 @@ alias dtc="cd ~/drw/desk-tools/typescript/packages/@desk-tools/common/"
 alias cdts="cd ~/drw/desk-tools/typescript/"
 alias cdpy="cd ~/drw/desk-tools/python/"
 alias cdk8="cd ~/drw/k8s/"
+alias vault-login="vault login -no-print -method=ldap username=$(whoami)"
 
 # colors in conda
 export CONDA_CHANGEPS1=false
