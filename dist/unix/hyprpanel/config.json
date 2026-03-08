@@ -66,10 +66,10 @@
   "bar.workspaces.showApplicationIcons": true,
   "bar.workspaces.show_numbered": false,
   "bar.workspaces.show_icons": false,
-  "bar.clock.format": "%a %m/%d  - %H:%M:%S",
+  "bar.clock.format": "%a %m/%d - %I:%M:%S %p",
   "bar.clock.icon": "󰸗",
-  "menus.clock.time.military": true,
-  "menus.clock.time.hideSeconds": true,
+  "menus.clock.time.military": false,
+  "menus.clock.time.hideSeconds": false,
   "menus.clock.weather.enabled": false,
   "menus.dashboard.shortcuts.left.shortcut1.tooltip": "vivaldi",
   "menus.dashboard.shortcuts.left.shortcut1.command": "vivaldi",
@@ -107,5 +107,11 @@
   "theme.bar.menus.menu.dashboard.profile.size": "8.5em",
   "menus.dashboard.powermenu.avatar.image": "/home/ozhang/dotfiles/imgs/catppuccin_cat.png",
   "theme.bar.transparent": true,
-  "bar.customModules.ram.labelType": "percentage"
+  "bar.customModules.ram.labelType": "percentage",
+  "menus.clock.weather.location": "60654",
+  "bar.customModules.worldclock.showIcon": true,
+  "theme.bar.buttons.modules.worldclock.enableBorder": false,
+  "bar.clock.showIcon": true,
+  "bar.clock.showTime": true,
+  "theme.bar.buttons.clock.enableBorder": false
 }
