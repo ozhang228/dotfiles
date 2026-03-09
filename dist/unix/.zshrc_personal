@@ -1,7 +1,9 @@
 
 # C/C++ compiler and vcpkg
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
+# export CC=/usr/bin/gcc
+# export CXX=/usr/bin/g++
+export CC=clang
+export CXX=clang++
 export VCPKG_ROOT="$HOME/.local/vcpkg"
 
 alias dot="cd ~/dotfiles;nvim"

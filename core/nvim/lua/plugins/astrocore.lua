@@ -103,11 +103,28 @@ return {
         ["<Leader>gC"] = false,
         ["<Leader>gT"] = false,
         ["<Leader>h"] = false,
-        ["<Leader>d"] = false,
         ["<Leader>tf"] = false,
         ["<Leader>th"] = false,
         ["<Leader>tv"] = false,
         ["<Leader>ts"] = false,
+        ["<Leader>xl"] = false,
+        ["<Leader>xq"] = false,
+        ["<Leader>x"] = false,
+        ["<Leader>dc"] = {
+          function()
+            require("dap").continue()
+            require("dap-view").open()
+          end,
+          desc = "Start/Continue Debugger",
+        },
+        ["<Leader>dt"] = {
+          function()
+            require("dap").continue()
+            require("dap-view").open()
+          end,
+          desc = "Toggle DapView",
+        },
+
         ["<Leader>fr"] = {
           function() require("snacks.picker").lsp_references() end,
           nowait = true,
@@ -158,9 +175,6 @@ return {
             require("mini.files").reveal_cwd()
           end,
           desc = "Open Mini.files",
-        },
-        ["<Leader>x"] = {
-          desc = require("mini.icons").get("filetype", "Trouble") .. " QFL",
         },
 
         ["<Leader>t1"] = {
@@ -278,10 +292,6 @@ return {
             end)
           end,
           desc = "Find man page",
-        },
-        ["<Leader>W"] = {
-          ":noa w<CR>",
-          desc = "Save without formatting",
         },
         ["<Leader>lR"] = {
           "<Cmd>LspRestart<CR>",

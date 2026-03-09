@@ -5,10 +5,6 @@ return {
       presets = { bottom_search = false },
     },
   },
-  { -- better quickfix list
-    "kevinhwang91/nvim-bqf",
-    opts = {},
-  },
   {
     "akinsho/toggleterm.nvim",
     version = "*",
