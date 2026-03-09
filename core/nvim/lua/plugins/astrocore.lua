@@ -336,7 +336,11 @@ return {
         },
       },
       t = {
-        ["<Esc><Esc>"] = [[<C-\><C-n>]],
+        ["<Esc><Esc>"] = { [[<C-\><C-n>]], desc = "Exit terminal mode" },
+        ["<C-h>"] = { [[<Cmd>wincmd h<CR>]], desc = "Move to left window" },
+        ["<C-j>"] = { [[<Cmd>wincmd j<CR>]], desc = "Move to below window" },
+        ["<C-k>"] = { [[<Cmd>wincmd k<CR>]], desc = "Move to above window" },
+        ["<C-l>"] = { [[<Cmd>wincmd l<CR>]], desc = "Move to right window" },
       },
       i = {
         ["<Tab>"] = "<Tab>",

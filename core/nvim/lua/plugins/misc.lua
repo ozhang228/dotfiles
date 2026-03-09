@@ -10,7 +10,6 @@ return {
     version = "*",
     opts = {
       start_in_insert = true,
-      persist_mode = false,
       auto_scroll = false,
       float_opts = {
         border = "curved",

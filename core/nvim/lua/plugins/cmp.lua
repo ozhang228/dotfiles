@@ -5,7 +5,7 @@ return {
       enabled = function()
         local filetype = vim.bo[0].filetype
 
-        if filetype == "snacks_picker_input" then return false end
+        if filetype == "snacks_picker_input" or filetype == "minifiles" then return false end
         return true
       end,
       sources = {
