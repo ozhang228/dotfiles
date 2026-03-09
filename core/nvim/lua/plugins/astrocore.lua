@@ -118,10 +118,7 @@ return {
           desc = "Start/Continue Debugger",
         },
         ["<Leader>dt"] = {
-          function()
-            require("dap").continue()
-            require("dap-view").open()
-          end,
+          function() require("dap-view").toggle() end,
           desc = "Toggle DapView",
         },
 
