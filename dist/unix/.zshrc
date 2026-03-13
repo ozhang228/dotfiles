@@ -19,7 +19,7 @@ export MANPAGER='nvim +Man!'
 export PAGER='less'
 export LESS='-R'
 # Used in nvim to open up ai
-export AI_CLI_CMD="agent"
+export AI_CLI_CMD="claude --resume || claude"
 
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
@@ -78,6 +78,30 @@ alias gp="git push"
 alias aic="~/ai/copy.zsh"
 
 alias xdgo="xdg-open"
+
+# Wrapper to sync shell cwd with lazygit's working directory on exit
+lg()
+{
+    export LAZYGIT_NEW_DIR_FILE=~/.lazygit/newdir
+
+    lazygit "$@"
+
+    if [ -f $LAZYGIT_NEW_DIR_FILE ]; then
+            cd "$(cat $LAZYGIT_NEW_DIR_FILE)"
+            rm -f $LAZYGIT_NEW_DIR_FILE > /dev/null
+    fi
+}
+
+# Wrapper to sync shell cwd with nvim's working directory on exit
+nv()
+{
+    nvim "$@"
+
+    if [ -f ~/.nvim_newdir ]; then
+            cd "$(cat ~/.nvim_newdir)"
+            rm -f ~/.nvim_newdir > /dev/null
+    fi
+}
 
 # Personal computer specific settings
 source "$HOME/dotfiles/dist/unix/.zshrc_personal"

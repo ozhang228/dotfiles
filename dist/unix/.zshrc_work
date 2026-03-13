@@ -19,7 +19,11 @@ alias dtc="cd ~/drw/desk-tools/typescript/packages/@desk-tools/common/"
 alias cdts="cd ~/drw/desk-tools/typescript/"
 alias cdpy="cd ~/drw/desk-tools/python/"
 alias cdk8="cd ~/drw/k8s/"
+alias cdalp="cd ~/drw/alp-config/"
+alias cdapp="cd ~/drw/app-launcher/"
 alias vault-login="vault login -no-print -method=ldap username=$(whoami)"
+
+alias makea="make fmt;make check;make test"
 
 # colors in conda
 export CONDA_CHANGEPS1=false
