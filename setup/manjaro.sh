@@ -68,7 +68,7 @@ if [[ -n "$ONLY_SECTION" ]]; then
 fi
 
 declare -A SYMLINKS=(
-  ["core/nvim"]="$HOME/.config/nvim"
+  ["nvim"]="$HOME/.config/nvim"
   ["core/starship"]="$HOME/.config/starship"
   ["core/lazygit"]="$HOME/.config/lazygit"
   ["core/kitty"]="$HOME/.config/kitty"
