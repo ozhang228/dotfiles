@@ -93,9 +93,9 @@ lg()
 }
 
 # Wrapper to sync shell cwd with nvim's working directory on exit
-nv()
+nvim()
 {
-    nvim "$@"
+    command nvim "$@"
 
     if [ -f ~/.nvim_newdir ]; then
             cd "$(cat ~/.nvim_newdir)"
