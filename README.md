@@ -4,14 +4,19 @@ Dotfiles with setup script
 
 ## Requirements
 
-- `uv` to run the setup script
+- `uv` and `python` to run the setup script
+- either `Mac`, `Ubuntu`, or `Manjaro` (could probably work for any arch based distro)
+- must be cloned under `$HOME/dotfiles`
 
-- Currently Maintained
-  - Ubuntu
-  - Manjaro
-  - Mac
+# Todos
 
-- Manual Setup Needed
+- config tooling
+  - each tool defines what it requires
+    - symlinks
+    - packages
+    - env variables being set
+
+- automate manual setups
   - **General**
     - Github setup (gh auth login)
     - AI Coding Assistant Setup (Opencode, Codex, etc.)
@@ -22,5 +27,9 @@ Dotfiles with setup script
 
   - **Ubuntu**
     - Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
-    - Edit etc/systemd/logind.conf with sudo nvim and change HandleLidSwitch to shutdown, HandleLidSwitchExternalPower to suspend, and IdleAction to shudown with the IdleActionSec=5min
-    - solaar for unifying receivers if needed
+
+- cleanup i3
+  - should have a session setup and a toolbar and better monitor handling
+- try pet cli tool
+- make bmark. create bookamrks and press buttons to go to ecah in a tree like pattern
+- zshrc alias profiles

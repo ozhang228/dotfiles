@@ -1,5 +1,8 @@
+from domain.distro import detect_distro
+
+
 def main():
-    print("Hello from dotconfig!")
+    distro = detect_distro()
 
 
 if __name__ == "__main__":
