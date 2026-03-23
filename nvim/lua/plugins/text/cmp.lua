@@ -75,14 +75,14 @@ return {
                 text = function(ctx)
                   local icon = ctx.kind_icon
                   if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                    local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+                    local dev_icon, _ = MiniIcons.get("file", ctx.label)
                     if dev_icon then icon = dev_icon end
                   end
                   return icon .. ctx.icon_gap
                 end,
                 highlight = function(ctx)
                   if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                    local _, hl = require("nvim-web-devicons").get_icon(ctx.label)
+                    local _, hl = MiniIcons.get("file", ctx.label)
                     if hl then return hl end
                   end
                   return "BlinkCmpKind" .. ctx.kind
@@ -98,9 +98,6 @@ return {
       },
       signature = { enabled = true },
       fuzzy = { implementation = "prefer_rust" },
-    },
-    documentation = {
-      window = { border = "rounded" },
     },
   },
 }

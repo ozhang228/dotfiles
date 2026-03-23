@@ -15,6 +15,8 @@ require("lazy").setup({
   { import = "plugins.text" },
   { import = "plugins.git" },
   { import = "plugins.tools" },
+  { import = "plugins.notes" },
+  { import = "plugins.dap" },
 }, {
   ui = {
     icons = vim.g.have_nerd_font and {} or {

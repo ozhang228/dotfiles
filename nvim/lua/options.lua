@@ -1,5 +1,5 @@
 vim.o.mouse = "a"
-vim.cmd.colorscheme("catppuccin-mocha")
+vim.cmd.colorscheme("catppuccin-nvim")
 
 vim.opt.shell = "/bin/zsh"
 
@@ -62,32 +62,7 @@ vim.o.showmode = false
 -- what to save in a session
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
-vim.api.nvim_create_autocmd("BufHidden", {
-  callback = function(args)
-    local buf = args.buf
-    if not vim.api.nvim_buf_is_valid(buf) then return end
-    if vim.bo[buf].buftype ~= "" then return end
-    if not vim.bo[buf].buflisted then return end
-
-    vim.schedule(function()
-      if not vim.api.nvim_buf_is_valid(buf) then return end
-      for _, win in ipairs(vim.api.nvim_list_wins()) do
-        if vim.api.nvim_win_get_buf(win) == buf then return end
-      end
-
-      if vim.bo[buf].modified then
-        local name = vim.api.nvim_buf_get_name(buf)
-        local short = name ~= "" and vim.fn.fnamemodify(name, ":~:.") or "[No Name]"
-        local choice = vim.fn.confirm("Save changes to " .. short .. "?", "&Yes\n&No\n&Cancel")
-        if choice == 1 then
-          vim.api.nvim_buf_call(buf, function() vim.cmd("write") end)
-        elseif choice ~= 2 then
-          return
-        end
-      end
-      vim.api.nvim_buf_delete(buf, { force = true })
-    end)
-  end,
-})
+-- buffers should delete when hidden
+vim.o.bufhidden = "delete"
 
 vim.o.swapfile = false

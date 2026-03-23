@@ -24,6 +24,7 @@ return {
         -- C/C++
         "clangd",
         "clang-format",
+        "codelldb",
 
         -- Lua
         "lua-language-server",

@@ -12,9 +12,15 @@ return {
 
           -- Rule 1: hidden items always last
           if a_hidden ~= b_hidden then return not a_hidden end
-          -- Rule 2: directories before files (within same hidden group)
+          -- Rule 2: directories before files
           if a_dir ~= b_dir then return a_dir end
-          -- Rule 3: case-insensitive alphabetical
+          -- Rule 3: group by extension (directories have no extension)
+          if not a_dir and not b_dir then
+            local a_ext = a.name:match("%.([^%.]+)$") or ""
+            local b_ext = b.name:match("%.([^%.]+)$") or ""
+            if a_ext ~= b_ext then return a_ext < b_ext end
+          end
+          -- Rule 4: case-insensitive alphabetical
           return a.name:lower() < b.name:lower()
         end)
         return entries

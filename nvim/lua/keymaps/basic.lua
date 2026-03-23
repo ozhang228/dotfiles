@@ -57,6 +57,11 @@ return {
       end,
       desc = "Smart dd (void on empty line)",
     },
+    {
+      "<leader>|",
+      function() vim.cmd("vsplit " .. vim.api.nvim_buf_get_name(0)) end,
+      desc = "Vertical split",
+    },
   },
   {
     mode = "t",

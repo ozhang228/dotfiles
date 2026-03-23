@@ -11,5 +11,6 @@ return {
       mappings = false, -- no icons on mapping
       group = "",
     },
+    delay = 50, -- faster
   },
 }

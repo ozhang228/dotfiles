@@ -1,27 +1,27 @@
 return {
   mode = "n",
   {
-    "<leader>m",
+    "<leader>M",
     "nop",
     desc = "Mason",
   },
   {
-    "<leader>mg",
+    "<leader>Mg",
     "<cmd>Mason<cr>",
     desc = "GUI",
   },
   {
-    "<leader>mi",
+    "<leader>Mi",
     "<cmd>MasonToolsInstall<cr>",
     desc = "Install",
   },
   {
-    "<leader>mu",
+    "<leader>Mu",
     "<cmd>MasonToolsUpdate<cr>",
     desc = "Update",
   },
   {
-    "<leader>mc",
+    "<leader>Mc",
     "<cmd>MasonToolsClean<cr>",
     desc = "Clean",
   },
