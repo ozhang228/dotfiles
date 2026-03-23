@@ -1,0 +1,10 @@
+local wk = require("which-key")
+
+wk.add(require("keymaps.basic"))
+wk.add(require("keymaps.find"))
+wk.add(require("keymaps.terminal"))
+wk.add(require("keymaps.lsp"))
+wk.add(require("keymaps.ai"))
+wk.add(require("keymaps.git"))
+wk.add(require("keymaps.plugins"))
+wk.add(require("keymaps.mason"))
