@@ -32,7 +32,13 @@ class SetEnvVar(BaseModel):
     value: str
 
 
+class Metadata(BaseModel):
+    name: str
+    supported_distros: Sequence[Distro]
+
+
 class DotConfig(BaseModel):
+    metadata: Metadata
     deps: Sequence[Depencency] = []
     symlinks: Sequence[Symlink] = []
     env_vars: Sequence[RequiredEnvVar | SetEnvVar] = []
