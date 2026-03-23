@@ -1,2 +1,3 @@
 dist/unix/hypr/hyprpaper.conf
 /core/Dygma/Backups/Defy
+__pycache__/
