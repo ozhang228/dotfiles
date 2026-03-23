@@ -88,7 +88,7 @@ fi
 
 # ── data ──────────────────────────────────────────────────────────────
 declare -A SYMLINKS=(
-  ["core/nvim"]="$HOME/.config/nvim"
+  ["nvim"]="$HOME/.config/nvim"
   ["core/starship"]="$HOME/.config/starship"
   ["core/kitty"]="$HOME/.config/kitty"
   ["core/lazygit"]="$HOME/.config/lazygit"
