@@ -18,7 +18,7 @@ return {
 
         -- Python
         "basedpyright",
-        "mypy",
+        "ty",
         "ruff",
 
         -- C/C++

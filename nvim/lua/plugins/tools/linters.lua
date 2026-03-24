@@ -13,7 +13,7 @@ return {
       css = { "eslint_d" },
 
       -- Python
-      python = { "mypy", "ruff" },
+      python = { "ty", "ruff" },
 
       -- Lua
       lua = { "luacheck" },

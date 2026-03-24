@@ -18,12 +18,28 @@ return {
       preferences = {
         useAliasesForRenames = false, -- important for renaming object keys
       },
+      inlayHints = {
+        parameterNames = { enabled = "all" },
+        parameterTypes = { enabled = true },
+        variableTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        functionLikeReturnTypes = { enabled = true },
+        enumMemberValues = { enabled = true },
+      },
     },
 
     javascript = {
       preferGoToSourceDefinition = true,
       preferences = {
         useAliasesForRenames = false,
+      },
+      inlayHints = {
+        parameterNames = { enabled = "all" },
+        parameterTypes = { enabled = true },
+        variableTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        functionLikeReturnTypes = { enabled = true },
+        enumMemberValues = { enabled = true },
       },
     },
 
