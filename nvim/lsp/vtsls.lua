@@ -10,49 +10,19 @@ return {
     "typescriptreact",
   },
   settings = {
-    typescript = {
-      preferGoToSourceDefinition = true,
-      tsserver = {
-        maxTsServerMemory = 4096,
-      },
-      preferences = {
-        useAliasesForRenames = false, -- important for renaming object keys
-      },
-      inlayHints = {
-        parameterNames = { enabled = "all" },
-        parameterTypes = { enabled = true },
-        variableTypes = { enabled = true },
-        propertyDeclarationTypes = { enabled = true },
-        functionLikeReturnTypes = { enabled = true },
-        enumMemberValues = { enabled = true },
-      },
-    },
-
-    javascript = {
-      preferGoToSourceDefinition = true,
-      preferences = {
-        useAliasesForRenames = false,
-      },
-      inlayHints = {
-        parameterNames = { enabled = "all" },
-        parameterTypes = { enabled = true },
-        variableTypes = { enabled = true },
-        propertyDeclarationTypes = { enabled = true },
-        functionLikeReturnTypes = { enabled = true },
-        enumMemberValues = { enabled = true },
-      },
-    },
-
     vtsls = {
       autoUseWorkspaceTsdk = true,
-      experimental = {
-        completion = {
-          enableServerSideFuzzyMatch = true,
-          entriesLimit = 200,
-        },
-      },
     },
   },
+
+  on_attach = function(client)
+    local keep = { "semanticTokensProvider" }
+    for key, _ in pairs(client.server_capabilities) do
+      if not vim.tbl_contains(keep, key) then
+        client.server_capabilities[key] = nil
+      end
+    end
+  end,
 
   root_dir = function(bufnr, on_dir)
     local root_markers = { "package-lock.json", "yarn.lock", "pnpm-lock.yaml", "bun.lockb", "bun.lock" }
