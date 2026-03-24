@@ -10,6 +10,14 @@ return {
           },
         },
       },
+      formatters = {
+        file = {
+          filename_first = true,
+        },
+      },
+      jump = {
+        jumplist = false,
+      },
     },
   },
 }

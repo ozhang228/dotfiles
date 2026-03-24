@@ -1,5 +1,5 @@
 vim.o.mouse = "a"
-vim.cmd.colorscheme("catppuccin-nvim")
+vim.cmd.colorscheme("rose-pine")
 
 vim.opt.shell = "/bin/zsh"
 

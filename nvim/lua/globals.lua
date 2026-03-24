@@ -1,2 +1,2 @@
-Palette = require("catppuccin.palettes").get_palette("mocha")
+Palette = require("rose-pine.palette")
 Snacks = require("snacks")
