@@ -16,7 +16,7 @@ return {
         local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
         local bg = normal.bg and string.format("#%06x", normal.bg) or nil
 
-        local dot = modified and { "◆ ", guifg = Palette.peach } or { "◆ ", guifg = Palette.green }
+        local dot = modified and { "◆ ", guifg = Palette.gold } or { "◆ ", guifg = Palette.foam }
 
         return {
           " ",
