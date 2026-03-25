@@ -21,9 +21,6 @@ alias cdpy="cd ~/drw/desk-tools/python/"
 alias cdk8="cd ~/drw/k8s/"
 alias cdalp="cd ~/drw/alp-config/"
 alias cdapp="cd ~/drw/app-launcher/"
-export VAULT_NAMESPACE=fio
-export VAULT_ADDR=https://vault.drw
-alias vault-login="vault login -no-print -method=ldap username=$(whoami)"
 
 alias makea="make fmt;make check;make test"
 
