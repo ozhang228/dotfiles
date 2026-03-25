@@ -3,6 +3,7 @@ return {
   opts = {
     picker = {
       enabled = true,
+      hidden = true,
       win = {
         list = {
           wo = {
