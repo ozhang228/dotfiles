@@ -23,23 +23,12 @@ return {
     },
     {
       "gd",
-      function() vim.lsp.buf.definition() end,
+      function() Snacks.picker.lsp_definitions() end,
       desc = "Go to Definition",
     },
     {
       "<leader>lr",
-      function()
-        -- go into buffer mode for renames
-        vim.api.nvim_create_autocmd("CmdlineEnter", {
-          once = true, -- fires once then deletes itself
-          callback = function()
-            local key = vim.api.nvim_replace_termcodes("<C-f>", true, false, true)
-            vim.api.nvim_feedkeys(key, "c", false)
-            vim.api.nvim_feedkeys("0", "n", false)
-          end,
-        })
-        vim.lsp.buf.rename()
-      end,
+      function() vim.lsp.buf.rename() end,
       desc = "Rename",
     },
     {

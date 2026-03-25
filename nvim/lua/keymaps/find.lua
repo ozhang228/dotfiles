@@ -1,5 +1,5 @@
 return {
-  { "<leader>f", "<nop>", desc = "[F]ind" },
+  { "<leader>f", "<nop>", desc = "Find" },
   {
     "<leader>ff",
     function() Snacks.picker.smart() end,
@@ -26,9 +26,19 @@ return {
     desc = "Grep Word",
   },
   {
+    "<leader>fW",
+    function() Snacks.picker.grep_word() end,
+    desc = "Grep Word Under Cursor",
+  },
+  {
     "<leader>fd",
     function() Snacks.picker.diagnostics_buffer() end,
     desc = "Diagnostics (Buffer)",
+  },
+  {
+    "<leader>fD",
+    function() Snacks.picker.diagnostics() end,
+    desc = "Diagnostics",
   },
   {
     "<leader>fr",

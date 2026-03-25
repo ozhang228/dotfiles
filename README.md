@@ -16,6 +16,8 @@ Dotfiles with setup script
     - packages
     - env variables being set
 
+- add flameshot gui as env var and make my rofi better
+
 - automate manual setups
   - **General**
     - Github setup (gh auth login)

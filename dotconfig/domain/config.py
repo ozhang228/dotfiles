@@ -12,7 +12,7 @@ from result import Err, Ok, Result
 InstallCommand = str
 
 
-class Depencency(BaseModel):
+class Dependency(BaseModel):
     name: str
     description: str
     install_method: dict[Distro, InstallCommand]
@@ -39,7 +39,7 @@ class Metadata(BaseModel):
 
 class DotConfig(BaseModel):
     metadata: Metadata
-    deps: Sequence[Depencency] = []
+    deps: Sequence[Dependency] = []
     symlinks: Sequence[Symlink] = []
     env_vars: Sequence[RequiredEnvVar | SetEnvVar] = []
 

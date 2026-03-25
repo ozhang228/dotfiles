@@ -22,13 +22,3 @@ vim.api.nvim_create_autocmd("User", {
   callback = function(event) require("snacks").rename.on_rename_file(event.data.from, event.data.to) end,
   desc = "LSP Rename on mini files changes",
 })
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-  callback = function()
-    vim.api.nvim_set_hl(0, "LspInlayHint", {
-      fg = Palette.peach,
-      bg = Palette.teal,
-      italic = true,
-    })
-  end,
-})
