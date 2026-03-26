@@ -28,6 +28,7 @@ return {
       "markdown_inline",
       "query",
       "regex",
+      "toml",
     },
     highlight = {
       enable = true,

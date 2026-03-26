@@ -34,6 +34,7 @@ return {
         -- Misc
         "jq",
         "checkmake",
+        "taplo",
       },
     },
   },

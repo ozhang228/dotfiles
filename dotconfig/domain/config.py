@@ -1,5 +1,5 @@
 import tomllib
-from abc import ABC
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -45,6 +45,7 @@ class DotConfig(BaseModel):
 
 
 class AbstractConfig(ABC):
+    @abstractmethod
     def get_config(self) -> Sequence[Result[DotConfig, str]]: ...
 
 

@@ -45,18 +45,7 @@ return {
       end,
       desc = "Diagnostic / Hover",
     },
-    {
-      "dd",
-      function()
-        local line = vim.api.nvim_get_current_line()
-        if line:match("^%s*$") then
-          vim.cmd('normal! "_dd')
-        else
-          vim.cmd("normal! dd")
-        end
-      end,
-      desc = "Smart dd (void on empty line)",
-    },
+    { "dd", '"_dd', desc = "dd but don't overwrite reg" },
     {
       "<leader>|",
       function() vim.cmd("vsplit " .. vim.api.nvim_buf_get_name(0)) end,
