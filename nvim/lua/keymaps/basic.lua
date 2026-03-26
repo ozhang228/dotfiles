@@ -45,7 +45,6 @@ return {
       end,
       desc = "Diagnostic / Hover",
     },
-    { "dd", '"_dd', desc = "dd but don't overwrite reg" },
     {
       "<leader>|",
       function() vim.cmd("vsplit " .. vim.api.nvim_buf_get_name(0)) end,
