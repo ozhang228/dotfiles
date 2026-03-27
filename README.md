@@ -17,6 +17,7 @@ Dotfiles with setup script
     - env variables being set
 
 - add flameshot gui as env var and make my rofi better
+- brew
 
 - automate manual setups
   - **General**

@@ -6,6 +6,9 @@ def main():
     distro = detect_distro()
     configs = FileConfigs()
 
+    # symlinks, env vars, packages, all locked behind a cmd line flag, and the make
+    # then do gh auth login
+
     print(configs.get_config())
 
 

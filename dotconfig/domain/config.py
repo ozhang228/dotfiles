@@ -13,8 +13,7 @@ InstallCommand = str
 
 
 class Dependency(BaseModel):
-    name: str
-    description: str
+    id: str
     install_method: dict[Distro, InstallCommand]
 
 
@@ -25,10 +24,12 @@ class Symlink(BaseModel):
 
 class RequiredEnvVar(BaseModel):
     type: Literal["required"] = "required"
+    key: str
 
 
 class SetEnvVar(BaseModel):
     type: Literal["set"] = "set"
+    key: str
     value: str
 
 
