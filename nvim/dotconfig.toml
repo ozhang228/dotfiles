@@ -3,8 +3,8 @@ name = "Nvim Config"
 supported_distros = ["manjaro", "ubuntu", "mac"]
 
 [[symlinks]]
-src = "$HOME/dotfiles/nvim"
-dst = "$HOME/.config/nvim"
+src = "~/dotfiles/nvim"
+dst = "~/.config/nvim"
 
 [[env_vars]]
 type = "required"

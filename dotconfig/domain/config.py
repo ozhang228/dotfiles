@@ -4,10 +4,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from pydantic import BaseModel
-from typing_extensions import Literal, Sequence
+from typing_extensions import Sequence
 
 from domain.distro import Distro
 from result import Err, Ok, Result
+from steps.env_var import EnvVar
+from steps.symlink import Symlink
 
 InstallCommand = str
 
@@ -15,22 +17,6 @@ InstallCommand = str
 class Dependency(BaseModel):
     id: str
     install_method: dict[Distro, InstallCommand]
-
-
-class Symlink(BaseModel):
-    src: Path
-    dst: Path
-
-
-class RequiredEnvVar(BaseModel):
-    type: Literal["required"] = "required"
-    key: str
-
-
-class SetEnvVar(BaseModel):
-    type: Literal["set"] = "set"
-    key: str
-    value: str
 
 
 class Metadata(BaseModel):
@@ -42,7 +28,7 @@ class DotConfig(BaseModel):
     metadata: Metadata
     deps: Sequence[Dependency] = []
     symlinks: Sequence[Symlink] = []
-    env_vars: Sequence[RequiredEnvVar | SetEnvVar] = []
+    env_vars: Sequence[EnvVar] = []
 
 
 class AbstractConfig(ABC):
