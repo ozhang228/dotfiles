@@ -32,13 +32,6 @@ manjaro = "sudo pacman -S github-cli"
 mac = "brew install gh"
 
 [[deps]]
-id = "lazygit"
-[deps.install_method]
-ubuntu = "sudo apt install lazygit"
-manjaro = "sudo pacman -S lazygit"
-mac = "brew install lazygit"
-
-[[deps]]
 id = "clang-tidy"
 [deps.install_method]
 ubuntu = "sudo apt install clang-tools"

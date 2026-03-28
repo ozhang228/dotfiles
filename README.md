@@ -10,12 +10,6 @@ Dotfiles with setup script
 
 # Todos
 
-- config tooling
-  - each tool defines what it requires
-    - symlinks
-    - packages
-    - env variables being set
-
 - add flameshot gui as env var and make my rofi better
 - brew
 

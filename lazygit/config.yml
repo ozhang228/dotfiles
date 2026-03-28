@@ -1,0 +1,58 @@
+gui:
+  scrollPastBottom: true
+  mouseEvents: true
+  sidePanelWidth: 0.3
+  expandFocusedSidePanel: true
+  
+  theme:
+    activeBorderColor:
+      - "#3e8fb0"
+      - bold
+    inactiveBorderColor:
+      - "#6e6a86"
+    searchingActiveBorderColor:
+      - "#ea9a97"
+      - bold
+    optionsTextColor:
+      - "#9ccfd8"
+    selectedLineBgColor:
+      - "#3e8fb0"
+    inactiveViewSelectedLineBgColor:
+      - "#393552"
+      - bold
+    cherryPickedCommitFgColor:
+      - "#2a273f"
+    cherryPickedCommitBgColor:
+      - "#ea9a97"
+    markedBaseCommitFgColor:
+      - "#9ccfd8"
+    markedBaseCommitBgColor:
+      - "#f6c177"
+    unstagedChangesColor:
+      - "#eb6f92"
+    defaultFgColor:
+      - "#e0def4"
+  
+  showNumstatInFilesView: true
+  showRandomTip: false
+  nerdFontsVersion: "3"
+  showDivergenceFromBaseBranch: "arrowAndNumber"
+  filterMode: fuzzy
+  spinner:
+    rate: 60
+
+git:
+  pagers:
+    - colorArg: always
+      pager: "delta --dark --side-by-side --paging=never"
+      externalDiffTool: "delta --dark --side-by-side --paging=never"
+  parseEmoji: true
+
+os:
+  editPreset: nvim
+
+notARepository: quit
+quitOnTopLevelReturn: true
+keybinding:
+  universal:
+    return: <c-q>
