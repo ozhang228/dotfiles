@@ -2,10 +2,13 @@ import argparse
 import os
 
 from pydantic import BaseModel, Field
+from rich.console import Console
+from rich.panel import Panel
 
 from domain.config import FileConfigs
 from domain.distro import detect_distro
-from result import Err, Ok, expect_never
+from result import Err, Ok
+from steps.dependencies import install_dependency
 from steps.env_var import RequiredEnvVar
 from steps.symlink import perform_symlink
 
@@ -16,54 +19,79 @@ class Arguments(BaseModel):
     do_packages: bool = Field(alias="packages")
 
 
+console = Console()
+
+
 def main(args: Arguments):
-    distro = detect_distro()
+    distro_result = detect_distro()
+    match distro_result:
+        case Ok(value):
+            distro = value
+        case Err(error):
+            console.print(f"[red]✗ Failed to detect distro: {error}[/red]")
+            return
+
     configs = FileConfigs()
 
-    # packages
-    # then do gh auth login
     for config_result in configs.get_config():
         if isinstance(config_result, Err):
-            print(f"Failed to get config with err: {config_result.error}")
+            console.print(f"[red]✗ Failed to get config: {config_result.error}[/red]")
             continue
 
         config = config_result.value
 
         if args.do_symlink:
-            print("""
-            ----- Symlinks -----\n
-            """)
-
+            console.print(Panel("Symlinks", style="bold blue"))
             for sym in config.symlinks:
                 symlink_result = perform_symlink(sym)
-
                 match symlink_result:
                     case Ok():
-                        print(f"Symlinked {sym.src} -> {sym.dst}")
+                        console.print(
+                            f"[green]✓[/green] Symlinked {sym.src} -> {sym.dst}"
+                        )
                     case Err(error):
-                        print(f"Symlink failed with err: {error}")
+                        console.print(f"[red]✗[/red] Symlink failed: {error}")
 
         if args.do_env_vars:
-            print("""
-            ----- Env Vars -----\n
-            """)
+            console.print(Panel("Env Vars", style="bold cyan"))
             for env_var in config.env_vars:
                 os_var = os.getenv(env_var.key)
                 match env_var:
                     case RequiredEnvVar():
                         if os_var is None:
-                            print(f"{env_var.key} environment variable is not set")
+                            console.print(
+                                f"[yellow]⚠[/yellow] {env_var.key} is not set"
+                            )
                         else:
-                            print(
-                                f"{env_var.key} environment variable is set to '{os_var}'"
+                            console.print(
+                                f"[green]✓[/green] {env_var.key} = '{os_var}'"
                             )
 
-                    case _:
-                        expect_never(env_var)
         if args.do_packages:
-            print("""
-            ----- Package Installs -----\n
-            """)
+            console.print(Panel("Package Installs", style="bold magenta"))
+
+            installed_packages = set[str]()
+            for dep in config.deps:
+                if dep.id in installed_packages:
+                    console.print(
+                        f"[yellow]⚠[/yellow] {dep.id} already installed. Skipping"
+                    )
+                installed_packages.add(dep.id)
+
+                install_cmd = dep.install_method.get(distro)
+                if install_cmd is None:
+                    console.print(f"[yellow]⚠[/yellow] No command for {distro}")
+                    continue
+
+                console.rule(f"[bold cyan]{dep.id}[/bold cyan]")
+                console.print(f"[dim]$ {install_cmd}[/dim]\n")
+
+                installation_result = install_dependency(install_cmd)
+                match installation_result:
+                    case Ok(success):
+                        console.print(f"[green]✓[/green] {success}")
+                    case Err(error):
+                        console.print(f"[red]✗[/red] Failed to install: {error}")
 
 
 if __name__ == "__main__":
@@ -74,6 +102,5 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--symlink", action="store_true", default=False)
     parser.add_argument("-e", "--env_vars", action="store_true", default=False)
     parser.add_argument("-p", "--packages", action="store_true", default=False)
-
     args = Arguments.model_validate(vars(parser.parse_args()))
     main(args)

@@ -8,15 +8,9 @@ from typing_extensions import Sequence
 
 from domain.distro import Distro
 from result import Err, Ok, Result
+from steps.dependencies import Dependency
 from steps.env_var import EnvVar
 from steps.symlink import Symlink
-
-InstallCommand = str
-
-
-class Dependency(BaseModel):
-    id: str
-    install_method: dict[Distro, InstallCommand]
 
 
 class Metadata(BaseModel):
