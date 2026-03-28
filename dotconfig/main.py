@@ -39,10 +39,16 @@ def main(args: Arguments):
             continue
 
         config = config_result.value
+        console.print(Panel(renderable=f"{config.metadata.name}", style="magenta"))
+
+        if distro not in config.metadata.supported_distros:
+            console.print("[red]✗ Distro is unsupported")
+            continue
 
         if args.do_symlink:
-            console.print(Panel("Symlinks", style="bold blue"))
+            console.print("[blue]--- Symlinks ---")
             for sym in config.symlinks:
+                console.rule(f"[bold cyan]{sym.src} -> {sym.dst}[/bold cyan]")
                 symlink_result = perform_symlink(sym)
                 match symlink_result:
                     case Ok():
@@ -53,8 +59,9 @@ def main(args: Arguments):
                         console.print(f"[red]✗[/red] Symlink failed: {error}")
 
         if args.do_env_vars:
-            console.print(Panel("Env Vars", style="bold cyan"))
+            console.print("[blue]--- Env Vars ---")
             for env_var in config.env_vars:
+                console.rule(f"[bold cyan]{env_var}[/bold cyan]")
                 os_var = os.getenv(env_var.key)
                 match env_var:
                     case RequiredEnvVar():
@@ -68,7 +75,7 @@ def main(args: Arguments):
                             )
 
         if args.do_packages:
-            console.print(Panel("Package Installs", style="bold magenta"))
+            console.print("[blue]--- Packages ---")
 
             installed_packages = set[str]()
             for dep in config.deps:

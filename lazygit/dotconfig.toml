@@ -12,3 +12,10 @@ id = "lazygit"
 ubuntu = "sudo apt install lazygit"
 manjaro = "sudo pacman -S lazygit"
 mac = "brew install lazygit"
+
+[[deps]]
+id = "lazygit"
+[deps.install_method]
+ubuntu = "sudo apt install lazygit"
+manjaro = "sudo pacman -S lazygit"
+mac = "brew install lazygit"
