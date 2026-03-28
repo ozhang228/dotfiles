@@ -1,7 +1,7 @@
 gui:
   scrollPastBottom: true
   mouseEvents: true
-  sidePanelWidth: 0.3
+  sidePanelWidth: 0.15
   expandFocusedSidePanel: true
   
   theme:
@@ -44,8 +44,8 @@ gui:
 git:
   pagers:
     - colorArg: always
-      pager: "delta --dark --side-by-side --paging=never"
-      externalDiffTool: "delta --dark --side-by-side --paging=never"
+      pager: "delta --side-by-side --paging=never"
+      externalDiffTool: "delta --side-by-side --paging=never"
   parseEmoji: true
 
 os:
