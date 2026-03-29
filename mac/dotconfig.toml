@@ -1,0 +1,12 @@
+[metadata]
+name = "Mac Config"
+supported_distros = ["mac"]
+
+[[deps]]
+id = "aerospace"
+[deps.install_method]
+mac = "brew install --cask nikitabobko/tap/aerospace"
+
+[[symlinks]]
+src = "~/dotfiles/mac/.aerospace.toml"
+dst = "~/.aerospace.toml"

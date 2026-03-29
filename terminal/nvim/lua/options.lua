@@ -1,8 +1,6 @@
 vim.o.mouse = "a"
 vim.cmd.colorscheme("rose-pine")
 
-vim.opt.shell = "/bin/zsh"
-
 vim.g.have_nerd_font = true
 
 vim.o.number = true
