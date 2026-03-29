@@ -11,9 +11,10 @@ Dotfiles with setup script
 
 # Todos
 
-- add flameshot gui as env var and make my rofi better
-- brew
-
+- cleanup i3
+  - should have a session setup and a toolbar and better monitor handling
+- fish stuff
+- emulate all setup script duties
 - automate manual setups
   - **General**
     - Github setup (gh auth login)
@@ -26,8 +27,7 @@ Dotfiles with setup script
   - **Ubuntu**
     - Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
 
-- cleanup i3
-  - should have a session setup and a toolbar and better monitor handling
 - try pet cli tool
-- make bmark. create bookamrks and press buttons to go to ecah in a tree like pattern
-- zshrc alias profiles
+
+- write about manual setup
+  - ubuntu monitor handling with arandr then save in autorandr

@@ -20,3 +20,18 @@ ubuntu = "sudo apt install alsa-utils"
 id = "flameshot"
 [deps.install_method]
 ubuntu = "sudo apt install flameshot"
+
+[[deps]]
+id = "picom"
+[deps.install_method]
+ubuntu = "sudo apt install picom"
+
+[[deps]]
+id = "google-chrome"
+[deps.install_method]
+ubuntu = "sudo apt install google-chrome"
+
+[[deps]]
+id = "autorandr"
+[deps.install_method]
+ubuntu = "sudo apt install autorandr"
