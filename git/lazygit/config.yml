@@ -1,7 +1,7 @@
 gui:
   scrollPastBottom: true
   mouseEvents: true
-  sidePanelWidth: 0.15
+  sidePanelWidth: 0.2
   expandFocusedSidePanel: true
   
   theme:

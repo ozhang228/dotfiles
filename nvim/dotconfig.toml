@@ -11,6 +11,13 @@ type = "required"
 key = "AI_CLI_CMD"
 
 [[deps]]
+id = "nvim"
+[deps.install_method]
+ubuntu = "sh ~/dotfiles/nvim/ubuntu_install.sh"
+manjaro = "sudo pacman -S neovim"
+mac = "brew install neovim"
+
+[[deps]]
 id = "ripgrep"
 [deps.install_method]
 ubuntu = "sudo apt install ripgrep"
