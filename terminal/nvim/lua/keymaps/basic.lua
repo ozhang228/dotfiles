@@ -8,7 +8,13 @@ return {
     {
       "<leader>o",
       function()
-        require("mini.files").open(vim.api.nvim_buf_get_name(0), false)
+        -- use current buffer path if valid else use cwd
+        local buf_name = vim.api.nvim_buf_get_name(0)
+
+        local path = buf_name ~= "" and buf_name or vim.fn.getcwd()
+        if vim.fn.filereadable(path) == 0 and vim.fn.isdirectory(path) == 0 then path = vim.fn.getcwd() end
+
+        require("mini.files").open(path, false)
         require("mini.files").reveal_cwd()
       end,
       desc = "Mini.files",

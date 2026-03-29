@@ -1,1 +1,1 @@
-fish_config theme choose "rose_pine_moon"
+fish_config theme choose "Rosé Pine Moon"
