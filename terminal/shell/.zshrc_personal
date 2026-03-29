@@ -1,2 +1,0 @@
-
-alias cfcheck='f() { g++ "template.cpp" -g -o a.out && ./a.out < input.txt; }; f'
