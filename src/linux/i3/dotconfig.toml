@@ -7,6 +7,11 @@ src = "~/dotfiles/src/linux/i3"
 dst = "~/.config/i3"
 
 [[deps]]
+id = "i3"
+[deps.install_method]
+ubuntu = "sudo apt install i3"
+
+[[deps]]
 id = "alsa-utils"
 [deps.install_method]
 ubuntu = "sudo apt install alsa-utils"

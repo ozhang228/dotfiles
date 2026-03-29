@@ -1,0 +1,8 @@
+[metadata]
+name = "Polybar config"
+supported_distros = ["ubuntu"]
+
+[[deps]]
+id = "polybar"
+[deps.install_method]
+ubuntu = "sudo apt install polybar"

@@ -114,17 +114,34 @@ bindsym $mod+$smod+$wm_setting_key_right move right
 default_border pixel $wm_setting_border_size
 default_floating_border pixel $wm_setting_border_size
 
-### Colors ###
-# class                 border                       background                   text                         indicator                    child_border
-client.focused          $wm_color_border_active_bg   $wm_color_border_active_bg   $wm_color_border_active_fg   $wm_color_border_active_bg   $wm_color_border_active_bg
-client.focused_inactive $wm_color_border_inactive_bg $wm_color_border_inactive_bg $wm_color_border_inactive_fg $wm_color_border_inactive_bg $wm_color_border_inactive_bg
-client.unfocused        $wm_color_border_inactive_bg $wm_color_border_inactive_bg $wm_color_border_inactive_fg $wm_color_border_inactive_bg $wm_color_border_inactive_bg
-client.urgent           $wm_color_border_inactive_bg $wm_color_border_inactive_bg $wm_color_border_inactive_fg $wm_color_border_inactive_bg $wm_color_border_inactive_bg
-client.placeholder      $wm_color_border_inactive_bg $wm_color_border_inactive_bg $wm_color_border_inactive_fg $wm_color_border_inactive_bg $wm_color_border_inactive_bg
-client.background       $wm_color_background
-
 bindsym $mod+$smod+f fullscreen toggle
 
 bindsym $mod+$smod+e exec "i3-msg exit"
 bindsym $mod+$smod+r restart 
 bindsym $mod+$smod+q kill
+
+# -- Theme --
+# set primary Rosé Pine Moon colorscheme colors
+set $base           #232136
+set $surface        #2a273f
+set $overlay        #393552
+set $muted          #6e6a86
+set $subtle         #908caa
+set $text           #e0def4
+set $love           #eb6f92
+set $gold           #f6c177
+set $rose           #ea9a97
+set $pine           #3e8fb0
+set $foam           #9ccfd8
+set $iris           #c4a7e7
+set $highlightlow   #2a283e
+set $highlightmed   #44415a
+set $highlighthigh  #56526e
+
+# target                title          bg             text     indicator border
+client.focused          $highlightlow  $highlightlow  $text    $iris     $highlightlow
+client.focused_inactive $muted         $muted         $subtle  $muted    $muted
+client.unfocused        $muted         $muted         $subtle  $muted    $muted
+client.urgent           $love          $love          $text    $love     $love
+client.placeholder      $base          $base          $text    $base     $base
+client.background       $base
