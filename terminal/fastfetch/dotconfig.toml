@@ -1,0 +1,10 @@
+[metadata]
+name = "`fastfetch` Config"
+supported_distros = ["manjaro", "ubuntu", "mac"]
+
+[[deps]]
+id = "fastfetch"
+[deps.install_method]
+manjaro = "sudo pacman -S fastfetch"
+mac = "brew install --cask fastfetch"
+ubuntu = "sh ~/dotfiles/terminal/fastfetch/ubuntu_install.sh"

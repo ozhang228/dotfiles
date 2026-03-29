@@ -1,0 +1,14 @@
+[metadata]
+name = "`lsd` Config"
+supported_distros = ["manjaro", "mac", "ubuntu"]
+
+[[symlinks]]
+src = "~/dotfiles/terminal/lsd"
+dst = "~/.config/lsd"
+
+[[deps]]
+id = "lsd"
+[deps.install_method]
+manjaro = "sudo pacman -S lsd"
+ubuntu = "sudo apt install lsd"
+mac = "brew install lsd"

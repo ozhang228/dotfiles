@@ -1,0 +1,7 @@
+[metadata]
+name = "Dygma Keyboard Config"
+supported_distros = ["manjaro", "ubuntu", "mac"]
+
+[[symlinks]]
+src = "~/dotfiles/Dygma"
+dst = "~/Dygma"
