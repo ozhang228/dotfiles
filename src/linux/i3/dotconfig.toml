@@ -1,0 +1,17 @@
+[metadata]
+name = "i3 Config"
+supported_distros = ["ubuntu"]
+
+[[symlinks]]
+src = "~/dotfiles/src/linux/i3"
+dst = "~/.config/i3"
+
+[[deps]]
+id = "alsa-utils"
+[deps.install_method]
+ubuntu = "sudo apt install alsa-utils"
+
+[[deps]]
+id = "flameshot"
+[deps.install_method]
+ubuntu = "sudo apt install flameshot"

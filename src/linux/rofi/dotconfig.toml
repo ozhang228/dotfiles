@@ -1,0 +1,13 @@
+[metadata]
+name = "rofi config"
+supported_distros = ["manjaro", "ubuntu"]
+
+[[deps]]
+id = "rofi"
+[deps.install_method]
+manjaro = "sudo pacman -S rofi-wayland"
+ubuntu = "sudo apt install rofi"
+
+[[symlinks]]
+src = "~/dotfiles/src/linux/rofi/"
+dst = "~/.config/rofi"

@@ -1,0 +1,56 @@
+[metadata]
+name = "Hyprland Configs"
+supported_distros = ["manjaro"]
+
+[[symlinks]]
+src = "~/dotfiles/src/linux/hyprland/hypr"
+dst = "~/.config/hypr"
+
+[[symlinks]]
+src = "~/dotfiles/src/linux/hyprland/hyprpanel"
+dst = "~/.config/hyprpanel"
+
+[[deps]]
+id = "hyprland"
+[deps.install_method]
+manjaro = "sudo pacman -S hyprland"
+
+[[deps]]
+id = "hyprshot"
+[deps.install_method]
+manjaro = "sudo pacman -S hyprshot"
+
+[[deps]]
+id = "hyprcursor"
+[deps.install_method]
+manjaro = "sudo pacman -S hyprcursor"
+
+[[deps]]
+id = "hyprpaper"
+[deps.install_method]
+manjaro = "sudo pacman -S hyprpaper"
+
+[[deps]]
+id = "xdg-desktop-portal-hyprland"
+[deps.install_method]
+manjaro = "sudo pacman -S xdg-desktop-portal-hyprland"
+
+[[deps]]
+id = "xdg-desktop-portal-gtk"
+[deps.install_method]
+manjaro = "sudo pacman -S xdg-desktop-portal-gtk"
+
+[[deps]]
+id = "hypridle"
+[deps.install_method]
+manjaro = "sudo pacman -S hypridle"
+
+[[deps]]
+id = "hyprlock"
+[deps.install_method]
+manjaro = "sudo pacman -S hyprlock"
+
+[[deps]]
+id = "hyprpolkitagent"
+[deps.install_method]
+manjaro = "sudo pacman -S hyprpolkitagent"
