@@ -3,7 +3,7 @@ name = "Nvim Config"
 supported_distros = ["manjaro", "ubuntu", "mac"]
 
 [[symlinks]]
-src = "~/dotfiles/nvim"
+src = "~/dotfiles/terminal/nvim"
 dst = "~/.config/nvim"
 
 [[env_vars]]
@@ -13,7 +13,7 @@ key = "AI_CLI_CMD"
 [[deps]]
 id = "nvim"
 [deps.install_method]
-ubuntu = "sh ~/dotfiles/nvim/ubuntu_install.sh"
+ubuntu = "sh ~/dotfiles/terminal/nvim/ubuntu_install.sh"
 manjaro = "sudo pacman -S neovim"
 mac = "brew install neovim"
 
