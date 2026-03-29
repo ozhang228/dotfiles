@@ -147,6 +147,7 @@ section_ppas() {
   for ppa in "${APT_PPAS[@]}"; do
     log "Adding PPA: $ppa"
     sudo add-apt-repository -y "$ppa"
+
   done
   ok "PPAs ensured."
 }

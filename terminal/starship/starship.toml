@@ -1,52 +1,57 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+
 format = """
 [](red)\
 $os\
-$shell\
 [](bg:peach fg:red)\
-$directory\
+$shell\
 [](fg:peach bg:yellow)\
-$git_branch\
+$directory\
 [](fg:yellow bg:green)\
+$git_branch\
 [](fg:green bg:teal)\
-$c\
-$rust\
-$golang\
-$nodejs\
-$php\
-$java\
-$kotlin\
-$haskell\
 $python\
 $conda\
+[](fg:teal bg:blue)\
 [](fg:blue bg:purple)\
 $time\
 [ ](fg:purple)\
 $line_break$character"""
 
-palette = "rose-pine-moon"
+palette = 'catppuccin_mocha'
 
-[palettes.rose_pine_moon]
-base = "#232136"
-surface = "#2a2639"
-overlay = "#393552"
-muted = "#6e6a86"
-subtle = "#908caa"
-text = "#e0def4"
-love = "#eb6f92"
-gold = "#f6c177"
-rose = "#ea9a97"
-pine = "#3e8fb0"
-foam = "#9ccfd8"
-iris = "#c4a7e7"
-highlight_low = "#2a283e"
-highlight_med = "#44415a"
-highlight_high = "#56526e"
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+orange = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
 
 [os]
 disabled = false
-style = "bg:love fg:text"
+style = "bg:red fg:mantle"
 format = "[$symbol]($style)"
 
 [os.symbols]
@@ -70,56 +75,23 @@ Debian = "󰣚"
 Redhat = "󱄛"
 RedHatEnterprise = "󱄛"
 
+[shell]
+disabled = false
+style = "fg:base bg:peach"
+format = '[[ $indicator ](fg:base bg:peach)]($style)'
+
 [directory]
-style = "fg:mantle bg:peach"
+style = "fg:base bg:yellow"
 format = "[ $path ]($style)"
-truncation_length = 3
+truncation_length = 5
 truncation_symbol = "…/"
+truncate_to_repo = true
+read_only = "󰌾"
+home_symbol = ""
 
 [git_branch]
 symbol = ""
-format = '[[ $symbol $branch ](fg:base bg:yellow)]($style)'
-
-
-[nodejs]
-symbol = ""
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[c]
-symbol = " "
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[rust]
-symbol = ""
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[golang]
-symbol = ""
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[php]
-symbol = ""
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[java]
-symbol = " "
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[kotlin]
-symbol = ""
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
-
-[haskell]
-symbol = ""
-style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
+format = '[[ $symbol $branch ](fg:base bg:green)]($style)'
 
 [python]
 symbol = ""
@@ -127,30 +99,19 @@ style = "bg:teal"
 format = '[[ $symbol( $virtualenv) ](fg:base bg:teal)]($style)'
 
 [conda]
-symbol = ""
-style = "bg:teal fg:crust"
-format = '[ $environment ]($style)'
-
-[docker_context]
-symbol = ""
-style = "bg:mantle"
-format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+symbol = '🅒'
+style = "bg:teal"
+format = '[[ $symbol $environment ](fg:base bg:teal)]($style)'
 
 [time]
 disabled = false
 time_format = "%I:%M %p"
-style = "bg:peach"
 format = '[[  $time ](fg:mantle bg:purple)]($style)'
-
-[line_break]
-disabled = false
 
 [character]
 disabled = false
 success_symbol = '[](bold fg:green)'
 error_symbol = '[](bold fg:red)'
 
-[shell]
+[line_break]
 disabled = false
-style = "fg:mantle bg:red"
-format = '[[ $indicator ](fg:base bg:red)]($style)'
