@@ -2,7 +2,7 @@ return {
   { "<leader>f", "<nop>", desc = "Find" },
   {
     "<leader>ff",
-    function() Snacks.picker.smart() end,
+    function() Snacks.picker.smart({ multi = { "recent", "files" } }) end,
     desc = "Files (smart)",
   },
   {
