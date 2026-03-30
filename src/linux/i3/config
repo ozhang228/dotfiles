@@ -12,7 +12,7 @@ set $key_right        l
 
 set $terminal         kitty
 set $browser          google-chrome
-set $app_lancher      rofi -show drun
+set $app_launcher     rofi -show drun
 set $compositor       picom
 
 # Core

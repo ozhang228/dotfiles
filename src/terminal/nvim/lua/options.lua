@@ -1,5 +1,6 @@
 vim.o.mouse = "a"
 vim.cmd.colorscheme("rose-pine")
+vim.o.shell = "/bin/fish"
 
 vim.g.have_nerd_font = true
 
