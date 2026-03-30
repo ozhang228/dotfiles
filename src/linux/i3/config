@@ -2,9 +2,9 @@
 set $mod              Mod1
 set $smod             Shift
 set $font             pango:JetBrains Mono 14
-set $gap_width        15
-set $gap_heigth       15
-set $border_size      5
+set $gap_width        0
+set $gap_heigth       0
+set $border_size      8
 set $key_left         h
 set $key_down         j
 set $key_up           k
@@ -17,6 +17,8 @@ set $compositor       picom
 
 # Core
 font $font
+focus_follows_mouse yes
+popup_during_fullscreen smart
 default_border pixel $border_size
 default_floating_border pixel $border_size
 
@@ -109,9 +111,9 @@ set $highlightmed   #44415a
 set $highlighthigh  #56526e
 
 # target                title          bg             text     indicator border
-client.focused          $highlightlow  $highlightlow  $text    $iris     $highlightlow
-client.focused_inactive $muted         $muted         $subtle  $muted    $muted
-client.unfocused        $muted         $muted         $subtle  $muted    $muted
+client.focused          $love          $love          $text    $love     $love
+client.focused_inactive $surface       $surface       $subtle  $surface  $surface
+client.unfocused        $surface       $surface       $subtle  $surface  $surface
 client.urgent           $love          $love          $text    $love     $love
 client.placeholder      $base          $base          $text    $base     $base
 client.background       $base
