@@ -72,3 +72,17 @@ id = "nerd_font"
 ubuntu = "mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts && curl -L https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip -o jbm.zip && unzip -o jbm.zip && rm jbm.zip && fc-cache -f -v"
 manjaro = "sudo pacman -S ttf-jetbrains-mono"
 mac = "brew tap homebrew/cask-fonts && brew install font-jetbrains-mono"
+
+[[deps]]
+id = "curl"
+[deps.install_method]
+ubuntu = "sudo apt install curl"
+manjaro = "sudo pacman -S curl"
+mac = "brew install curl"
+
+[[deps]]
+id = "jq"
+[deps.install_method]
+ubuntu = "sudo apt install jq"
+manjaro = "sudo pacman -S jq"
+mac = "brew install jq"
