@@ -11,9 +11,7 @@ Dotfiles with setup script
 
 # Todos
 
-- cleanup i3
-  - should have a session setup and a toolbar and better monitor handling
-- fish stuff
+- kitty super key
 - emulate all setup script duties
 - automate manual setups
   - **General**

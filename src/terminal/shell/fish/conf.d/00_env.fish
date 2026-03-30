@@ -10,3 +10,5 @@ set -gx VCPKG_ROOT "$HOME/.local/vcpkg"
 
 # colors in conda
 set -gx CONDA_CHANGEPS1 true
+# disable greeting
+set fish_greeting
