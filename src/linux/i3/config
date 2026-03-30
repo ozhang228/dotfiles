@@ -29,6 +29,9 @@ exec_always --no-startup-id $app_compositor
 # use autorandr monitor setup, then get a random wallpaper and launch my bar
 exec_always --no-startup-id "autorandr --change && bash $HOME/dotfiles/src/linux/i3/wallpaper.sh && bash $HOME/dotfiles/src/linux/polybar/launch.sh"
 
+# hack: PipeWire on Ubuntu resets mic volume on login
+exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
+
 exec --no-startup-id $browser
 exec --no-startup-id $terminal
 exec --no-startup-id slack
