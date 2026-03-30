@@ -1,3 +1,5 @@
+if status is-interactive
+
 command -v lsd &>/dev/null && alias ls='lsd'
 
 abbr -a py "python3"
@@ -11,9 +13,11 @@ abbr -a notes "cd ~/notes;nvim"
 abbr -a cfcheck 'f() { g++ "template.cpp" -g -o a.out && ./a.out < input.txt; }; f'
 
 # project paths for work
-abbr -a dtc "~/drw/desk-tools/typescript/packages/@desk-tools/common/"
-abbr -a dtts "~/drw/desk-tools/typescript/"
-abbr -a dtpy "~/drw/desk-tools/python"
-abbr -a k8s "~/drw/k8s"
-abbr -a alp "~/drw/alp-config"
-abbr -a appl "~/drw/app-launcher"
+set -gx dtc "~/drw/desk-tools/typescript/packages/@desk-tools/common/"
+set -gx dtts "~/drw/desk-tools/typescript/"
+set -gx dtpy "~/drw/desk-tools/python"
+set -gx k8 "~/drw/k8s"
+set -gx alp "~/drw/alp-config"
+set -gx appl "~/drw/app-launcher"
+
+end
