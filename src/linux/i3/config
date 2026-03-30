@@ -33,8 +33,8 @@ exec --no-startup-id $browser
 exec --no-startup-id $terminal
 exec --no-startup-id slack
 
-bindsym $mod+Return exec $app_terminal
-bindsym $mod+$smod+Return exec $app_browser
+bindsym $mod+Return exec $terminal
+bindsym $mod+$smod+Return exec $browser
 bindsym Mod4+space exec $app_launcher
 
 bindsym XF86AudioMute exec "amixer -D pulse set Master 1+ toggle"
