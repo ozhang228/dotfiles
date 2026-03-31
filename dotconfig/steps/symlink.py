@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 
 from pydantic import BaseModel
@@ -24,7 +25,7 @@ def perform_symlink(symlink: Symlink, overwrite: bool = False) -> Result[None, s
             if dst.is_symlink():
                 os.unlink(dst)
             elif dst.is_dir():
-                dst.rmdir()
+                shutil.rmtree(dst)
             else:
                 dst.unlink()
 
