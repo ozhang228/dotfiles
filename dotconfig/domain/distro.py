@@ -21,7 +21,7 @@ def detect_distro() -> Result[Distro, str]:
         distro_id = os_info.get("ID", "").lower()
 
         if "ubuntu" in distro_id:
-            return Ok(Distro.MANJARO)
+            return Ok(Distro.UBUNTU)
         elif "manjaro" in distro_id:
             return Ok(Distro.MANJARO)
         else:
