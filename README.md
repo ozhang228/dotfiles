@@ -9,23 +9,19 @@ Dotfiles with setup script
 - either `Mac`, `Ubuntu`, or `Manjaro` (could probably work for any arch based distro)
 - must be cloned under `$HOME/dotfiles`
 
-# Todos
+## Manual Setup
 
-- kitty super key
-- emulate all setup script duties
-- automate manual setups
-  - **General**
-    - Github setup (gh auth login)
-    - AI Coding Assistant Setup (Opencode, Codex, etc.)
-    - Run Tests
-      - audio, camera, screen share
-      - bluetooth, wifi
-    - remap caps to escape
+- for linux setups, run tests to confirm all of these functions work
+  - audio
+  - camera
+  - screen share
+  - bluetooth
+  - wifi
 
-  - **Ubuntu**
-    - Remap caps to escape by doing `sudo nvim /etc/default/keyboard` and changing `XKBOPTIONS="caps:swapescape"`
+- Github setup (gh auth login)
+- AI Coding Assistant Setup
+  - clone `/ai` github repository
+  - setup rules to read ai files
 
-- try pet cli tool
-
-- write about manual setup
-  - ubuntu monitor handling with arandr then save in autorandr
+- ubuntu
+  - setup monitors in arandr then save in autorandr

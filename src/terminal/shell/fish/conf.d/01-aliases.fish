@@ -20,4 +20,7 @@ set -gx k8 "$HOME/drw/k8s"
 set -gx alp "$HOME/drw/alp-config"
 set -gx appl "$HOME/drw/app-launcher"
 
+# swap escape on ubuntu and manjaro
+set -gx XKB_DEFAULT_OPTIONS caps:swapescape
 end
+
