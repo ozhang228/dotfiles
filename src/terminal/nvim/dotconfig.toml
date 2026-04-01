@@ -86,3 +86,10 @@ id = "jq"
 ubuntu = "sudo apt install jq"
 manjaro = "sudo pacman -S jq"
 mac = "brew install jq"
+
+[[deps]]
+id = "luarocks"
+[deps.install_method]
+ubuntu = "sudo apt install luarocks"
+manjaro = "sudo pacman -S luarocks"
+mac = "brew install luarocks"

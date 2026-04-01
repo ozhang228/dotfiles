@@ -6,3 +6,13 @@ supported_distros = ["ubuntu"]
 id = "polybar"
 [deps.install_method]
 ubuntu = "sudo apt install polybar"
+
+[[deps]]
+id = "pavucontrol"
+[deps.install_method]
+ubuntu = "sudo apt install pavucontrol"
+
+[[deps]]
+id = "blueman"
+[deps.install_method]
+ubuntu = "sudo apt install blueman"

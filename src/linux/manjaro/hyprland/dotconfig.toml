@@ -3,11 +3,11 @@ name = "Hyprland Configs"
 supported_distros = ["manjaro"]
 
 [[symlinks]]
-src = "~/dotfiles/src/linux/hyprland/hypr"
+src = "~/dotfiles/src/linux/manjaro/hyprland/hypr"
 dst = "~/.config/hypr"
 
 [[symlinks]]
-src = "~/dotfiles/src/linux/hyprland/hyprpanel"
+src = "~/dotfiles/src/linux/manjaro/hyprland/hyprpanel"
 dst = "~/.config/hyprpanel"
 
 [[deps]]
@@ -15,10 +15,6 @@ id = "hyprland"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprland"
 
-[[deps]]
-id = "hyprshot"
-[deps.install_method]
-manjaro = "sudo pacman -S hyprshot"
 
 [[deps]]
 id = "hyprcursor"
@@ -49,6 +45,21 @@ manjaro = "sudo pacman -S hypridle"
 id = "hyprlock"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprlock"
+
+[[deps]]
+id = "hyprpanel"
+[deps.install_method]
+manjaro = "sudo yay -S ags-hyprpanel-git"
+
+[[deps]]
+id = "cursor_theme"
+[deps.install_method]
+manjaro = "sudo yay -S bibata-cursor-theme"
+
+[[deps]]
+id = "hyprshot"
+[deps.install_method]
+manjaro = "sudo yay -S hyprshot"
 
 [[deps]]
 id = "hyprpolkitagent"

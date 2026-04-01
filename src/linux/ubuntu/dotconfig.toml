@@ -1,0 +1,13 @@
+[metadata]
+name = "Ubuntu Config"
+supported_distros = ["ubuntu"]
+
+[[deps]]
+id = "dunst"
+[deps.install_method]
+ubuntu = "sudo apt install dunst"
+
+[[deps]]
+id = "feh"
+[deps.install_method]
+ubuntu = "sudo apt install feh"
