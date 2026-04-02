@@ -12,3 +12,6 @@ set -gx VCPKG_ROOT "$HOME/.local/vcpkg"
 set -gx CONDA_CHANGEPS1 true
 # disable greeting
 set fish_greeting
+
+# rose pine in jq
+set -gx JQ_COLORS "1;38;5;60:0;38;5;204:0;38;5;116:0;38;5;222:0;38;5;217:0;38;5;183:0;38;5;66"
