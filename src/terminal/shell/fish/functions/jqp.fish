@@ -1,3 +1,4 @@
+# JQ but pretty
 # Wrapper around jq for mixed JSON/string streams with colors and error handling baked in.
 # JSON lines are parsed, formatted, and colored. Plain strings pass through as-is.
 # Usage: cat app.log | jqp
@@ -9,5 +10,5 @@ function jqp
     if test -z "$filter"
         set filter '.'
     end
-    jq -R ". as \$raw | try (fromjson | $filter) catch \$raw" --color-output
+    jq -R ". as \$raw | try (fromjson | $filter) catch ({type: \"string\", message: \$raw} | $filter)" --color-output
 end
