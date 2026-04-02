@@ -3,6 +3,8 @@ return {
   opts = {
     scratch = {
       enabled = true,
+      ft = "markdown",
+      root = vim.fn.expand("~/dotfiles/src/terminal/nvim/scratch"),
       filekey = {
         cwd = true,
         branch = false,

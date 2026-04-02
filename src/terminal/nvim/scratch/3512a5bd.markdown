@@ -1,0 +1,3 @@
+# Surface Viz
+
+uv run fio/desk_tools/apps/surface_viz/entry_points/dash/main.py ./configs/surface_viz/dash/natgas.json
