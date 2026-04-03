@@ -8,6 +8,8 @@ abbr -a aic "$HOME/ai/copy.fish"
 
 abbr -a dot "cd $HOME/dotfiles/;nvim"
 abbr -a notes "cd $HOME/notes;nvim"
+abbr -a ai "cd $HOME/ai;nvim"
+abbr -a forge "cd $HOME/forge;nvim"
 
 # check the template.cpp file against the output
 abbr -a cfcheck 'f() { g++ "template.cpp" -g -o a.out && ./a.out < input.txt; }; f'

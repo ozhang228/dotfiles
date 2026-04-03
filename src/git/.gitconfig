@@ -28,3 +28,5 @@
 [credential "https://github.gatech.edu"]
 	helper = 
 	helper = !/usr/bin/gh auth git-credential
+[init]
+	defaultBranch = main
