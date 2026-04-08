@@ -6,7 +6,7 @@ uv run fio/desk_tools/apps/surface_viz/entry_points/dash/main.py ./configs/surfa
 
 - Aggregator
   uv run fio/desk_tools/apps/risk_viewer/risk_aggregator/main_change_on_day.py configs/risk_viewer/risk_aggregator/eorv/change_on_day.json &| jqlog cod.log
-  uv run fio/desk_tools/apps/risk_viewer/risk_aggregator/main_scenario.py configs/risk_viewer/risk_aggregator/eorv/scenario.json &| jqlog scenario.log
+  uv run fio/desk_tools/apps/risk_viewer/risk_aggregator/main_scenario.py configs/risk_viewer/risk_aggregator/eorv/scenario.json &| jqlog scenario.log&
   uv run fio/desk_tools/apps/risk_viewer/risk_aggregator/main_pnl.py configs/risk_viewer/risk_aggregator/eorv/pnl.json &| jqlog pnl.log
 
 - Webserver
@@ -14,3 +14,9 @@ uv run fio/desk_tools/apps/surface_viz/entry_points/dash/main.py ./configs/surfa
 
 - Risk Viewer
   cd ../typescript/risk-viewer && make dev
+
+# Empirical Risk
+
+## Dash
+
+uv run fio/desk_tools/apps/empirical_risk/entry_points/dashboard/main.py ./configs/empirical_risk/dashboard/treasuries.json

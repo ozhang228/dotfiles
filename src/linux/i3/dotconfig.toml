@@ -21,10 +21,6 @@ id = "flameshot"
 [deps.install_method]
 ubuntu = "sudo apt install flameshot"
 
-[[deps]]
-id = "picom"
-[deps.install_method]
-ubuntu = "sudo apt install picom"
 
 [[deps]]
 id = "google-chrome"

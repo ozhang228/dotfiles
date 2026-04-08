@@ -2,9 +2,9 @@
 set $mod              Mod1
 set $smod             Shift
 set $font             pango:JetBrains Mono 14
-set $gap_width        0
-set $gap_heigth       0
-set $border_size      8
+set $gap_width        3
+set $gap_heigth       3
+set $border_size      5
 set $key_left         h
 set $key_down         j
 set $key_up           k
@@ -84,8 +84,6 @@ bindsym $mod+$smod+$key_left  move left
 bindsym $mod+$smod+$key_down  move down
 bindsym $mod+$smod+$key_up    move up
 bindsym $mod+$smod+$key_right move right
-
-### Borders ###
 
 bindsym $mod+$smod+f fullscreen toggle
 

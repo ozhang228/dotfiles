@@ -11,3 +11,12 @@ ubuntu = "sudo apt install dunst"
 id = "feh"
 [deps.install_method]
 ubuntu = "sudo apt install feh"
+
+[[deps]]
+id = "picom"
+[deps.install_method]
+ubuntu = "sudo apt install picom"
+
+[[symlinks]]
+src = "~/dotfiles/src/linux/ubuntu/picom"
+dst = "~/.config/picom"
