@@ -18,6 +18,9 @@ skip_if: Working in TypeScript, C++, or any non-Python language
   def create_user(first_name: str, last_name: str, email: str) -> User: ...
   ```
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
+- Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
+- Use `MutableMapping` instead of `dict` for mutable dataclass fields to make mutability intent explicit.
+- Prefer idiomatic dict operations: `.get(key, default)` over if/else lookups, `.pop()` over `del`.
 - When logging exceptions, use the logger's `exception` method so the type and full stack trace are included.
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
 - New 3rd-party libraries must be added in conda-meta rather than depended on directly.

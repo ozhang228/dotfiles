@@ -20,7 +20,7 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 - `drw_related/desks/cumberland.md` — Cumberland crypto desk, OPXL key format, partitions, FT, haruko, basis-model
 
 ## Projects
-- `drw_related/projects/liquidation_monitor.md` — Liquidation monitor: haruko data server, basis-model, Kafka pipeline, OPXL publishing
+- `drw_related/projects/liquidation_monitor_stack.md` — Liquidation monitor stack: haruko data server, basis-model, Kafka pipeline, OPXL publishing, adding accounts, release process
 - `drw_related/projects/surface_viz.md` — Surface Viz: vol surface heatmaps, Dash app, replaces Clownfish
 - `drw_related/projects/clownfish.md` — Clownfish (DEPRECATED, replaced by Surface Viz)
 - `drw_related/projects/risk_viewer.md` — Risk Viewer: aggregator → webserver → frontend, successor to Edo Risk
