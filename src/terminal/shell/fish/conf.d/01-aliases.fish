@@ -4,7 +4,6 @@ command -v lsd &>/dev/null && alias ls='lsd'
 
 abbr -a py "python3"
 abbr -a pm "sudo pacman"
-abbr -a aic "$HOME/ai/copy.fish"
 abbr -a deltas "delta --side-by-side"
 
 abbr -a dot "cd $HOME/dotfiles/;nvim"
