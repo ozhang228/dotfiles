@@ -8,6 +8,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Follow Google's Python style guide.
 - Do not use timezone-naive datetimes, ever.
 - Use type annotations wherever possible.
+- Prefer `Self` from `typing_extensions` instead of forward-referencing the class name (e.g. `-> "ClassName"`).
 - When a function has two or more consecutive parameters of the same type, force keyword arguments using `*` to prevent accidental transposition.
 
   ```python
@@ -17,6 +18,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
   # Bad — easy to accidentally swap arguments.
   def create_user(first_name: str, last_name: str, email: str) -> User: ...
   ```
+- Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation and marginal performance. Only use `pd.DataFrame` when the data has dynamic columns/rows (e.g. 2D grids) that can't fit a fixed `pl.Schema`.
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields to make mutability intent explicit.

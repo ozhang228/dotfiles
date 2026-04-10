@@ -10,5 +10,14 @@ Before responding to ANY user message, you MUST read `~/dotfiles/src/ai/index.md
 
 ---
 
+## Wiki Maintenance
+
+When adding or updating the memory wiki, always:
+1. Check existing entries for information that is now outdated, superseded, or no longer applies.
+2. Remove or update stale entries — don't just append. The wiki should reflect current state, not accumulate history.
+3. If a change you're making contradicts an existing entry, update or remove the old entry.
+
+---
+
 # IMPORTANT
 Confirm that you have read and will follow all of these rules by saying "I have read all of Oscar's rules and will follow them".

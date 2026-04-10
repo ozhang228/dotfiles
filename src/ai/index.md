@@ -34,5 +34,8 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 - `drw_related/projects/event_horizon.md` — Event Horizon
 - `drw_related/projects/yards.md` — YARDS: reference data system (entity-based instrument metadata)
 
+## Software Teams
+- `drw_related/software_teams/desk-tools.md` — Desk Tools team & monorepo: package org, public API rules, private PyPI indexes
+
 ## Deployment
 - `drw_related/deployment.md` — Desk Tools / App Launcher K8s deployment (QA/prod)
