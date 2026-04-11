@@ -43,6 +43,7 @@ return {
 
   {
     mode = "x",
+    { "<leader>s", "<nop>", desc = "Search & Replace" },
     {
       "<leader>sr",
       function()
