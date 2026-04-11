@@ -10,6 +10,12 @@ Before responding to ANY user message, you MUST read `~/dotfiles/src/ai/index.md
 
 ---
 
+## drw_related/
+
+This folder contains work-related context that may not be present on this laptop. If the folder is not present, it can be ignored.
+
+---
+
 ## Wiki Maintenance
 
 When adding or updating the wiki, always:
