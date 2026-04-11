@@ -1,3 +1,5 @@
+set -gx AI_CLI_CMD "claude --resume || claude"
+
 # pnpm
 fish_add_path $HOME/.local/share/pnpm
 
