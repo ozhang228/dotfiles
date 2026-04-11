@@ -1,0 +1,12 @@
+[metadata]
+name = "AI Global Rules"
+supported_distros = ["mac", "manjaro", "ubuntu"]
+
+[[symlinks]]
+src = "~/dotfiles/src/ai/GLOBAL.md"
+dst = "~/.opencode/AGENTS.md"
+
+[[symlinks]]
+src = "~/dotfiles/src/ai/GLOBAL.md"
+dst = "~/.claude/CLAUDE.md"
+
