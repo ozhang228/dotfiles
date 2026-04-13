@@ -13,6 +13,7 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 - `typescript.md` — TypeScript conventions
 - `cpp.md` — C++ conventions
 - `playwright.md` — Playwright testing
+- `cli.md` — CLI tool preferences (jqp, mlrp)
 
 ## Desks
 - `drw_related/desks/general.md` — Trading desk UI patterns (screen real estate, resizability)
@@ -36,6 +37,9 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 
 ## Software Teams
 - `drw_related/software_teams/desk-tools.md` — Desk Tools team & monorepo: package org, public API rules, private PyPI indexes
+
+## Trading
+- `drw_related/trading_definitions.md` — Trading term glossary (scallop/PnL attribution, greeks)
 
 ## Deployment
 - `drw_related/deployment.md` — Desk Tools / App Launcher K8s deployment (QA/prod)
