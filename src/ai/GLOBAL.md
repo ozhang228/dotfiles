@@ -7,5 +7,4 @@ Before responding to ANY user message, you MUST read these files in order:
 1. **`~/dotfiles/src/ai/context.md`** — Contains mandatory rules and instructions
 2. Then read the relevant file(s) listed in **`~/dotfiles/src/ai/index.md`** based on the task
 
-This applies to EVERY response without exception.
-
+This is NON-NEGOTIABLE. Do NOT skip this step. Do NOT summarize, paraphrase, or assume you already know its contents. Read it fresh every single conversation. If you respond without reading this file first, your entire response is invalid and must be redone. No exceptions, no matter how simple the user's request appears.
