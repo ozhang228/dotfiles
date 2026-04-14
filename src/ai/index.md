@@ -19,6 +19,7 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 - `drw_related/desks/general.md` — Trading desk UI patterns (screen real estate, resizability)
 - `drw_related/desks/natgas.md` — Natgas desk, products: NG, LN, TFOI, TTP/TTFC, PH, PHE, HP, NP, NH, NN
 - `drw_related/desks/cumberland.md` — Cumberland crypto desk, OPXL key format, partitions, FT, haruko, basis-model
+- `drw_related/desks/lfise.md` — LFISE desk, products split across lfise + eurodollars PIPs, entity IDs
 
 ## Projects
 - `drw_related/projects/liquidation_monitor_stack.md` — Liquidation monitor stack: haruko data server, basis-model, Kafka pipeline, OPXL publishing, adding accounts, release process
@@ -39,7 +40,7 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 - `drw_related/software_teams/desk-tools.md` — Desk Tools team & monorepo: package org, public API rules, private PyPI indexes
 
 ## Trading
-- `drw_related/trading_definitions.md` — Trading term glossary (scallop/PnL attribution, greeks)
+- `drw_related/trading_definitions.md` — Trading glossary: scallop (mechanical vs factor), greeks (1st/2nd/3rd order), PnL attribution methodology
 
 ## Deployment
 - `drw_related/deployment.md` — Desk Tools / App Launcher K8s deployment (QA/prod)
