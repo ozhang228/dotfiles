@@ -51,11 +51,18 @@ return {
       html = { "eslint_d" },
       css = { "eslint_d" },
 
+      -- C / C++
+      c = { "clang-tidy" },
+      cpp = { "clang-tidy" },
+
       -- Python
       python = { "ty", "ruff" },
 
       -- Lua
       lua = { "luacheck" },
+
+      -- Go
+      go = { "golangci-lint" },
 
       -- Misc
       json = { "eslint_d" },

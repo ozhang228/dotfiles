@@ -31,6 +31,10 @@ return {
         "luacheck",
         "stylua",
 
+        -- Go
+        "gopls",
+        "golangci-lint",
+
         -- Misc
         "jq",
         "checkmake",

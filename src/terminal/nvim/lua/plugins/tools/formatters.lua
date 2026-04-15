@@ -20,6 +20,9 @@ return {
       -- Lua
       lua = { "stylua" },
 
+      -- Go
+      go = { "gofmt" },
+
       -- Misc
       json = { "jq", "prettierd", "prettier", stop_after_first = true },
       markdown = { "prettierd", "prettier", stop_after_first = true },
