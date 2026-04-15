@@ -32,11 +32,43 @@ return {
   },
   {
     "<leader>fd",
+    function()
+      local cwd = vim.uv.cwd()
+      Snacks.picker.pick({
+        title = "Directories",
+        finder = function(opts, ctx)
+          return require("snacks.picker.source.proc").proc(
+            ctx:opts({
+              cmd = "fd",
+              args = { "--type", "d", "--hidden", "--exclude", ".git", "--color", "never" },
+              transform = function(item)
+                item.cwd = cwd
+                item.file = item.text
+                item.dir = true
+              end,
+            }),
+            ctx
+          )
+        end,
+        format = "file",
+        confirm = function(picker, item)
+          picker:close()
+          if item then
+            local path = Snacks.picker.util.path(item) or item.file
+            require("mini.files").open(path, false)
+          end
+        end,
+      })
+    end,
+    desc = "Find Directory → Mini.files",
+  },
+  {
+    "<leader>fq",
     function() Snacks.picker.diagnostics_buffer() end,
     desc = "Diagnostics (Buffer)",
   },
   {
-    "<leader>fD",
+    "<leader>fQ",
     function() Snacks.picker.diagnostics() end,
     desc = "Diagnostics",
   },
