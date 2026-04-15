@@ -1,6 +1,12 @@
 ## MANDATORY FIRST STEP — DO THIS BEFORE ANY REPLY
 
-Before responding to ANY user message, you MUST read `~/dotfiles/src/ai/index.md`. This is a compact index of all context files — read the specific files listed there only when relevant to the current task.
+Before responding to ANY user message, you MUST read `~/dotfiles/src/ai/index.md`. This is a compact index of all context files.
+
+Use the index to determine which files to read:
+
+- **Always read**: General files like this one (`context.md`) and `core_principles.md`
+- **Task-specific**: Read when relevant to current task (e.g., CLI commands, TypeScript, Python, etc.)
+- **When unsure**: Prefer reading — it's better to have context than to miss something important
 
 ---
 
