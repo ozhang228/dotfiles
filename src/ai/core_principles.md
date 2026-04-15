@@ -27,7 +27,7 @@ skip_if: Never skip — these rules always apply
 
 - Domain types should be purely data. They should not contain methods that transform them into presentation or application-specific formats (e.g. `to_heatmap`, `to_json_response`). The application layer that consumes domain types is responsible for those transformations.
 
-- Before starting on any code changes, always outline a plan. Identify what needs to be changed, what files these changes are in, and how you will approach it.
+- Before starting on any code changes, always outline a plan and write it to `plan.md` in the project root. Identify what needs to be changed, what files these changes are in, and how you will approach it.
 
 # Team Coding Style
 
