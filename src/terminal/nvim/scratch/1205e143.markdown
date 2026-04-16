@@ -1,0 +1,10 @@
+Would it be possible to make the vega pnl scale absolute/fixed rather than relative to the current values?
+5 repliesOscar Zhang  [8:23 AM]
+Sorry could you clarify what you mean by this? As in you want a fixed number by which gets added / subtracted from the vega pnl diff heatmap?
+James Guo  [8:24 AM]
+yeah so right now the color bar on the right of the grid is based on the current min/max values in the grid
+[8:25 AM]Was just thinking of having the color bar be a fixed range, so for example the darkest shade of red always responds to suppose -10, rather than -50 some days and -2 some other days
+Oscar Zhang  [8:33 AM]
+Ah I see. Would you want to be able to set that range dynamically or is this something you'd like to do in a static config?
+James Guo  [8:35 AM]
+hmmm, prefer dynamically if it isn't too much work, statically is fine too if it is

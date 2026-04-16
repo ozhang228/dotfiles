@@ -40,7 +40,7 @@ Read the relevant file(s) below when working on a matching topic. Only read what
 - `drw_related/software_teams/desk-tools.md` — Desk Tools team & monorepo: package org, public API rules, private PyPI indexes
 
 ## Trading
-- `drw_related/trading_definitions.md` — Trading glossary: scallop (mechanical vs factor), greeks (1st/2nd/3rd order), PnL attribution methodology
+- `drw_related/trading_definitions.md` — Trading glossary: scallop (analytical vs mechanical vs factor), greeks (1st/2nd/3rd order), PnL attribution methodology
 
 ## Deployment
 - `drw_related/deployment.md` — Desk Tools / App Launcher K8s deployment (QA/prod)
