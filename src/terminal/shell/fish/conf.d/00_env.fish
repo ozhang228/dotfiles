@@ -1,4 +1,5 @@
 fish_add_path "$HOME/.local/bin"
+fish_add_path /home/ozhang/.opencode/bin
 
 set -gx EDITOR "nvim"
 
@@ -14,3 +15,4 @@ set fish_greeting
 
 # rose pine in jq
 set -gx JQ_COLORS "1;38;5;60:0;38;5;204:0;38;5;116:0;38;5;222:0;38;5;217:0;38;5;183:0;38;5;66"
+

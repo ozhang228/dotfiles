@@ -60,11 +60,18 @@ manjaro = "npm install -g @mermaid-js/mermaid-cli"
 mac = "npm install -g @mermaid-js/mermaid-cli"
 
 [[deps]]
-id = "clipboard_manager"
+id = "clipboard"
 [deps.install_method]
 ubuntu = "sudo apt install xclip"
 manjaro = "sudo pacman -S xclip"
 mac = "echo 'Built-in pbcopy/pbpaste'"
+
+[[deps]]
+id = "clipboard_manager"
+[deps.install_method]
+ubuntu = "sudo apt install copyq" # might need to use ppa if this version is too low
+manjaro = "sudo pacman -S copyq"
+mac = "brew install copyq"
 
 [[deps]]
 id = "nerd_font"
