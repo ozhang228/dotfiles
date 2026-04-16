@@ -1,0 +1,14 @@
+[metadata]
+name = "Copyq Config"
+supported_distros = ["manjaro", "ubuntu", "mac"]
+
+[[symlinks]]
+src = "~/dotfiles/src/terminal/copyq/"
+dst = "~/.config/copyq/"
+
+[[deps]]
+id = "clipboard_manager"
+[deps.install_method]
+ubuntu = "sudo apt install copyq" # might need to use ppa if this version is too low
+manjaro = "sudo pacman -S copyq"
+mac = "brew install copyq"

@@ -67,13 +67,6 @@ manjaro = "sudo pacman -S xclip"
 mac = "echo 'Built-in pbcopy/pbpaste'"
 
 [[deps]]
-id = "clipboard_manager"
-[deps.install_method]
-ubuntu = "sudo apt install copyq" # might need to use ppa if this version is too low
-manjaro = "sudo pacman -S copyq"
-mac = "brew install copyq"
-
-[[deps]]
 id = "nerd_font"
 [deps.install_method]
 ubuntu = "mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts && curl -L https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip -o jbm.zip && unzip -o jbm.zip && rm jbm.zip && fc-cache -f -v"
