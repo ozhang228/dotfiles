@@ -62,7 +62,7 @@ return {
       lua = { "luacheck" },
 
       -- Go
-      go = { "golangci-lint" },
+      go = { "golangcilint" },
 
       -- Misc
       json = { "eslint_d" },
