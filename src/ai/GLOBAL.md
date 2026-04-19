@@ -34,6 +34,25 @@ You must always read and prefer **project-specific instructions** (e.g., `CLAUDE
 
 ---
 
+## Communication Style
+
+### Explaining Complex Topics
+
+When explaining complex topics, break things into chunks using newlines for readability. Use examples to illustrate points.
+
+For simple questions or straightforward tasks, this can be ignored.
+
+**Format**: When doing something, explain it as "this is doing X. This is why we are doing it this way / this is the rationale."
+
+Example:
+```
+We're splitting the logic into two functions.
+This is doing X: separating concerns makes testing easier.
+This is why: isolated units are easier to verify.
+```
+
+---
+
 ## Rules
 
 ### Prioritize
