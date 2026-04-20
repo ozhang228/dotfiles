@@ -11,20 +11,23 @@ vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
 
 -- Sync clipboard between OS and Neovim.
--- Uses OSC 52 so yanks land in the terminal emulator's clipboard,
--- which works both locally and over SSH (no xclip/xsel/wl-copy needed).
+-- Over SSH, use OSC 52 so yanks land in the terminal emulator's clipboard.
+-- Locally, fall through to the default provider (xclip/wl-copy) — OSC 52
+-- paste triggers a per-paste permission prompt in most terminals.
 -- See `:help 'clipboard'`
-vim.g.clipboard = {
-  name = "OSC 52",
-  copy = {
-    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-  },
-  paste = {
-    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-    ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
-  },
-}
+if vim.env.SSH_TTY then
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+    },
+    paste = {
+      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+    },
+  }
+end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 -- A wrapped line will have same indent on every line
@@ -81,5 +84,3 @@ vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,
 vim.o.bufhidden = "delete"
 
 vim.o.swapfile = false
-
-
