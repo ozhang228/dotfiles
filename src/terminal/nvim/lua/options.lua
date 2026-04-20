@@ -11,7 +11,20 @@ vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
 
 -- Sync clipboard between OS and Neovim.
+-- Uses OSC 52 so yanks land in the terminal emulator's clipboard,
+-- which works both locally and over SSH (no xclip/xsel/wl-copy needed).
 -- See `:help 'clipboard'`
+vim.g.clipboard = {
+  name = "OSC 52",
+  copy = {
+    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+  },
+  paste = {
+    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+  },
+}
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 -- A wrapped line will have same indent on every line
