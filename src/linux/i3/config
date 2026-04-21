@@ -27,7 +27,7 @@ workspace 2 output DP-6
 workspace 3 output DP-6
 
 # Autostart
-exec_always --no-startup-id $app_compositor
+exec_always --no-startup-id $compositor
 # use autorandr monitor setup, then get a random wallpaper and launch my bar
 exec_always --no-startup-id "autorandr --change && bash $HOME/dotfiles/src/linux/i3/wallpaper.sh && bash $HOME/dotfiles/src/linux/polybar/launch.sh"
 
