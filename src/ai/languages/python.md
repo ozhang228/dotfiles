@@ -23,6 +23,16 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - When logging exceptions, use the logger's `exception` method.
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
 - New 3rd-party libraries must be added in conda-meta rather than depended on directly.
+- Every `match` statement must end with `case _: assert_never(x)` on the matched value. This makes adding a new union/enum variant a type error at every call site, instead of silently falling through. Applies even when the match looks exhaustive today — future variants are the point.
+
+  ```python
+  match payoff:
+      case OptionPayoffType.CALL: ...
+      case OptionPayoffType.PUT: ...
+      case OptionPayoffType.STRADDLE: ...
+      case _:
+          assert_never(payoff)
+  ```
 
 ## Module Structure
 

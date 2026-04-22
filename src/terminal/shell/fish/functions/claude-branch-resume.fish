@@ -9,9 +9,11 @@ function claude-branch-resume --description "Resume (or create) a Claude Code se
     set -l session_id (uuidgen --sha1 --namespace @url --name "$repo:$branch")
 
     set -l existing (find ~/.claude/projects -maxdepth 2 -name "$session_id.jsonl" -print -quit 2>/dev/null)
+    pushd $repo
     if test -n "$existing"
         claude --resume $session_id $argv
     else
         claude --session-id $session_id $argv
     end
+    popd
 end
