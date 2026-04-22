@@ -15,6 +15,7 @@ skip_if: Not doing a code review
 
 1. Do a git diff against master (unless another branch is specified)
 2. Read full files and related files for context
+3. **Read the tests first.** Tests encode the expected behavior of the PR — they show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong *before* looking at the implementation. Then check the implementation against this understanding.
 
 ## Iterations
 
