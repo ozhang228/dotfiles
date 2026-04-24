@@ -68,6 +68,7 @@ This is why: isolated units are easier to verify.
 - Global state: pass dependencies explicitly
 - Tests relying on a live-system or file system
 - String parsing
+- Writing throwaway/one-off scripts to `/tmp/` — use cwd-relative `./tmp/` instead so they stay alongside the repo they target
 
 ### Patterns
 
