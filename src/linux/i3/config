@@ -11,7 +11,7 @@ set $key_up           k
 set $key_right        l
 
 set $terminal         kitty
-set $browser          google-chrome
+set $browser          google-chrome --profile-directory=Default
 set $app_launcher     rofi -show drun
 set $compositor       picom
 
