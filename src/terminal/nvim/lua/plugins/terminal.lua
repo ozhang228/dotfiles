@@ -5,7 +5,7 @@ return {
       enabled = true,
       win = {
         style = "float",
-        border = "rounded",
+        border = "none",
         width = 0.99,
         height = 0.99,
         keys = {
