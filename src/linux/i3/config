@@ -11,7 +11,7 @@ set $key_up           k
 set $key_right        l
 
 set $terminal         kitty
-set $browser          google-chrome --profile-directory=Default
+set $browser          google-chrome --profile-directory="Profile 1" --restore-last-session
 set $app_launcher     rofi -show drun
 set $compositor       picom
 
@@ -33,6 +33,9 @@ exec_always --no-startup-id "autorandr --change && bash $HOME/dotfiles/src/linux
 
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
+
+# restore saved workspace layouts on login
+exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh"
 
 bindsym $mod+Return exec $terminal
 bindsym $mod+$smod+Return exec $browser
@@ -83,7 +86,7 @@ bindsym $mod+$smod+$key_right move right
 
 bindsym $mod+$smod+f fullscreen toggle
 
-bindsym $mod+$smod+e exec "i3-msg exit"
+bindsym $mod+$smod+e exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-save-all.sh && i3-msg exit"
 bindsym $mod+$smod+r restart
 bindsym $mod+$smod+q kill
 
