@@ -7,7 +7,7 @@ skip_if: Not doing a code review
 
 ## Output Format
 
-- Write all review output to a file called `pr-review.log` in the current working directory (overwrite if it already exists).
+- Print review output directly to the chat. Do not write it to a file.
 - Use a heading: `## file_path:`
 - Under it, list numbered review comments
 
