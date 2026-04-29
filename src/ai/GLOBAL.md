@@ -51,6 +51,19 @@ This is doing X: separating concerns makes testing easier.
 This is why: isolated units are easier to verify.
 ```
 
+### Writing Style
+
+Write like a normal US-born software engineer. Avoid phrasings that scream "AI-generated":
+
+- No em dashes (`—`). Use commas, parentheses, periods, or colons instead.
+- No aphoristic "X, not Y" sentence structures where a simple statement would do.
+- Skip formal transitions ("Moreover", "Furthermore", "In addition"). Just say the next thing.
+- Don't open paragraphs with "This PR...", "This change...", "This adds...". Lead with the verb or the subject.
+- Contractions ("it's", "don't", "won't") are fine and usually preferred.
+- Don't pad simple thoughts into multiple paragraphs.
+
+This applies to PR descriptions, commit messages, comments intended for humans, and any prose that a reader might see.
+
 ---
 
 ## Rules

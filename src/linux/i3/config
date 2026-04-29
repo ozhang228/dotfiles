@@ -34,10 +34,6 @@ exec_always --no-startup-id "autorandr --change && bash $HOME/dotfiles/src/linux
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
 
-exec --no-startup-id $browser
-exec --no-startup-id $terminal
-exec --no-startup-id slack
-
 bindsym $mod+Return exec $terminal
 bindsym $mod+$smod+Return exec $browser
 bindsym Mod4+space exec $app_launcher
@@ -88,8 +84,12 @@ bindsym $mod+$smod+$key_right move right
 bindsym $mod+$smod+f fullscreen toggle
 
 bindsym $mod+$smod+e exec "i3-msg exit"
-bindsym $mod+$smod+r restart 
+bindsym $mod+$smod+r restart
 bindsym $mod+$smod+q kill
+
+### Layout save/restore (i3-resurrect) ###
+bindsym $mod+$smod+s exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-save-all.sh"
+bindsym $mod+$smod+o exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh"
 
 # -- Theme (Rose Pine Moon)--
 set $base           #232136
