@@ -17,6 +17,11 @@ skip_if: Not doing a code review
 2. Read full files and related files for context
 3. **Read the tests first.** Tests encode the expected behavior of the PR — they show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong *before* looking at the implementation. Then check the implementation against this understanding.
 
+## Running git commands
+
+- Never prepend `cd <path> && git …` — that triggers a "cd before git" permission prompt and requires human approval. Use `git -C <path> …` instead, or just run git from the current working directory (it already operates on the current tree).
+- The review must run end-to-end without permission prompts. If a command would require approval, pick an equivalent that doesn't.
+
 ## Iterations
 
 ### Phase 1 — Build understanding (do these first, then STOP)
