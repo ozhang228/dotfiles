@@ -10,3 +10,11 @@ dst = "~/.opencode/AGENTS.md"
 src = "~/dotfiles/src/ai/GLOBAL.md"
 dst = "~/.claude/CLAUDE.md"
 
+[[symlinks]]
+src = "~/dotfiles/src/ai/claude/skills"
+dst = "~/.claude/skills"
+
+[[symlinks]]
+src = "~/dotfiles/src/ai/claude/keybindings.json"
+dst = "~/.claude/keybindings.json"
+

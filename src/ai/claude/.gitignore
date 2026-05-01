@@ -1,0 +1,17 @@
+settings.json
+settings.local.json
+projects/
+sessions/
+session-env/
+shell-snapshots/
+file-history/
+paste-cache/
+plugins/
+plans/
+tasks/
+todos/
+backups/
+debug/
+statsig/
+history.jsonl
+.claude/

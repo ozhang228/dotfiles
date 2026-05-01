@@ -1,13 +1,12 @@
 # Global AI Rules
 
-## MANDATORY — READ BEFORE ANY RESPONSE
+## Auto-Injected Context
 
-Before responding to ANY user message, you MUST read all relevant files from:
+Language conventions and task rules in `src/ai/rules/` are injected automatically by a PreToolUse hook whenever you Write, Edit, or run a Bash command. Do not try to read them manually as a preamble, the hook is authoritative and handles stacking (e.g. `test_foo.py` gets Python rules plus testing rules).
 
-- `src/ai/languages/` — read when working in that language (Python, TypeScript, C++)
-- `src/ai/tasks/` — read when doing that task (testing, code reviews, etc.)
+Skills at `~/.claude/skills/` (e.g. `pr-review`, `pr-context`) appear in the skill listing each turn and are invoked by user intent.
 
-This is NON-NEGOTIABLE. Do NOT skip this step. Do NOT summarize, paraphrase, or assume you already know its contents. Read fresh every conversation.
+If the user asks a pure Q&A question about a convention without editing any file, read the relevant `src/ai/rules/*.md` on demand.
 
 ---
 
@@ -111,4 +110,4 @@ When pitching a system migration or stakeholder ask:
   isEnabled ? handleEnabled() : handleDisabled();
   ```
 
-Respond with !! I HAVE READ OSCAR'S RULES AND HAVE READ THE RELEVANT CONTEXT !!
+Respond with !! I HAVE READ OSCAR'S RULES !!

@@ -17,19 +17,18 @@ import sys
 from pathlib import Path
 
 AI_DIR = Path(__file__).resolve().parent.parent
-LANGUAGES_DIR = AI_DIR / "languages"
-TASKS_DIR = AI_DIR / "tasks"
+RULES_DIR = AI_DIR / "rules"
 
 EXTENSION_TO_FILE: dict[str, Path] = {
-    ".py": LANGUAGES_DIR / "python.md",
-    ".ts": LANGUAGES_DIR / "typescript.md",
-    ".tsx": LANGUAGES_DIR / "typescript.md",
-    ".cpp": LANGUAGES_DIR / "cpp.md",
-    ".cc": LANGUAGES_DIR / "cpp.md",
-    ".cxx": LANGUAGES_DIR / "cpp.md",
-    ".h": LANGUAGES_DIR / "cpp.md",
-    ".hpp": LANGUAGES_DIR / "cpp.md",
-    ".hxx": LANGUAGES_DIR / "cpp.md",
+    ".py": RULES_DIR / "python.md",
+    ".ts": RULES_DIR / "typescript.md",
+    ".tsx": RULES_DIR / "typescript.md",
+    ".cpp": RULES_DIR / "cpp.md",
+    ".cc": RULES_DIR / "cpp.md",
+    ".cxx": RULES_DIR / "cpp.md",
+    ".h": RULES_DIR / "cpp.md",
+    ".hpp": RULES_DIR / "cpp.md",
+    ".hxx": RULES_DIR / "cpp.md",
 }
 
 TEST_NAME_SUBSTRINGS: tuple[str, ...] = ("test", "spec")
@@ -56,7 +55,7 @@ def handle_file(path_arg: str) -> str:
         chunks.append(_emit(lang_rules, for_target=path.name, kind=f"{path.suffix} language"))
 
     if _is_test_file(path):
-        testing_rules = TASKS_DIR / "testing.md"
+        testing_rules = RULES_DIR / "testing.md"
         if testing_rules.exists():
             chunks.append(_emit(testing_rules, for_target=path.name, kind="Testing"))
 
@@ -72,7 +71,7 @@ def handle_bash(command: str) -> str:
     if not any(t in CLI_TRIGGERS for t in tokens):
         return ""
 
-    cli_rules = TASKS_DIR / "cli.md"
+    cli_rules = RULES_DIR / "cli.md"
     if not cli_rules.exists():
         return ""
 
