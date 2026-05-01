@@ -64,6 +64,18 @@ Write like a normal US-born software engineer. Avoid phrasings that scream "AI-g
 
 This applies to PR descriptions, commit messages, comments intended for humans, and any prose that a reader might see.
 
+### Pitch Pattern
+
+When pitching a system migration or stakeholder ask:
+
+1. Lead with their benefit, not your work.
+2. Ground urgency in real events they already felt.
+3. Be honest about gaps. It builds trust and invites help.
+4. Frame the ask as collaboration, not a demand.
+5. State the end goal clearly so people can orient.
+6. Put their priorities first explicitly.
+7. Make the next step easy and concrete.
+
 ---
 
 ## Rules
