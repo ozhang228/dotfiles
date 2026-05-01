@@ -12,7 +12,6 @@ Silent (no output, exit 0) if nothing matches.
 from __future__ import annotations
 
 import argparse
-import re
 import shlex
 import sys
 from pathlib import Path
@@ -33,13 +32,14 @@ EXTENSION_TO_FILE: dict[str, Path] = {
     ".hxx": LANGUAGES_DIR / "cpp.md",
 }
 
-_TEST_NAME_RE = re.compile(r"(?:^|[^a-z0-9])(test|spec)(?:[^a-z0-9]|$)", re.IGNORECASE)
+TEST_NAME_SUBSTRINGS: tuple[str, ...] = ("test", "spec")
 
 CLI_TRIGGERS: frozenset[str] = frozenset({"jq", "mlr"})
 
 
 def _is_test_file(path: Path) -> bool:
-    return _TEST_NAME_RE.search(path.name) is not None
+    name_lower = path.name.lower()
+    return any(frag in name_lower for frag in TEST_NAME_SUBSTRINGS)
 
 
 def _emit(rules_path: Path, *, for_target: str, kind: str) -> str:
