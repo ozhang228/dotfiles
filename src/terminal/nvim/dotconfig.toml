@@ -93,3 +93,10 @@ id = "luarocks"
 ubuntu = "sudo apt install luarocks"
 manjaro = "sudo pacman -S luarocks"
 mac = "brew install luarocks"
+
+[[deps]]
+id = "tectonic"
+[deps.install_method]
+ubuntu = "sudo snap install tectonic"
+manjaro = "sudo pacman -S tectonic"
+mac = "brew install tectonic"
