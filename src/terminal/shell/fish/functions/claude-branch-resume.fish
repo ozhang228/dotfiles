@@ -21,10 +21,11 @@ function claude-branch-resume --description "Resume (or create) a Claude Code se
         if test (readlink $project_dir) != $shared_dir
             ln -sfn $shared_dir $project_dir
         end
-    else if test -e $project_dir
-        echo "claude-branch-resume: $project_dir exists and isn't a symlink to $shared_dir; refusing to clobber" >&2
-        return 1
     else
+        if test -d $project_dir
+            find $project_dir -mindepth 1 -maxdepth 1 -exec mv -t $shared_dir {} +
+            rm -rf $project_dir
+        end
         ln -sfn $shared_dir $project_dir
     end
 
