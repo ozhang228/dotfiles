@@ -6,6 +6,10 @@ supported_distros = ["manjaro", "ubuntu", "mac"]
 src = "~/dotfiles/src/terminal/kitty"
 dst = "~/.config/kitty"
 
+[[symlinks]]
+src = "~/dotfiles/src/terminal/kitty/kitty-load.sh"
+dst = "~/.local/bin/kitty-load"
+
 [[deps]]
 id = "kitty"
 [deps.install_method]
