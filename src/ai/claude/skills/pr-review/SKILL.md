@@ -37,6 +37,8 @@ description: Review a pull request the way Oscar wants it reviewed. Use when ask
 3. **Correctness pass:** Find logic that may be wrong. Describe failure cases.
 4. **Modeling + nits:** Evaluate data/modeling approach.
 
+**Draft the full review to `./tmp/pr-review-<branch>.md` first** (a cwd-relative scratch file). Include every comment with its label, file:line, and message. Then **walk the user through one comment at a time**, in file order. Print only the single current comment and wait for the user's response before moving on. Update the scratch file as you go if the user's response changes the status (e.g. "nvm, that's fine" → strike it out). This prevents the "wall of 15 comments at once" problem where users skim instead of engaging.
+
 ## Labels
 
 Every comment must be labeled:
