@@ -61,9 +61,6 @@ return {
       -- Lua
       lua = { "luacheck" },
 
-      -- Go
-      go = { "golangcilint" },
-
       -- Misc
       json = { "eslint_d" },
       makefile = { "checkmake" },
