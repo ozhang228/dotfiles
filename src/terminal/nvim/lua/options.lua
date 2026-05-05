@@ -80,7 +80,7 @@ vim.o.showmode = false
 -- what to save in a session
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
--- buffers should delete when hidden
-vim.o.bufhidden = "delete"
+-- never show the tabline; we don't use tabs as a workflow primitive
+vim.o.showtabline = 0
 
 vim.o.swapfile = false
