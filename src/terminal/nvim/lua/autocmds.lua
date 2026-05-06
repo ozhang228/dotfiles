@@ -5,15 +5,16 @@
 vim.o.title = true
 local function update_title()
   local tab_label = os.getenv("KITTY_TAB_TITLE") or ""
-  local branch = vim.fn.system("git branch --show-current 2>/dev/null"):gsub("%s+", "")
+  local branch = vim.b.gitsigns_head or ""
   local label = tab_label ~= "" and tab_label or vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
   vim.o.titlestring = branch ~= "" and (label .. " [" .. branch .. "]") or label
 end
-vim.api.nvim_create_autocmd({ "FocusGained", "DirChanged" }, {
+
+vim.api.nvim_create_autocmd({ "WinEnter", "DirChanged", "User" }, {
   desc = "Sync kitty tab title with git branch",
+  pattern = { "*", "*", "GitSignsUpdate" },
   callback = update_title,
 })
-update_title()
 
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
@@ -44,9 +45,7 @@ vim.api.nvim_create_autocmd("TermRequest", {
   desc = "Notify when a :terminal child emits OSC-9 (e.g. Claude Stop hook)",
   callback = function(ev)
     local seq = type(ev.data) == "table" and ev.data.sequence or ev.data or ""
-    local msg = seq:match("\027%]9;(.-)\007")
-      or seq:match("\027%]9;(.-)\027\\")
-      or seq:match("\027%]9;(.+)")
+    local msg = seq:match("\027%]9;(.-)\007") or seq:match("\027%]9;(.-)\027\\") or seq:match("\027%]9;(.+)")
     if not msg then return end
     if vim.api.nvim_get_current_buf() == ev.buf then return end
     vim.notify(msg, vim.log.levels.INFO, { title = "Terminal" })
