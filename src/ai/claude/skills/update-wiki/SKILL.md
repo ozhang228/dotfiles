@@ -1,11 +1,11 @@
 ---
 name: update-wiki
-description: Add, update, or prune entries in Oscar's dotfiles wiki (`~/dotfiles/src/ai/wiki/`). Use when the user says "add this to the wiki", "wiki this", "update the wiki", "document X in the wiki", or when a conversation surfaces durable business/domain knowledge that Claude should recall in future sessions. Enforces the rule "only non-derivable knowledge belongs here" — rejects architecture dumps and file-path inventories that will rot.
+description: Add, update, or prune entries in Oscar's wiki (`~/forge/ai_wiki/`). Use when the user says "add this to the wiki", "wiki this", "update the wiki", "document X in the wiki", or when a conversation surfaces durable business/domain knowledge that Claude should recall in future sessions. Enforces the rule "only non-derivable knowledge belongs here" — rejects architecture dumps and file-path inventories that will rot.
 ---
 
 # Update Wiki
 
-Wiki location: `~/dotfiles/src/ai/wiki/`. It is a git submodule — changes there commit separately from the dotfiles repo.
+Wiki location: `~/forge/ai_wiki/`. It lives in the `forge` monorepo.
 
 ## The one rule
 
@@ -79,14 +79,14 @@ Not every entry needs every section. A 10-line entry pointing at the code path +
 
 ## Process
 
-1. **Read `~/dotfiles/src/ai/wiki/` layout first.** Top-level `trading_definitions.md` + `deployment.md`; subdirs `desks/`, `projects/`, `software_teams/`. Pick the right location.
-2. **Grep before writing.** The user may have an existing entry on the same topic. `grep -ri "<topic>" ~/dotfiles/src/ai/wiki/`. Update the existing entry in place if there is one — don't create a duplicate.
+1. **Read `~/forge/ai_wiki/` layout first.** Top-level `trading_definitions.md` + `deployment.md`; subdirs `desks/`, `projects/`, `software_teams/`. Pick the right location.
+2. **Grep before writing.** The user may have an existing entry on the same topic. `grep -ri "<topic>" ~/forge/ai_wiki/`. Update the existing entry in place if there is one — don't create a duplicate.
 3. **Prune while you're there.** If the existing entry has any of the "does NOT belong" content, delete it in the same commit. The wiki rule from `GLOBAL.md`: *"If a change contradicts an existing entry, update or remove the old entry."* The same applies to entries that are merely stale, not contradictory.
 4. **Match the existing style.** Look at `trading_definitions.md`, `desks/natgas.md`, and `deployment.md` — those are the reference quality bar. Terse, fact-first, tables where a table helps.
 5. **Follow Oscar's writing rules.** No em dashes. No "This adds…" openers. Contractions are fine. No padding.
 6. **Prefer lists over prose.** Gotchas, state descriptions, and conventions read better as bulleted lists with a bolded lead.
 7. **Link, don't copy.** External docs → URL. Scripts → file path, not embedded code. Cross-wiki terms → reference the other file.
-8. **After writing, verify the diff.** `git -C ~/dotfiles/src/ai/wiki diff`. Scan for any line that a rename would invalidate — if you find one, ask whether it really belongs.
+8. **After writing, verify the diff.** `git -C ~/forge diff`. Scan for any line that a rename would invalidate — if you find one, ask whether it really belongs.
 
 ## Promoting from conversation
 

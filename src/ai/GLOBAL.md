@@ -12,8 +12,8 @@ If the user asks a pure Q&A question about a convention without editing any file
 
 ## Definitions
 
-- **wiki/** — Business context (how the business works and information not evident from code). Use when something isn't clear from the code and requires business knowledge. Search using grep.
-- **dotfiles wiki** — This directory (`$HOME/dotfiles/src/ai/`).
+- **$HOME/forge/ai_wiki/** — Business context (how the business works and information not evident from code). Use when something isn't clear from the code and requires business knowledge. Search using grep.
+- **ai wiki** — (`$HOME/forge/ai_wiki`).
 
 ---
 
@@ -44,6 +44,7 @@ For simple questions or straightforward tasks, this can be ignored.
 **Format**: When doing something, explain it as "this is doing X. This is why we are doing it this way / this is the rationale."
 
 Example:
+
 ```
 We're splitting the logic into two functions.
 This is doing X: separating concerns makes testing easier.
