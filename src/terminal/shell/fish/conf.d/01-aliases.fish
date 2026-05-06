@@ -7,7 +7,6 @@ abbr -a pm "sudo pacman"
 abbr -a deltas "delta --side-by-side"
 
 abbr -a dot "cd $HOME/dotfiles/;nvim"
-abbr -a notes "cd $HOME/notes;nvim"
 abbr -a forge "cd $HOME/forge;nvim"
 
 # check the template.cpp file against the output
