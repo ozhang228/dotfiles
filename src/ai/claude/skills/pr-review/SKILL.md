@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: Review a pull request the way Oscar wants it reviewed. Use when asked to review a PR, review a branch, review a diff, or give code-review feedback on pending changes. Runs in two phases (interview first, deep review second), labels every comment (Question/Unclear/Incorrect/Model/Nit), and prints output directly to chat under `## file_path:` headings. Prefer this over the generic built-in review for Oscar's projects.
+description: Review a pull request the way Oscar wants it reviewed. Use when asked to review a PR, review a branch, review a diff, or give code-review feedback on pending changes. Runs in two phases (interview first, deep review second), labels every comment (Question/Unclear/Incorrect/Model/Nit), and prints output directly to chat under `## file_path:` headings. When the PR author is not ozhang, opens with a plain-English explanation of what the PR does so Oscar understands it before seeing the review. Prefer this over the generic built-in review for Oscar's projects.
 ---
 
 # PR Review
@@ -23,19 +23,43 @@ description: Review a pull request the way Oscar wants it reviewed. Use when ask
 3. Read full files and related files for context.
 4. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong *before* looking at the implementation. Then check the implementation against this understanding.
 
+## Mental model: work in this order
+
+The best reviews happen when you have a clear picture of the problem before you pick at the code. A reviewer who skips to nits without understanding the goal routinely misses real bugs and wastes everyone's time flagging style. Work through three stages mentally:
+
+**Stage 1 — Understand the problem.** Before looking at any individual line, form an answer to: "This PR is solving X." Not a file-by-file summary — a single sentence stating the underlying problem or goal. If you can't state it, you don't understand the PR yet.
+
+**Stage 2 — Substantive concerns.** With the problem in mind, look for things that are actually wrong or risky: logic that produces incorrect results, a modeling choice that doesn't fit the domain, a missing case, a design that will cause pain later. These are the comments that block merging. State the failure case or consequence, not just the smell.
+
+**Stage 3 — Mechanical / nits.** Once the big stuff is resolved, look at clarity: is the logic easy to follow? are names good? does anything deviate from code conventions? is there dead code or unnecessary complexity? Label everything here as **Nit** so the author can deprioritize.
+
+This ordering matters because it's cognitively easier — you can't judge whether a name is misleading until you know what the thing is supposed to do. It also prevents nits from crowding out real concerns.
+
 ## Iterations
 
 ### Phase 1: Build understanding (do these first, then STOP)
 
-1. **PR summary:** For each changed file, summarize: (a) what it does, (b) why, (c) notable design choices.
-2. **Understand the change:** Call out unclear naming or overly complex control flow.
+0. **If the PR author is not `ozhang`, explain the PR to Oscar first.** Write a short plain-English summary (3–6 sentences) covering: what problem this solves, what the author changed, and any context Oscar needs to understand the review that follows. Do this before the problem statement step. Skip this step when reviewing Oscar's own PRs — he already knows what he built.
 
-**After completing steps 1–2, STOP and enter interview mode.** Present your summary and understanding to the prompter, then ask targeted questions. Do NOT proceed until the prompter says to continue.
+1. **State the problem:** In one sentence, what is this PR solving? Read the diff, tests, and related files until you can answer this confidently.
+2. **Summarize the approach:** For each changed file, note (a) what it does, (b) why, (c) notable design choices.
+3. **Flag anything confusing** about the approach before you've fully reviewed it — unclear naming, control flow that's hard to follow, design choices that seem surprising given the problem statement.
+
+**After completing steps 0–3, STOP and enter interview mode.** Present your problem statement and summary to the prompter, then ask targeted questions. Do NOT proceed until the prompter says to continue.
+
+Also surface any **knowledge gaps** here — things you couldn't determine from the diff, tests, or context files. For each gap, state:
+- What you don't know
+- Where Oscar could look to find out (file, function, Slack, ticket, ask the author)
+- Whether you think it's blocking (must be resolved before you can assess correctness) or non-blocking (context that would sharpen the review but isn't required)
+
+Example format:
+> **Gap:** Can't tell if `AttachFutureYtes` is called on every cycle or once on startup. This affects whether the caching concern is real.
+> **Investigate:** `risk_aggregator/mappers.py` around the `run_cycle` entrypoint, or ask alchen directly.
 
 ### Phase 2: Deep review (only after interview is resolved)
 
-3. **Correctness pass:** Find logic that may be wrong. Describe failure cases.
-4. **Modeling + nits:** Evaluate data/modeling approach.
+4. **Correctness + model pass:** Find logic that may be wrong (describe failure cases) and evaluate the data/modeling approach. These are non-nit concerns that could block merging.
+5. **Nits:** Code clarity, naming, conventions, dead code. Label all of these **Nit** explicitly.
 
 **Draft the full review to `./tmp/pr-review-<branch>.md` first** (a cwd-relative scratch file). Include every comment with its label, file:line, and message. Then **walk the user through one comment at a time**, in file order. Print only the single current comment and wait for the user's response before moving on. Update the scratch file as you go if the user's response changes the status (e.g. "nvm, that's fine" → strike it out). This prevents the "wall of 15 comments at once" problem where users skim instead of engaging.
 
