@@ -11,14 +11,14 @@ Use this alongside the `pr-review` skill for any Python PR. These are the patter
 
 ## Comments and docstrings — minimal by default
 
-> "Comments aren't necessary" (abedra)
 > "Comments should either fully describe what we're doing or link out to something that does. Don't appeal to authority" (abedra)
 > "We're trying to move towards fewer explanatory comments, and instead reflecting the functionality through clearer code" (prawat)
 > "The `Args` and `Returns` docstrings here are redundant with the type signature… comments can't be typechecked" (ajyang)
 
 Default: no docstrings, no comments. Exceptions:
+
 - Public-facing API with non-obvious domain terminology
-- Load-bearing *why*: a workaround, a hidden invariant, a unit clarification
+- Load-bearing _why_: a workaround, a hidden invariant, a unit clarification
 
 If tempted to write a comment, first ask: would a better name do the job?
 
@@ -28,7 +28,6 @@ If tempted to write a comment, first ask: would a better name do the job?
 
 > "Self?" (pnickols) — use `Self` not the class name
 > "Isn't pop more idiomatic?" (pnickols) — use `dict.pop`
-> "You don't need to wrap `.keys()` in `set()` calls" (pnickols)
 > "`expiry_to_listings.setdefault(expiry, set()).add(listing)`" (opyper)
 > "You can get rid of the `set` call if you use `<=`" (pnickols)
 
@@ -78,6 +77,7 @@ URLs, hostnames, vault paths, port numbers belong in a Pydantic config model loa
 > "This should be put into an explicit `start` method; it's better practice to avoid spawning threads/processes inside of a (pseudo)constructor" (ajyang)
 
 Anti-pattern signals in `__init__`:
+
 - Calls a network/DB client
 - Reads from disk
 - Spawns a thread
@@ -99,29 +99,35 @@ Pass a `Clock: Callable[[], Instant]`. Tests get a deterministic fake; prod gets
 ## Logging
 
 ### Pick levels deliberately
+
 > "Is warning the appropriate level here? This seems quite bad/weird, rather than just unusual?" (pnickols)
 > "Given it's only going to get logged once at startup, this seems like it should be info-level" (pnickols)
 
 Startup identity → INFO. Per-event happy path → DEBUG. Recoverable but worth noting → WARNING. Real problem → ERROR.
 
 ### Don't log + raise the same string
+
 > "Looks weird to me that this is the exception string and the debug log line. If they're always coupled, do you need both?" (opyper)
 > "Why log here if it's essentially passed on as-is and caller needs to deal with the error condition anyway" (thoueland)
 
 ### Bound log-line size
+
 > "As a rule I prefer bounding log-lines that otherwise look unbounded" (pnickols)
 
 Don't log entire dataframes, lists, or scenario grids. Truncate.
 
 ### Add context
+
 > "WDYT about logging requests (handler, username, query params, and ok/missing-params outcome)?" (thoueland)
 > "Please log in a more explicit way to distinguish between the early return and not for debugging sake (ideally log the ids too)" (pnickols)
 
 ### Use `timed_block` / `Histogram`, not bare `time.time()`
+
 > "We can use `timed_block` defined in `time.py` for this purpose" (alchen)
 > "Histogram probably more informative here" (alchen)
 
 ### `from fio import logging` — only in `main.py`
+
 > "Shouldn't this be default logging not `fio.logging` since it's not a main?" (pnickols)
 
 `from fio import logging` sets up the root formatter. It belongs only in an app's `main.py`.
@@ -131,6 +137,7 @@ Don't log entire dataframes, lists, or scenario grids. Truncate.
 ## PR-level signals
 
 ### Split unfocused PRs
+
 > "Please leave just the vectorisation change which gives the speedup and not renaming" (pnickols)
 > "This change will need to be broken into multiple PRs" (pnickols)
 > "Would prefer a formatting PR separately if the PR is already hundreds of lines" (pnickols)
@@ -138,6 +145,7 @@ Don't log entire dataframes, lists, or scenario grids. Truncate.
 Renames, formatting, "while I'm here" cleanups → separate PRs. The diff for the actual change should be visually scannable.
 
 ### New code in `unstable/` until proven
+
 > "This should probably be in unstable until it's properly tested" (prawat)
 
 Large unproven additions go to `unstable/`. `quarantine/` is for legacy code we can't yet remove.
@@ -147,6 +155,7 @@ Large unproven additions go to `unstable/`. `quarantine/` is for legacy code we 
 ## What NOT to over-flag
 
 These appear in the codebase already; don't gate on them unless egregious:
+
 - Trailing-comma style on tight diffs
 - `dict[K, V]` vs `Mapping[K, V]` for return types of private helpers
 - Single-letter loop variables in 3-line comprehensions with nothing to gain from a longer name

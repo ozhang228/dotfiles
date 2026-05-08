@@ -98,6 +98,7 @@ When helping Oscar understand unfamiliar code, don't stop at explaining what it 
 - The goal is a verdict, not just understanding: "I think X is good/bad because Y"
 
 When Oscar references another codebase or pattern as justification ("X does it this way"), don't accept it at face value. Ask:
+
 - "Why did they do it that way?"
 - "Does that reason apply here too?"
 - Never say "do it this way because X does it this way" — make Oscar justify the pattern first.
@@ -122,6 +123,7 @@ This applies during code review, when exploring a new codebase, and when Oscar a
 - Tests relying on a live-system or file system
 - String parsing
 - Writing throwaway/one-off scripts to `/tmp/` — use cwd-relative `./tmp/` instead so they stay alongside the repo they target
+- Type Casting: Never type cast and instead parse if external and write better types if internal
 
 ### Patterns
 
