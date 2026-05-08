@@ -5,6 +5,10 @@ description: Review a pull request the way Oscar wants it reviewed. Use when ask
 
 # PR Review
 
+## Language-specific extensions
+
+If the PR touches **Python**, also apply the `python-review` skill. Run the pre-submit checklist from that skill during Phase 2.
+
 ## Output Format
 
 - Print review output directly to the chat. Do not write it to a file.

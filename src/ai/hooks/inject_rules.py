@@ -46,6 +46,12 @@ def _emit(rules_path: Path, *, for_target: str, kind: str) -> str:
     return header + rules_path.read_text()
 
 
+def _emit_skill_directive(skill_name: str, *, for_target: str, condition: str = "") -> str:
+    header = f"# Skill directive (applies to {for_target})\n\n"
+    cond = f" {condition}" if condition else ""
+    return header + f"You MUST invoke the `{skill_name}` skill via the Skill tool{cond}."
+
+
 def handle_file(path_arg: str) -> str:
     path = Path(path_arg)
     chunks: list[str] = []
@@ -54,10 +60,23 @@ def handle_file(path_arg: str) -> str:
     if lang_rules is not None and lang_rules.exists():
         chunks.append(_emit(lang_rules, for_target=path.name, kind=f"{path.suffix} language"))
 
+    if path.suffix == ".py":
+        chunks.append(_emit_skill_directive(
+            "python-review",
+            for_target=path.name,
+            condition="if this session involves reviewing Python code (PR review, code review)",
+        ))
+
     if _is_test_file(path):
         testing_rules = RULES_DIR / "testing.md"
         if testing_rules.exists():
             chunks.append(_emit(testing_rules, for_target=path.name, kind="Testing"))
+        else:
+            chunks.append(_emit_skill_directive(
+                "testing",
+                for_target=path.name,
+                condition="before writing or modifying any tests",
+            ))
 
     return "\n\n---\n\n".join(chunks)
 

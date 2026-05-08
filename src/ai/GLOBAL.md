@@ -78,6 +78,16 @@ When pitching a system migration or stakeholder ask:
 
 ---
 
+## Reasoning About Prod vs Tests
+
+Test stubs are set up for convenience, not to reflect real production configuration. Don't use stub values to make claims about what the app does in prod.
+
+When reasoning about what the real app does (e.g. what pricer type a desk uses, whether a flag is set, what config is active), trace the actual prod code path rather than inferring from test fixtures. If the prod configuration isn't visible in the codebase, say so and ask Oscar.
+
+Be explicit when making inferences vs stating verified facts. Say "I'm inferring this from the test stub but haven't verified what prod uses" rather than stating it as fact.
+
+---
+
 ## Developing Oscar's Engineering Judgment
 
 When helping Oscar understand unfamiliar code, don't stop at explaining what it does. Push him to form an opinion:
