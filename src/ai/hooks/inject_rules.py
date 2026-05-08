@@ -77,17 +77,13 @@ def handle_file(path_arg: str) -> str:
         )
 
     if _is_test_file(path):
-        testing_rules = RULES_DIR / "testing.md"
-        if testing_rules.exists():
-            chunks.append(_emit(testing_rules, for_target=path.name, kind="Testing"))
-        else:
-            chunks.append(
-                _emit_skill_directive(
-                    "testing",
-                    for_target=path.name,
-                    condition="before writing or modifying any tests",
-                )
+        chunks.append(
+            _emit_skill_directive(
+                "testing",
+                for_target=path.name,
+                condition="before writing or modifying any tests",
             )
+        )
 
     return "\n\n---\n\n".join(chunks)
 

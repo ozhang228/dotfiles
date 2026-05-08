@@ -16,5 +16,5 @@ set -gx FIO_LOGGING_ENABLE_RICH_TRACEBACK 1
 set -gx ks_main $HOME/dotfiles/src/terminal/kitty/sessions/work.conf
 
 # needed to not error on multiprocessing apps 
-set -gx PROMETHEUS_MULTIPROC_DIR tmp
+set -gx PROMETHEUS_MULTIPROC_DIR /tmp
 
