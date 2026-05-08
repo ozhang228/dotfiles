@@ -9,6 +9,7 @@ Usage:
 Prints all matching rule markdown to stdout, stacked with separators.
 Silent (no output, exit 0) if nothing matches.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -46,10 +47,14 @@ def _emit(rules_path: Path, *, for_target: str, kind: str) -> str:
     return header + rules_path.read_text()
 
 
-def _emit_skill_directive(skill_name: str, *, for_target: str, condition: str = "") -> str:
+def _emit_skill_directive(
+    skill_name: str, *, for_target: str, condition: str = ""
+) -> str:
     header = f"# Skill directive (applies to {for_target})\n\n"
     cond = f" {condition}" if condition else ""
-    return header + f"You MUST invoke the `{skill_name}` skill via the Skill tool{cond}."
+    return (
+        header + f"You MUST invoke the `{skill_name}` skill via the Skill tool{cond}."
+    )
 
 
 def handle_file(path_arg: str) -> str:
@@ -58,25 +63,31 @@ def handle_file(path_arg: str) -> str:
 
     lang_rules = EXTENSION_TO_FILE.get(path.suffix)
     if lang_rules is not None and lang_rules.exists():
-        chunks.append(_emit(lang_rules, for_target=path.name, kind=f"{path.suffix} language"))
+        chunks.append(
+            _emit(lang_rules, for_target=path.name, kind=f"{path.suffix} language")
+        )
 
     if path.suffix == ".py":
-        chunks.append(_emit_skill_directive(
-            "python-review",
-            for_target=path.name,
-            condition="if this session involves reviewing Python code (PR review, code review)",
-        ))
+        chunks.append(
+            _emit_skill_directive(
+                "python-review",
+                for_target=path.name,
+                condition="if this session involves reviewing Python code (PR review, code review)",
+            )
+        )
 
     if _is_test_file(path):
         testing_rules = RULES_DIR / "testing.md"
         if testing_rules.exists():
             chunks.append(_emit(testing_rules, for_target=path.name, kind="Testing"))
         else:
-            chunks.append(_emit_skill_directive(
-                "testing",
-                for_target=path.name,
-                condition="before writing or modifying any tests",
-            ))
+            chunks.append(
+                _emit_skill_directive(
+                    "testing",
+                    for_target=path.name,
+                    condition="before writing or modifying any tests",
+                )
+            )
 
     return "\n\n---\n\n".join(chunks)
 
