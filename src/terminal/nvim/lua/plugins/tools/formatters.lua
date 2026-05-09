@@ -22,7 +22,6 @@ return {
 
       -- Misc
       json = { "jq", "prettierd", "prettier", stop_after_first = true },
-      markdown = { "prettierd", "prettier", stop_after_first = true },
       toml = { "taplo" },
     },
     format_on_save = {
