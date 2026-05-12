@@ -17,7 +17,6 @@ Run `! pr-languages` first to identify which languages are in the diff, then loa
 | ----------------- | --------------------------------- | ------------------------------------- |
 | Python            | `references/python.md`            | Any `.py` files in the diff           |
 | TypeScript/TSX    | `references/typescript.md`        | Any `.ts` or `.tsx` files in the diff |
-| Review Checklist  | `references/review-checklist.md`  | Starting a review, categories         |
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
 | Wiki Update       | `references/update-wiki.md`       | After review, recording lessons       |
 

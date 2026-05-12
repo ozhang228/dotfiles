@@ -15,6 +15,10 @@ src = "~/dotfiles/src/ai/claude/skills"
 dst = "~/.claude/skills"
 
 [[symlinks]]
+src = "~/dotfiles/src/ai/claude/settings.json"
+dst = "~/.claude/settings.json"
+
+[[symlinks]]
 src = "~/dotfiles/src/ai/claude/keybindings.json"
 dst = "~/.claude/keybindings.json"
 

@@ -34,29 +34,12 @@ EXTENSION_TO_FILE: dict[str, Path] = {
     ".hxx": RULES_DIR / "cpp.md",
 }
 
-TEST_NAME_SUBSTRINGS: tuple[str, ...] = ("test", "spec")
-
 CLI_TRIGGERS: frozenset[str] = frozenset({"jq", "mlr"})
-
-
-def _is_test_file(path: Path) -> bool:
-    name_lower = path.name.lower()
-    return any(frag in name_lower for frag in TEST_NAME_SUBSTRINGS)
 
 
 def _emit(rules_path: Path, *, for_target: str, kind: str) -> str:
     header = f"# {kind} rules (applies to {for_target})\n\n"
     return header + rules_path.read_text()
-
-
-def _emit_skill_directive(
-    skill_name: str, *, for_target: str, condition: str = ""
-) -> str:
-    header = f"# Skill directive (applies to {for_target})\n\n"
-    cond = f" {condition}" if condition else ""
-    return (
-        header + f"You MUST invoke the `{skill_name}` skill via the Skill tool{cond}."
-    )
 
 
 def handle_file(path_arg: str) -> str:
@@ -67,24 +50,6 @@ def handle_file(path_arg: str) -> str:
     if lang_rules is not None and lang_rules.exists():
         chunks.append(
             _emit(lang_rules, for_target=path.name, kind=f"{path.suffix} language")
-        )
-
-    if path.suffix == ".py":
-        chunks.append(
-            _emit_skill_directive(
-                "python-review",
-                for_target=path.name,
-                condition="if this session involves reviewing Python code (PR review, code review)",
-            )
-        )
-
-    if _is_test_file(path):
-        chunks.append(
-            _emit_skill_directive(
-                "testing",
-                for_target=path.name,
-                condition="before writing or modifying any tests",
-            )
         )
 
     return "\n\n---\n\n".join(chunks)
@@ -110,7 +75,6 @@ def handle_prompt(prompt: str) -> str:
     """Scan the user's message for file extensions and CLI tool mentions."""
     chunks: list[str] = []
     seen_exts: set[str] = set()
-    has_test_file = False
 
     # Extract file paths from @mentions and bare paths in the prompt
     for match in re.finditer(r"[@\s\"']?([\w./\-]+\.\w+)", prompt):
@@ -120,27 +84,9 @@ def handle_prompt(prompt: str) -> str:
             seen_exts.add(ext)
             rules = EXTENSION_TO_FILE[ext]
             if rules.exists():
-                chunks.append(_emit(rules, for_target=ext + " files", kind=f"{ext} language"))
-        if _is_test_file(path):
-            has_test_file = True
-
-    if ".py" in seen_exts:
-        chunks.append(
-            _emit_skill_directive(
-                "python-review",
-                for_target=".py files",
-                condition="if this session involves reviewing Python code (PR review, code review)",
-            )
-        )
-
-    if has_test_file:
-        chunks.append(
-            _emit_skill_directive(
-                "testing",
-                for_target="test files",
-                condition="before writing or modifying any tests",
-            )
-        )
+                chunks.append(
+                    _emit(rules, for_target=ext + " files", kind=f"{ext} language")
+                )
 
     # CLI tool mentions in the prompt
     try:
