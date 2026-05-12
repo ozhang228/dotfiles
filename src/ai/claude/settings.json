@@ -118,7 +118,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "notify-send 'Claude Code' 'Done' 2>/dev/null || true"
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_stop.sh"
           }
         ]
       }

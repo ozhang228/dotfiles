@@ -44,13 +44,13 @@ At the end of this, form an answer to "The PR is solving X" and put that in the 
 ## Output Format
 
 - Write the full review to a file: `./tmp/review-<branch-name>.md`
-- Use a heading: `# <file_path>` with numbered review comments under each file
+- Use a heading: `# <file_path>:<line_number>` with numbered review comments under each file
 - Every comment must be labeled:
   - **Unclear:** naming/control flow unclear
   - **Incorrect:** logic produces wrong result
   - **Model:** data/modeling approach doesn't make sense
   - **Nit:** style issue (non-functional)
-- After writing the file, present comments to the user **one at a time** in the chat. After each comment, wait for a response before presenting the next.
+- After writing the file, present comments to the user **one at a time** in the chat. Include the `file_path:line_number` reference at the top of each comment. After each comment, wait for a response before presenting the next.
 
 ### After the review
 

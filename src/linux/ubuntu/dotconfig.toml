@@ -18,5 +18,9 @@ id = "picom"
 ubuntu = "sudo apt install picom"
 
 [[symlinks]]
+src = "~/dotfiles/src/linux/ubuntu/dunst"
+dst = "~/.config/dunst"
+
+[[symlinks]]
 src = "~/dotfiles/src/linux/ubuntu/picom"
 dst = "~/.config/picom"
