@@ -27,6 +27,21 @@ When adding or updating the wiki:
 
 ---
 
+## Skill Observation (passive, every session)
+
+Throughout every session, watch for these signals and save them to memory immediately as `skill-observation: <skill-name or "new"> — <what happened>`:
+
+- User corrected or overrode a skill's output
+- User did something manually that an existing skill should have handled
+- A skill fired on the wrong trigger (false positive)
+- A skill failed to fire when it should have (false negative)
+- An instruction in a skill required repeated clarification
+- A task recurred across sessions with no skill covering it (new skill candidate)
+
+These are consumed by the `skill-audit` skill to continuously improve skills over time.
+
+---
+
 ## Project-Specific Instructions Take Priority
 
 You must always read and prefer **project-specific instructions** (e.g., `CLAUDE.md` in the project root) over these global rules.
