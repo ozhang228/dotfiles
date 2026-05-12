@@ -12,9 +12,21 @@
     diffFilter = delta --color-only
 
 [delta]
-		# use n and N to move between diff sections
+    # use n and N to move between diff sections
     navigate = true
     dark = true
+
+[pull]
+    rebase = false
+
+[fetch]
+    prune = true
+
+[rerere]
+    enabled = true
+
+[diff]
+    algorithm = histogram
 
 [merge]
     conflictStyle = zdiff3
