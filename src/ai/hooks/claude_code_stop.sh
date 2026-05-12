@@ -28,4 +28,4 @@ fi
 body="${loc}
 <span foreground='${text}'>claude code finished</span>"
 
-notify-send -u low 'Claude Code' "$body" 2>/dev/null || true
+notify-send -u low -a "Kitty" 'Claude Code' "$body" 2>/dev/null || true

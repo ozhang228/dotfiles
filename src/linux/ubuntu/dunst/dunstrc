@@ -32,7 +32,7 @@
     highlight = "#3e8fb0"
     frame_color = "#3e8fb0"
     default_icon = "dialog-information"
-    format = "<b><span foreground='#3e8fb0'>%s</span></b>\n<span size='13312'>%b</span>"
+    format = "<b><span foreground='#3e8fb0'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
     timeout = 4
 
 [urgency_normal]
@@ -40,7 +40,7 @@
     highlight = "#f6c177"
     frame_color = "#f6c177"
     default_icon = "dialog-warning"
-    format = "<b><span foreground='#f6c177'>%s</span></b>\n<span size='13312'>%b</span>"
+    format = "<b><span foreground='#f6c177'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
     timeout = 6
 
 [urgency_critical]
@@ -48,7 +48,7 @@
     highlight = "#eb6f92"
     frame_color = "#eb6f92"
     default_icon = "dialog-error"
-    format = "<b><span foreground='#eb6f92'>%s</span></b>\n<span size='13312'>%b</span>"
+    format = "<b><span foreground='#eb6f92'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
     timeout = 0
 
 [claude_code]
