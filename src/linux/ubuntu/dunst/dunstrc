@@ -33,7 +33,7 @@
     frame_color = "#3e8fb0"
     default_icon = "dialog-information"
     format = "<b><span foreground='#3e8fb0'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
-    timeout = 4
+    timeout = 6
 
 [urgency_normal]
     background = "#443c53"
@@ -41,7 +41,7 @@
     frame_color = "#f6c177"
     default_icon = "dialog-warning"
     format = "<b><span foreground='#f6c177'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
-    timeout = 6
+    timeout = 9
 
 [urgency_critical]
     background = "#433754"
