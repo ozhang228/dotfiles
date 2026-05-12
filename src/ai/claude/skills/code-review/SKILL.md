@@ -31,7 +31,7 @@ Run `! pr-languages` first to identify which languages are in the diff, then loa
 3. Read full files and related files for context.
 4. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
 
-At the end of this, form an answer to "The PR is solving X" and put that in the chat for confirmation before proceeding.
+At the end of this, form an answer to "The PR is solving X" and put that in the chat. **Stop and wait for the user to confirm before proceeding.** Do not write any review comments until they confirm.
 
 ### Substantive Concerns
 
@@ -44,13 +44,14 @@ At the end of this, form an answer to "The PR is solving X" and put that in the 
 
 ## Output Format
 
-- Print review directly to the chat. Do not write to a file
-- Use a heading: <h1> file_path </h1> with numbered review comments under this
+- Write the full review to a file: `./tmp/review-<branch-name>.md`
+- Use a heading: `# <file_path>` with numbered review comments under each file
 - Every comment must be labeled:
   - **Unclear:** naming/control flow unclear
   - **Incorrect:** logic produces wrong result
   - **Model:** data/modeling approach doesn't make sense
   - **Nit:** style issue (non-functional)
+- After writing the file, present comments to the user **one at a time** in the chat. After each comment, wait for a response before presenting the next.
 
 ### After the review
 
