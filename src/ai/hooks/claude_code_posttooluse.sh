@@ -21,7 +21,7 @@ _prettier_inplace() {
   local f="$1"
   local tmp
   tmp=$(mktemp)
-  if prettierd "$f" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+  if prettierd "$f" < "$f" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
     cat "$tmp" > "$f"
   else
     prettier --write "$f" 2>/dev/null || true
