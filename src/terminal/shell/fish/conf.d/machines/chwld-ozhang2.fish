@@ -1,5 +1,8 @@
 set -gx AI_CLI_CMD "claude-branch-resume || claude"
 
+# Load local Claude credentials (not in git — create ~/.local/share/claude_credentials.fish)
+test -f ~/.local/share/claude_credentials.fish && source ~/.local/share/claude_credentials.fish
+
 # pnpm
 fish_add_path $HOME/.local/share/pnpm
 

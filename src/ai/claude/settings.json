@@ -73,6 +73,7 @@
       "/home/ozhang/forge"
     ]
   },
+  "theme": "ansi",
   "model": "sonnet[1m]",
   "hooks": {
     "PreToolUse": [
