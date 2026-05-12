@@ -52,8 +52,8 @@ return {
       css = { "eslint_d" },
 
       -- C / C++
-      c = { "clang-tidy" },
-      cpp = { "clang-tidy" },
+      c = { "clangtidy" },
+      cpp = { "clangtidy" },
 
       -- Python
       python = { "ty", "ruff" },
