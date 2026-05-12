@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Print which languages are changed in the current branch vs its merge base,
+# and which language-specific review skills to invoke.
+# Usage: pr-languages [base-branch]   (default: main, falls back to master)
+set -euo pipefail
+
+base="${1:-}"
+if [[ -z "$base" ]]; then
+    if git rev-parse --verify main &>/dev/null; then
+        base="main"
+    elif git rev-parse --verify master &>/dev/null; then
+        base="master"
+    else
+        echo "error: can't find main or master; pass base branch explicitly" >&2
+        exit 1
+    fi
+fi
+
+merge_base=$(git merge-base HEAD "$base" 2>/dev/null || echo "$base")
+files=$(git diff --name-only "$merge_base" 2>/dev/null)
+
+if [[ -z "$files" ]]; then
+    echo "No changed files found vs $base"
+    exit 0
+fi
+
+declare -A langs
+while IFS= read -r f; do
+    ext="${f##*.}"
+    case "$ext" in
+        py)             langs[python]=1 ;;
+        ts|tsx)         langs[typescript]=1 ;;
+        cpp|cc|cxx|h|hpp|hxx) langs[cpp]=1 ;;
+        js|jsx)         langs[javascript]=1 ;;
+        go)             langs[go]=1 ;;
+        rs)             langs[rust]=1 ;;
+    esac
+done <<< "$files"
+
+total=$(echo "$files" | wc -l | tr -d ' ')
+echo "Changed files vs $base ($merge_base): $total"
+echo ""
+echo "Languages detected:"
+for lang in "${!langs[@]}"; do
+    echo "  $lang"
+done | sort
+
+echo ""
+echo "Skills to invoke:"
+[[ -n "${langs[python]:-}" ]]     && echo "  python-review"
+[[ -n "${langs[typescript]:-}" ]] && echo "  typescript-review"
+if [[ -z "${langs[python]:-}" && -z "${langs[typescript]:-}" ]]; then
+    echo "  (none — no Python or TypeScript files changed)"
+fi
