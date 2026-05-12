@@ -3,29 +3,12 @@
 ## Auto-Injected Context
 
 Language conventions and task rules in `src/ai/rules/` are injected automatically by a PreToolUse hook whenever you Write, Edit, or run a Bash command. Do not try to read them manually as a preamble, the hook is authoritative and handles stacking (e.g. `test_foo.py` gets Python rules plus testing rules).
-
-Skills at `~/.claude/skills/` (e.g. `pr-review`, `pr-context`) appear in the skill listing each turn and are invoked by user intent.
-
 If the user asks a pure Q&A question about a convention without editing any file, read the relevant `src/ai/rules/*.md` on demand.
-
----
 
 ## Definitions
 
 - **$HOME/forge/ai_wiki/** — Business context (how the business works and information not evident from code). Use when something isn't clear from the code and requires business knowledge. Search using grep.
 - **ai wiki** — (`$HOME/forge/ai_wiki`).
-
----
-
-## Wiki Maintenance
-
-When adding or updating the wiki:
-
-1. Check existing entries for outdated info
-2. Remove or update stale entries — don't just append
-3. If a change contradicts an existing entry, update or remove the old entry
-
----
 
 ## Skill Observation (passive, every session)
 
