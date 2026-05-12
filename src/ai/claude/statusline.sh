@@ -3,22 +3,27 @@
 set -euo pipefail
 
 input=$(cat)
-cwd=$(echo "$input"    | jq -r '.workspace.current_dir')
-model=$(echo "$input"  | jq -r '.model.display_name')
-used=$(echo "$input"   | jq -r '.context_window.used_percentage // empty')
-in_tok=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
-out_tok=$(echo "$input"| jq -r '.context_window.total_output_tokens // 0')
+cwd=$(echo "$input"      | jq -r '.workspace.current_dir')
+model=$(echo "$input"    | jq -r '.model.display_name')
+model_id=$(echo "$input" | jq -r '.model.id // empty')
+used=$(echo "$input"     | jq -r '.context_window.used_percentage // 0')
+in_tok=$(echo "$input"   | jq -r '.context_window.total_input_tokens // 0')
+out_tok=$(echo "$input"  | jq -r '.context_window.total_output_tokens // 0')
+max_tokens=$(echo "$input" | jq -r '.context_window.max_tokens // 0')
 
 branch=$(git -C "$cwd" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')
 cost=$(printf '%.2f' "$(echo "scale=4; ($in_tok * 15 + $out_tok * 75) / 1000000" | bc 2>/dev/null || echo '0')")
 dir=$(basename "$cwd")
-tok=$(( (in_tok + out_tok) / 1000 ))
-
-# Derive max context window size from model name e.g. "claude-sonnet-4-6 (1m)"
-max_k=0
-if [[ "$model" =~ \(?([0-9]+)([km])\)? ]]; then
-    val="${BASH_REMATCH[1]}"; unit="${BASH_REMATCH[2]}"
-    [ "$unit" = "m" ] && max_k=$(( val * 1000 )) || max_k=$val
+# Derive max context window: prefer JSON field, then parse model ID/name for e.g. [1m] or (200k)
+max_k=$(( max_tokens / 1000 ))
+if [ "$max_k" -eq 0 ]; then
+    for src in "$model_id" "$model"; do
+        if [[ "$src" =~ ([0-9]+)([km]) ]]; then
+            val="${BASH_REMATCH[1]}"; unit="${BASH_REMATCH[2]}"
+            [ "$unit" = "m" ] && max_k=$(( val * 1000 )) || max_k=$val
+            break
+        fi
+    done
 fi
 
 # Active skills (up to 10)
@@ -49,16 +54,10 @@ out="${c_red}${i_robot} ${model}${reset}"
 out+="${sep}${c_peach}${i_folder} ${dir}${reset}"
 [ -n "$branch" ] && out+=" ${c_muted}(${c_yellow}${i_branch} ${branch}${c_muted})${reset}"
 
-if [ -n "$used" ]; then
-    pct=$(printf '%.0f' "$used")
-    ctx_color="$c_green"
-    [ "$pct" -ge 70 ] 2>/dev/null && ctx_color="$c_red_warn"
-    if [ "$max_k" -gt 0 ]; then
-        out+="${sep}${ctx_color}${i_ctx} ${tok}k/${max_k}k (${pct}%)${reset}"
-    else
-        out+="${sep}${ctx_color}${i_ctx} ${tok}k (${pct}%)${reset}"
-    fi
-fi
+pct=$(printf '%.0f' "$used")
+ctx_color="$c_green"
+[ "$pct" -ge 70 ] 2>/dev/null && ctx_color="$c_red_warn"
+out+="${sep}${ctx_color}${i_ctx} ${pct}%${reset}"
 
 out+="${sep}${c_teal}${i_cost} \$${cost}${reset}"
 
