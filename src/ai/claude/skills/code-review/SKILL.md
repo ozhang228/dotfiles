@@ -19,6 +19,7 @@ Run `! pr-languages` first to identify which languages are in the diff, then loa
 | TypeScript/TSX    | `references/typescript.md`        | Any `.ts` or `.tsx` files in the diff |
 | Review Checklist  | `references/review-checklist.md`  | Starting a review, categories         |
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
+| Wiki Update       | `references/update-wiki.md`       | After review, recording lessons       |
 
 ## Review Workflow
 
@@ -50,3 +51,7 @@ At the end of this, form an answer to "The PR is solving X" and put that in the 
   - **Incorrect:** logic produces wrong result
   - **Model:** data/modeling approach doesn't make sense
   - **Nit:** style issue (non-functional)
+
+### After the review
+
+**Update the wiki** (see `references/update-wiki.md`). After finishing, check whether the review surfaced any durable domain knowledge — counterintuitive gotchas, design rationales, operational facts, product relationships — that belongs in `~/forge/ai_wiki/`. If yes, write it in. If nothing new was learned, skip.
