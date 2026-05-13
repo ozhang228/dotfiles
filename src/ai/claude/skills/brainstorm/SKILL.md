@@ -28,7 +28,7 @@ You MUST create a task for each of these items and complete them in order:
 - Explore project context - check files / ai wiki (`$HOME/forge/ai_wiki/`)
 - Ask clarifying questions - one at a time, understand purpose/constraints/success criteria
 - Present suggested approach - talk about tradeoffs and if there are any other possible approaches that have different tradeoffs
-- Define expected behaviors as tests - using `references/testing.md` format, produce a list of `test_<name> / why:` entries that describe what the feature must do. Get user approval on this list before proceeding. These become the test plan for implementation.
+- Define expected behaviors as tests - focus on **core behaviors only**: what must be true for the feature to be correct? Aim for 3–5 entries that would catch a broken implementation. Skip edge cases and style assertions unless the feature is inherently complex (stateful multi-step flows, parsing, data transformations). Use `references/testing.md` format. Get user approval before proceeding — this approval can be combined with the "transition to implementation" step if the list is short and uncontroversial.
 - Write design doc - save to `cwd/docs/DESIGN.md`
 - Spec self-review - quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 - User reviews written spec - ask user to review the spec file before proceeding
