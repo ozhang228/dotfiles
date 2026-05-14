@@ -23,7 +23,7 @@ A skill needs attention when any of these fail consistently.
 
 ### 1. Collect observations
 
-Pull saved memory observations (`skill-observation:` entries) plus reflect on the current conversation for the signals listed in "Passive observation" above.
+Pull saved memory observations (`skill-observation:` entries) from the memory directory. Also reflect on the current conversation: did the user correct a skill's output, bypass a skill manually, or encounter a gap the skill didn't cover?
 
 ### 2. Inventory all skills
 
