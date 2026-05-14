@@ -42,3 +42,6 @@
 	helper = !/usr/bin/gh auth git-credential
 [init]
 	defaultBranch = main
+
+[includeIf "hasconfig:remote.*.url:*drwholdings*/**"]
+    path = ~/dotfiles/src/git/.gitconfig-drw

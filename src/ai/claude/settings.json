@@ -121,6 +121,15 @@
             "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_stop.sh"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/skill-observation.sh",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
