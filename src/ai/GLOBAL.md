@@ -5,11 +5,6 @@
 Language conventions and task rules in `src/ai/rules/` are injected automatically by a PreToolUse hook whenever you Write, Edit, or run a Bash command. Do not try to read them manually as a preamble, the hook is authoritative and handles stacking (e.g. `test_foo.py` gets Python rules plus testing rules).
 If the user asks a pure Q&A question about a convention without editing any file, read the relevant `src/ai/rules/*.md` on demand.
 
-## Definitions
-
-- **$HOME/forge/ai_wiki/** — Business context (how the business works and information not evident from code). Use when something isn't clear from the code and requires business knowledge. Search using grep.
-- **ai wiki** — (`$HOME/forge/ai_wiki`).
-
 ## Skill Observation (passive, every session)
 
 Throughout every session, watch for these signals and save them to memory immediately as `skill-observation: <skill-name or "new"> — <what happened>`:

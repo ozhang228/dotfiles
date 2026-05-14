@@ -25,7 +25,7 @@ allowed-tools: Read, Grep, Glob
 
 You MUST create a task for each of these items and complete them in order:
 
-- Explore project context - check files / ai wiki (`$HOME/forge/ai_wiki/`)
+- Explore project context - check files
 - Ask clarifying questions - one at a time, understand purpose/constraints/success criteria
 - Present suggested approach - talk about tradeoffs and if there are any other possible approaches that have different tradeoffs
 - Define expected behaviors as tests - focus on **core behaviors only**: what must be true for the feature to be correct? Aim for 3–5 entries that would catch a broken implementation. Skip edge cases and style assertions unless the feature is inherently complex (stateful multi-step flows, parsing, data transformations). Use `references/testing.md` format. Get user approval before proceeding — this approval can be combined with the "transition to implementation" step if the list is short and uncontroversial.
