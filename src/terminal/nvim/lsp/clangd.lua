@@ -81,7 +81,9 @@ return {
   on_attach = function(client, bufnr)
     -- Do not start if no compile database
     local root = client.root_dir or vim.fn.getcwd()
-    local has_compile_commands = vim.fn.filereadable(root .. "/compile_commands.json") == 1 or vim.fn.filereadable(root .. "/compile_flags.txt") == 1
+    local has_compile_commands = vim.fn.filereadable(root .. "/compile_commands.json") == 1
+      or vim.fn.filereadable(root .. "/compile_flags.txt") == 1
+      or vim.fn.filereadable(root .. "/build/compile_commands.json") == 1
 
     if not has_compile_commands then
       vim.notify("clangd: no compile_commands.json or compile_flags.txt found — diagnostics and completion will be degraded", vim.log.levels.WARN)

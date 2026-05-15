@@ -73,8 +73,6 @@
       "/home/ozhang/forge"
     ]
   },
-  "theme": "ansi",
-  "model": "sonnet[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -92,8 +90,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -rn --arg cwd \"$(pwd)\" --arg b \"$(git branch --show-current 2>/dev/null || echo 'not-a-repo')\" '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":(\"CWD: \"+$cwd+\"\\nBranch: \"+$b)}}'",
-            "suppressOutput": true
+            "command": "jq -rn --arg cwd \"$(pwd)\" --arg b \"$(git branch --show-current 2>/dev/null || echo 'not-a-repo')\" '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":(\"CWD: \"+$cwd+\"\\nBranch: \"+$b)}}'"
           },
           {
             "type": "command",
@@ -136,5 +133,6 @@
   "statusLine": {
     "type": "command",
     "command": "/home/ozhang/dotfiles/src/ai/claude/statusline.sh"
-  }
+  },
+  "theme": "auto"
 }
