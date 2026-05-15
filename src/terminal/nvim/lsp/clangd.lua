@@ -79,6 +79,7 @@ return {
     if init_result.offsetEncoding then client.offset_encoding = init_result.offsetEncoding end
   end,
   on_attach = function(client, bufnr)
+    vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
     -- Do not start if no compile database
     local root = client.root_dir or vim.fn.getcwd()
     local has_compile_commands = vim.fn.filereadable(root .. "/compile_commands.json") == 1
