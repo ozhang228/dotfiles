@@ -8,7 +8,6 @@ return {
     opts = {
       auto_update = true,
       ensure_installed = {
-        -- TS/JS
         "tsgo",
         "vtsls",
         "eslint_d",
@@ -16,25 +15,22 @@ return {
         "prettierd",
         "prettier",
 
-        -- Python
         "basedpyright",
         "ty",
         "ruff",
 
-        -- C/C++
         "clangd",
         "clang-format",
         "codelldb",
 
-        -- Lua
         "lua-language-server",
         "luacheck",
         "stylua",
 
-        -- Misc
+        "rust-analyzer",
+
         "jq",
         "checkmake",
-        "taplo",
         "marksman",
       },
     },

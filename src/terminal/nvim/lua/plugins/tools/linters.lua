@@ -43,7 +43,6 @@ return {
     }
 
     lint.linters_by_ft = {
-      -- TS/JS
       typescript = { "eslint_d" },
       javascript = { "eslint_d" },
       typescriptreact = { "eslint_d" },
@@ -51,15 +50,11 @@ return {
       html = { "eslint_d" },
       css = { "eslint_d" },
 
-      -- C / C++
       c = { "clangtidy" },
       cpp = { "clangtidy" },
-
-      -- Python
       python = { "ty", "ruff" },
-
-      -- Lua
       lua = { "luacheck" },
+      rust = { "clippy" },
 
       -- Misc
       json = { "eslint_d" },
