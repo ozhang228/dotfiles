@@ -1,3 +1,4 @@
+---@type vim.lsp.Config
 return {
   cmd = { "vtsls", "--stdio" },
   init_options = {
@@ -18,9 +19,7 @@ return {
   on_attach = function(client)
     local keep = { "semanticTokensProvider" }
     for key, _ in pairs(client.server_capabilities) do
-      if not vim.tbl_contains(keep, key) then
-        client.server_capabilities[key] = nil
-      end
+      if not vim.tbl_contains(keep, key) then client.server_capabilities[key] = nil end
     end
   end,
 

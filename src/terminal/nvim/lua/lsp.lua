@@ -1,3 +1,7 @@
+-- Ensure ~/.cargo/bin is in PATH so rust-analyzer can spawn cargo/rustc
+local cargo_bin = vim.fs.joinpath(vim.env.HOME, ".cargo/bin")
+if vim.env.PATH and not vim.env.PATH:find(cargo_bin, 1, true) then vim.env.PATH = cargo_bin .. ":" .. vim.env.PATH end
+
 -- enable all lsps in /lsp
 local disabled = { "vtsls" }
 

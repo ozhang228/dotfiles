@@ -1,5 +1,8 @@
+local cargo = os.getenv("CARGO") or vim.fn.exepath("cargo")
+if cargo == "" then cargo = vim.fs.joinpath(vim.env.HOME, ".cargo/bin/cargo") end
+
 local function reload_workspace(bufnr)
-  local clients = vim.lsp.get_clients({ bufnr = bufnr, name = "rust_analyzer" })
+  local clients = vim.lsp.get_clients({ bufnr = bufnr, name = "rust-analyzer" })
   for _, client in ipairs(clients) do
     vim.notify("Reloading Cargo Workspace")
     ---@diagnostic disable-next-line:param-type-mismatch
@@ -10,12 +13,13 @@ local function reload_workspace(bufnr)
   end
 end
 
-local function user_sysroot_src() return vim.tbl_get(vim.lsp.config["rust_analyzer"], "settings", "rust-analyzer", "cargo", "sysrootSrc") end
+local function user_sysroot_src() return vim.tbl_get(vim.lsp.config["rust-analyzer"], "settings", "rust-analyzer", "cargo", "sysrootSrc") end
 
 local function default_sysroot_src()
-  local sysroot = vim.tbl_get(vim.lsp.config["rust_analyzer"], "settings", "rust-analyzer", "cargo", "sysroot")
+  local sysroot = vim.tbl_get(vim.lsp.config["rust-analyzer"], "settings", "rust-analyzer", "cargo", "sysroot")
   if not sysroot then
-    local rustc = os.getenv("RUSTC") or "rustc"
+    local rustc = os.getenv("RUSTC") or vim.fn.exepath("rustc")
+    if rustc == "" then rustc = vim.fs.joinpath(vim.env.HOME, ".cargo/bin/rustc") end
     local result = vim.system({ rustc, "--print", "sysroot" }, { text = true }):wait()
 
     local stdout = result.stdout
@@ -48,7 +52,7 @@ local function is_library(fname)
 
   for _, item in ipairs({ toolchains, registry, git_registry, sysroot_src }) do
     if item and vim.fs.relpath(item, fname) then
-      local clients = vim.lsp.get_clients({ name = "rust_analyzer" })
+      local clients = vim.lsp.get_clients({ name = "rust-analyzer" })
       return #clients > 0 and clients[#clients].config.root_dir or nil
     end
   end
@@ -75,7 +79,7 @@ return {
     end
 
     local cmd = {
-      "cargo",
+      cargo,
       "metadata",
       "--no-deps",
       "--format-version",
@@ -112,6 +116,7 @@ return {
   ---@type lspconfig.settings.rust_analyzer
   settings = {
     ["rust-analyzer"] = {
+      check = { command = "clippy" },
       lens = {
         debug = { enable = true },
         enable = true,
@@ -133,18 +138,18 @@ return {
     ---@param command table{ title: string, command: string, arguments: any[] }
     vim.lsp.commands["rust-analyzer.runSingle"] = function(command)
       local r = command.arguments[1]
-      local cmd = { "cargo", unpack(r.args.cargoArgs) }
+      local cmd = { cargo, unpack(r.args.cargoArgs) }
       if r.args.executableArgs and #r.args.executableArgs > 0 then vim.list_extend(cmd, { "--", unpack(r.args.executableArgs) }) end
 
-      local proc = vim.system(cmd, { cwd = r.args.cwd, env = r.args.environment })
-
-      local result = proc:wait()
-
-      if result.code == 0 then
-        vim.notify(result.stdout, vim.log.levels.INFO)
-      else
-        vim.notify(result.stderr, vim.log.levels.ERROR)
-      end
+      vim.system(cmd, { cwd = r.args.cwd, env = r.args.environment, text = true }, function(result)
+        vim.schedule(function()
+          if result.code == 0 then
+            vim.notify(result.stdout or "", vim.log.levels.INFO)
+          else
+            vim.notify(result.stderr or "", vim.log.levels.ERROR)
+          end
+        end)
+      end)
     end
   end,
   on_attach = function(_, bufnr)

@@ -5,6 +5,7 @@ local root_markers = {
   "tsconfig.base.json",
 }
 
+---@type vim.lsp.Config
 return {
   cmd = { "tsgo", "--lsp", "--stdio" },
   filetypes = {
@@ -48,7 +49,7 @@ return {
     },
   },
   root_dir = function(bufnr, on_dir)
-    local markers = vim.fn.has("nvim-0.11.3") == 1 and { root_markers, { ".git" } } or vim.list_extend(vim.deepcopy(root_markers), { ".git" })
+    local markers = { root_markers, { ".git" } }
     local deno_root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc" })
     local deno_lock_root = vim.fs.root(bufnr, { "deno.lock" })
     local project_root = vim.fs.root(bufnr, markers)

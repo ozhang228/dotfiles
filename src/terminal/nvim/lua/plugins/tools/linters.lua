@@ -54,8 +54,6 @@ return {
       cpp = { "clangtidy" },
       python = { "ty", "ruff" },
       lua = { "luacheck" },
-      rust = { "clippy" },
-
       -- Misc
       json = { "eslint_d" },
       makefile = { "checkmake" },
