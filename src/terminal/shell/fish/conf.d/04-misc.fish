@@ -1,6 +1,8 @@
 if status is-interactive
 
 fish_config theme choose "Rosé Pine Moon"
-copyq --start-server
+if not pgrep -x copyq &>/dev/null
+    copyq --start-server
+end
 
 end
