@@ -134,5 +134,8 @@
     "type": "command",
     "command": "/home/ozhang/dotfiles/src/ai/claude/statusline.sh"
   },
-  "theme": "auto"
+  "theme": "auto",
+  "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": true
+  }
 }
