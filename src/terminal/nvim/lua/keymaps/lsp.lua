@@ -22,6 +22,16 @@ return {
       desc = "Code Action",
     },
     {
+      "K",
+      function() vim.lsp.buf.hover() end,
+      desc = "Hover",
+    },
+    {
+      "gl",
+      function() vim.diagnostic.open_float() end,
+      desc = "Show Diagnostics",
+    },
+    {
       "gd",
       function() Snacks.picker.lsp_definitions() end,
       desc = "Go to Definition",
