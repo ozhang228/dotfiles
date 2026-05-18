@@ -29,6 +29,7 @@ def perform_symlink(symlink: Symlink, overwrite: bool = False) -> Result[None, s
             else:
                 dst.unlink()
 
+        dst.parent.mkdir(parents=True, exist_ok=True)
         os.symlink(src, dst)
         return Ok(None)
     except Exception as e:
