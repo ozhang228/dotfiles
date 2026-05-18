@@ -63,7 +63,8 @@
       "Bash(make *)",
       "Bash(pytest)",
       "Bash(pytest *)",
-      "Bash(sed *)"
+      "Bash(sed *)",
+      "Skill"
     ],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
@@ -134,8 +135,9 @@
     "type": "command",
     "command": "/home/ozhang/dotfiles/src/ai/claude/statusline.sh"
   },
-  "theme": "auto",
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true
-  }
+  },
+  "theme": "auto",
+  "model": "opus[1m]"
 }
