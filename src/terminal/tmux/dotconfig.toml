@@ -1,0 +1,21 @@
+[metadata]
+name = "tmux config"
+supported_distros = ["manjaro", "ubuntu"]
+
+[[deps]]
+id = "tmux"
+check = "command -v tmux"
+[deps.install_method]
+manjaro = "sudo pacman -S tmux"
+ubuntu = "sudo apt install tmux"
+
+[[deps]]
+id = "tpm"
+check = "test -d ~/.tmux/plugins/tpm"
+[deps.install_method]
+manjaro = "git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm --depth 1"
+ubuntu = "git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm --depth 1"
+
+[[symlinks]]
+src = "~/dotfiles/src/terminal/tmux/tmux.conf"
+dst = "~/.config/tmux/tmux.conf"

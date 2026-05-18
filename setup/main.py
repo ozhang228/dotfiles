@@ -93,7 +93,7 @@ def main(args: Arguments):
                 console.rule(f"[bold cyan]{dep.id}[/bold cyan]")
                 console.print(f"[dim]$ {install_cmd}[/dim]\n")
 
-                installation_result = install_dependency(install_cmd)
+                installation_result = install_dependency(dep, install_cmd)
                 match installation_result:
                     case Ok(success):
                         console.print(f"[green]✓[/green] {success}")
