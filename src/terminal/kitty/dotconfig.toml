@@ -12,6 +12,7 @@ dst = "~/.local/bin/kitty-load"
 
 [[deps]]
 id = "kitty"
+check = "command -v kitty"
 [deps.install_method]
 ubuntu = "sudo apt install kitty"
 manjaro = "sudo pacman -S kitty"

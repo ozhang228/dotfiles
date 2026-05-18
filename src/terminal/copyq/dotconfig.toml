@@ -8,6 +8,7 @@ dst = "~/.config/copyq/"
 
 [[deps]]
 id = "clipboard_manager"
+check = "command -v copyq"
 [deps.install_method]
 ubuntu = "sudo apt install copyq" # might need to use ppa if this version is too low
 manjaro = "sudo pacman -S copyq"

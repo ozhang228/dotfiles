@@ -5,6 +5,7 @@ supported_distros = ["mac", "manjaro", "ubuntu"]
 
 [[deps]]
 id = "node_version_manager"
+check = "test -d ~/.nvm"
 [deps.install_method]
 manjaro = "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
 ubuntu = "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
@@ -12,6 +13,7 @@ mac = "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh 
 
 [[deps]]
 id = "node_js"
+check = "command -v node"
 [deps.install_method]
 manjaro = "nvm install --lts"
 ubuntu = "nvm install --lts"
@@ -19,6 +21,7 @@ mac = "nvm install --lts"
 
 [[deps]]
 id = "vivaldi"
+check = "command -v vivaldi"
 [deps.install_method]
 manjaro = "sudo pacman -S vivaldi"
 ubuntu = "echo 'install vivaldi manually or just use chrome'"

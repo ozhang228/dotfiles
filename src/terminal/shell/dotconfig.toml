@@ -8,6 +8,7 @@ dst = "~/.config/fish"
 
 [[deps]]
 id = "default_shell"
+check = "echo $SHELL | grep -q fish"
 [deps.install_method]
 ubuntu = "chsh -s $(which fish)"
 manjaro = "chsh -s $(which fish)"

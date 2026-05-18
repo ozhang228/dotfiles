@@ -12,56 +12,66 @@ dst = "~/.config/hyprpanel"
 
 [[deps]]
 id = "hyprland"
+check = "command -v hyprland"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprland"
 
-
 [[deps]]
 id = "hyprcursor"
+check = "pacman -Q hyprcursor"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprcursor"
 
 [[deps]]
 id = "hyprpaper"
+check = "command -v hyprpaper"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprpaper"
 
 [[deps]]
 id = "xdg-desktop-portal-hyprland"
+check = "pacman -Q xdg-desktop-portal-hyprland"
 [deps.install_method]
 manjaro = "sudo pacman -S xdg-desktop-portal-hyprland"
 
 [[deps]]
 id = "xdg-desktop-portal-gtk"
+check = "pacman -Q xdg-desktop-portal-gtk"
 [deps.install_method]
 manjaro = "sudo pacman -S xdg-desktop-portal-gtk"
 
 [[deps]]
 id = "hypridle"
+check = "command -v hypridle"
 [deps.install_method]
 manjaro = "sudo pacman -S hypridle"
 
 [[deps]]
 id = "hyprlock"
+check = "command -v hyprlock"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprlock"
 
 [[deps]]
 id = "hyprpanel"
+check = "command -v ags"
 [deps.install_method]
 manjaro = "yay -S ags-hyprpanel-git"
 
 [[deps]]
 id = "cursor_theme"
+check = "pacman -Q bibata-cursor-theme"
 [deps.install_method]
 manjaro = "yay -S bibata-cursor-theme"
 
 [[deps]]
 id = "hyprshot"
+check = "command -v hyprshot"
 [deps.install_method]
 manjaro = "yay -S hyprshot"
 
 [[deps]]
 id = "hyprpolkitagent"
+check = "pacman -Q hyprpolkitagent"
 [deps.install_method]
 manjaro = "sudo pacman -S hyprpolkitagent"

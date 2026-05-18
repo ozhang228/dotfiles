@@ -4,5 +4,6 @@ supported_distros = ["manjaro"]
 
 [[deps]]
 id = "yay"
+check = "command -v yay"
 [deps.install_method]
 manjaro = "sh ~/dotfiles/src/linux/manjaro/yay_install.sh"

@@ -4,6 +4,7 @@ supported_distros = ["manjaro", "ubuntu", "mac"]
 
 [[deps]]
 id = "fastfetch"
+check = "command -v fastfetch"
 [deps.install_method]
 manjaro = "sudo pacman -S fastfetch"
 mac = "brew install --cask fastfetch"

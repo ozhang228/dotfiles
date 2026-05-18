@@ -8,6 +8,7 @@ dst = "~/.config/starship"
 
 [[deps]]
 id = "starship"
+check = "command -v starship"
 [deps.install_method]
 ubuntu = "sh ~/dotfiles/terminal/starship/ubuntu_install.sh"
 manjaro = "sudo pacman -S starship"

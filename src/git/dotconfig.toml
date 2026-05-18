@@ -12,6 +12,7 @@ dst = "~/.gitconfig"
 
 [[deps]]
 id = "lazygit"
+check = "command -v lazygit"
 [deps.install_method]
 ubuntu = "sh ~/dotfiles/git/lazygit/ubuntu_install.sh"
 manjaro = "sudo pacman -S lazygit"

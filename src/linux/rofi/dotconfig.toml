@@ -4,6 +4,7 @@ supported_distros = ["manjaro", "ubuntu"]
 
 [[deps]]
 id = "rofi"
+check = "command -v rofi"
 [deps.install_method]
 manjaro = "sudo pacman -S rofi-wayland"
 ubuntu = "sudo apt install rofi"

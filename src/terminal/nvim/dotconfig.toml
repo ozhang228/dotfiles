@@ -12,6 +12,7 @@ key = "AI_CLI_CMD"
 
 [[deps]]
 id = "nvim"
+check = "command -v nvim"
 [deps.install_method]
 ubuntu = "sh ~/dotfiles/terminal/nvim/ubuntu_install.sh"
 manjaro = "sudo pacman -S neovim"
@@ -19,6 +20,7 @@ mac = "brew install neovim"
 
 [[deps]]
 id = "ripgrep"
+check = "command -v rg"
 [deps.install_method]
 ubuntu = "sudo apt install ripgrep"
 manjaro = "sudo pacman -S ripgrep"
@@ -26,6 +28,7 @@ mac = "brew install ripgrep"
 
 [[deps]]
 id = "fzf"
+check = "command -v fzf"
 [deps.install_method]
 ubuntu = "sudo apt install fzf"
 manjaro = "sudo pacman -S fzf"
@@ -33,6 +36,7 @@ mac = "brew install fzf"
 
 [[deps]]
 id = "gh"
+check = "command -v gh"
 [deps.install_method]
 ubuntu = "sudo apt install gh"
 manjaro = "sudo pacman -S github-cli"
@@ -40,6 +44,7 @@ mac = "brew install gh"
 
 [[deps]]
 id = "clang-tidy"
+check = "command -v clang-tidy"
 [deps.install_method]
 ubuntu = "sudo apt install clang-tools"
 manjaro = "sudo pacman -S clang"
@@ -47,6 +52,7 @@ mac = "brew install llvm"
 
 [[deps]]
 id = "treesitter-cli"
+check = "command -v tree-sitter"
 [deps.install_method]
 ubuntu = "cargo install tree-sitter-cli"
 manjaro = "cargo install tree-sitter-cli"
@@ -54,6 +60,7 @@ mac = "cargo install tree-sitter-cli"
 
 [[deps]]
 id = "mmdc"
+check = "command -v mmdc"
 [deps.install_method]
 ubuntu = "npm install -g @mermaid-js/mermaid-cli"
 manjaro = "npm install -g @mermaid-js/mermaid-cli"
@@ -61,6 +68,7 @@ mac = "npm install -g @mermaid-js/mermaid-cli"
 
 [[deps]]
 id = "clipboard"
+check = "command -v xclip || command -v pbcopy"
 [deps.install_method]
 ubuntu = "sudo apt install xclip"
 manjaro = "sudo pacman -S xclip"
@@ -68,6 +76,7 @@ mac = "echo 'Built-in pbcopy/pbpaste'"
 
 [[deps]]
 id = "nerd_font"
+check = "fc-list | grep -qi JetBrains"
 [deps.install_method]
 ubuntu = "mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts && curl -L https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip -o jbm.zip && unzip -o jbm.zip && rm jbm.zip && fc-cache -f -v"
 manjaro = "sudo pacman -S ttf-jetbrains-mono"
@@ -75,6 +84,7 @@ mac = "brew tap homebrew/cask-fonts && brew install font-jetbrains-mono"
 
 [[deps]]
 id = "curl"
+check = "command -v curl"
 [deps.install_method]
 ubuntu = "sudo apt install curl"
 manjaro = "sudo pacman -S curl"
@@ -82,6 +92,7 @@ mac = "brew install curl"
 
 [[deps]]
 id = "jq"
+check = "command -v jq"
 [deps.install_method]
 ubuntu = "sudo apt install jq"
 manjaro = "sudo pacman -S jq"
@@ -89,6 +100,7 @@ mac = "brew install jq"
 
 [[deps]]
 id = "luarocks"
+check = "command -v luarocks"
 [deps.install_method]
 ubuntu = "sudo apt install luarocks"
 manjaro = "sudo pacman -S luarocks"
@@ -96,6 +108,7 @@ mac = "brew install luarocks"
 
 [[deps]]
 id = "tectonic"
+check = "command -v tectonic"
 [deps.install_method]
 ubuntu = "sudo snap install tectonic"
 manjaro = "sudo pacman -S tectonic"

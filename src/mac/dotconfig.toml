@@ -4,6 +4,7 @@ supported_distros = ["mac"]
 
 [[deps]]
 id = "aerospace"
+check = "command -v aerospace"
 [deps.install_method]
 mac = "brew install --cask nikitabobko/tap/aerospace"
 

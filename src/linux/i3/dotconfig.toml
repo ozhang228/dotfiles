@@ -8,26 +8,30 @@ dst = "~/.config/i3"
 
 [[deps]]
 id = "i3"
+check = "command -v i3"
 [deps.install_method]
 ubuntu = "sudo apt install i3"
 
 [[deps]]
 id = "alsa-utils"
+check = "command -v amixer"
 [deps.install_method]
 ubuntu = "sudo apt install alsa-utils"
 
 [[deps]]
 id = "flameshot"
+check = "command -v flameshot"
 [deps.install_method]
 ubuntu = "sudo apt install flameshot"
 
-
 [[deps]]
 id = "google-chrome"
+check = "command -v google-chrome || command -v google-chrome-stable"
 [deps.install_method]
 ubuntu = "sudo apt install google-chrome"
 
 [[deps]]
 id = "autorandr"
+check = "command -v autorandr"
 [deps.install_method]
 ubuntu = "sudo apt install autorandr"

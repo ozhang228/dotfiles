@@ -8,6 +8,7 @@ dst = "~/.config/lsd"
 
 [[deps]]
 id = "lsd"
+check = "command -v lsd"
 [deps.install_method]
 manjaro = "sudo pacman -S lsd"
 ubuntu = "sudo apt install lsd"

@@ -4,16 +4,19 @@ supported_distros = ["ubuntu"]
 
 [[deps]]
 id = "dunst"
+check = "command -v dunst"
 [deps.install_method]
 ubuntu = "sudo apt install dunst"
 
 [[deps]]
 id = "feh"
+check = "command -v feh"
 [deps.install_method]
 ubuntu = "sudo apt install feh"
 
 [[deps]]
 id = "picom"
+check = "command -v picom"
 [deps.install_method]
 ubuntu = "sudo apt install picom"
 
