@@ -100,17 +100,6 @@
         ]
       }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_posttooluse.sh"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "hooks": [
