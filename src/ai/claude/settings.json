@@ -63,6 +63,8 @@
       "Bash(make *)",
       "Bash(pytest)",
       "Bash(pytest *)",
+      "Bash(uv run pytest *)",
+      "Bash(uv run pytest)",
       "Bash(sed *)",
       "Skill"
     ],

@@ -42,5 +42,7 @@ You MUST create a task for each of these items and complete them in order:
 - Write design doc - save to `cwd/docs/DESIGN.md`
 - Spec self-review - quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 - User reviews written spec - ask user to review the spec file before proceeding
-- Transition to implementation with a plan — see the `writing-plans` doc in `references/writing-plans.md` for what it produces and the execution options it will offer
+- Transition to implementation with a plan — see the `writing-plans` doc in `references/writing-plans.md` for what it produces
   - start with the design doc previously made and the tests that were previously defined and approved
+  - Once the plan is saved, **default to inline execution one task at a time** and just start working on Task 1. Do not poll the user with AskUserQuestion about execution mode — they have already approved the plan, and Oscar in particular handles all commits himself between tasks. Only deviate from inline-one-at-a-time if the user explicitly asks for a different mode (subagent-driven, all-at-once, etc.) or if the plan is large enough that fresh subagents per task are obviously needed.
+  - **Run each task end-to-end without pausing in the middle.** Don't stop after writing the failing test to ask if you should implement, and don't stop after implementing to ask if you should run tests. The natural pause point is after the full task is green (test red → implement → test green → make fmt/check/test passing). Hand off for user review there, not between sub-steps.
