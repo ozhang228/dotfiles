@@ -10,6 +10,16 @@ allowed-tools: Read, Grep, Glob
 - Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
 - Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 
+## Challenge the premise first
+
+Before going deep on design, sanity-check the work itself. The user often has a thread to pull but hasn't decided whether the work is worth doing — your job is to surface that, not to assume it.
+
+- Is the request redundant with an existing system? (e.g. "double-alert in addition to the upstream alert" — what failure mode does the new copy actually catch?)
+- Is the user's framing the right one, or is there a simpler interpretation of their goal?
+- Is there an existing solution they don't know about?
+
+If the premise looks shaky, raise it early — before clarifying questions, not after design. A short "before we go deep, here's what I'd push back on…" is cheaper than a full design that ends with the user saying "actually, should we even do this?"
+
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
 - Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
@@ -25,7 +35,7 @@ allowed-tools: Read, Grep, Glob
 
 You MUST create a task for each of these items and complete them in order:
 
-- Explore project context - check files
+- Explore project context - check files. **Look for sibling/reference implementations** in this repo or related repos (e.g. how does `vol_surface` / `product_surface` / `rv-utils` solve the same shape of problem?). Reading them up front prevents reinventing patterns. **But do not accept them at face value** — for each pattern you'd borrow, ask "why did they do it that way, and does that reason apply here?" If the answer is "because X does it this way," that's not a justification. Expect to argue the pattern's merits before adopting it.
 - Ask clarifying questions - one at a time, understand purpose/constraints/success criteria
 - Present suggested approach - talk about tradeoffs and if there are any other possible approaches that have different tradeoffs
 - Define expected behaviors as tests - focus on **core behaviors only**: what must be true for the feature to be correct? Aim for 3–5 entries that would catch a broken implementation. Skip edge cases and style assertions unless the feature is inherently complex (stateful multi-step flows, parsing, data transformations). Use `references/testing.md` format. Get user approval before proceeding — this approval can be combined with the "transition to implementation" step if the list is short and uncontroversial.
