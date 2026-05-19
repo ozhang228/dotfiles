@@ -111,6 +111,7 @@ This applies during code review, when exploring a new codebase, and when Oscar a
 
 ### Avoid
 
+- Compound bash commands chained with `&&` or `;`: run each as a separate Bash tool call so existing permission allowlists apply per-command. Pipes (`|`) are fine — that's a single command. Example: instead of `make fmt && make check && pytest`, make three separate Bash calls.
 - Comments: code should be self-documenting (only add if asked)
 - Global state: pass dependencies explicitly
 - Tests relying on a live-system or file system
