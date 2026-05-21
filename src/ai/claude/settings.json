@@ -106,6 +106,16 @@
         ]
       }
     ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_notification.sh"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
