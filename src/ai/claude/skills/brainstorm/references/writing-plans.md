@@ -5,9 +5,9 @@ When transitioning from brainstorm to implementation, invoke the `writing-plans`
 ## What the plan contains
 
 - **File structure** — exact paths for files to create or modify, locked in before tasks are written
-- **TDD tasks** — each task follows: write failing test → run to confirm fail → implement → run to confirm pass → commit
+- **TDD tasks** — each task follows: write failing test → run to confirm fail → implement → run to confirm pass. Do NOT include "stop for user review" between tasks — the default is to run the full plan end-to-end with a single review at the end. The user handles all commits, so never include commit steps in the plan.
 - **No placeholders** — every step has actual code, exact commands, and expected output
-- Principles: DRY, YAGNI, TDD, frequent commits
+- Principles: DRY, YAGNI, TDD
 
 ## Where plans are saved
 

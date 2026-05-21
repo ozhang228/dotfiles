@@ -49,5 +49,7 @@ At the end of this, form an answer to "The PR is solving X" and put that in the 
   - **Incorrect:** logic produces wrong result
   - **Model:** data/modeling approach doesn't make sense
   - **Nit:** style issue (non-functional)
-- After writing the file, present comments to the user **one at a time** in the chat. Include the `file_path:line_number` reference at the top of each comment. After each comment, wait for a response before presenting the next.
+- After writing the file, present comments to the user **one at a time** in the chat. Each comment must start with `**Comment X of N**` so the user knows how many to expect. Include the `file_path:line_number` reference at the top. After each comment, wait for a response before presenting the next.
+- **When the user accepts a comment that proposes a concrete change** (e.g., "yeah let's do that" / "ok" on a comment with old/new code blocks), apply the change before presenting the next comment. Don't advance silently. Acceptance of a structural suggestion is a fix-now signal.
+- **When the user redirects mid-walkthrough** to make a code change unrelated to the comment in flight, after applying the redirected change, refresh the saved review file at `./tmp/review-<branch-name>.md` so it tracks current code state. Don't silently continue with stale comments.
 

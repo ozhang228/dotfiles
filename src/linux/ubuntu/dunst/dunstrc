@@ -54,3 +54,7 @@
 [claude_code]
     summary = "Claude Code"
     script = ~/.config/dunst/play_sound.sh
+
+[claude_code_permission]
+    summary = "Claude Code (waiting)"
+    script = ~/.config/dunst/play_sound_permission.sh
