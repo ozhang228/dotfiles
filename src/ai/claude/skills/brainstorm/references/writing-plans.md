@@ -1,6 +1,6 @@
 # Writing Plans
 
-When transitioning from brainstorm to implementation, invoke the `writing-plans` skill. It produces a step-by-step plan for an engineer with zero codebase context.
+Format and rules for the implementation plan produced at the end of brainstorming. The plan is a step-by-step document for an engineer with zero codebase context.
 
 ## What the plan contains
 

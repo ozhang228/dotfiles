@@ -23,7 +23,15 @@ A skill needs attention when any of these fail consistently.
 
 ### 1. Collect observations
 
-Pull saved memory observations (`skill-observation:` entries) from the memory directory. Also reflect on the current conversation: did the user correct a skill's output, bypass a skill manually, or encounter a gap the skill didn't cover?
+Pull saved memory observations across **all project memory directories**:
+
+```
+find ~/.claude/projects -name 'skill_observation*' -type f
+```
+
+Observations live in per-project (`~/.claude/projects/-home-ozhang-*/memory/`) and shared (`~/.claude/projects/-shared-*/memory/`) dirs — checking only the current project's memory misses ones logged elsewhere.
+
+Also reflect on the current conversation: did the user correct a skill's output, bypass a skill manually, or encounter a gap the skill didn't cover?
 
 ### 2. Inventory all skills
 
@@ -33,10 +41,11 @@ List every skill in `~/.claude/skills/`. For each, read its `SKILL.md` and note:
 - Whether its workflow/references are complete or have placeholders
 - Whether the trigger condition matches how it's actually being invoked
 - Whether it passes the effectiveness criteria above
+- **Whether it's user-modifiable.** Skills under `~/.claude/skills/` (symlinked from `~/dotfiles/src/ai/claude/skills/`) are editable. Built-in / plugin skills (e.g. `init`, `review`, `security-review`) are flag-only — observations targeting them can be surfaced but not fixed.
 
 ### 3. Cross-check observations against skills
 
-For each observation, identify which skill it belongs to (or confirm no skill covers it). Build a map:
+For each observation, identify which skill it belongs to (or confirm no skill covers it). Mark each as **editable** or **flag-only** based on step 2. Build a map:
 
 ```
 skill-name → [observation 1, observation 2, ...]

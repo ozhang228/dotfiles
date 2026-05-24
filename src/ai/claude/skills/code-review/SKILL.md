@@ -24,7 +24,7 @@ Run `! pr-languages` first to identify which languages are in the diff, then loa
 ### Understanding
 
 1. **Check the branch is up to date with the base before diffing.** Run `git -C <repo> merge-base --is-ancestor <base> HEAD` (or `git -C <repo> log --oneline <base> ^HEAD | head`) to see if the base has commits the branch is missing. If the branch is behind, **ask the prompter** whether to merge the base in before reviewing. Diffing against a stale branch surfaces changes from the base as if they belong to the PR — a common false-positive that wastes review time.
-2. Run `! pr-languages` — this is a custom script that computes which languages are changed vs the merge base and tells you which language review skills to invoke (e.g. `python-review`, `typescript-review`). Load the relevant references from the table above.
+2. Run `! pr-languages` — this is a custom script that computes which languages are changed vs the merge base. Use the output to load the relevant language references from the table above (`references/python.md`, `references/typescript.md`).
 3. Do a git diff against master (unless another branch is specified).
 4. Read full files and related files for context.
 5. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
