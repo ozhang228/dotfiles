@@ -9,10 +9,13 @@ return {
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "tex",
       callback = function(ev)
-        local map = function(lhs, rhs, desc) vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, desc = desc }) end
-        map("<localleader>m", "nop", "LaTeX (math)")
-        map("<localleader>mc", "<cmd>VimtexCompile<cr>", "Compile (toggle)")
-        map("<localleader>mv", "<cmd>VimtexView<cr>", "View PDF")
+        require("which-key").add({
+          buffer = ev.buf,
+          { "<localleader>m", group = "LaTeX" },
+          { "<localleader>mc", "<cmd>VimtexCompile<cr>", desc = "Compile (toggle)" },
+          { "<localleader>mv", "<cmd>VimtexView<cr>", desc = "View PDF" },
+          { "<localleader>me", "<cmd>VimtexErrors<cr>", desc = "View Errors" },
+        })
       end,
     })
   end,
