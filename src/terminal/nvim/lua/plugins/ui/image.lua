@@ -12,4 +12,11 @@ return {
       },
     },
   },
+  config = function(_, opts)
+    require("snacks").setup(opts)
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "tex",
+      callback = function(ev) vim.b[ev.buf].snacks_image_attached = true end,
+    })
+  end,
 }
