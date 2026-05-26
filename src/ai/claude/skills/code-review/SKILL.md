@@ -34,22 +34,22 @@ At the end of this, form an answer to "The PR is solving X" and put that in the 
 ### Substantive Concerns
 
 - Find logic that may be wrong and provide explicit failure cases / suggestions on how to fix. Phrase the suggestions as old code: <code wrapped in code `> \n new code: <code wrapped in code `>
-- Evaluate the modeling and data approach for the problem that is being solved. Challenge implicit assumptions
+- **Verify the bug actually exists before writing it up.** Re-trace the code path and articulate a concrete input that triggers the wrong behavior. If you can't construct a failure case, the bug isn't real: drop it, or downgrade to a question if you genuinely don't understand the code. Suspected-but-unverified bugs are the top source of bad review feedback.
+- Evaluate the modeling and data approach for the problem that is being solved. Challenge implicit assumptions.
 
 ### Nits
 
-- Code clarity, naming, conventions, dead code
+- Code clarity, naming, conventions, dead code.
 
 ## Output Format
 
 - Write the full review to a file: `./tmp/review-<branch-name>.md`
-- Use a heading: `# <file_path>:<line_number>` with numbered review comments under each file
-- Every comment must be labeled:
-  - **Unclear:** naming/control flow unclear
-  - **Incorrect:** logic produces wrong result
-  - **Model:** data/modeling approach doesn't make sense
-  - **Nit:** style issue (non-functional)
-- After writing the file, present comments to the user **one at a time** in the chat. Each comment must start with `**Comment X of N**` so the user knows how many to expect. Include the `file_path:line_number` reference at the top. After each comment, wait for a response before presenting the next.
+- The review file has two top-level sections: `## Bugs` and `## Nits`. They do not mix.
+  - **Bugs**: anything that could produce wrong behavior or wrong design. Labels within: `**Incorrect:**` (logic produces wrong result), `**Model:**` (data/modeling approach doesn't make sense).
+  - **Nits**: non-functional. Labels within: `**Unclear:**` (naming/control flow unclear), `**Nit:**` (style).
+- Under each section, group comments by file with a sub-heading: `### <file_path>:<line_number>` and number comments under each file.
+- **Every comment must demand a response.** It must either propose a concrete change (old/new code blocks) or ask a specific question the author needs to answer. Do **not** write observational "FYI / this is happening / not a problem but be aware" comments. If there's no ask and no risk worth surfacing, drop it.
+- After writing the file, present comments to the user **one at a time** in the chat, **bugs first, then nits**. Each comment must start with `**Comment X of N**` so the user knows how many to expect. Include the `file_path:line_number` reference at the top. After each comment, wait for a response before presenting the next.
 - **When the user accepts a comment that proposes a concrete change** (e.g., "yeah let's do that" / "ok" on a comment with old/new code blocks), apply the change before presenting the next comment. Don't advance silently. Acceptance of a structural suggestion is a fix-now signal.
 - **When the user redirects mid-walkthrough** to make a code change unrelated to the comment in flight, after applying the redirected change, refresh the saved review file at `./tmp/review-<branch-name>.md` so it tracks current code state. Don't silently continue with stale comments.
 
