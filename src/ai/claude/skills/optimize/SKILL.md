@@ -7,6 +7,8 @@ description: Guide a performance optimization session. TRIGGER when the user men
 
 You do not touch code until you have a profile that identifies the bottleneck.
 
+**Scope: this skill is Python-only.** The tooling (viztracer, memray, see `references/profiling.md`) profiles Python processes. If the suspected bottleneck is in TypeScript / browser code, do NOT load the profiling reference — say so and pivot to Chrome DevTools (Performance tab for CPU, Memory tab for heap snapshots). Server-side Node has its own profilers (`node --prof`, clinic.js). Only continue with the workflow below when the target is a Python process.
+
 **Profile against production, not synthetic inputs.** Spin up real clients with production config, feed them production-representative data, and time the full operation end-to-end. A microbenchmark on an isolated function misses I/O, serialization, cache effects, and integration overhead that dominate real-world latency. Only drill into a subfunction after the end-to-end measurement identifies it as the hotspot.
 
 ## Reference Guide

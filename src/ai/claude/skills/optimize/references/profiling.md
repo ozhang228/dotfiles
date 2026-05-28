@@ -15,8 +15,12 @@ Profile as close to production as possible. A benchmark that doesn't reflect pro
 ```bash
 pip install viztracer
 
-# replace python3 with viztracer; --min_duration prevents huge dump files
+# --min_duration prevents huge dump files. viztracer's own -m runs the module,
+# so there is NO separate `python -m` — that form is invalid.
 viztracer --min_duration 0.2ms -m my.module.main path/to/config.json
+
+# in a uv project, prefix with `uv run` and keep viztracer's -m (NOT `uv run python -m`):
+uv run viztracer --min_duration 0.2ms -m my.module.main path/to/config.json
 
 # visualize
 vizviewer result.json   # opens browser on port 9001

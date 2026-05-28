@@ -21,6 +21,12 @@ return {
       jump = {
         jumplist = false,
       },
+      transform = function(item)
+        local name = item.file and vim.fn.fnamemodify(item.file, ":t") or item.text or ""
+        if name:sub(1, 1) == "_" then
+          item.score_add = (item.score_add or 0) - 20
+        end
+      end,
     },
   },
 }
