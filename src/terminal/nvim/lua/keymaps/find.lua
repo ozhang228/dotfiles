@@ -21,11 +21,6 @@ return {
     desc = "Buffers",
   },
   {
-    "<leader>fw",
-    function() Snacks.picker.grep() end,
-    desc = "Grep Word",
-  },
-  {
     "<leader>fW",
     function() Snacks.picker.grep_word() end,
     desc = "Grep Word Under Cursor",

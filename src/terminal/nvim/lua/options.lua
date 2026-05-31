@@ -10,6 +10,7 @@ vim.o.tabstop = 4
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
 vim.o.expandtab = true
+vim.o.autoindent = true
 vim.o.smartindent = true
 
 -- Sync clipboard between OS and Neovim.
@@ -86,3 +87,4 @@ vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,
 vim.o.showtabline = 0
 
 vim.o.swapfile = false
+vim.o.linebreak = true
