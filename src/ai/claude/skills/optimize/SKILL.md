@@ -40,6 +40,8 @@ Based on the bottleneck, form one concrete hypothesis before touching code:
 
 If you can't predict the improvement, your hypothesis is too vague. Sharpen it.
 
+**Reason through the allocation/call model before claiming a change is faster.** A change that "looks cleaner" is not automatically faster, and can regress badly. Real example: replacing two list comprehensions with `zip(*large_seq, strict=True)` regressed 92ms → 500ms, because `zip(*seq)` splats the whole sequence as positional args, copying all of it at call time. Never present a perf-motivated change as faster on intuition — either profile it (step 5) or say "this might be cleaner but I haven't profiled it."
+
 ### 4. Change one thing
 
 Make exactly one change. Bundling multiple changes means you can't attribute the improvement to any one of them. If you're tempted to batch, do them in sequence with a re-profile between each.

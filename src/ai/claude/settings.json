@@ -120,6 +120,6 @@
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true
   },
-  "theme": "auto",
-  "model": "opus[1m]"
+  "effortLevel": "high",
+  "theme": "auto"
 }

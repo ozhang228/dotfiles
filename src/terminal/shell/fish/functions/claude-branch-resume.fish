@@ -1,4 +1,10 @@
-function claude-branch-resume --description "Resume (or create) a Claude Code session bound to the current git branch"
+function claude-branch-resume --description "Resume (or create) a Claude Code session bound to the current git branch. Use --fresh to delete the existing session and start clean."
+    set -l fresh 0
+    if set -l idx (contains -i -- --fresh $argv)
+        set fresh 1
+        set -e argv[$idx]
+    end
+
     set -l branch (git branch --show-current 2>/dev/null)
     if test -z "$branch"
         echo "claude-branch-resume: not on a git branch" >&2
@@ -27,6 +33,21 @@ function claude-branch-resume --description "Resume (or create) a Claude Code se
             rm -rf $project_dir
         end
         ln -sfn $shared_dir $project_dir
+    end
+
+    # Check if Stop hook recorded a newer session for this branch (e.g. after /clear)
+    set -l branch_key (printf '%s:%s' "$remote_key" "$branch" | sha1sum | string sub -l 12)
+    set -l tracked_session (cat ~/.claude/branch-sessions/$branch_key 2>/dev/null)
+    if test -n "$tracked_session"
+        set session_id $tracked_session
+    end
+
+    if test $fresh -eq 1
+        rm -f $shared_dir/$session_id.jsonl
+        rm -f ~/.claude/branch-sessions/$branch_key
+        # Reset to the deterministic UUID so --session-id creates a fresh session
+        set session_id (uuidgen --sha1 --namespace @url --name "$remote:$branch")
+        echo "Deleted session for $branch — starting fresh"
     end
 
     set -l existing (find $shared_dir -maxdepth 1 -name "$session_id.jsonl" -print -quit 2>/dev/null)

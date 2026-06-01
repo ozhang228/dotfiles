@@ -10,6 +10,16 @@ cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty' 2>/dev/nul
 dir=$(basename "$cwd")
 branch=$(git -C "$cwd" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')
 
+# Track the actual session ID per branch so claude-branch-resume picks up new
+# sessions created by /clear rather than resuming the pre-clear session.
+session_id=$(echo "$input" | jq -r '.session_id // empty' 2>/dev/null || echo '')
+if [ -n "$session_id" ] && [ -n "$branch" ]; then
+    remote=$(git -C "$cwd" config --get remote.origin.url 2>/dev/null || echo "$cwd")
+    branch_key=$(printf '%s:%s' "$remote" "$branch" | sha1sum | cut -c1-12)
+    mkdir -p ~/.claude/branch-sessions
+    echo "$session_id" > ~/.claude/branch-sessions/"$branch_key"
+fi
+
 # Icons — same codepoints as status line
 i_folder=$'\U000F024B'   # 󰉋 nf-md-folder
 i_branch=$''       # U+F418 git branch (explicit codepoint)

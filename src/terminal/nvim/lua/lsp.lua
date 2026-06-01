@@ -12,7 +12,9 @@ for _, f in pairs(vim.api.nvim_get_runtime_file("lsp/*.lua", true)) do
 end
 vim.lsp.enable(lsp_configs)
 
-vim.lsp.inlay_hint.enable(true)
+-- Too noisy
+vim.lsp.inlay_hint.enable(false)
+
 local max_len = 30
 local orig_handler = vim.lsp.handlers["textDocument/inlayHint"]
 vim.lsp.handlers["textDocument/inlayHint"] = function(err, result, ctx, config)
