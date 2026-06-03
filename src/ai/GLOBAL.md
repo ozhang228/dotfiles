@@ -7,16 +7,19 @@ If the user asks a pure Q&A question about a convention without editing any file
 
 ## Skill Observation (passive, every session)
 
-Throughout every session, watch for these signals and save them to memory immediately as `skill-observation: <skill-name or "new"> — <what happened>`:
+Save a memory entry only when **all three** are true:
+1. There is a concrete editable target (a skill file, a rules file, GLOBAL.md) — not harness/plugin behavior you can't change
+2. The issue has recurred or is likely to recur — not a one-off
+3. The fix wasn't applied immediately — if you fixed it on the spot, no entry needed (apply-and-done beats accumulate-and-review)
 
+Signals worth recording when the bar is met:
 - User corrected or overrode a skill's output
 - User did something manually that an existing skill should have handled
-- A skill fired on the wrong trigger (false positive)
+- A skill fired on the wrong trigger (false positive) — only if the trigger is in an editable file
 - A skill failed to fire when it should have (false negative)
-- An instruction in a skill required repeated clarification
 - A task recurred across sessions with no skill covering it (new skill candidate)
 
-These are consumed by the `skill-audit` skill to continuously improve skills over time.
+These are consumed by the `skill-audit` skill. Keep the observation count low — a short list of real, actionable items beats a log of every friction point.
 
 ---
 

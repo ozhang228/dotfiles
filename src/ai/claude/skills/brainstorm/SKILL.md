@@ -1,6 +1,6 @@
 ---
 name: brainstorm
-description: You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.
+description: You MUST use this before any creative work — creating features, building components, or adding functionality — when there is real design space to explore. Skip when plan mode is already driving a design conversation, when the user is directly steering a concrete change, or when the task is a mechanical fix (type errors, build fixes, config edits with no design choices).
 allowed-tools: Read, Grep, Glob
 ---
 
