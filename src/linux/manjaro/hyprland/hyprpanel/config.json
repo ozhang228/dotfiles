@@ -30,30 +30,42 @@
       "left": [
         "dashboard",
         "workspaces",
-        "windowtitle"
+        "windowtitle",
+        "network",
+        "bluetooth"
       ],
       "middle": [
-        "media"
+        "clock"
       ],
       "right": [
+        "systray",
+        "cpu",
+        "ram",
         "volume",
-        "clock",
-        "notifications"
+        "battery",
+        "notifications",
+        "power"
       ]
     },
     "2": {
       "left": [
         "dashboard",
         "workspaces",
-        "windowtitle"
+        "windowtitle",
+        "network",
+        "bluetooth"
       ],
       "middle": [
-        "media"
+        "clock"
       ],
       "right": [
+        "systray",
+        "cpu",
+        "ram",
         "volume",
-        "clock",
-        "notifications"
+        "battery",
+        "notifications",
+        "power"
       ]
     }
   },
