@@ -1,4 +1,5 @@
 set -gx AI_CLI_CMD "claude-branch-resume || claude"
+set -gx ANTHROPIC_MODEL opus[1m]
 
 # Load local Claude credentials (not in git — create ~/.local/share/claude_credentials.fish)
 test -f ~/.local/share/claude_credentials.fish && source ~/.local/share/claude_credentials.fish
