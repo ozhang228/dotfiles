@@ -15,10 +15,17 @@ return {
       rust = { "rustfmt" },
       -- Misc
       json = { "prettierd", "prettier", stop_after_first = true },
+      markdown = { "prettierd", "prettier", stop_after_first = true },
     },
-    format_on_save = {
-      timeout_ms = 500,
-      lsp_format = "fallback",
-    },
+    format_on_save = function(bufnr)
+      local path = vim.api.nvim_buf_get_name(bufnr)
+      if vim.bo[bufnr].filetype == "markdown" and not path:match("/forge/") then
+        return nil
+      end
+      return {
+        timeout_ms = 500,
+        lsp_format = "fallback",
+      }
+    end,
   },
 }
