@@ -115,7 +115,7 @@ This applies during code review, when exploring a new codebase, and when Oscar a
 ### Avoid
 
 - Compound bash commands chained with `&&` or `;`: run each as a separate Bash tool call so existing permission allowlists apply per-command. Pipes (`|`) are fine — that's a single command. Example: instead of `make fmt && make check && pytest`, make three separate Bash calls.
-- Comments: code should be self-documenting (only add if asked)
+- Comments: never write them. Code can always be made self-evident, so make it self-evident instead (rename to intent-revealing names, extract well-named helpers/constants, restructure). The only exceptions are module/function docstrings and a genuinely irreducible "why" that the code cannot express (a non-obvious external constraint, a workaround for an upstream bug). If you catch yourself writing a comment to explain *what* code does, that's a signal to rewrite the code, not annotate it.
 - Global state: pass dependencies explicitly
 - Tests relying on a live-system or file system
 - String parsing
