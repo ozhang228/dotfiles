@@ -1,54 +1,80 @@
 #!/usr/bin/env bash
-# Fuzzy-pick a project directory and create-or-switch to a tmux session
-# named after it. Shows "dir [branch]" and sorts by most-recently-used
-# tmux session first.
+# Fuzzy-pick an existing tmux session or a project directory, and
+# switch-or-create a tmux session for it.
+#
+# - Existing sessions show as "name (path) [branch]".
+# - Project directories without a matching session show as "path [branch]".
+# - Entries are sorted by most-recently-active session first.
+# - ctrl-x kills the session under the cursor and refreshes the list.
 set -euo pipefail
 
-candidates=()
+SCRIPT=$(realpath "$0")
 
-for root in ~/forge ~/dotfiles; do
-    [ -d "$root" ] && candidates+=("$root")
-done
-
-if [ -d ~/drw ]; then
-    for d in ~/drw/*/; do
-        [ -d "$d" ] && candidates+=("${d%/}")
+list_entries() {
+    candidates=()
+    for root in ~/forge ~/dotfiles; do
+        [ -d "$root" ] && candidates+=("$root")
     done
+
+    if [ -d ~/drw ]; then
+        for d in ~/drw/*/; do
+            [ -d "$d" ] && candidates+=("${d%/}")
+        done
+    fi
+
+    declare -A session_activity
+    declare -A session_path
+    while IFS=$'\t' read -r name ts path; do
+        session_activity["$name"]="$ts"
+        session_path["$name"]="$path"
+    done < <(tmux list-sessions -F '#{session_name}	#{session_activity}	#{session_path}' 2>/dev/null)
+
+    cur_session=""
+    [ -n "${TMUX:-}" ] && cur_session=$(tmux display-message -p '#{session_name}')
+
+    entries=()
+    for name in "${!session_activity[@]}"; do
+        [ "$name" = "$cur_session" ] && continue
+        path="${session_path[$name]}"
+        branch=$(git -C "$path" branch --show-current 2>/dev/null || true)
+        label="$name  ($path)"
+        [ -n "$branch" ] && label="$label [$branch]"
+        entries+=("${session_activity[$name]}"$'\t'session$'\t'"$name"$'\t'"$label")
+    done
+
+    for dir in "${candidates[@]}"; do
+        name=$(basename "$dir" | tr '.:' '__')
+        [ -n "${session_activity[$name]+x}" ] && continue
+        branch=$(git -C "$dir" branch --show-current 2>/dev/null || true)
+        label="$dir"
+        [ -n "$branch" ] && label="$dir [$branch]"
+        entries+=("0"$'\t'dir$'\t'"$dir"$'\t'"$label")
+    done
+
+    printf '%s\n' "${entries[@]}" | sort -t $'\t' -k1,1 -rn
+}
+
+if [ "${1:-}" = "--list" ]; then
+    list_entries
+    exit 0
 fi
 
-cwd=$(realpath "$PWD")
-filtered=()
-for dir in "${candidates[@]}"; do
-    [ "$(realpath "$dir")" != "$cwd" ] && filtered+=("$dir")
-done
-candidates=("${filtered[@]}")
+selected=$(list_entries | fzf \
+    --delimiter $'\t' --with-nth=4 \
+    --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)")
 
-declare -A activity
-while IFS=$'\t' read -r name ts; do
-    activity["$name"]="$ts"
-done < <(tmux list-sessions -F '#{session_name}	#{session_activity}' 2>/dev/null)
+[ -z "$selected" ] && exit 0
 
-entries=()
-for dir in "${candidates[@]}"; do
-    name=$(basename "$dir" | tr '.:' '__')
-    branch=$(git -C "$dir" branch --show-current 2>/dev/null || true)
-    label="$dir"
-    [ -n "$branch" ] && label="$dir [$branch]"
-    entries+=("${activity[$name]:-0}"$'\t'"$dir"$'\t'"$label")
-done
+kind=$(printf '%s' "$selected" | cut -f2)
+key=$(printf '%s' "$selected" | cut -f3)
 
-selected_dir=$(printf '%s\n' "${entries[@]}" \
-    | sort -t $'\t' -k1,1 -rn \
-    | cut -f2- \
-    | fzf --delimiter $'\t' --with-nth=2 \
-    | cut -f1)
-
-[ -z "$selected_dir" ] && exit 0
-
-session_name=$(basename "$selected_dir" | tr '.:' '__')
-
-if ! tmux has-session -t "$session_name" 2>/dev/null; then
-    tmux new-session -d -s "$session_name" -c "$selected_dir"
+if [ "$kind" = "session" ]; then
+    session_name="$key"
+else
+    session_name=$(basename "$key" | tr '.:' '__')
+    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+        tmux new-session -d -s "$session_name" -c "$key"
+    fi
 fi
 
 if [ -n "${TMUX:-}" ]; then
