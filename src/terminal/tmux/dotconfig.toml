@@ -1,0 +1,35 @@
+[metadata]
+name = "tmux Config"
+supported_distros = ["manjaro", "ubuntu", "mac"]
+
+[[symlinks]]
+src = "~/dotfiles/src/terminal/tmux/tmux.conf"
+dst = "~/.config/tmux/tmux.conf"
+
+[[symlinks]]
+src = "~/dotfiles/src/terminal/tmux/sessionizer.sh"
+dst = "~/.config/tmux/sessionizer.sh"
+
+[[deps]]
+id = "tmux"
+check = "command -v tmux"
+[deps.install_method]
+manjaro = "sudo pacman -S tmux"
+ubuntu = "sudo apt install tmux"
+mac = "brew install tmux"
+
+[[deps]]
+id = "fzf"
+check = "command -v fzf"
+[deps.install_method]
+manjaro = "sudo pacman -S fzf"
+ubuntu = "sudo apt install fzf"
+mac = "brew install fzf"
+
+[[deps]]
+id = "tmux-tpm"
+check = "test -d ~/.config/tmux/plugins/tpm"
+[deps.install_method]
+manjaro = "bash ~/dotfiles/src/terminal/tmux/tpm_install.sh"
+ubuntu = "bash ~/dotfiles/src/terminal/tmux/tpm_install.sh"
+mac = "bash ~/dotfiles/src/terminal/tmux/tpm_install.sh"
