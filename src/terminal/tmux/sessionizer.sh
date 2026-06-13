@@ -59,9 +59,26 @@ if [ "${1:-}" = "--list" ]; then
     exit 0
 fi
 
+if [ "${1:-}" = "--preview" ]; then
+    kind="$2"
+    key="$3"
+    if [ "$kind" = "session" ]; then
+        tmux capture-pane -e -p -t "$key"
+    else
+        ls -la --color=always "$key"
+        if git -C "$key" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            echo
+            git -C "$key" log --oneline --color=always -10
+        fi
+    fi
+    exit 0
+fi
+
 selected=$(list_entries | fzf \
     --delimiter $'\t' --with-nth=4 \
-    --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)")
+    --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
+    --preview "$SCRIPT --preview {2} {3}" \
+    --preview-window right:60%)
 
 [ -z "$selected" ] && exit 0
 
