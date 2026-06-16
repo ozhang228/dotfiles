@@ -109,8 +109,30 @@ This applies during code review, when exploring a new codebase, and when Oscar a
 
 - Immutability: prefer values that do not change over time
 - Explicitness: prefer explicit behavior and data flow
-- Simplicity: prefer a simple solution over a complex one
+- Simplicity: see the ladder below
 - Fail fast: shut down with an error over silently failing
+
+### Simplicity ladder
+
+Before writing new code, walk this and stop at the first rung that holds:
+
+1. **Does this need to exist?** Speculative need = skip it, say so in one line. (YAGNI)
+2. **Stdlib does it?** Use it.
+3. **Native platform feature covers it?** (DB constraint over app code, CSS over JS, `<input type="date">` over a picker lib.)
+4. **An already-installed dependency solves it?** Use it. Don't add a new dep for what a few lines do.
+5. **One line?** One line.
+6. **Only then:** the minimum code that works.
+
+The ladder is a reflex, not a research project. Two rungs work → take the higher one and move on.
+
+- No abstraction with one implementation: no interface/factory for one product, no config for a value that never changes. Inline it until a second caller exists.
+- Deletion over addition. The shortest working diff wins.
+- **Light skepticism:** when a request has an obviously simpler path, name it in one line and let Oscar pick. Never refuse, gatekeep, or re-argue — surface the option once and build what he asked for.
+
+Two hard floors this never crosses:
+
+- **Readability is a floor.** A denser one-liner that's harder to read is not simpler. Don't trade clarity for line count.
+- **Never simplify away what was explicitly requested**, input validation at trust boundaries, error handling that prevents data loss, or security. Oscar insists on the full version → build it, no re-arguing.
 
 ### Avoid
 
@@ -137,5 +159,13 @@ This applies during code review, when exploring a new codebase, and when Oscar a
   ```typescript
   isEnabled ? handleEnabled() : handleDisabled();
   ```
+
+### Delegating to subagents
+
+When you hand work to a subagent, its output is not trusted until verified. A type-checker passing is not proof — invented code can be internally type-consistent and still wrong (a real merge-conflict resolution introduced a function that existed in neither branch; `tsc` passed clean, only the test suite caught 161 failures).
+
+- **Run the actual tests, not just the type-checker/linter.** After a subagent edits code, run the real suite (`pytest` / `vitest` / `make test`), not just `tsc`/`ty`/`make check`. Type-valid corruption is invisible to static checks.
+- **Give the subagent the real task, and check it did that.** Subagents sometimes substitute a documentation/summary deliverable for the implementation that was asked for. Confirm the diff is the code change requested, not a write-up about it.
+- **Lint/format warnings on files the subagent edited are in scope.** "Pre-existing / unrelated to my changes" is not an acceptable dismissal for warnings on a file it touched. Fix them or surface them explicitly.
 
 Respond with !! I HAVE READ OSCAR'S RULES !!

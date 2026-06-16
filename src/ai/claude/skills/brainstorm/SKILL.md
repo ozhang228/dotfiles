@@ -1,6 +1,6 @@
 ---
 name: brainstorm
-description: You MUST use this before any creative work — creating features, building components, or adding functionality — when there is real design space to explore. Skip when plan mode is already driving a design conversation, when the user is directly steering a concrete change, or when the task is a mechanical fix (type errors, build fixes, config edits with no design choices).
+description: You MUST use this before any creative work — creating features, building components, adding functionality, or building a script/tool that has real design space (e.g. "create a script that compares X against Y", "propose how we could do Z") — when there are genuine design choices to explore. Skip when plan mode is already driving a design conversation, when the user is directly steering a concrete change, when the task is a mechanical fix (type errors, build fixes, config edits with no design choices), when the user just wants to try a throwaway/experimental thing in tmp/ (not production work), or when they're asking for a context handoff/summary for another agent rather than a design.
 allowed-tools: Read, Grep, Glob
 ---
 
@@ -33,6 +33,11 @@ If the premise looks shaky, raise it early — before clarifying questions, not 
 
 - Skip brainstorm when the user is directly directing a specific change with no design space to explore ("use format X", "switch to Y", "actually do Z instead"). They've already done the design thinking. Ask a targeted question if anything is ambiguous, then make the change.
 
+## Exception: throwaway experiment or context handoff
+
+- Skip when the user just wants to *try something out* — a throwaway probe, a `tmp/` experiment, a "let me see if this works" spike with no intent to ship. Design process on a disposable experiment is friction with no payoff. If the experiment graduates to real work, re-enter the flow then.
+- Skip when the user wants a **context handoff or summary for another agent/session** ("write up what we did so another Claude can pick this up", "summarize the state for a handoff"). That's a documentation task, not a design task — produce the handoff, don't run the DESIGN.md workflow.
+
 ## References
 
 | Topic         | Reference                     | When                                      |
@@ -52,6 +57,7 @@ You MUST create a task for each of these items and complete them in order:
 - Spec self-review - quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 - User reviews written spec - ask user to review the spec file before proceeding
 - Transition to implementation with a plan — follow the format in `references/writing-plans.md` to produce a step-by-step plan
+  - **Fast-path for clearly-bounded changes:** when the implementation is small and unambiguous after design approval (e.g. one guard clause + N tests, a single-function edit, ≤2 files), skip the separate plan file — the approved design doc already captures the intent. Go straight to TDD. Reserve the full plan file for multi-step or multi-file work where the sequencing isn't obvious. When in doubt, ask "is the plan file telling the user anything the design doc didn't?" — if no, skip it.
   - start with the design doc previously made and the tests that were previously defined and approved
   - Once the plan is saved, **stop and hand off.** The user drives implementation — don't auto-execute tasks. Wait for them to direct specific steps ("go ahead with task 1", "implement this"). Only execute if they explicitly say so.
   - When executing a task: follow TDD (test red → implement → test green → make fmt/check/test passing). **Don't stop in the middle of a task** — run the full TDD cycle straight through without pausing to ask if you should continue.

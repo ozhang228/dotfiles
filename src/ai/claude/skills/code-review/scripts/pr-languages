@@ -1,17 +1,27 @@
 #!/usr/bin/env bash
 # Print which languages are changed in the current branch vs its merge base,
 # and which language-specific review skills to invoke.
-# Usage: pr-languages [base-branch]   (default: main, falls back to master)
+# Usage: pr-languages [base-branch]   (default: the remote's actual default branch)
 set -euo pipefail
 
 base="${1:-}"
 if [[ -z "$base" ]]; then
-    if git rev-parse --verify main &>/dev/null; then
+    # Ask the remote what its real default branch is, rather than guessing
+    # main-then-master — a stale local `main` ref must not win over a repo
+    # whose actual base is `master` (the false-"no changes" bug).
+    remote_head=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null || true)
+    if [[ -n "$remote_head" ]]; then
+        base="${remote_head#refs/remotes/origin/}"
+    elif git rev-parse --verify origin/main &>/dev/null; then
+        base="main"
+    elif git rev-parse --verify origin/master &>/dev/null; then
+        base="master"
+    elif git rev-parse --verify main &>/dev/null; then
         base="main"
     elif git rev-parse --verify master &>/dev/null; then
         base="master"
     else
-        echo "error: can't find main or master; pass base branch explicitly" >&2
+        echo "error: can't determine base branch; pass it explicitly" >&2
         exit 1
     fi
 fi

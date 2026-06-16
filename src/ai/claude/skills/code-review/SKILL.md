@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Orchestrates a multi-agent code review. The main thread does the one deep investigation pass, gates on architecture, then fans out to three single-purpose subagents (Correctness, Testing, Performance) before merging their findings into a structured report. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, or checking for security issues. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality. Complements specialized skills (security-reviewer, test-master).
+description: Orchestrates a multi-agent code review. The main thread does the one deep investigation pass, gates on architecture, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, or checking for security issues. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality. Complements specialized skills (security-reviewer, test-master).
 allowed-tools: Read, Grep, Glob, Bash, Agent
 user-invocable-only: true
 ---
@@ -29,11 +29,12 @@ The flow is four phases: **you alone** investigate (1) and gate on architecture 
 
 This is the single deep pass over the PR. Do all of it before spawning anything.
 
-1. **Check the branch is up to date with the base before diffing.** Run `git -C <repo> merge-base --is-ancestor <base> HEAD` (or `git -C <repo> log --oneline <base> ^HEAD | head`) to see if the base has commits the branch is missing. If the branch is behind, **ask the prompter** whether to merge the base in before reviewing. Diffing against a stale branch surfaces changes from the base as if they belong to the PR — a common false-positive that wastes review time.
-2. Run `! pr-languages` — this is a custom script that computes which languages are changed vs the merge base. Note which language references (`references/python.md`, `references/typescript.md`) apply; you'll tell the subagents which to load. Load them yourself too for the architecture verdict.
-3. Do a git diff against master (unless another branch is specified).
-4. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so you can hand them to agents without making them re-discover the diff.
-5. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
+1. **Confirm which repo and branch you're reviewing matches the user's active context.** Before anything else, check that the repo/branch you're about to diff is the one the user is actually working in. If you're reviewing a branch in one repo while the user's CWD points at a different repo or branch, any edits you make during the walkthrough land in the wrong place — surface the mismatch and confirm before proceeding.
+2. **Check the branch is up to date with the base before diffing.** Run `git -C <repo> merge-base --is-ancestor <base> HEAD` (or `git -C <repo> log --oneline <base> ^HEAD | head`) to see if the base has commits the branch is missing. If the branch is behind, **ask the prompter** whether to merge the base in before reviewing. Diffing against a stale branch surfaces changes from the base as if they belong to the PR — a common false-positive that wastes review time.
+3. Run `! pr-languages` — this is a custom script that computes which languages are changed vs the merge base (it auto-detects the repo's real base branch). Note which language references (`references/python.md`, `references/typescript.md`) apply; you'll tell the subagents which to load. Load them yourself too for the architecture verdict.
+4. Do a git diff against the base branch pr-languages resolved (unless another branch is specified).
+5. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so you can hand them to agents without making them re-discover the diff.
+6. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
 
 ### Phase 2 — Architecture gate (hard block)
 
@@ -71,6 +72,7 @@ The four agents:
 The agents find; you decide what survives.
 
 - **Validate every finding before accepting it.** Re-trace correctness claims against the code you already read. Confirm proposed tests target genuine gaps. Sanity-check that perf numbers are plausible and the benchmark measured the right thing. Drop or downgrade anything that doesn't hold up — the anti-false-positive bar lives here, in the main thread.
+- **Drop functionally-equivalent rewrites.** A subagent will sometimes propose a "tightening" or "cleaner" rewrite that compiles to the same behavior and is no clearer to read — same logic, different spelling. That's not a finding. Before accepting any simplification/nit, ask "does the new version actually change behavior, fix a bug, or materially improve readability?" If it's just an equivalent restatement, cut it. Don't relay it to the user.
 - **Dedup across agents.** If two agents flag the same line, write one comment.
 - **Add style nits yourself.** Naming, clarity, dead code, conventions. This stays a main-thread job because it needs whole-PR context the single-focus agents don't have.
 
@@ -90,4 +92,5 @@ The agents find; you decide what survives.
 - After writing the file, present comments to the user **one at a time** in the chat, in section order (**Bugs → Testing → Performance → Simplification → Nits**). Each comment must start with `**Comment X of N**` so the user knows how many to expect. Include the `file_path:line_number` reference at the top. After each comment, wait for a response before presenting the next.
 - **When the user accepts a comment that proposes a concrete change** (e.g., "yeah let's do that" / "ok" on a comment with old/new code blocks), apply the change before presenting the next comment. Don't advance silently. Acceptance of a structural suggestion is a fix-now signal.
 - **When the user redirects mid-walkthrough** to make a code change unrelated to the comment in flight, after applying the redirected change, refresh the saved review file at `./tmp/review-<branch-name>.md` so it tracks current code state. Don't silently continue with stale comments.
+- **Resume the walkthrough on your own after any interruption.** Once a comment is handled, or after a redirect/tangent is resolved, immediately present the next comment (`**Comment X of N**`) without waiting to be told "keep going." The walkthrough is your job to drive to completion. Track which comments remain from the saved review file; the user prompting you to continue twice is a failure mode to avoid. The only thing that pauses you is an open question on the comment currently in flight.
 
