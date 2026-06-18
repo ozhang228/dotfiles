@@ -34,8 +34,12 @@ exec_always --no-startup-id "autorandr --change && bash $HOME/dotfiles/src/linux
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
 
-# restore saved workspace layouts on login
+# restore saved workspace layouts on login (everything except Chrome)
 exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh"
+
+# Chrome restores its own windows (one process, one SSO). i3-resurrect can't
+# distinguish its windows, so it's stripped from the saved state; launch once here.
+exec --no-startup-id $browser
 
 bindsym $mod+Return exec $terminal
 bindsym $mod+$smod+Return exec $browser
