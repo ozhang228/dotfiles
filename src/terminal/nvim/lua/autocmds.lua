@@ -16,6 +16,15 @@ vim.api.nvim_create_autocmd({ "WinEnter", "DirChanged", "User" }, {
   callback = update_title,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Enable spellcheck for prose filetypes",
+  pattern = { "markdown", "tex", "gitcommit", "text" },
+  callback = function()
+    vim.opt_local.spell = true
+    vim.opt_local.spelllang = "en_us"
+  end,
+})
+
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
   group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
