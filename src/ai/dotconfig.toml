@@ -11,8 +11,16 @@ src = "~/dotfiles/src/ai/GLOBAL.md"
 dst = "~/.claude/CLAUDE.md"
 
 [[symlinks]]
-src = "~/dotfiles/src/ai/claude/skills"
+src = "~/dotfiles/src/ai/GLOBAL.md"
+dst = "~/.codex/AGENTS.md"
+
+[[symlinks]]
+src = "~/dotfiles/src/ai/skills"
 dst = "~/.claude/skills"
+
+[[symlinks]]
+src = "~/dotfiles/src/ai/skills"
+dst = "~/.agents/skills"
 
 [[symlinks]]
 src = "~/dotfiles/src/ai/claude/settings.json"
@@ -21,4 +29,3 @@ dst = "~/.claude/settings.json"
 [[symlinks]]
 src = "~/dotfiles/src/ai/claude/keybindings.json"
 dst = "~/.claude/keybindings.json"
-
