@@ -1,0 +1,23 @@
+[metadata]
+name = "gh-dash"
+supported_distros = ["manjaro", "ubuntu", "mac"]
+
+[[symlinks]]
+src = "~/dotfiles/src/terminal/gh-dash"
+dst = "~/.config/gh-dash"
+
+[[deps]]
+id = "gh"
+check = "command -v gh"
+[deps.install_method]
+ubuntu = "sudo apt install gh"
+manjaro = "sudo pacman -S github-cli"
+mac = "brew install gh"
+
+[[deps]]
+id = "gh-dash"
+check = "gh extension list | grep -q dlvhdr/gh-dash"
+[deps.install_method]
+ubuntu = "gh extension install dlvhdr/gh-dash"
+manjaro = "gh extension install dlvhdr/gh-dash"
+mac = "gh extension install dlvhdr/gh-dash"
