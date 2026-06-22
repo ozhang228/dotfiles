@@ -17,6 +17,7 @@ Dotfiles with setup script
   - screen share
   - bluetooth
   - wifi
+  kldasfjfkladsjdfsalkfjdklf
 
 - Github setup (gh auth login)
 - AI Coding Assistant Setup
