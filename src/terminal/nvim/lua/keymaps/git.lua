@@ -7,10 +7,5 @@ return {
       function() Snacks.lazygit() end,
       desc = "Lazygit",
     },
-    {
-      "<leader>gh",
-      function() Snacks.terminal({ "gh", "dash" }) end,
-      desc = "GH Dash",
-    },
   },
 }
