@@ -6,7 +6,7 @@ return {
     gh = {
       enabled = true,
       wo = {
-        relative_number = true,
+        relativenumber = true,
       },
     },
   },

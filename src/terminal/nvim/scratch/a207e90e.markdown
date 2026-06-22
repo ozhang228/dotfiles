@@ -1,0 +1,22 @@
+---
+Title: /feature atm vol / underlying price support in custom view
+---
+
+## Context
+- current `UNIQUE_OR_NONE` (which I think is a bad name since what its actually doing is first one) doesn't work on custom view because the aggregation is returning the wrong value. 
+- since this is for values that should all be the same, we can do the first non-zero one 
+
+## Related Tickets
+
+## Tests
+- [x] Appropriate unit tests
+- [x] Changes verified in a local environment (if applicable)
+
+## Verification Steps
+
+Attach screenshots or notes here that can help reviewers reproduce and verify the outcome.
+<img width="2126" height="1702" alt="image" src="https://git.drwholdings.com/user-attachments/assets/f9f5b537-48bd-4754-b36d-4fb20946f1eb" />
+
+also fixes crude's custom view
+<img width="3819" height="1919" alt="image" src="https://git.drwholdings.com/user-attachments/assets/a16bc45a-efc4-46f8-9e96-38bb814a92b3" />
+
