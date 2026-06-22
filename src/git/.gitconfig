@@ -6,7 +6,7 @@
     autoSetupRemote = true
 
 [core]
-    pager = delta
+    pager = "delta --side-by-side --paging=never"
 
 [interactive]
     diffFilter = delta --color-only

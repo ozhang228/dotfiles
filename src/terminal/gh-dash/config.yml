@@ -1,5 +1,5 @@
 pager:
-  diff: delta
+  diff: "delta --side-by-side --paging=always"
 
 theme:
   colors:
