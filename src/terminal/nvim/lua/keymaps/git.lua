@@ -9,8 +9,8 @@ return {
     },
     {
       "<leader>gh",
-      function() Snacks.picker.gh_pr() end,
-      desc = "PRs",
+      function() Snacks.terminal({ "gh", "dash" }) end,
+      desc = "GH Dash",
     },
   },
 }
