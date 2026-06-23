@@ -5,7 +5,7 @@ set -gx ANTHROPIC_MODEL opus[1m]
 test -f ~/.local/share/claude_credentials.fish && source ~/.local/share/claude_credentials.fish
 
 # pnpm
-fish_add_path $HOME/.local/share/pnpm
+fish_add_path $HOME/.local/share/pnpm/bin $HOME/.local/share/pnpm
 
 # >>> conda initialize >>>
 if test -f /home/ozhang/miniconda3/bin/conda
