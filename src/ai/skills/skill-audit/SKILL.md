@@ -7,6 +7,15 @@ description: Audit existing skills and propose improvements or new skills based 
 
 Review all skills for gaps, stale content, and improvement opportunities. Propose new skills when a pattern recurs across conversations that no current skill handles.
 
+## Reference
+
+The principles and vocabulary for writing skills well live in reference files. Load them when diagnosing why a skill underperforms (step 2) or when proposing/writing skill changes (steps 4–5) — they give the named levers and failure modes to reason with, not just "this feels off."
+
+| Topic | Reference | When |
+| ----- | --------- | ---- |
+| How to write/edit a skill well | `references/writing-great-skills.md` | Diagnosing a weak skill, proposing improvements, or writing a new one |
+| Definitions of the bold terms | `references/skills-glossary.md` | Looking up a term (predictability, leading word, progressive disclosure, premature completion, etc.) |
+
 ## Effectiveness criteria
 
 A skill is effective when:
@@ -18,6 +27,14 @@ A skill is effective when:
 5. **No manual workarounds** — the user doesn't bypass the skill to do the work themselves
 
 A skill needs attention when any of these fail consistently.
+
+The criteria say *whether* a skill is failing; the **failure modes** in `references/writing-great-skills.md` say *why* and *what lever fixes it*. When a skill underperforms, name the failure mode driving it:
+
+- **Premature completion** — a step ends before the work is genuinely done (fix the completion criterion first; split the sequence only if the bound is irreducibly fuzzy).
+- **Duplication** — the same meaning in more than one place.
+- **Sediment** — stale layers never cleared.
+- **Sprawl** — too long even when every line is live; cure with progressive disclosure and splitting.
+- **No-op** — a line the model already obeys by default (a weak leading word is a no-op; fix with a stronger word, not more prose).
 
 ## Workflow
 
@@ -65,5 +82,13 @@ Get approval on the list before writing anything.
 ### 5. Apply
 
 For approved improvements, edit the relevant `SKILL.md` or reference files directly. For new skills, create the directory and `SKILL.md` with the standard format (frontmatter with `name` and `description`, workflow, reference table if references exist).
+
+Write to the principles in `references/writing-great-skills.md`, not just to fix the immediate complaint:
+
+- **Invocation:** does this skill need a model-facing description (agent or another skill must reach it), or is it user-invoked? Don't pay context load for a description nothing fires on.
+- **Description:** one trigger per branch, front-load the leading word, cut identity already in the body.
+- **Information hierarchy:** keep SKILL.md legible — disclose bulky reference behind a context pointer (a linked file), inline only what every branch needs.
+- **Leading words:** hunt restated triads and fuzzy phrases that collapse into one pretrained word; it sharpens both execution and invocation.
+- **Pruning:** every line must change behaviour vs. the default (kill no-ops), and each meaning gets one source of truth (kill duplication).
 
 After applying, clear the corresponding memory observations.
