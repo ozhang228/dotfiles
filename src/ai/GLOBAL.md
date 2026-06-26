@@ -1,25 +1,15 @@
 # Global AI Rules
 
-## Auto-Injected Context
+## Language & Task Rules
 
-Language conventions and task rules in `src/ai/rules/` are injected automatically by a PreToolUse hook whenever you Write, Edit, or run a Bash command. Do not try to read them manually as a preamble, the hook is authoritative and handles stacking (e.g. `test_foo.py` gets Python rules plus testing rules).
-If the user asks a pure Q&A question about a convention without editing any file, read the relevant `src/ai/rules/*.md` on demand.
+Per-language conventions live in their own files, imported once at session start:
 
-## Skill Observation (passive, every session)
+@~/dotfiles/src/ai/rules/python.md
+@~/dotfiles/src/ai/rules/typescript.md
+@~/dotfiles/src/ai/rules/cpp.md
+@~/dotfiles/src/ai/rules/cli.md
 
-Save a memory entry only when **all three** are true:
-1. There is a concrete editable target (a skill file, a rules file, GLOBAL.md) — not harness/plugin behavior you can't change
-2. The issue has recurred or is likely to recur — not a one-off
-3. The fix wasn't applied immediately — if you fixed it on the spot, no entry needed (apply-and-done beats accumulate-and-review)
-
-Signals worth recording when the bar is met:
-- User corrected or overrode a skill's output
-- User did something manually that an existing skill should have handled
-- A skill fired on the wrong trigger (false positive) — only if the trigger is in an editable file
-- A skill failed to fire when it should have (false negative)
-- A task recurred across sessions with no skill covering it (new skill candidate)
-
-These are consumed by the `skill-audit` skill. Keep the observation count low — a short list of real, actionable items beats a log of every friction point.
+Each file is scoped to its language by its own header — apply a rule only when editing a file of that language or running that CLI tool. They load every session regardless of what you touch; that's the deliberate tradeoff for not running an injection hook per edit.
 
 ---
 

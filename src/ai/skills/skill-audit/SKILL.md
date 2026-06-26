@@ -43,12 +43,12 @@ The criteria say *whether* a skill is failing; the **failure modes** in `referen
 Pull saved memory observations across **all project memory directories**:
 
 ```
-find ~/.claude/projects -name 'skill_observation*' -type f
+find ~/.claude/projects -path '*/memory/*' -type f \( -iname 'skill?obs*' -o -iname 'skill-observation*' \)
 ```
 
-Observations live in per-project (`~/.claude/projects/-home-ozhang-*/memory/`) and shared (`~/.claude/projects/-shared-*/memory/`) dirs — checking only the current project's memory misses ones logged elsewhere.
+Observations live in per-project (`~/.claude/projects/-home-ozhang-*/memory/`) and shared (`~/.claude/projects/-shared-*/memory/`) dirs — checking only the current project's memory misses ones logged elsewhere. These are saved ad hoc (there's no longer a Stop hook auto-prompting for them), so the pile is whatever has accumulated since the last audit — there may be few or none.
 
-Also reflect on the current conversation: did the user correct a skill's output, bypass a skill manually, or encounter a gap the skill didn't cover?
+Reflecting on the current conversation matters more now that nothing auto-collects observations: did the user correct a skill's output, bypass a skill manually, or hit a gap the skill didn't cover? That live signal is a primary input, not a supplement.
 
 ### 2. Inventory all skills
 

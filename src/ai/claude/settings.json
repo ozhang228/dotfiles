@@ -67,31 +67,6 @@
     ]
   },
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_pretooluse.sh"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "jq -rn --arg cwd \"$(pwd)\" --arg b \"$(git branch --show-current 2>/dev/null || echo 'not-a-repo')\" '{\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":(\"CWD: \"+$cwd+\"\\nBranch: \"+$b)}}'"
-          },
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_userprompt.sh"
-          }
-        ]
-      }
-    ],
     "Notification": [
       {
         "hooks": [
@@ -110,15 +85,6 @@
             "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_stop.sh"
           }
         ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/skill-observation.sh",
-            "timeout": 5
-          }
-        ]
       }
     ]
   },
@@ -130,5 +96,6 @@
     "clangd-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
-  "theme": "auto"
+  "theme": "auto",
+  "skipWorkflowUsageWarning": true
 }
