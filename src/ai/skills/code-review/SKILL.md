@@ -1,8 +1,6 @@
 ---
 name: code-review
 description: Orchestrates a multi-agent code review. The main thread does the one deep investigation pass, gates on architecture, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, or checking for security issues. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality. Complements specialized skills (security-reviewer, test-master).
-allowed-tools: Read, Grep, Glob, Bash, Agent
-user-invocable-only: true
 ---
 
 # Code Review
@@ -11,13 +9,16 @@ You are the **orchestrator**. You do the only deep investigation pass yourself, 
 
 ## Reference Guide
 
-Run `! ~/.claude/skills/code-review/scripts/pr-languages` first to identify which languages are in the diff, then load the relevant language references below. (The script isn't on `PATH`; invoke it by this absolute path so it resolves from any repo's CWD.)
+Run the bundled `scripts/pr-languages` first to identify which languages are in the diff, then load the relevant language references below. Invoke it from this skill directory or by its resolved filesystem path so it works from any repo CWD.
 
 | Topic             | Reference                         | When                                  |
 | ----------------- | --------------------------------- | ------------------------------------- |
 | Python            | `references/python.md`            | Any `.py` files in the diff           |
 | TypeScript/TSX    | `references/typescript.md`        | Any `.ts` or `.tsx` files in the diff |
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
+| Local Recaps      | `references/visual-recap.md`      | Authoring self-contained local recaps |
+| Wireframes        | `references/wireframe.md`         | Recapping rendered UI changes         |
+| Canvas            | `references/canvas.md`            | Authoring `canvas.mdx` for recaps     |
 
 ## Review Workflow
 
@@ -29,7 +30,7 @@ This is the single deep pass over the PR. Do all of it before spawning anything.
 
 1. **Confirm the repo/branch matches the user's active context.** If you're reviewing a branch in one repo while the user's CWD is a different repo or branch, edits during the walkthrough land in the wrong place. Surface any mismatch before proceeding.
 2. **Check the branch is up to date with the base before diffing.** Run `git -C <repo> merge-base --is-ancestor <base> HEAD` (or `git -C <repo> log --oneline <base> ^HEAD | head`) to see if the base has commits the branch is missing. If the branch is behind, **ask the prompter** whether to merge the base in before reviewing. Diffing against a stale branch surfaces changes from the base as if they belong to the PR — a common false-positive that wastes review time.
-3. Run `! ~/.claude/skills/code-review/scripts/pr-languages` — this is a custom script (not on `PATH`, invoke by absolute path) that computes which languages are changed vs the merge base (it auto-detects the repo's real base branch). Note which language references (`references/python.md`, `references/typescript.md`) apply; you'll tell the subagents which to load. Load them yourself too for the architecture verdict.
+3. Run the bundled `scripts/pr-languages` by resolved filesystem path. It computes which languages are changed vs the merge base and auto-detects the repo's real base branch. Note which language references (`references/python.md`, `references/typescript.md`) apply; you'll tell the subagents which to load. Load them yourself too for the architecture verdict.
 4. Do a git diff against the base branch pr-languages resolved (unless another branch is specified).
 5. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so you can hand them to agents without making them re-discover the diff.
 6. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
@@ -46,7 +47,7 @@ Then **stop and wait for the user to confirm the direction.** Do not spawn subag
 
 ### Phase 3 — Fan-out (only after confirmation)
 
-Spawn up to four subagents with the `Agent` tool, each focused on exactly one thing. **You decide which to spawn** — skip an agent with no surface area (a docs/config-only PR skips Performance; a pure refactor with full existing coverage may skip Testing; a one-line bugfix skips Simplification) and record the skip + reason for the report. Run the agents you do spawn in parallel (one message, multiple `Agent` calls).
+Spawn up to four subagents with the host multi-agent tool, each focused on exactly one thing. In Codex, if no subagent tool is visible, use `tool_search` to discover the multi-agent spawn tool before falling back to a main-thread pass. **You decide which to spawn** — skip an agent with no surface area (a docs/config-only PR skips Performance; a pure refactor with full existing coverage may skip Testing; a one-line bugfix skips Simplification) and record the skip + reason for the report. Run the agents you do spawn in parallel when the host supports it.
 
 Each agent gets a **context packet** so it doesn't re-investigate:
 
@@ -75,22 +76,33 @@ The agents find; you decide what survives.
 - **Dedup across agents.** If two agents flag the same line, write one comment.
 - **Add style nits yourself.** Naming, clarity, dead code, conventions. This stays a main-thread job because it needs whole-PR context the single-focus agents don't have.
 
+## Local Visual Recap Surface
+
+Use a self-contained local visual recap as the primary review surface:
+
+- Read diff, stat, and source context from local files and shell commands only. Do not fetch schemas, install packages, call hosted Plan tools, publish to a database, or depend on a bridge server.
+- Prefer `./tmp/review-<branch-name>-recap/` for scratch review artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in. The folder contains `index.html` as the primary review UI and `review.md` as the source-of-truth text fallback. Optional assets must be local files in the same folder.
+- Validate without dynamic dependencies: confirm `index.html` and `review.md` exist, open/read the generated files enough to catch broken anchors or placeholders, and run any repo-native formatter/checker only if it already exists locally. Do not run `npx`, package installs, or remote schema fetches.
+- Report the local folder path and the direct `index.html` path.
+- Treat review feedback as chat or file feedback: when the user refers to a recap item, anchor, or comment, inspect the matching local review section, apply accepted code fixes, update the local files, and refresh the artifact.
+
 ## Output Format
 
-- Write the full review to a file: `./tmp/review-<branch-name>.md`
-- Start the file with a one-line note of **which agents ran and which were skipped** (with reason).
-- The review file has these top-level sections, in this order. They do not mix:
-  - `## Architecture` — the confirmed verdict from Phase 2, one short block.
-  - `## Bugs` — Correctness findings. Labels: `**Incorrect:**` (logic produces wrong result), `**Model:**` (data/modeling approach doesn't make sense).
-  - `## Testing` — coverage gaps and critiques of the tests in the diff. Labels: `**Test gap:**` (missing coverage, with a proposed test), `**Test smell:**` (an added/changed test that's wrong or weak — imprecise assertion, redundant, asserts implementation detail).
-  - `## Performance` — validated wins with benchmark numbers. Label: `**Perf:**`.
-  - `## Simplification` — over-engineering to cut. Labels match the agent's tags: `**delete:**`, `**stdlib:**`, `**native:**`, `**yagni:**`, `**shrink:**`. End the section with `net: -<N> lines possible`, or `Lean already.` if there were no findings.
-  - `## Nits` — non-functional, main-thread style. Labels: `**Unclear:**` (naming/control flow unclear), `**Nit:**` (style).
-- Under each section, group comments by file with a sub-heading: `### <file_path>:<line_number>` and number comments under each file.
+- Write the agent-readable review to `./tmp/review-<branch-name>.md`.
+- Create the user-facing local recap in `./tmp/review-<branch-name>-recap/` unless the user asks for a checked-in artifact. The recap is the primary surface the user reads and must include `index.html` plus `review.md`.
+- Start the Markdown file with a one-line note of **which agents ran and which were skipped** (with reason).
+- The Markdown file has these top-level sections, in this order. They do not mix:
+  - `## Architecture` - the confirmed verdict from Phase 2, one short block.
+  - `## Bugs` - Correctness findings. Labels: `**Incorrect:**` (logic produces wrong result), `**Model:**` (data/modeling approach doesn't make sense).
+  - `## Testing` - coverage gaps and critiques of the tests in the diff. Labels: `**Test gap:**` (missing coverage, with a proposed test), `**Test smell:**` (an added/changed test that's wrong or weak: imprecise assertion, redundant, asserts implementation detail).
+  - `## Performance` - validated wins with benchmark numbers. Label: `**Perf:**`.
+  - `## Simplification` - over-engineering to cut. Labels match the agent's tags: `**delete:**`, `**stdlib:**`, `**native:**`, `**yagni:**`, `**shrink:**`. End the section with `net: -<N> lines possible`, or `Lean already.` if there were no findings.
+  - `## Nits` - non-functional, main-thread style. Labels: `**Unclear:**` (naming/control flow unclear), `**Nit:**` (style).
+- Under each Markdown section, group comments by file with a sub-heading: `### <file_path>:<line_number>` and number comments under each file.
+- Read `references/visual-recap.md`, plus `references/wireframe.md` and `references/canvas.md` when rendered UI changed. Mirror the review into the local recap as structured HTML sections: architecture verdict, changed file footprint, grouped review findings with stable ids, key diffs or annotated snippets for load-bearing changed files, schema/API summaries when relevant, and wireframes only when rendered UI changed.
 - **Every comment must demand a response.** It must either propose a concrete change (old/new code blocks) or ask a specific question the author needs to answer. Do **not** write observational "FYI / this is happening / not a problem but be aware" comments. If there's no ask and no risk worth surfacing, drop it.
-- After writing the file, present comments to the user **one at a time** in the chat, in section order (**Bugs → Testing → Performance → Simplification → Nits**). Each comment must start with `**Comment X of N**` so the user knows how many to expect. Include the `file_path:line_number` reference at the top. After each comment, wait for a response before presenting the next.
-- **When the user accepts a comment that proposes a concrete change** (e.g., "yeah let's do that" / "ok" on a comment with old/new code blocks), apply the change before presenting the next comment. Don't advance silently. Acceptance of a structural suggestion is a fix-now signal.
-- **Read hedge phrases in a comment as the floor, not the ceiling.** When implementing a comment (yours or an agent's), "at minimum one test", "even just X", "at least Y" name the *smallest acceptable* fix, not the whole fix. If the comment identified a systemic gap ("every `*_normalized` field is exercised at ratio=1 only"), the fix is the systemic one (harden every field), not the one example the hedge named. If the full version is large, surface that to the user ("the full fix touches N sites — all, or a subset?") rather than silently shipping the floor.
-- **When the user redirects mid-walkthrough** to make a code change unrelated to the comment in flight, after applying the redirected change, refresh the saved review file at `./tmp/review-<branch-name>.md` so it tracks current code state. Don't silently continue with stale comments.
-- **Resume the walkthrough on your own after any interruption.** Once a comment is handled, or after a redirect/tangent is resolved, immediately present the next comment (`**Comment X of N**`) without waiting to be told "keep going." The walkthrough is your job to drive to completion. Track which comments remain from the saved review file; the user prompting you to continue twice is a failure mode to avoid. The only thing that pauses you is an open question on the comment currently in flight.
-
+- After writing the Markdown and HTML, inspect the generated files for placeholders, broken anchors, and missing sections. If a repo-native checker exists for HTML or Markdown, run it; do not install one.
+- Present the local recap `index.html` path and folder path in chat, plus a short count by section. Do **not** walk comments one at a time in the terminal unless the user explicitly asks for that mode.
+- When the user references a recap item/comment and accepts a concrete change (for example "yeah let's do that" / "ok" on a finding with old/new code blocks), apply the change before moving to another item. Update `./tmp/review-<branch-name>.md`, `review.md`, and `index.html` so the UI tracks the current code.
+- **Read hedge phrases in a comment as the floor, not the ceiling.** When implementing a comment (yours or an agent's), "at minimum one test", "even just X", "at least Y" name the *smallest acceptable* fix, not the whole fix. If the comment identified a systemic gap ("every `*_normalized` field is exercised at ratio=1 only"), the fix is the systemic one (harden every field), not the one example the hedge named. If the full version is large, surface that to the user ("the full fix touches N sites: all, or a subset?") rather than silently shipping the floor.
+- When the user redirects mid-review to make a code change unrelated to the referenced recap item, after applying the redirected change, refresh the saved review file and local recap so they track current code state. Do not silently continue with stale comments.
