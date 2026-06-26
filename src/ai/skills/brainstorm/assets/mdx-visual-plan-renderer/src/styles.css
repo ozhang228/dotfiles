@@ -1,0 +1,343 @@
+:root {
+  color-scheme: dark;
+  --bg: #15171b;
+  --panel: #20242b;
+  --panel-2: #252b33;
+  --text: #f2f4f7;
+  --muted: #aab3c2;
+  --line: #3a414d;
+  --accent: #7db7ff;
+  --accent-2: #a6e3a1;
+  --ok: #70d6a3;
+  --warn: #f3c56b;
+  --bad: #ff8b8b;
+  --code: #111318;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  color: var(--accent);
+}
+
+code,
+pre {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+pre {
+  overflow-x: auto;
+  background: var(--code);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+blockquote {
+  margin: 16px 0;
+  border-left: 3px solid var(--warn);
+  background: rgba(243, 197, 107, 0.08);
+  padding: 12px 14px;
+  border-radius: 6px;
+}
+
+.page {
+  width: min(1240px, calc(100vw - 48px));
+  margin: 0 auto;
+  padding: 28px 0 44px;
+}
+
+.plan {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 24px;
+}
+
+.planHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: 18px;
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+.lead {
+  color: var(--muted);
+  max-width: 760px;
+  font-size: 15px;
+}
+
+.badgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 460px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  background: var(--panel-2);
+  font-size: 12px;
+}
+
+.summaryGrid,
+.metricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.summaryCard,
+.panel,
+.metric,
+.flowStep,
+.testItem {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  padding: 14px;
+  min-width: 0;
+}
+
+.summaryCard.good {
+  border-color: rgba(112, 214, 163, 0.6);
+}
+
+.summaryCard.warn {
+  border-color: rgba(243, 197, 107, 0.7);
+}
+
+.summaryCard.bad {
+  border-color: rgba(255, 139, 139, 0.65);
+}
+
+.summaryCard h3,
+.panel h3,
+.flowStep h3 {
+  margin-top: 0;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 16px 0;
+}
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(125, 183, 255, 0.08);
+  padding: 12px 14px;
+  border-radius: 6px;
+  margin: 16px 0;
+}
+
+.callout.good {
+  border-left-color: var(--ok);
+  background: rgba(112, 214, 163, 0.08);
+}
+
+.callout.warn {
+  border-left-color: var(--warn);
+  background: rgba(243, 197, 107, 0.08);
+}
+
+.callout.bad {
+  border-left-color: var(--bad);
+  background: rgba(255, 139, 139, 0.08);
+}
+
+.callout strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.flow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.flowStep {
+  position: relative;
+  min-height: 134px;
+}
+
+.flowStep:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 28px;
+  right: -10px;
+  width: 10px;
+  border-top: 1px solid var(--accent);
+}
+
+.flowStep span,
+.metric span {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.fileMap,
+.testMatrix {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.fileMapItem {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.4fr);
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.fileMapItem code {
+  color: var(--accent);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.fileMapItem p,
+.testItem p,
+.metric p {
+  margin-bottom: 0;
+}
+
+.testMatrix {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.testItem code {
+  color: var(--accent-2);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.checklist {
+  display: grid;
+  gap: 8px;
+  margin-left: 0;
+  list-style: none;
+}
+
+.checklist li {
+  border-left: 3px solid var(--ok);
+  background: rgba(112, 214, 163, 0.08);
+  border-radius: 6px;
+  padding: 9px 12px;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.plan > :first-child {
+  margin-top: 0;
+}
+
+.plan > :last-child {
+  margin-bottom: 0;
+}
+
+.plan h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.plan h2 {
+  margin: 26px 0 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  font-size: 20px;
+  letter-spacing: 0;
+}
+
+.plan h3 {
+  margin: 18px 0 8px;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.plan p {
+  margin: 0 0 10px;
+}
+
+.plan ul,
+.plan ol {
+  margin: 8px 0 14px 22px;
+  padding: 0;
+}
+
+.plan li {
+  margin: 5px 0;
+}
+
+@media (max-width: 900px) {
+  .page {
+    width: min(100vw - 24px, 1180px);
+  }
+
+  .plan {
+    padding: 18px;
+  }
+
+  .planHeader,
+  .summaryGrid,
+  .metricGrid,
+  .split,
+  .flow,
+  .fileMapItem,
+  .testMatrix {
+    grid-template-columns: 1fr;
+  }
+
+  .badgeRow {
+    justify-content: flex-start;
+  }
+
+  .flowStep:not(:last-child)::after {
+    display: none;
+  }
+}

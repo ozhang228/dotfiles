@@ -59,9 +59,10 @@ clean rich document. For a simple binary UI visual choice, show the two
 directions in the canvas only; do not repeat the same options as body
 wireframes or prose. Put the actual choice in the bottom "Open Questions" form.
 
-**Use the right section, and make it carry substance.** Author static HTML sections using the local references as the schema. Keep the HTML readable enough to patch by hand and mirror the content in `plan.md`:
+**Use the right section, and make it carry substance.** Author `plan.mdx` using the local references as the schema. Keep the MDX readable enough to patch by hand, with one source file and renderer-owned preview output:
 
 - Rich text sections for plan prose with real bold/italic/code/links and nested lists.
+- Renderer components for the first viewport and dense review blocks. Use `PlanHeader`, `SummaryGrid`, `SummaryCard`, `MetricGrid`, `Metric`, `Split`, `Panel`, `Flow`, `FileMap`, `TestMatrix`, `Checklist`, and `Callout` before falling back to raw Markdown. A visual plan that is mostly headings, paragraphs, and tables is underusing MDX.
 - Annotated code sections for the file map: when a load-bearing file is worth
   highlighting, prefer the annotated walkthrough over a bare `code` block — carry
   the real, syntax-highlighted code AND anchor short margin notes to the lines
@@ -149,16 +150,7 @@ real manifest or data fixture, browser interaction, save/sync action, and an
 on-disk or database assertion. Name the command or manual browser path when it
 is known.
 
-**Custom HTML is the artifact format, but it is still a bounded tool** — a single complete fragment
-inside a section, never `html`/`head`/`body`/`script` tags, never a generic
-placeholder, density demo, or proof that custom HTML works. Prefer normal semantic HTML sections for the plan. For architecture/code reviews, use local HTML/SVG diagrams in diagram sections. For UI/product work, put requested mockups, UI states, and visual comparisons in the visual area rather than burying them in prose. If UI fidelity requires
-HTML/CSS, image capture, or real React/CSS, the product fix is canvas support
-for that artifact type, not moving the mockup into the document.
-When `custom-html` is genuinely needed, author it against the sandbox-provided
-theme tokens (`--wf-paper`, `--wf-card`, `--wf-ink`, `--wf-muted`,
-`--wf-line`, `--wf-radius`, and the matching `--plan-*` aliases). Do not hardcode
-hex/rgb/hsl light palettes such as white cards with dark ink; the same fragment
-must read in dark mode without a plan-specific patch.
+**Custom HTML is an escape hatch, not the default MDX vocabulary.** Prefer renderer components and semantic Markdown. Use inline HTML only for a bounded fragment inside a section, never `html`/`head`/`body`/`script` tags, never a generic placeholder, density demo, or proof that custom HTML works. For architecture/code reviews, use local MDX diagrams or renderer components near the evidence. For UI/product work, put requested mockups, UI states, and visual comparisons in the visual area rather than burying them in prose. If UI fidelity requires HTML/CSS, image capture, or real React/CSS, the product fix is renderer support for that artifact type, not moving the mockup into the document.
 
 **Before handoff, open the plan and check it.** Fix overlap, excessive
 whitespace, clipped fragments, misleading inactive controls, poor contrast, and

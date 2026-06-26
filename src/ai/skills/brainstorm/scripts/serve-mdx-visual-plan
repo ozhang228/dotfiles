@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+  echo "Usage: serve-mdx-visual-plan <plan-dir> [port]" >&2
+  exit 2
+fi
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+renderer_dir="$(cd -- "${script_dir}/../assets/mdx-visual-plan-renderer" && pwd)"
+plan_dir="$(cd -- "$1" && pwd)"
+plan_file="${plan_dir}/plan.mdx"
+port="${2:-8765}"
+
+if [ ! -f "${plan_file}" ]; then
+  echo "Expected ${plan_file} to exist." >&2
+  exit 1
+fi
+
+"${script_dir}/setup-mdx-visual-plan-renderer"
+
+runtime_dir="${renderer_dir}/.runtime"
+mkdir -p "${runtime_dir}"
+rm -f "${runtime_dir}/plan.mdx"
+ln -s "${plan_file}" "${runtime_dir}/plan.mdx"
+
+if [ -e "${runtime_dir}/assets" ] || [ -L "${runtime_dir}/assets" ]; then
+  rm -rf "${runtime_dir}/assets"
+fi
+
+if [ -d "${plan_dir}/assets" ]; then
+  ln -s "${plan_dir}/assets" "${runtime_dir}/assets"
+fi
+
+npm run check --prefix "${renderer_dir}"
+exec npm run dev --prefix "${renderer_dir}" -- --host 127.0.0.1 --port "${port}" --strictPort

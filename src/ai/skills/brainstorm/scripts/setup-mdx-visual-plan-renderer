@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+renderer_dir="$(cd -- "${script_dir}/../assets/mdx-visual-plan-renderer" && pwd)"
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "Node.js is required for the MDX visual plan renderer." >&2
+  exit 1
+fi
+
+node_major="$(node -p 'Number(process.versions.node.split(".")[0])')"
+if [ "${node_major}" -lt 16 ]; then
+  echo "Node.js 16 or newer is required for MDX. Found $(node --version)." >&2
+  exit 1
+fi
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "npm is required for the MDX visual plan renderer." >&2
+  exit 1
+fi
+
+if [ ! -d "${renderer_dir}/node_modules" ]; then
+  npm install --prefix "${renderer_dir}"
+fi
