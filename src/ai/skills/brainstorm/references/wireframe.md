@@ -15,7 +15,7 @@ never write `<html>`/`<body>`/`<script>`/`<style>` tags or any
 width/height/coordinates. You write real HTML layout and real product
 content; the renderer styles and roughens it.
 
-**A wireframe block's data is an HTML screen plus a surface:**
+**A wireframe is an HTML screen plus a surface note:**
 
 ```json
 {
@@ -135,22 +135,13 @@ the whole page around it, and do not scale a duplicate up. Pick the matching
 `surface` (e.g. `popover`) so the footprint is right; never widen a popover to
 page width.
 
-**Loading / skeleton states.** Set `data.skeleton: true` on the wireframe and
-fill the `html` with neutral, textless placeholder geometry — boxes and bars
+**Loading / skeleton states.** For skeleton states, fill the wireframe HTML with neutral, textless placeholder geometry — boxes and bars
 built as `<div>`s with `background:var(--wf-line)` and explicit heights/widths,
 no labels or copy. The renderer drops borders, sketch, and color into the
-skeleton register automatically. Never escape to a `custom-html` document block
+skeleton register automatically. Never escape to a `custom HTML` document block
 to fake a loader.
 
-**Editing an existing mockup.** In hosted mode, to change one element, text, or
-color in an existing html mockup, do not regenerate the frame — call
-`update-visual-plan` with
-`contentPatches: [{ op: "patch-wireframe-html", blockId, edits: [{ find,
-replace }] }]`. Each `find` is a unique snippet of the current html (read it
-first with `get-visual-plan`); set `all: true` on an edit to replace every
-occurrence. The result is re-sanitized. In local-files privacy mode, do not call
-hosted Plan tools; edit the local MDX source directly and rerun the local
-check/serve or verify command for `<plan-dir>`.
+**Editing an existing mockup.** To change one element, text, or color in an existing HTML mockup, do not regenerate the frame. Read the current `index.html`, patch a unique snippet directly, mirror the source text in the Markdown fallback, and inspect the result.
 
 **Treat the wireframe border as part of the visible design.** Always wrap HTML
 wireframe content in a root container with real inner padding before drawing
@@ -160,7 +151,7 @@ root node itself so the first row never sits flush against the screen border. Do
 not rely on padding on a nested page section as the first visible inset; the
 outermost element must create the breathing room. Keep text away from borders:
 every container, field, button, menu item, and annotation needs enough padding
-and line-height to read cleanly in the rendered Plan view.
+and line-height to read cleanly in the rendered local review page.
 
 **For feature-cloud or abundance visuals, optimize the composition over line-by-line
 reading.** Some marketing/product sections need to feel like a large surface area
@@ -221,12 +212,9 @@ states in a `columns` block and set each column's `label` to `Before` and
 `After` — the renderer draws that label as an `h4` heading above each frame. Do
 NOT bake a `Before`/`After` pill, title, or heading into the wireframe `html`: a
 label placed inside reads as part of the product UI, lands in a random corner,
-and clutters the comparison. The column header is the one and only place the
-state name belongs. On a canvas, place the two state artboards as neighbors with
-frame labels — never encode Before/After inside the html.
+and clutters the comparison. The column header is the one and only place the state name belongs. In a canvas-like section, place the two state artboards as neighbors with frame labels; never encode Before/After inside the HTML.
 
-**Let the surface choose side-by-side vs. stacked.** For document-body
-wireframes (recaps), the `columns` renderer lays
+**Let the surface choose side-by-side vs. stacked.** For recap wireframes, the static recap layout should lay
 narrow surfaces (`mobile`, `popover`, `panel`) out side by side, and
 automatically stacks wide surfaces (`desktop`, `browser`) vertically at full
 document width so a large frame is never crushed into a half-width column and

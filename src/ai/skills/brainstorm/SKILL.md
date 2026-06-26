@@ -41,10 +41,10 @@ If the premise looks shaky, raise it early — before clarifying questions, not 
 
 Use a self-contained local visual plan as the user-facing design artifact when the work has real design space:
 
-- Read code context from local files and shell commands only. Do not fetch schemas, install packages, call hosted Plan tools, publish to a database, or depend on a bridge server.
+- Read code context from local files and shell commands only. Do not fetch schemas, install packages, call external visual-plan tools, publish to a database, or depend on any external server.
 - Prefer `./tmp/visual-plan-<slug>/` for scratch review artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in. The folder contains `index.html` as the primary review UI and `plan.md` as the source-of-truth text fallback. Optional assets must be local files in the same folder.
 - Keep the plan concise and scannable: outcome, expected behaviors, tradeoffs, file map or diagram, and open questions. Add a visual canvas section only when a visual surface helps the user decide; keep backend and architecture plans document-focused with inline diagrams or file maps.
-- Validate before handoff without dynamic dependencies: confirm `index.html` and `plan.md` exist, open/read the generated files enough to catch broken anchors or placeholders, and run any repo-native formatter/checker only if it already exists locally. Do not run `npx`, package installs, or remote schema fetches.
+- Validate before handoff without dynamic dependencies: confirm `index.html` and `plan.md` exist, open/read the generated files enough to catch broken anchors or placeholders, and run any repo-native formatter/checker only if it already exists locally. Do not run package-execution commands, package installs, or remote schema fetches.
 - Report the local folder path and the direct `index.html` path.
 - Treat feedback as chat or file feedback: edit the local files directly and refresh the artifact.
 - Keep the execution plan as Markdown for the agent. The visual plan is for design approval; `docs/PLAN.md` is for implementation sequencing.
@@ -58,7 +58,7 @@ Use a self-contained local visual plan as the user-facing design artifact when t
 | Local Visual Plans | `references/visual-plan.md`          | Authoring self-contained local plans      |
 | Document Quality   | `references/document-quality.md`     | Writing the plan body                     |
 | Wireframes         | `references/wireframe.md`            | Authoring any wireframe or screen mockup  |
-| Canvas             | `references/canvas.md`               | Authoring `canvas.mdx`                    |
+| Canvas             | `references/canvas.md`               | Authoring canvas-like sections                    |
 | Exemplar           | `references/exemplar.md`             | Calibrating good vs bad visual plans      |
 
 ## Workflow

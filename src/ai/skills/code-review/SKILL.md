@@ -18,7 +18,7 @@ Run the bundled `scripts/pr-languages` first to identify which languages are in 
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
 | Local Recaps      | `references/visual-recap.md`      | Authoring self-contained local recaps |
 | Wireframes        | `references/wireframe.md`         | Recapping rendered UI changes         |
-| Canvas            | `references/canvas.md`            | Authoring `canvas.mdx` for recaps     |
+| Canvas            | `references/canvas.md`            | Authoring canvas-like recap sections     |
 
 ## Review Workflow
 
@@ -80,9 +80,9 @@ The agents find; you decide what survives.
 
 Use a self-contained local visual recap as the primary review surface:
 
-- Read diff, stat, and source context from local files and shell commands only. Do not fetch schemas, install packages, call hosted Plan tools, publish to a database, or depend on a bridge server.
+- Read diff, stat, and source context from local files and shell commands only. Do not fetch schemas, install packages, call external visual-plan tools, publish to a database, or depend on any external server.
 - Prefer `./tmp/review-<branch-name>-recap/` for scratch review artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in. The folder contains `index.html` as the primary review UI and `review.md` as the source-of-truth text fallback. Optional assets must be local files in the same folder.
-- Validate without dynamic dependencies: confirm `index.html` and `review.md` exist, open/read the generated files enough to catch broken anchors or placeholders, and run any repo-native formatter/checker only if it already exists locally. Do not run `npx`, package installs, or remote schema fetches.
+- Validate without dynamic dependencies: confirm `index.html` and `review.md` exist, open/read the generated files enough to catch broken anchors or placeholders, and run any repo-native formatter/checker only if it already exists locally. Do not run package-execution commands, package installs, or remote schema fetches.
 - Report the local folder path and the direct `index.html` path.
 - Treat review feedback as chat or file feedback: when the user refers to a recap item, anchor, or comment, inspect the matching local review section, apply accepted code fixes, update the local files, and refresh the artifact.
 

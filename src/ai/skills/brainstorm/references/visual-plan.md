@@ -5,7 +5,7 @@ Use this reference when authoring the local visual plan artifact for the brainst
 ## Self-Contained Contract
 
 - Keep plan content local. Read project context from local files and shell commands only.
-- Do not install packages, run `npx`, fetch a remote block catalog, publish plan content, or depend on a bridge server.
+- Do not install packages, execute remote packages, fetch a remote schema, publish plan content, or depend on any external server.
 - Use `./tmp/visual-plan-<slug>/` for scratch artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in.
 - The plan directory contains `index.html` as the primary review UI and `plan.md` as the source-of-truth text fallback. Optional assets must live inside the same folder.
 - The HTML must be self-contained: inline CSS, no external CDN, no remote fonts, no remote scripts, and no runtime dependency outside a browser opening the file.

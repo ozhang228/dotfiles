@@ -59,13 +59,10 @@ clean rich document. For a simple binary UI visual choice, show the two
 directions in the canvas only; do not repeat the same options as body
 wireframes or prose. Put the actual choice in the bottom "Open Questions" form.
 
-**Use the right block, and make it carry substance.** For the authoritative,
-machine-checked list of block types and their data schemas, call `get-plan-blocks`
-— it returns the live registry vocabulary (type, MDX tag, placement, key fields)
-so you never emit a block the editor cannot render or round-trip:
+**Use the right section, and make it carry substance.** Author static HTML sections using the local references as the schema. Keep the HTML readable enough to patch by hand and mirror the content in `plan.md`:
 
-- `rich-text` for plan prose with real bold/italic/code/links and nested lists.
-- `annotated-code` for the file map: when a load-bearing file is worth
+- Rich text sections for plan prose with real bold/italic/code/links and nested lists.
+- Annotated code sections for the file map: when a load-bearing file is worth
   highlighting, prefer the annotated walkthrough over a bare `code` block — carry
   the real, syntax-highlighted code AND anchor short margin notes to the lines
   that actually change (the new action, the changed schema, the wiring point), so
@@ -73,24 +70,21 @@ so you never emit a block the editor cannot render or round-trip:
   annotation is `{ lines: "12" | "12-18"; label?; note }`; keep a few high-signal
   notes per file, not one per line. Highlight only the files worth reading; never
   an exhaustive list of every touched file, and never a prose-only description of
-  a file. Drop to a plain `code` block only for a throwaway snippet with nothing
-  to call out. When more than one file matters, group the blocks in a vertical
-  `tabs` block (the standard tab primitive) rather than a bespoke container. If
+  a file. Drop to a plain code section only for a throwaway snippet with nothing
+  to call out. When more than one file matters, group them in a local tabbed section or adjacent panels rather than a bespoke container. If
   the exact code is unknown, show the smallest plausible planned shape or a
-  commented stub naming what to fill in. (`code-tabs` and `implementation-map`
-  are legacy: their renderers stay for old plans, but do not author new ones.)
+  commented stub naming what to fill in. (avoid inventing legacy section types.)
 - For a decision: if the reviewer must still pick between a genuinely-open
-  either/or, put it in the bottom Open Questions `question-form` as a `single`
-  question — one option per real alternative, each with a short detail and
+  either/or, put it in the bottom Open Questions `Open Questions section as a single-choice question — one option per real alternative, each with a short detail and
   `recommended: true` on the one you would choose; do not also restate the same
   choice elsewhere. If you have already committed to an approach, state it as
-  settled prose or a `callout` with `tone="decision"`, optionally with a
-  `columns` block for a side-by-side comparison of the options you weighed — not
+  settled prose or a decision callout, optionally with a
+  columns section for a side-by-side comparison of the options you weighed — not
   as a confusing mid-document form for a question you have already answered.
-- `columns` for side-by-side before/after or current/target comparisons where
+- Columns for side-by-side before/after or current/target comparisons where
   each side needs real nested blocks; label the columns clearly and avoid
   stacking comparison blocks vertically when parallel reading is the point.
-- `diagram` for two-dimensional architecture, dependency, data-flow, or state
+- Diagram sections for two-dimensional architecture, dependency, data-flow, or state
   relationships, only when it clarifies something real. Prefer standard
   two-dimensional layouts — paired before/after panels, layered diagrams,
   swimlanes, dependency maps, matrices, or grouped regions; do not default to
@@ -119,20 +113,19 @@ so you never emit a block the editor cannot render or round-trip:
   recommendation title, confidence and category badges, code-path evidence, a
   local before/after or current/target spatial diagram, then concise
   Problem/Solution/Why text.
-- `tabs` for multiple states, directions, or comparisons. A tab that reveals
+- Tabs for multiple states, directions, or comparisons. A tab that reveals
   only prose usually means the plan is under-specified — include a relevant
   visual unless the tab is intentionally document-only.
-- `table`, `checklist`, `callout` for scannable structure.
+- Tables, checklists, and callouts for scannable structure.
 
 **Open questions live at the bottom as a form when answers would change the
-plan.** Surface answerable unresolved decisions in a final `question-form`
-block titled "Open Questions" so the renderer presents it as a distinct section.
+plan.** Surface answerable unresolved decisions in a final section titled "Open Questions" so the renderer presents it as a distinct section.
 That bottom form is the ONLY place that enumerates the open questions: never add
 a second "Open Questions" heading, list, or recap of the same questions earlier
 in the document. A one-line pointer in the overview prose ("a few decisions are
 still open — see Open Questions below") is fine, but do not reproduce the
 question list or a parallel questions/decisions section above it.
-Use `single` or `multi` for clear choices, `freeform` for constraints,
+Use single-choice or multi-choice for clear choices, `freeform` for constraints,
 `recommended: true` for the default you would pick, and option `wireframe` /
 `diagram` previews only when the options are not already visible in the top
 canvas. `single` and `multi` questions always render a write-in field so a
@@ -156,13 +149,9 @@ real manifest or data fixture, browser interaction, save/sync action, and an
 on-disk or database assertion. Name the command or manual browser path when it
 is known.
 
-**`custom-html` is a bounded escape hatch only** — a single complete fragment
-inside a block, never `html`/`head`/`body`/`script` tags, never a generic
-placeholder, density demo, or proof that custom HTML works. Prefer the native
-blocks for normal plans. For architecture/code reviews, use `diagram`
-`data.html` / `data.css` for rich local HTML/SVG diagrams instead of
-`custom-html`. For UI/product work, `custom-html` is never the primary home for a
-requested mockup, UI state, or visual comparison. If UI fidelity requires
+**Custom HTML is the artifact format, but it is still a bounded tool** — a single complete fragment
+inside a section, never `html`/`head`/`body`/`script` tags, never a generic
+placeholder, density demo, or proof that custom HTML works. Prefer normal semantic HTML sections for the plan. For architecture/code reviews, use local HTML/SVG diagrams in diagram sections. For UI/product work, put requested mockups, UI states, and visual comparisons in the visual area rather than burying them in prose. If UI fidelity requires
 HTML/CSS, image capture, or real React/CSS, the product fix is canvas support
 for that artifact type, not moving the mockup into the document.
 When `custom-html` is genuinely needed, author it against the sandbox-provided

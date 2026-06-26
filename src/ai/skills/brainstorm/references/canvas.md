@@ -52,47 +52,20 @@ freeform review-markup layers and must be reserved for intentional markup in
 open canvas space. Reserve arrows for a note that must point at one specific
 control inside a frame; a note that simply sits beside its frame needs no arrow.
 
-**Patching.** Edit one wireframe, canvas annotation, diagram, or block with targeted `contentPatches`
-(for example `patch-wireframe-html`, `patch-diagram-html`, `update-block`,
-`replace-blocks`, `update-canvas-annotation`) rather
-than regenerating the whole plan. `contentPatches` are part of the public MCP
-action schema, so Codex and other hosts can make surgical
-edits. If an agent is working from exported source files, use
-`read-visual-plan-source` / `patch-visual-plan-source`: `plan.mdx` holds
-frontmatter plus markdown/document blocks, `canvas.mdx` holds
-`<DesignBoard>/<Section>/<Artboard>/<Screen>/<Annotation>/<Connector>`, and the
-patch action normalizes the MDX back into the same JSON runtime model. JSON is
-the canonical runtime shape; MDX is the repo-friendly authoring/export surface.
-In the browser, humans edit `rich-text` prose inline; agents should still use
-`update-rich-text` content patches or source patches for prose, and use
-comments/structured patches for canvas, artboard, wireframe, and diagram edits.
-Never send a partial top-level `content` object as a shortcut to add a canvas,
-frame, or block: `content` is a full structured replacement, so omitted blocks
-or surfaces can disappear. If a full replacement is truly unavoidable, read the
-complete source/JSON first, include every existing block and surface in the new
-payload, and verify the source/export immediately after the update.
+**Patching.** Edit one wireframe, canvas annotation, diagram, or section directly in `index.html` and mirror the source text in the Markdown fallback. Prefer a targeted find/replace against a unique snippet over regenerating the whole artifact. If a broad rewrite is unavoidable, reread the full current `index.html` and Markdown fallback first, carry forward every existing section, and inspect the result before handoff.
 
-**Never emit a titled artboard with no interior wireframe content.** Every artboard
-you place on the canvas must carry an `html` wireframe or reference a wireframe
-block via `blockId`; when using `blockId`, the referenced `wireframe` /
-`legacy-wireframe` block must remain in the plan. If you remove a duplicate
-wireframe from the document body, first move its `data` inline onto the
-corresponding `content.canvas.frames[*].wireframe` / `legacyWireframe`. A
-label-only frame or a frame pointing at a deleted block renders empty and is
-rejected at parse time. If you only have a title, write it as a section header or
-annotation, not an empty artboard.
+**Never emit a titled artboard with no interior wireframe content.** Every artboard you place on the canvas must carry real HTML wireframe content. A label-only frame is empty. If you only have a title, write it as a section header or annotation, not an empty artboard.
 
 **UI mockups belong in the top visual review area.** Static UI/product visuals
 live on the canvas; multi-step UI flows get both canvas wireframes and a
 prototype. When the user asks for a mockup, UI state, loading state, layout,
 screen, or visual comparison, make the canvas the primary home for that static
 visual. When the user asks for a prototype or the plan contains a sequence the
-reviewer must feel, keep the canvas artboards and add `content.prototype` so the
+reviewer must feel, keep the canvas artboards and add `a local prototype section` so the
 top surface shows Wireframes / Prototype tabs. Architecture/code diagrams stay
-inline in the document (the SKILL.md Visual Surface Choice section owns that
-rule) unless the user explicitly asks for a spatial board. Document blocks
+inline in the document (the local visual authoring reference owns that rule) unless the user explicitly asks for a spatial board. Document sections
 can explain, compare, or map implementation, but they should not host the
-primary UI mockup or prototype just because `custom-html`, screenshots, or prose
+primary UI mockup or prototype just because `custom HTML`, screenshots, or prose
 are easier to produce. If the canvas/prototype surface cannot represent the
 requested UI fidelity, still keep the closest top-surface representation and
 call out or extend the needed renderer capability. A skeleton/loading mockup

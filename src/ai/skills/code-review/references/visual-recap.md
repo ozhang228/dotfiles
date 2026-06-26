@@ -5,7 +5,7 @@ Use this reference when authoring the local visual recap artifact for code revie
 ## Self-Contained Contract
 
 - Keep recap content local. Read diff, stat, and source context from local files and shell commands only.
-- Do not install packages, run `npx`, fetch a remote block catalog, publish recap content, or depend on a bridge server.
+- Do not install packages, execute remote packages, fetch a remote schema, publish recap content, or depend on any external server.
 - Use `./tmp/review-<branch-name>-recap/` for scratch artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in.
 - The recap directory contains `index.html` as the primary review UI and `review.md` as the source-of-truth text fallback. Optional assets must live inside the same folder.
 - The HTML must be self-contained: inline CSS, no external CDN, no remote fonts, no remote scripts, and no runtime dependency outside a browser opening the file.
