@@ -46,7 +46,7 @@ list_entries() {
             printf '%s\n' "$active_panes" | grep -qx "$pane_id" || continue
             case "$(cat "$f" 2>/dev/null)" in
                 working) icons+=("⚡") ;;
-                done)    icons+=("✓") ;;
+                done)    icons+=("✅") ;;
                 wait)    icons+=("⏸") ;;
             esac
         done
