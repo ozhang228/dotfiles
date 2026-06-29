@@ -17,6 +17,17 @@ return {
             mode = "t",
             desc = "Exit to normal mode",
           },
+          to_vsplit = {
+            "<leader>|",
+            function(self)
+              local buf = self.buf
+              self:hide()
+              vim.cmd("vertical sbuffer " .. buf)
+              vim.cmd("startinsert")
+            end,
+            mode = "t",
+            desc = "Move to vertical split",
+          },
         },
       },
     },

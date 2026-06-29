@@ -1,3 +1,22 @@
+local function resize(direction, amount)
+  local cur = vim.fn.winnr()
+  local has = {
+    left  = vim.fn.winnr("h") ~= cur,
+    right = vim.fn.winnr("l") ~= cur,
+    up    = vim.fn.winnr("k") ~= cur,
+    down  = vim.fn.winnr("j") ~= cur,
+  }
+  if direction == "left" then
+    vim.cmd((has.left  and "vertical resize +" or "vertical resize -") .. amount)
+  elseif direction == "right" then
+    vim.cmd((has.right and "vertical resize +" or "vertical resize -") .. amount)
+  elseif direction == "up" then
+    vim.cmd((has.up    and "resize +" or "resize -") .. amount)
+  elseif direction == "down" then
+    vim.cmd((has.down  and "resize +" or "resize -") .. amount)
+  end
+end
+
 return {
   {
     mode = "n",
@@ -30,6 +49,10 @@ return {
     { "<C-l>", "<C-w><C-l>", desc = "Move focus to the right window" },
     { "<C-j>", "<C-w><C-j>", desc = "Move focus to the lower window" },
     { "<C-k>", "<C-w><C-k>", desc = "Move focus to the upper window" },
+    { "<C-Up>",    function() resize("up",    5) end, desc = "Move divider up" },
+    { "<C-Down>",  function() resize("down",  5) end, desc = "Move divider down" },
+    { "<C-Left>",  function() resize("left",  5) end, desc = "Move divider left" },
+    { "<C-Right>", function() resize("right", 5) end, desc = "Move divider right" },
     { "n", "nzz", desc = "Next search result with cursor centered" },
     { "N", "Nzz", desc = "Previous search result with cursor centered" },
     { "<C-D>", "<C-D>zz", desc = "Scroll down with cursor centered" },
