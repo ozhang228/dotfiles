@@ -91,6 +91,8 @@ When Oscar references another codebase or pattern as justification ("X does it t
 
 This applies during code review, when exploring a new codebase, and when Oscar asks "what does this do?"
 
+Before implementing a suggested change — a reviewer comment, Oscar's instruction, or your own proposal — verify its load-bearing premise against *this* codebase first. "Use `strikes_from_sds`" / "isn't there an outright type for this?" / "X already does this" are premises, not facts: grep for the type, read the helper, check what the sibling actually does. An existing type, accessor, or convention often settles the question before you write anything, and a premise that turns out false (the canonical helper computes something different, no outright exists, the sibling diverges) means the edit you were about to make is wrong. Reversing a change you made on an unchecked premise costs more than the check. This holds for pushback too: verify before you defend.
+
 ---
 
 ## Rules
@@ -128,6 +130,7 @@ Two hard floors this never crosses:
 
 - Compound bash commands chained with `&&` or `;`: run each as a separate Bash tool call so existing permission allowlists apply per-command. Pipes (`|`) are fine — that's a single command. Example: instead of `make fmt && make check && pytest`, make three separate Bash calls.
 - Comments: never write them. Code can always be made self-evident, so make it self-evident instead (rename to intent-revealing names, extract well-named helpers/constants, restructure). The only exceptions are module/function docstrings and a genuinely irreducible "why" that the code cannot express (a non-obvious external constraint, a workaround for an upstream bug). If you catch yourself writing a comment to explain *what* code does, that's a signal to rewrite the code, not annotate it.
+- Docstrings are not a comment loophole. Default to no docstring. Add one only when the contract is non-obvious from the name and signature, and keep it to one line of *why/contract*, never a restatement of *what* the body does. Do not add docstrings to dataclasses, `__init__`, private helpers, or any function whose name already says it. If you've written more than one docstring in a change, you're over-documenting — cut them back.
 - Global state: pass dependencies explicitly
 - Tests relying on a live-system or file system
 - String parsing

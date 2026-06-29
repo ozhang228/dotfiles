@@ -76,6 +76,14 @@ The agents find; you decide what survives.
 - **Dedup across agents.** If two agents flag the same line, write one comment.
 - **Add style nits yourself.** Naming, clarity, dead code, conventions. This stays a main-thread job because it needs whole-PR context the single-focus agents don't have.
 
+## Resolving review comments (author side)
+
+When the work is the reverse — you're the author addressing comments on your own PR, not producing a review — three failure modes recur:
+
+- **Verify the comment's premise before agreeing or building.** "Use `strikes_from_sds`", "isn't there an outright type for this?", "X already does it this way" are premises, not facts. Grep for the type, read the helper, check what the sibling actually does — *then* act. A premise that turns out false (the canonical helper computes something different, no outright type exists, the sibling diverges) means the change you were about to make is wrong, and reversing an applied change costs more than the check. This holds for pushback too: verify before you defend. The reviewer being senior doesn't make the premise true.
+- **Lead placement decisions with ownership, not the import graph.** When a comment is "this doesn't belong here," decide where a thing lives by *what conceptually owns it* (a port belongs with its consumer; an interface with its domain), then use cycle-avoidance to break ties — never let "what imports cleanly" drive the call. Shuffling a file through three locations chasing an import cycle is the symptom of optimizing the graph instead of the ownership.
+- **Branch hygiene under concurrent pushes.** When the author (you or Oscar) may be pushing in parallel, re-check `HEAD` vs `origin/<branch>` before every commit and push — a clean-looking `git diff <base>` can be base-ahead churn rather than your change, and a published merge commit must never be amended. Land each fix on the PR/branch that *owns* the file it touches, not whichever branch is checked out.
+
 ## Local Visual Recap Surface
 
 Use a self-contained local visual recap as the primary review surface:
