@@ -2,8 +2,8 @@
 # Fuzzy-pick an existing tmux session or a project directory, and
 # switch-or-create a tmux session for it.
 #
-# - Existing sessions show as "name [branch] <agent> <ahead>↑ <behind>↓".
-# - Project directories without a matching session show as "name [branch] <ahead>↑ <behind>↓".
+# - Existing sessions show as "name [branch] <agent>".
+# - Project directories without a matching session show as "name [branch]".
 # - Entries are sorted by most-recently-active session first.
 # - ctrl-x kills the session under the cursor and refreshes the list.
 set -euo pipefail
@@ -53,28 +53,15 @@ list_entries() {
         [ "${#icons[@]}" -gt 0 ] && printf '%s' "${icons[*]}"
     }
 
-    git_sync() {
-        local stat ins del parts=()
-        stat=$(git -C "$1" diff HEAD --shortstat 2>/dev/null) || return 0
-        [ -n "$stat" ] || return 0
-        ins=$(printf '%s' "$stat" | sed 's/.*[^0-9]\([0-9]\+\) insertion.*/\1/;t;d')
-        del=$(printf '%s' "$stat" | sed 's/.*[^0-9]\([0-9]\+\) deletion.*/\1/;t;d')
-        [ -n "$ins" ] && parts+=("+${ins}")
-        [ -n "$del" ] && parts+=("-${del}")
-        [ "${#parts[@]}" -gt 0 ] && printf '%s' "${parts[*]}"
-    }
-
     entries=()
     for name in "${!session_activity[@]}"; do
         [ "$name" = "$cur_session" ] && continue
         path="${session_path[$name]}"
         branch=$(git -C "$path" branch --show-current 2>/dev/null || true)
         agent=$(agent_icons "$name")
-        sync=$(git_sync "$path")
         label="$name"
         [ -n "$branch" ] && label="$label [$branch]"
         [ -n "$agent" ]  && label="$label $agent"
-        [ -n "$sync" ]   && label="$label $sync"
         entries+=("${session_activity[$name]}"$'\t'session$'\t'"$name"$'\t'"$label")
     done
 
@@ -82,10 +69,8 @@ list_entries() {
         name=$(basename "$dir" | tr '.:' '__')
         [ -n "${session_activity[$name]+x}" ] && continue
         branch=$(git -C "$dir" branch --show-current 2>/dev/null || true)
-        sync=$(git_sync "$dir")
         label="$name"
         [ -n "$branch" ] && label="$label [$branch]"
-        [ -n "$sync" ]   && label="$label $sync"
         entries+=("0"$'\t'dir$'\t'"$dir"$'\t'"$label")
     done
 

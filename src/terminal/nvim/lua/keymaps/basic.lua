@@ -17,6 +17,34 @@ local function resize(direction, amount)
   end
 end
 
+local function open_url_under_cursor()
+  local line = vim.api.nvim_get_current_line()
+  local cursor_col = vim.api.nvim_win_get_cursor(0)[2] + 1
+  local patterns = {
+    "https?://%S+",
+    "localhost:%d+[%w%-%._~:/%?#%[%]@!$&'()*+,;=%%]*",
+    "127%.0%.0%.1:%d+[%w%-%._~:/%?#%[%]@!$&'()*+,;=%%]*",
+    "0%.0%.0%.0:%d+[%w%-%._~:/%?#%[%]@!$&'()*+,;=%%]*",
+  }
+
+  for _, pattern in ipairs(patterns) do
+    for url_start, url, _ in line:gmatch("()(" .. pattern .. ")()") do
+      local cleaned = url:gsub("[%)%],%.;:]+$", "")
+      local cleaned_end = url_start + #cleaned - 1
+      if cursor_col >= url_start and cursor_col <= cleaned_end then
+        if cleaned:match("^https?://") then
+          vim.ui.open(cleaned)
+        else
+          vim.ui.open("http://" .. cleaned)
+        end
+        return
+      end
+    end
+  end
+
+  vim.ui.open(vim.fn.expand("<cfile>"))
+end
+
 return {
   {
     mode = "n",
@@ -79,6 +107,7 @@ return {
       function() vim.cmd("vsplit " .. vim.api.nvim_buf_get_name(0)) end,
       desc = "Vertical split",
     },
+    { "gx", open_url_under_cursor, desc = "Open URL / File" },
   },
   {
     mode = "t",
