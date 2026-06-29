@@ -2,8 +2,8 @@
 # Fuzzy-pick an existing tmux session or a project directory, and
 # switch-or-create a tmux session for it.
 #
-# - Existing sessions show as "name (path) [branch]".
-# - Project directories without a matching session show as "path [branch]".
+# - Existing sessions show as "name [branch] <agent> <ahead>↑ <behind>↓".
+# - Project directories without a matching session show as "name [branch] <ahead>↑ <behind>↓".
 # - Entries are sorted by most-recently-active session first.
 # - ctrl-x kills the session under the cursor and refreshes the list.
 set -euo pipefail
@@ -32,13 +32,49 @@ list_entries() {
     cur_session=""
     [ -n "${TMUX:-}" ] && cur_session=$(tmux display-message -p '#{session_name}')
 
+    agent_icons() {
+        local session="$1"
+        local pane_dir="$HOME/.cache/tmux-agent-status/panes"
+        [ -d "$pane_dir" ] || return 0
+        local active_panes icons=()
+        active_panes=$(tmux list-panes -t "$session" -F '#{pane_id}' 2>/dev/null || true)
+        for f in "$pane_dir/${session}_"*.status; do
+            [ -f "$f" ] || continue
+            local pane_id
+            pane_id=$(basename "$f" .status)
+            pane_id="${pane_id#${session}_}"
+            printf '%s\n' "$active_panes" | grep -qx "$pane_id" || continue
+            case "$(cat "$f" 2>/dev/null)" in
+                working) icons+=("⚡") ;;
+                done)    icons+=("✓") ;;
+                wait)    icons+=("⏸") ;;
+            esac
+        done
+        [ "${#icons[@]}" -gt 0 ] && printf '%s' "${icons[*]}"
+    }
+
+    git_sync() {
+        local stat ins del parts=()
+        stat=$(git -C "$1" diff HEAD --shortstat 2>/dev/null) || return 0
+        [ -n "$stat" ] || return 0
+        ins=$(printf '%s' "$stat" | sed 's/.*[^0-9]\([0-9]\+\) insertion.*/\1/;t;d')
+        del=$(printf '%s' "$stat" | sed 's/.*[^0-9]\([0-9]\+\) deletion.*/\1/;t;d')
+        [ -n "$ins" ] && parts+=("+${ins}")
+        [ -n "$del" ] && parts+=("-${del}")
+        [ "${#parts[@]}" -gt 0 ] && printf '%s' "${parts[*]}"
+    }
+
     entries=()
     for name in "${!session_activity[@]}"; do
         [ "$name" = "$cur_session" ] && continue
         path="${session_path[$name]}"
         branch=$(git -C "$path" branch --show-current 2>/dev/null || true)
-        label="$name  ($path)"
+        agent=$(agent_icons "$name")
+        sync=$(git_sync "$path")
+        label="$name"
         [ -n "$branch" ] && label="$label [$branch]"
+        [ -n "$agent" ]  && label="$label $agent"
+        [ -n "$sync" ]   && label="$label $sync"
         entries+=("${session_activity[$name]}"$'\t'session$'\t'"$name"$'\t'"$label")
     done
 
@@ -46,8 +82,10 @@ list_entries() {
         name=$(basename "$dir" | tr '.:' '__')
         [ -n "${session_activity[$name]+x}" ] && continue
         branch=$(git -C "$dir" branch --show-current 2>/dev/null || true)
-        label="$dir"
-        [ -n "$branch" ] && label="$dir [$branch]"
+        sync=$(git_sync "$dir")
+        label="$name"
+        [ -n "$branch" ] && label="$label [$branch]"
+        [ -n "$sync" ]   && label="$label $sync"
         entries+=("0"$'\t'dir$'\t'"$dir"$'\t'"$label")
     done
 

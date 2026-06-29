@@ -67,12 +67,40 @@
     ]
   },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh UserPromptSubmit"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh PreToolUse"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_notification.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh Notification"
           }
         ]
       }
@@ -83,6 +111,14 @@
           {
             "type": "command",
             "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_stop.sh"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh Stop"
           }
         ]
       }
