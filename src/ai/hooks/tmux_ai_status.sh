@@ -30,8 +30,11 @@ has_running_background_task() {
 }
 
 case "${1:-}" in
-    UserPromptSubmit|PreToolUse)
+    UserPromptSubmit|PreToolUse|PostToolUse)
         echo "working" > "$PANE_FILE"
+        ;;
+    PermissionRequest)
+        echo "wait" > "$PANE_FILE"
         ;;
     Stop)
         if has_running_background_task "$HOOK_JSON"; then

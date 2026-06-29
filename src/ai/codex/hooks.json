@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh UserPromptSubmit",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh PreToolUse",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh PermissionRequest",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh Stop",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

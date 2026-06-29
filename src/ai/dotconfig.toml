@@ -15,6 +15,10 @@ src = "~/dotfiles/src/ai/GLOBAL.md"
 dst = "~/.codex/AGENTS.md"
 
 [[symlinks]]
+src = "~/dotfiles/src/ai/codex/hooks.json"
+dst = "~/.codex/hooks.json"
+
+[[symlinks]]
 src = "~/dotfiles/src/ai/skills"
 dst = "~/.claude/skills"
 
