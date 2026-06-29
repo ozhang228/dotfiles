@@ -146,7 +146,7 @@ return {
           if result.code == 0 then
             vim.notify(result.stdout or "", vim.log.levels.INFO)
           else
-            vim.notify(result.stderr or "", vim.log.levels.ERROR)
+            vim.notify(("[rust-analyzer] cargo exited %d:\n%s"):format(result.code, result.stderr or ""), vim.log.levels.ERROR)
           end
         end)
       end)
