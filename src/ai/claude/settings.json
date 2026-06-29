@@ -97,20 +97,5 @@
   },
   "effortLevel": "high",
   "skipWorkflowUsageWarning": true,
-  "theme": "auto",
-  "sandbox": {
-    "enabled": true,
-    "autoAllowBashIfSandboxed": true,
-    "allowUnsandboxedCommands": false,
-    "excludedCommands": [],
-    "network": {
-      "allowUnixSockets": [],
-      "allowAllUnixSockets": false,
-      "allowLocalBinding": false,
-      "allowedDomains": [],
-      "httpProxyPort": null,
-      "socksProxyPort": null
-    },
-    "enableWeakerNestedSandbox": false
-  }
+  "theme": "auto"
 }
