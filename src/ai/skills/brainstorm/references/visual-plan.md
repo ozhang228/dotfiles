@@ -44,6 +44,27 @@ Use stable ids for sections and questions so the user can refer to them in chat.
 
 MDX should make the plan easier to parse than Markdown. A plan that is mostly headings, paragraphs, and tables has failed the format choice. Put the first screen in `PlanHeader`, `SummaryGrid`, and `MetricGrid` when possible. Use prose for rationale, but move dense lists, decisions, flows, file maps, tests, and risks into renderer components.
 
+### MDX is JSX, not HTML — inline markup must be JSX (FAILURE SEEN)
+
+Any inline HTML you write in `plan.mdx` (e.g. a hand-built wireframe `<div>` block) is compiled as **JSX**, not HTML. Raw HTML attributes throw at client render and blank the **entire** page. Convert before writing:
+
+- `class="..."` → `className="..."`
+- `style="display:flex;gap:10px"` (string) → `style={{ display: "flex", gap: "10px" }}` (object; camelCase keys; every value a string except unitless numbers like `flex: 1`)
+- `<input>` / `<br>` / self-closing icons → must be explicitly closed: `<input />`, `<span ... />`
+- Literal `{`, `}`, or a bare `<` in text → wrap in a JSX expression or template string (`<pre>{\`{ "v": 1 }\`}</pre>`), or it parses as a JSX expression and errors.
+
+Prefer the provided renderer components (`Split`/`Panel`, `Flow`, `FileMap`, etc.) over hand-rolled HTML wherever they fit — they're already valid JSX. Reach for inline JSX blocks only for genuine wireframe mockups, and write them as JSX from the start.
+
+### Match each component's prop contract exactly (FAILURE SEEN)
+
+Passing the wrong prop *shape* to a renderer component throws at render and blanks the **entire** page, with no server-side error. The bug seen: `PlanHeader badges` is typed `string[]`, but was passed objects `[{ label, tone }]` — React tried to render an object as a child and crashed the whole plan. Before using a component, open `assets/mdx-visual-plan-renderer/src/planComponents.tsx` and read its prop types. Known gotchas:
+
+- `PlanHeader badges` — array of **plain strings**, not objects. No per-badge tone exists.
+- `SummaryCard tone` — one of `default | good | warn | bad`. `Callout tone` — `info | good | warn | bad`. There is **no `"ok"` or `"info"` on SummaryCard**; an unknown tone silently yields a dead className (no crash, but no styling either), so it won't error but also won't look right.
+- `Metric` takes `label` + `value` strings; `Flow steps` / `FileMap items` / `TestMatrix tests` each take arrays of objects with the exact keys defined in the file — anything else renders blank.
+
+Rule: never pass a prop shape from memory. The component file is the source of truth; read it.
+
 ## Validation
 
 Before handoff:
@@ -52,6 +73,25 @@ Before handoff:
 - Read `plan.mdx` enough to catch placeholders, stale claims, contradictions, broken anchors, or missing expected sections.
 - Check that the first viewport is componentized and scannable. If the page opens as a long text document, rewrite it with MDX components before handoff.
 - Run `scripts/serve-mdx-visual-plan <plan-dir> <port>` and inspect the rendered page enough to catch obvious layout or navigation failures. If dependencies or renderer commands are missing, report that exact missing piece.
+- **A `200` from `curl http://127.0.0.1:<port>/` does NOT mean the plan rendered, and neither does the compiled module.** The page is a client-rendered SPA: the server returns the ~500-byte Vite shell even when the MDX crashes the browser at render time and shows a blank page. Grepping the transformed module (`/.runtime/plan.mdx`) for `_createMdxContent` only proves it *parsed* — it does NOT catch render-time crashes like a bad prop shape (an object passed where a string is expected throws only when React renders it). That false-confidence check was the gap that let a blank page be reported as "verified."
+- **Verify by actually rendering the plan through the real components (SSR).** This executes every component and throws on the exact errors a browser would. Drop a script *inside* `assets/mdx-visual-plan-renderer/` (so `vite`/`react` resolve) and run it with node:
+
+  ```js
+  // _ssr-check.mjs — run from inside assets/mdx-visual-plan-renderer/, then delete it
+  import { createServer } from 'vite';
+  import React from 'react';
+  import { renderToStaticMarkup } from 'react-dom/server';
+  const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', root: process.cwd() });
+  try {
+    const plan = await vite.ssrLoadModule('<ABSOLUTE_PATH>/plan.mdx');
+    const comps = await vite.ssrLoadModule('./src/planComponents.tsx');
+    const html = renderToStaticMarkup(React.createElement(plan.default, { components: comps.planComponents }));
+    console.log('SSR_OK length=', html.length, 'HAS=', html.includes('<a distinctive phrase from your plan>'));
+  } catch (e) { console.log('SSR_ERROR:', e.message); }
+  finally { await vite.close(); }
+  ```
+
+  A clean run prints `SSR_OK length=<thousands> HAS= true`. `SSR_ERROR: ...` (e.g. "Objects are not valid as a React child") is the real failure the `200`/grep checks miss. Only report the URL as verified after an `SSR_OK` with your content present.
 - Run repo-native checks only when they already exist locally. Do not install validators.
 - Verify the `http://127.0.0.1:<port>/` URL responds, and report the verified URL with the folder path and direct `plan.mdx` path.
 
