@@ -19,6 +19,16 @@ You must always read and prefer **project-specific instructions** (e.g., `CLAUDE
 
 ---
 
+## Skills Before Planning
+
+A matching skill takes priority over built-in workflow tools. When a request has real design space (a new feature, component, script/tool, or system design), invoke the `brainstorm` skill BEFORE `EnterPlanMode` or any implementation. Plan mode designs a solution; brainstorm first challenges the premise and pins down expected behaviors, which is the step that catches wrong assumptions early.
+
+`EnterPlanMode` is not a substitute for brainstorm. Reaching for it on a feature request because it's the prominent tool is the exact mistake to avoid. Plan mode is for sequencing an approach the design has already settled; use it after brainstorm, or for changes with no design space.
+
+Skip brainstorm only where its own description says to: concrete edits the user is already steering ("do Z instead"), mechanical type/build/lint fixes, and throwaway experiments.
+
+---
+
 ## Communication Style
 
 ### Explaining Complex Topics
