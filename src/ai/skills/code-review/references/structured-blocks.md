@@ -409,6 +409,6 @@ line the summary got wrong.
 | Several key files needing full diffs | group under `tabs`, 3-8 tabs, horizontal only |
 | Structured before/after (schema/contract shape) | `columns`, not stacked cards |
 | Architecture or data-flow shift | two-panel/swimlane `diagram`, never a single arrow chain |
-| Rendered UI / interaction change | wireframe — see `references/wireframe.md`, not a `diagram` |
+| Rendered UI / interaction change | describe the before/after in prose, or `columns` when the states summarize as fields |
 
 <!-- SHARED-CORE:structured-blocks END -->

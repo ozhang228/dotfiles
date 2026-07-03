@@ -57,8 +57,9 @@ the short version:
   stacked cards.
 - **Architecture or data-flow shift** → two-panel/swimlane `diagram`. Never
   reduce a structural change to one left-to-right arrow chain.
-- **Rendered UI/interaction change** → wireframes (`references/wireframe.md`),
-  not a `diagram`.
+- **Rendered UI/interaction change** → describe the before/after in prose, or
+  use `columns` for a structured before/after when the states are simple
+  enough to summarize as fields, not a `diagram`.
 
 ## Folder Shape
 
@@ -90,9 +91,6 @@ part. Three parts, top to bottom:
    Performance / Simplification / Nits) with stable ids, per the Output
    Format in `SKILL.md`.
 
-Prepend a UI-impact headline (wireframes) before part 1, but only when the
-diff actually changed rendered UI — most PRs skip it entirely.
-
 Budgets that keep the recap reviewable:
 
 - 3-8 key-change tabs. Fewer than 3 on a large change under-serves the
@@ -122,14 +120,6 @@ value.
 and for easy regeneration — the structured findings (Bugs/Testing/etc.) plus
 a plain-text rendering of the key diffs. It should keep the same stable ids
 used in `index.html`.
-
-## UI Recap Coverage
-
-When rendered UI changed, identify the changed entry surface, interaction
-surface, destination or persistent state, and role/access variants. Show the
-smallest wireframe set that makes that review clear. Read
-`references/wireframe.md` before authoring any wireframe and
-`references/canvas.md` before authoring a canvas-like visual area.
 
 ## Validation
 

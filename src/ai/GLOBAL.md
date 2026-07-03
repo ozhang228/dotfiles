@@ -23,19 +23,9 @@ You must always read and prefer **project-specific instructions** (e.g., `CLAUDE
 
 ### Explaining Complex Topics
 
-When explaining complex topics, break things into chunks using newlines for readability. Use examples to illustrate points.
+When explaining complex topics, break things into chunks using newlines for readability, use examples to illustrate points, and give the rationale, not just the what. Vary the phrasing naturally rather than forcing every explanation into the same sentence template.
 
 For simple questions or straightforward tasks, this can be ignored.
-
-**Format**: When doing something, explain it as "this is doing X. This is why we are doing it this way / this is the rationale."
-
-Example:
-
-```
-We're splitting the logic into two functions.
-This is doing X: separating concerns makes testing easier.
-This is why: isolated units are easier to verify.
-```
 
 ### Writing Style
 
@@ -133,15 +123,15 @@ Two hard floors this never crosses:
 - Docstrings are not a comment loophole. Default to no docstring. Add one only when the contract is non-obvious from the name and signature, and keep it to one line of *why/contract*, never a restatement of *what* the body does. Do not add docstrings to dataclasses, `__init__`, private helpers, or any function whose name already says it. If you've written more than one docstring in a change, you're over-documenting — cut them back.
 - Global state: pass dependencies explicitly
 - Tests relying on a live-system or file system
-- String parsing
+- String parsing: don't derive structured data by decoding it out of a string when a real structured field already carries it. E.g. don't extract month/year from an option symbol like `NGM2026` — fragile the moment the format shifts. Get them from the actual dated fields.
 - Writing throwaway/one-off scripts to `/tmp/` — use cwd-relative `./tmp/` instead so they stay alongside the repo they target
-- Type Casting: Never type cast and instead parse if external and write better types if internal
+- Type Casting: never type-cast. Parse external data instead; strengthen internal types instead.
 
 ### Patterns
 
 - Domain types: purely data, no transformation methods
 - Library types: define your own abstractions, don't expose library types
-- Magic numbers: extract to named constants or add a comment
+- Magic numbers: extract to named constants
 - Client state: include `version` field, group into single JSON object
 
   ```typescript

@@ -98,7 +98,7 @@ source of truth.
 | Several key files needing full proposed diffs | group under `Tabs`, 3-8 tabs |
 | Before/after architecture or data-flow shift | `Split` + `Panel` + `DiagramNode`/`DiagramConnector`, never a single arrow chain |
 | File footprint of a multi-file change | `FileMap` with `change` flags |
-| Rendered UI/interaction change | wireframe — see `references/wireframe.md`, not a diagram |
+| Rendered UI/interaction change | describe the before/after states in prose, or sketch them with `Split`+`Panel` |
 
 ## MDX Source
 
@@ -115,7 +115,7 @@ Any inline HTML you write in `plan.mdx` (e.g. a hand-built wireframe `<div>` blo
 - `<input>` / `<br>` / self-closing icons → must be explicitly closed: `<input />`, `<span ... />`
 - Literal `{`, `}`, or a bare `<` in text → wrap in a JSX expression or template string (`<pre>{\`{ "v": 1 }\`}</pre>`), or it parses as a JSX expression and errors.
 
-Prefer the provided renderer components (`Split`/`Panel`, `Flow`, `FileMap`, etc.) over hand-rolled HTML wherever they fit — they're already valid JSX. Reach for inline JSX blocks only for genuine wireframe mockups, and write them as JSX from the start.
+Prefer the provided renderer components (`Split`/`Panel`, `Flow`, `FileMap`, etc.) over hand-rolled HTML wherever they fit — they're already valid JSX.
 
 ### Match each component's prop contract exactly (FAILURE SEEN)
 
@@ -162,12 +162,6 @@ Before handoff:
 - Run repo-native checks only when they already exist locally. Do not install validators.
 - **The one artifact the user actually reviews is the live `scripts/serve-mdx-visual-plan` URL.** After the SSR check passes, run it (or confirm it's already running) and verify the `http://127.0.0.1:<port>/` URL responds. This is a real Vite dev server serving hydrated React — tabs, disclosure, and any future interactive component work there. Report that URL, the folder path, and the direct `plan.mdx` path. If you only ever showed the user an SSR snapshot, you have not shown them the plan.
 
-## Visual Surface Choice
-
-- Use no visual canvas for backend-only, architecture-only, data migration, copy-only, or otherwise non-visual work. Use document sections with inline diagrams, data models, file maps, or tables instead.
-- Use a static visual area for one screen, component state, popover, before/after comparison, architecture map, or visual direction that does not need clicking.
-- Use small inline JavaScript only when it materially improves reviewing tabs or toggles. Keep it local and readable inside the MDX artifact or renderer-supported component.
-- Keep product wireframes separate from architecture diagrams. Product screens should show app state; file paths, data contracts, risks, and implementation mechanics belong in document sections or annotations.
 
 ## Plan Body Shape
 
@@ -191,10 +185,19 @@ already says, so skip it (see the `PlanHeader` note above).
    when there were real alternatives worth showing, diagrams
    (`DiagramNode`/`DiagramConnector`) for architecture or data-flow shifts.
 5. **Whatever else the plan needs.** Performance boundaries, risks, a single
-   bottom `question-form` for open questions. Don't force a section that has
-   nothing to say for this particular plan.
+   bottom `## Open Questions` section for anything genuinely unresolved. Don't
+   force a section that has nothing to say for this particular plan.
 
 Use MDX components for parts 2-5; prose for part 1. A plan that's mostly
 headings and paragraphs has failed the format choice.
 
-Use `references/document-quality.md` for the document quality bar. Read `references/canvas.md` before authoring a canvas-like visual area. Read `references/wireframe.md` before authoring any wireframe. Read `references/exemplar.md` when a worked example would help calibrate quality.
+A plan stands alone: no "as discussed above," "this revision," or "unlike
+the prior version" — fold decisions into normal prose, not changelog
+language. When the ask is broader than one motivating example, separate the
+reusable core from the specific example/adapter so a reader doesn't mistake
+one for the other. No marketing chrome — no hero headings, gradients, or
+value-prop cards; this is a technical document. Verification should exercise
+the real workflow, not just typecheck/unit tests, when the plan touches
+something a smoke test can catch that a unit test can't.
+
+Read `references/exemplar.md` when a worked example would help calibrate quality.

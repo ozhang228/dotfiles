@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Orchestrates a multi-agent code review that explains a PR to the user in reading order, deeply enough to understand it, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. With no diff to review, the same investigative approach produces a guided file:line reading tour of an existing system or feature instead. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, checking for security issues, or when the user wants to understand how a system/feature/concept works in the codebase. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality, code walkthroughs, "explain how X works", "walk me through Y".
+description: Orchestrates a multi-agent code review that explains a PR to the user in reading order, deeply enough to understand it, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. With no diff to review, the same approach produces a guided file:line reading tour of an existing system or feature instead. Triggers: PR/code review, code quality audits, refactoring suggestions, security-issue checks, "explain how X works", "walk me through Y".
 ---
 
 # Code Review
@@ -20,8 +20,6 @@ Run the bundled `scripts/pr-languages` first to identify which languages are in 
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
 | Local Recaps      | `references/visual-recap.md`      | Authoring self-contained local recaps |
 | Structured Blocks | `references/structured-blocks.md` | Diff, data-model, API, file-tree, tabs, diagram components |
-| Wireframes        | `references/wireframe.md`         | Recapping rendered UI changes         |
-| Canvas            | `references/canvas.md`            | Authoring canvas-like recap sections     |
 
 ## Review Workflow
 
