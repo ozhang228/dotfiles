@@ -271,6 +271,345 @@ blockquote {
   font-size: 22px;
 }
 
+.badge.added {
+  color: var(--ok);
+  border-color: rgba(112, 214, 163, 0.5);
+  background: rgba(112, 214, 163, 0.1);
+}
+
+.badge.removed {
+  color: var(--bad);
+  border-color: rgba(255, 139, 139, 0.5);
+  background: rgba(255, 139, 139, 0.1);
+}
+
+.badge.modified {
+  color: var(--accent);
+  border-color: rgba(125, 183, 255, 0.5);
+  background: rgba(125, 183, 255, 0.1);
+}
+
+.badge.renamed {
+  color: var(--warn);
+  border-color: rgba(243, 197, 107, 0.5);
+  background: rgba(243, 197, 107, 0.1);
+}
+
+.fileMapPath {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.diff {
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel-2);
+}
+
+.diffHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.diffPath {
+  color: var(--text);
+}
+
+.diffSummary {
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  margin-left: auto;
+  text-align: right;
+}
+
+.diffSplit,
+.annoCode > div:not(.diffHead):not(.diffNotes) {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12.5px;
+}
+
+.diffSplit {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diffPane {
+  overflow-x: auto;
+}
+
+.diffPane + .diffPane {
+  border-left: 1px solid var(--line);
+}
+
+.diffRow {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  width: max-content;
+  min-width: 100%;
+}
+
+.diffRow .ln {
+  color: var(--muted);
+  text-align: right;
+  padding: 1px 8px;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+.diffRow .code {
+  padding: 1px 14px 1px 4px;
+  white-space: pre;
+}
+
+.diffRow.add {
+  background: rgba(112, 214, 163, 0.08);
+}
+
+.diffRow.add .code {
+  color: var(--ok);
+}
+
+.diffRow.del {
+  background: rgba(255, 139, 139, 0.08);
+}
+
+.diffRow.del .code {
+  color: var(--bad);
+}
+
+.diffRow.blank .code {
+  opacity: 0;
+}
+
+.noteMarker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--code);
+  font-size: 10px;
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+.diffNotes {
+  border-top: 1px solid var(--line);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.diffNotes .note {
+  display: flex;
+  gap: 9px;
+}
+
+.diffNotes .note .n {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--code);
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.diffNotes .note p {
+  margin: 0;
+}
+
+.diffNotes .note code {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  background: var(--panel);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.dataModel,
+.endpoint {
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px 18px;
+  background: var(--panel-2);
+}
+
+.entityName {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.fieldTable .fname {
+  font-family: "SFMono-Regular", Consolas, monospace;
+}
+
+.fieldTable .ftype {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  color: var(--muted);
+}
+
+.fieldTable .was {
+  color: var(--muted);
+  text-decoration: line-through;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+}
+
+.fieldTable .arrow {
+  color: var(--muted);
+  margin: 0 4px;
+}
+
+.endpointHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.methodPill {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(125, 183, 255, 0.15);
+  color: var(--accent);
+}
+
+.endpointPath {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 14px;
+}
+
+.endpointDesc {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 14px;
+}
+
+.endpoint h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 14px 0 6px;
+}
+
+.jsonExplorer summary {
+  cursor: pointer;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12.5px;
+  background: var(--panel);
+  padding: 8px 10px;
+  border-radius: 6px;
+  list-style: none;
+}
+
+.jsonExplorer summary::-webkit-details-marker {
+  display: none;
+}
+
+.jsonExplorer summary::before {
+  content: "▸ ";
+  color: var(--muted);
+}
+
+.jsonExplorer[open] summary::before {
+  content: "▾ ";
+}
+
+.jsonExplorer pre {
+  margin: 6px 0 0;
+}
+
+.tabs {
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel-2);
+}
+
+.tabBar {
+  display: flex;
+  gap: 2px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  padding: 4px 4px 0;
+  overflow-x: auto;
+}
+
+.tabBtn {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  white-space: nowrap;
+}
+
+.tabBtn:hover {
+  color: var(--text);
+}
+
+.tabBtn.active {
+  background: var(--panel-2);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.diagramNode {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12.5px;
+  margin-bottom: 8px;
+}
+
+.diagramNode.hot {
+  border-color: var(--accent);
+  background: rgba(125, 183, 255, 0.1);
+}
+
+.diagramConnector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 22px;
+}
+
 .plan > :first-child {
   margin-top: 0;
 }

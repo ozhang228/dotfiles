@@ -1,11 +1,13 @@
 ---
 name: code-review
-description: Orchestrates a multi-agent code review. The main thread does the one deep investigation pass, gates on architecture, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, or checking for security issues. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality. Complements specialized skills (security-reviewer, test-master).
+description: Orchestrates a multi-agent code review that explains a PR to the user in reading order, deeply enough to understand it, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. With no diff to review, the same investigative approach produces a guided file:line reading tour of an existing system or feature instead. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, checking for security issues, or when the user wants to understand how a system/feature/concept works in the codebase. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality, code walkthroughs, "explain how X works", "walk me through Y". Complements specialized skills (security-reviewer, test-master).
 ---
 
 # Code Review
 
-You are the **orchestrator**. You do the only deep investigation pass yourself, gate on whether the PR's direction is even right, then fan the line-level review out to four subagents that each focus on exactly one thing. You merge and validate everything they return. The point of the split is focus: each agent is blind to the others' concerns and can't be distracted from its single job.
+You are the **orchestrator**. At its core this skill explains a PR to the user, in reading order, well enough that they deeply understand it — not just a bug list. You do the only deep investigation pass yourself, gate on whether the PR's direction is even right, then fan the line-level review out to four subagents that each focus on exactly one thing. You merge and validate everything they return. The point of the split is focus: each agent is blind to the others' concerns and can't be distracted from its single job.
+
+**No diff to review?** Same skill, same investigative instinct, pointed at an existing system/feature/concept instead of a PR ("explain how X works", "walk me through the auth flow"). Skip the diff-specific mechanics — merge-base resolution, the architecture gate, subagent fan-out, the Bugs/Testing/Performance/Simplification findings sections — and skip straight to producing the reading order itself: identify prerequisites (invariants, vocabulary, abstractions the code assumes), then write `## Prerequisites` followed by `## Reading Tour` with ordered `file:line` stops, each explaining what to look for and why it comes at this point, with your opinions inline (confusing naming, a better structure, why it's built this way). End by inviting the user to read and come back with questions — push toward a verdict ("does this design make sense to you?", "what would you do differently?"), not just comprehension. Length follows the concept: some systems need 3 stops, some need 12. Give `file:line` anchors rather than pasting large snippets — the user reads the real code.
 
 ## Reference Guide
 
@@ -17,6 +19,7 @@ Run the bundled `scripts/pr-languages` first to identify which languages are in 
 | TypeScript/TSX    | `references/typescript.md`        | Any `.ts` or `.tsx` files in the diff |
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
 | Local Recaps      | `references/visual-recap.md`      | Authoring self-contained local recaps |
+| Structured Blocks | `references/structured-blocks.md` | Diff, data-model, API, file-tree, tabs, diagram components |
 | Wireframes        | `references/wireframe.md`         | Recapping rendered UI changes         |
 | Canvas            | `references/canvas.md`            | Authoring canvas-like recap sections     |
 

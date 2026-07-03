@@ -30,13 +30,70 @@ The rendered `plan.mdx` should be a focused review surface, not a marketing page
 - `PlanHeader`: title, status, scope, and decision badges.
 - `SummaryGrid` with `SummaryCard`: first-viewport outcome, hard guards, scope, and recommendation.
 - `MetricGrid` with `Metric`: numeric or bounded facts such as call counts, cache keys, display units, and latency boundaries.
-- `Split` with `Panel`: side-by-side decisions, tradeoffs, or current/target comparisons.
+- `Split` with `Panel`: side-by-side decisions, tradeoffs, or current/target comparisons. Also the before/after primitive — two `Panel`s inside one `Split`.
 - `Flow`: actual data flow or user flow. Use only when sequence matters.
-- `FileMap`: real files, symbols, data shapes, and ownership boundaries grounded in local code.
+- `FileMap`: real files, symbols, data shapes, and ownership boundaries grounded in local code. Pass `change` on an item (`added`/`modified`/`removed`/`renamed`) when the plan extends an existing file, not just for net-new ones.
 - `TestMatrix`: 3-5 core behaviors and why each test exists.
 - `Callout`: non-answerable risks, gates, hard constraints, or no-open-question statements.
+- `Diff` / `AnnotatedCode`: real before/after code for a proposed change to an existing file, or the shape of a genuinely new file. See "Diff, data-model, and API components" below.
+- `DataModel` / `Endpoint`: proposed schema or API contract, with per-field `change` flags.
+- `Tabs` + `TabPanel`: group 3-8 related code/diff panels under one horizontal tab strip instead of stacking them.
+- `DiagramNode` / `DiagramConnector` inside `Split`+`Panel`: a two-panel before/after architecture sketch — plain boxes, no diagram library.
 
 Use stable ids for sections and questions so the user can refer to them in chat.
+
+## Diff, data-model, and API components
+
+These components exist because a plan is easier to review as structured,
+scannable blocks than as prose describing a diff, a schema, or a contract —
+the same idea `/code-review`'s recap uses for reviewing a diff, applied in
+the forward direction (proposing a change instead of summarizing one). Full
+prop types live in `assets/mdx-visual-plan-renderer/src/planComponents.tsx` —
+read it before using any of these; the shapes below are a summary, not the
+source of truth.
+
+- **`Diff`** — proposed before/after for an existing file. Props: `filename`,
+  optional `summary`, `before`/`after` (arrays of `{ ln?, type, code, note? }`
+  where `type` is `"ctx" | "add" | "del" | "blank"`), optional `notes`
+  (array of `{ n, text }`, cross-referenced by the line's `note` number).
+  Use `"blank"` rows to keep the two panes line-aligned when one side has
+  more lines than the other.
+- **`AnnotatedCode`** — same visual language, one column, for a proposed
+  brand-new file with no "before". Props: `filename`, optional `summary`,
+  `lines` (array of `DiffLine`, usually all `type: "ctx"`), optional `notes`.
+- **`DataModel`** — proposed entity/table. Props: `entity`, `fields` (array
+  of `{ name, type, change?, was? }`). For a net-new entity every field is
+  `change: "added"`; for extending an existing table, mix `added` on new
+  columns with unflagged existing ones.
+- **`Endpoint`** — proposed API contract. Props: `method`, `path`, optional
+  `change`, optional `description`, optional `params` (array of
+  `{ name, type, in?, change?, was? }`), optional `examples` (array of
+  `{ label, json }` where `json` is a real JS value — it's rendered through
+  `JSON.stringify(json, null, 2)` inside a native `<details>`, not hand-typed
+  text).
+- **`Tabs`** + **`TabPanel`** — `<Tabs><TabPanel label="...">...</TabPanel>...</Tabs>`.
+  Each `TabPanel` needs a `label`; wrap `Diff`/`AnnotatedCode` blocks for the
+  key files inside. Budget: 3-8 tabs — fewer doesn't need tabs, more stops
+  being scannable.
+- **`DiagramNode`** (optional `hot` prop to highlight the changed/new step)
+  and **`DiagramConnector`** (defaults to `→`) — place inside two `Panel`s
+  under one `Split` for a before/after architecture sketch. Use more `Panel`s
+  for a swimlane with more than two tracks. Never collapse a structural
+  change into a single node-to-node chain when panels/lanes would show it
+  better.
+
+### Proposed-change → component mapping
+
+| Kind of proposed change | Component |
+| --- | --- |
+| New or modified schema/table | `DataModel`, field-level `change` |
+| New or modified API/route | `Endpoint` with request/response examples |
+| Modifying an existing file | `Diff` (split), one-line `summary`, a few `note`-numbered annotations |
+| Proposing a brand-new file | `AnnotatedCode` instead of a one-sided diff |
+| Several key files needing full proposed diffs | group under `Tabs`, 3-8 tabs |
+| Before/after architecture or data-flow shift | `Split` + `Panel` + `DiagramNode`/`DiagramConnector`, never a single arrow chain |
+| File footprint of a multi-file change | `FileMap` with `change` flags |
+| Rendered UI/interaction change | wireframe — see `references/wireframe.md`, not a diagram |
 
 ## MDX Source
 
@@ -62,6 +119,10 @@ Passing the wrong prop *shape* to a renderer component throws at render and blan
 - `PlanHeader badges` — array of **plain strings**, not objects. No per-badge tone exists.
 - `SummaryCard tone` — one of `default | good | warn | bad`. `Callout tone` — `info | good | warn | bad`. There is **no `"ok"` or `"info"` on SummaryCard**; an unknown tone silently yields a dead className (no crash, but no styling either), so it won't error but also won't look right.
 - `Metric` takes `label` + `value` strings; `Flow steps` / `FileMap items` / `TestMatrix tests` each take arrays of objects with the exact keys defined in the file — anything else renders blank.
+- `change` on `FileMap items` / `DataModel fields` / `Endpoint params` / `Endpoint` itself is one of `"added" | "modified" | "removed" | "renamed"` — exact strings, they're also the CSS badge class names.
+- `Diff before`/`after` and `AnnotatedCode lines` are arrays of `{ ln?, type, code, note? }` — `type` must be exactly `"ctx" | "add" | "del" | "blank"`; any other string renders an unstyled row instead of failing loudly.
+- `Endpoint examples[].json` takes a **real JS value** (object/array/string/number), not a JSON string — passing a string double-encodes it inside the `<pre>`.
+- `Tabs` children must be `TabPanel` elements, each with a `label` prop — a bare `<div>` child inside `<Tabs>` is silently filtered out by `isValidElement`, so it just won't appear as a tab.
 
 Rule: never pass a prop shape from memory. The component file is the source of truth; read it.
 
@@ -91,9 +152,10 @@ Before handoff:
   finally { await vite.close(); }
   ```
 
-  A clean run prints `SSR_OK length=<thousands> HAS= true`. `SSR_ERROR: ...` (e.g. "Objects are not valid as a React child") is the real failure the `200`/grep checks miss. Only report the URL as verified after an `SSR_OK` with your content present.
+  A clean run prints `SSR_OK length=<thousands> HAS= true`. `SSR_ERROR: ...` (e.g. "Objects are not valid as a React child") is the real failure the `200`/grep checks miss. Only proceed to serving after an `SSR_OK` with your content present.
+- **The SSR check is a headless crash test, not a preview — it has no JavaScript.** It proves the components render without throwing; it does NOT prove `Tabs` clicking works, JSON `<details>` disclosure opens, or any other interaction — `renderToStaticMarkup` produces dead HTML with no event handlers attached. Never hand the SSR output to the user as "the plan." Delete the check script after running it.
 - Run repo-native checks only when they already exist locally. Do not install validators.
-- Verify the `http://127.0.0.1:<port>/` URL responds, and report the verified URL with the folder path and direct `plan.mdx` path.
+- **The one artifact the user actually reviews is the live `scripts/serve-mdx-visual-plan` URL.** After the SSR check passes, run it (or confirm it's already running) and verify the `http://127.0.0.1:<port>/` URL responds. This is a real Vite dev server serving hydrated React — tabs, disclosure, and any future interactive component work there. Report that URL, the folder path, and the direct `plan.mdx` path. If you only ever showed the user an SSR snapshot, you have not shown them the plan.
 
 ## Visual Surface Choice
 
