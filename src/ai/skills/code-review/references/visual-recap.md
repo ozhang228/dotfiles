@@ -71,18 +71,27 @@ the short version:
 
 ## Canonical Shape And Budgets
 
-A strong recap follows one skeleton, top to bottom:
+A recap reads like a review someone walks through, not a section checklist.
+No decorative title or category-tag header — open straight into the first
+part. Three parts, top to bottom:
 
-1. UI-impact headline — wireframes first, only when the diff changed rendered
-   UI.
-2. Short outcome narrative (prose): what changed and why, 1-3 paragraphs. This
-   is the one place free-form judgment and risk assessment belong — every
-   structured block below it must still be diff-derived, not narrated.
-3. `data-model` / `api-endpoint` blocks for schema and contract changes.
-4. `file-tree` of the changed files with `change` flags.
-5. `## Key changes` — one horizontal `tabs` block of `diff` / `annotated-code`.
-6. Grouped review findings (Bugs / Testing / Performance / Simplification /
-   Nits) with stable ids, per the Output Format in `SKILL.md`.
+1. **Understanding the PR.** Prose, grounded in the tests (Phase 1 step 6:
+   read the tests first). Summarize succinctly what the PR does and why —
+   the behavior a reader needs before looking at a single line of the diff.
+   This is not a findings list yet; it's the same understanding the tests
+   gave you, handed to the reader.
+2. **Modeling.** The deeper why: the confirmed architecture verdict from
+   Phase 2, plus `data-model` / `api-endpoint` blocks wherever the PR touches
+   schema or contracts, explaining the design choices and whether they hold
+   up — not just what the code does, why it's shaped this way.
+3. **The review.** `file-tree` of the changed files, then `## Key changes` —
+   one horizontal `tabs` block of `diff` / `annotated-code` with annotations
+   calling out what's important, then the grouped findings (Bugs / Testing /
+   Performance / Simplification / Nits) with stable ids, per the Output
+   Format in `SKILL.md`.
+
+Prepend a UI-impact headline (wireframes) before part 1, but only when the
+diff actually changed rendered UI — most PRs skip it entirely.
 
 Budgets that keep the recap reviewable:
 
@@ -134,4 +143,7 @@ Before handoff:
   page's own `<style>` tag (no partial copy-paste of the token CSS).
 - Run repo-native checks only when they already exist locally. Do not install
   validators.
+- Serve the recap directory with an already-available local static server
+  (e.g. `python3 -m http.server`) and report the browser URL. If serving
+  fails, report the failure and still provide the direct file path.
 - Report the folder path and direct `index.html` path.

@@ -1,8 +1,8 @@
 ---
 name: learn
-description: Conversational learning-project planner. Talk through what to learn, propose a project that teaches the internals by building them, then create a spec in ~/forge with behavior steps and inline reading links. TRIGGER on "I want to learn X", "project to learn X", "learning project about X", or any prompt where the goal is understanding a technology through building something.
+description: Conversational learning-project planner. Talk through what to learn, propose a project that teaches the internals by building them, then create a spec in ~/forge with behavior steps and inline reading links.
 allowed-tools: WebSearch, WebFetch, Read, Write, Bash
-user-invocable-only: true
+disable-model-invocation: true
 ---
 
 # Learn

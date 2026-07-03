@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Orchestrates a multi-agent code review that explains a PR to the user in reading order, deeply enough to understand it, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. With no diff to review, the same investigative approach produces a guided file:line reading tour of an existing system or feature instead. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, checking for security issues, or when the user wants to understand how a system/feature/concept works in the codebase. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality, code walkthroughs, "explain how X works", "walk me through Y". Complements specialized skills (security-reviewer, test-master).
+description: Orchestrates a multi-agent code review that explains a PR to the user in reading order, deeply enough to understand it, then fans out to four single-purpose subagents (Correctness, Testing, Performance, Simplification) before merging their findings into a structured report. With no diff to review, the same investigative approach produces a guided file:line reading tour of an existing system or feature instead. Use when reviewing pull requests, conducting code quality audits, identifying refactoring opportunities, checking for security issues, or when the user wants to understand how a system/feature/concept works in the codebase. Invoke for PR reviews, code quality checks, refactoring suggestions, review code, code quality, code walkthroughs, "explain how X works", "walk me through Y".
 ---
 
 # Code Review
@@ -89,13 +89,7 @@ When the work is the reverse — you're the author addressing comments on your o
 
 ## Local Visual Recap Surface
 
-Use a self-contained local visual recap as the primary review surface:
-
-- Read diff, stat, and source context from local files and shell commands only. Do not fetch schemas, install packages, call external visual-plan tools, publish to a database, or depend on any external server.
-- Prefer `./tmp/review-<branch-name>-recap/` for scratch review artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in. The folder contains `index.html` as the primary review UI and `review.md` as the source-of-truth text fallback. Optional assets must be local files in the same folder.
-- Validate without dynamic dependencies: confirm `index.html` and `review.md` exist, open/read the generated files enough to catch broken anchors or placeholders, and run any repo-native formatter/checker only if it already exists locally. Do not run package-execution commands, package installs, or remote schema fetches.
-- Serve the recap directory with an already-available local static server, such as `python3 -m http.server`, and report the browser URL alongside the local folder path and direct `index.html` path. If serving fails, report the failure and still provide the direct file path.
-- Treat review feedback as chat or file feedback: when the user refers to a recap item, anchor, or comment, inspect the matching local review section, apply accepted code fixes, update the local files, and refresh the artifact.
+Use a self-contained local visual recap as the primary review surface. Read `references/visual-recap.md` in full — it owns the self-contained contract, the structured-blocks component library, the canonical shape/budgets, and the validation and serving steps.
 
 ## Output Format
 
@@ -110,7 +104,6 @@ Use a self-contained local visual recap as the primary review surface:
   - `## Simplification` - over-engineering to cut. Labels match the agent's tags: `**delete:**`, `**stdlib:**`, `**native:**`, `**yagni:**`, `**shrink:**`. End the section with `net: -<N> lines possible`, or `Lean already.` if there were no findings.
   - `## Nits` - non-functional, main-thread style. Labels: `**Unclear:**` (naming/control flow unclear), `**Nit:**` (style).
 - Under each Markdown section, group comments by file with a sub-heading: `### <file_path>:<line_number>` and number comments under each file.
-- Read `references/visual-recap.md`, plus `references/wireframe.md` and `references/canvas.md` when rendered UI changed. Mirror the review into the local recap as structured HTML sections: architecture verdict, changed file footprint, grouped review findings with stable ids, key diffs or annotated snippets for load-bearing changed files, schema/API summaries when relevant, and wireframes only when rendered UI changed.
 - **Every comment must demand a response.** It must either propose a concrete change (old/new code blocks) or ask a specific question the author needs to answer. Do **not** write observational "FYI / this is happening / not a problem but be aware" comments. If there's no ask and no risk worth surfacing, drop it.
 - For non-obvious findings, include enough local code context to make the claim readable without a follow-up. Name the relevant function chain or data path, and cite the exact code sites where the accepted input, transformation, and bad outcome happen. Example shape: "`zServerRow` accepts recursive `children` -> `parseRow` preserves recursive children -> `detailGridOptions` renders only one plain child grid." Do this in the review comment itself, not only in private analysis.
 - After writing the Markdown and HTML, inspect the generated files for placeholders, broken anchors, and missing sections. If a repo-native checker exists for HTML or Markdown, run it; do not install one.

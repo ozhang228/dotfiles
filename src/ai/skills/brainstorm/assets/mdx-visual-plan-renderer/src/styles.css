@@ -1,17 +1,18 @@
 :root {
   color-scheme: dark;
-  --bg: #15171b;
-  --panel: #20242b;
-  --panel-2: #252b33;
-  --text: #f2f4f7;
-  --muted: #aab3c2;
-  --line: #3a414d;
-  --accent: #7db7ff;
-  --accent-2: #a6e3a1;
-  --ok: #70d6a3;
-  --warn: #f3c56b;
-  --bad: #ff8b8b;
-  --code: #111318;
+  /* Rosé Pine Moon */
+  --bg: #232136;
+  --panel: #2a273f;
+  --panel-2: #393552;
+  --text: #e0def4;
+  --muted: #908caa;
+  --line: #44415a;
+  --accent: #c4a7e7;
+  --accent-2: #ea9a97;
+  --ok: #9ccfd8;
+  --warn: #f6c177;
+  --bad: #eb6f92;
+  --code: #2a283e;
 }
 
 * {
@@ -22,7 +23,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font: 14px/1.5 "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 a {
@@ -58,13 +59,13 @@ td {
 blockquote {
   margin: 16px 0;
   border-left: 3px solid var(--warn);
-  background: rgba(243, 197, 107, 0.08);
+  background: rgba(246, 193, 119, 0.08);
   padding: 12px 14px;
   border-radius: 6px;
 }
 
 .page {
-  width: min(1240px, calc(100vw - 48px));
+  width: min(1680px, calc(100vw - 64px));
   margin: 0 auto;
   padding: 28px 0 44px;
 }
@@ -133,15 +134,15 @@ blockquote {
 }
 
 .summaryCard.good {
-  border-color: rgba(112, 214, 163, 0.6);
+  border-color: rgba(156, 207, 216, 0.6);
 }
 
 .summaryCard.warn {
-  border-color: rgba(243, 197, 107, 0.7);
+  border-color: rgba(246, 193, 119, 0.7);
 }
 
 .summaryCard.bad {
-  border-color: rgba(255, 139, 139, 0.65);
+  border-color: rgba(235, 111, 146, 0.65);
 }
 
 .summaryCard h3,
@@ -159,7 +160,7 @@ blockquote {
 
 .callout {
   border-left: 3px solid var(--accent);
-  background: rgba(125, 183, 255, 0.08);
+  background: rgba(196, 167, 231, 0.08);
   padding: 12px 14px;
   border-radius: 6px;
   margin: 16px 0;
@@ -167,17 +168,17 @@ blockquote {
 
 .callout.good {
   border-left-color: var(--ok);
-  background: rgba(112, 214, 163, 0.08);
+  background: rgba(156, 207, 216, 0.08);
 }
 
 .callout.warn {
   border-left-color: var(--warn);
-  background: rgba(243, 197, 107, 0.08);
+  background: rgba(246, 193, 119, 0.08);
 }
 
 .callout.bad {
   border-left-color: var(--bad);
-  background: rgba(255, 139, 139, 0.08);
+  background: rgba(235, 111, 146, 0.08);
 }
 
 .callout strong {
@@ -260,7 +261,7 @@ blockquote {
 
 .checklist li {
   border-left: 3px solid var(--ok);
-  background: rgba(112, 214, 163, 0.08);
+  background: rgba(156, 207, 216, 0.08);
   border-radius: 6px;
   padding: 9px 12px;
 }
@@ -273,26 +274,26 @@ blockquote {
 
 .badge.added {
   color: var(--ok);
-  border-color: rgba(112, 214, 163, 0.5);
-  background: rgba(112, 214, 163, 0.1);
+  border-color: rgba(156, 207, 216, 0.5);
+  background: rgba(156, 207, 216, 0.1);
 }
 
 .badge.removed {
   color: var(--bad);
-  border-color: rgba(255, 139, 139, 0.5);
-  background: rgba(255, 139, 139, 0.1);
+  border-color: rgba(235, 111, 146, 0.5);
+  background: rgba(235, 111, 146, 0.1);
 }
 
 .badge.modified {
   color: var(--accent);
-  border-color: rgba(125, 183, 255, 0.5);
-  background: rgba(125, 183, 255, 0.1);
+  border-color: rgba(196, 167, 231, 0.5);
+  background: rgba(196, 167, 231, 0.1);
 }
 
 .badge.renamed {
   color: var(--warn);
-  border-color: rgba(243, 197, 107, 0.5);
-  background: rgba(243, 197, 107, 0.1);
+  border-color: rgba(246, 193, 119, 0.5);
+  background: rgba(246, 193, 119, 0.1);
 }
 
 .fileMapPath {
@@ -372,7 +373,7 @@ blockquote {
 }
 
 .diffRow.add {
-  background: rgba(112, 214, 163, 0.08);
+  background: rgba(156, 207, 216, 0.08);
 }
 
 .diffRow.add .code {
@@ -380,7 +381,7 @@ blockquote {
 }
 
 .diffRow.del {
-  background: rgba(255, 139, 139, 0.08);
+  background: rgba(235, 111, 146, 0.08);
 }
 
 .diffRow.del .code {
@@ -498,7 +499,7 @@ blockquote {
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 4px;
-  background: rgba(125, 183, 255, 0.15);
+  background: rgba(196, 167, 231, 0.15);
   color: var(--accent);
 }
 
@@ -599,7 +600,7 @@ blockquote {
 
 .diagramNode.hot {
   border-color: var(--accent);
-  background: rgba(125, 183, 255, 0.1);
+  background: rgba(196, 167, 231, 0.1);
 }
 
 .diagramConnector {
@@ -608,6 +609,125 @@ blockquote {
   justify-content: center;
   color: var(--muted);
   font-size: 22px;
+}
+
+.optionsCompare {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.optionCard {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-2);
+  padding: 14px;
+  min-width: 0;
+}
+
+.optionCard.recommended {
+  border-color: var(--accent);
+}
+
+.optionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.optionHead h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.optionCriteria {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+
+.optionCriteria div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
+}
+
+.optionCriteria dt {
+  color: var(--muted);
+}
+
+.optionCriteria dd {
+  margin: 0;
+  text-align: right;
+}
+
+.optionPros,
+.optionCons {
+  margin: 0 0 8px;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.optionPros li {
+  color: var(--ok);
+}
+
+.optionCons li {
+  color: var(--bad);
+}
+
+.optionPros li::marker,
+.optionCons li::marker {
+  color: inherit;
+}
+
+.assumptionList {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.assumptionRow {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.assumptionRow p {
+  margin: 0;
+}
+
+.assumptionNote {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px !important;
+}
+
+.badge.status-verified {
+  color: var(--ok);
+  border-color: rgba(156, 207, 216, 0.5);
+  background: rgba(156, 207, 216, 0.1);
+}
+
+.badge.status-unverified {
+  color: var(--warn);
+  border-color: rgba(246, 193, 119, 0.5);
+  background: rgba(246, 193, 119, 0.1);
+}
+
+.badge.status-todo {
+  color: var(--bad);
+  border-color: rgba(235, 111, 146, 0.5);
+  background: rgba(235, 111, 146, 0.1);
 }
 
 .plan > :first-child {

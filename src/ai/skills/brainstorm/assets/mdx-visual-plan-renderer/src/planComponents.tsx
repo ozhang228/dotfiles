@@ -472,6 +472,90 @@ export function DiagramConnector({ children = "→" }: { children?: ReactNode })
   return <div className="diagramConnector">{children}</div>;
 }
 
+type Criterion = {
+  label: string;
+  value: string;
+};
+
+type Option = {
+  name: string;
+  recommended?: boolean;
+  criteria?: Criterion[];
+  pros?: string[];
+  cons?: string[];
+};
+
+type OptionsCompareProps = {
+  options: Option[];
+};
+
+export function OptionsCompare({ options }: OptionsCompareProps) {
+  return <section className="optionsCompare">{options.map(renderOption)}</section>;
+}
+
+function renderOption({ name, recommended = false, criteria = [], pros = [], cons = [] }: Option) {
+  return (
+    <section className={`optionCard${recommended ? " recommended" : ""}`} key={name}>
+      <div className="optionHead">
+        <h3>{name}</h3>
+        {recommended ? <span className="badge modified">recommended</span> : undefined}
+      </div>
+      {criteria.length === 0 ? undefined : (
+        <dl className="optionCriteria">
+          {criteria.map(({ label, value }) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+      {pros.length === 0 ? undefined : (
+        <ul className="optionPros">
+          {pros.map((pro) => (
+            <li key={pro}>{pro}</li>
+          ))}
+        </ul>
+      )}
+      {cons.length === 0 ? undefined : (
+        <ul className="optionCons">
+          {cons.map((con) => (
+            <li key={con}>{con}</li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+type AssumptionStatus = "verified" | "unverified" | "todo";
+
+type Assumption = {
+  text: string;
+  status: AssumptionStatus;
+  note?: string;
+};
+
+type AssumptionListProps = {
+  items: Assumption[];
+};
+
+export function AssumptionList({ items }: AssumptionListProps) {
+  return <section className="assumptionList">{items.map(renderAssumption)}</section>;
+}
+
+function renderAssumption({ text, status, note }: Assumption, index: number) {
+  return (
+    <div className="assumptionRow" key={index}>
+      <span className={`badge status-${status}`}>{status}</span>
+      <div>
+        <p>{text}</p>
+        {note === undefined ? undefined : <p className="assumptionNote">{note}</p>}
+      </div>
+    </div>
+  );
+}
+
 export const planComponents: MDXComponents = {
   PlanHeader,
   SummaryGrid,
@@ -493,4 +577,6 @@ export const planComponents: MDXComponents = {
   TabPanel,
   DiagramNode,
   DiagramConnector,
+  OptionsCompare,
+  AssumptionList,
 };

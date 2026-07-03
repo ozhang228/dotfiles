@@ -1,8 +1,8 @@
 ---
 name: revise-message
-description: Revise short work messages (Slack DMs, stakeholder emails, announcements, pitches, signoff requests, re-pings) so they read clearly and land the ask. Applies Oscar's writing rules, cuts hedges that undermine the point, and concretizes vague phrases. TRIGGER on "help revise this", "make this sound better", "help me reframe", "reword plz", "tighten this up", "what should I type", "how should I phrase this" applied to a paragraph of work prose. SKIP for PR descriptions and commit messages (those have their own conventions) and for code.
+description: Revise short work messages (Slack DMs, stakeholder emails, announcements, pitches, signoff requests, re-pings) so they read clearly and land the ask. Applies Oscar's writing rules, cuts hedges that undermine the point, and concretizes vague phrases. Not for PR descriptions, commit messages, or code.
 allowed-tools: Read
-user-invocable-only: true
+disable-model-invocation: true
 ---
 
 # Revise Message

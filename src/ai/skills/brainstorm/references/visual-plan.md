@@ -27,7 +27,10 @@ Use this structure:
 
 The rendered `plan.mdx` should be a focused review surface, not a marketing page:
 
-- `PlanHeader`: title, status, scope, and decision badges.
+- `PlanHeader`: rarely needed. The Plan Body Shape below opens with the ask
+  restated in prose, not a title/badge header — a separate title or category
+  tags (e.g. `badges={["auth", "backend"]}`) just restate that. Reach for it
+  only if a plan genuinely needs a status/scope strip beyond the opening ask.
 - `SummaryGrid` with `SummaryCard`: first-viewport outcome, hard guards, scope, and recommendation.
 - `MetricGrid` with `Metric`: numeric or bounded facts such as call counts, cache keys, display units, and latency boundaries.
 - `Split` with `Panel`: side-by-side decisions, tradeoffs, or current/target comparisons. Also the before/after primitive — two `Panel`s inside one `Split`.
@@ -39,6 +42,8 @@ The rendered `plan.mdx` should be a focused review surface, not a marketing page
 - `DataModel` / `Endpoint`: proposed schema or API contract, with per-field `change` flags.
 - `Tabs` + `TabPanel`: group 3-8 related code/diff panels under one horizontal tab strip instead of stacking them.
 - `DiagramNode` / `DiagramConnector` inside `Split`+`Panel`: a two-panel before/after architecture sketch — plain boxes, no diagram library.
+- `OptionsCompare`: the tradeoff menu for "Present suggested approach" — N options side by side, each with criteria, pros, and cons, one marked `recommended`. Use this instead of a two-column `Split` once there are 3+ options, and instead of a plain Markdown table always (MDX should out-scan Markdown, not fall back to it).
+- `AssumptionList`: status-flagged load-bearing assumptions (`verified` / `unverified` / `todo`). Use for the "verify load-bearing assumptions, don't just list them" step — an assumption that's a TODO should render as a TODO, not disappear into prose.
 
 Use stable ids for sections and questions so the user can refer to them in chat.
 
@@ -99,7 +104,7 @@ source of truth.
 
 `plan.mdx` is the source-of-truth document for the user and the agent. Keep the prose, diagrams, structured sections, and open questions in that one file so revisions do not require syncing parallel HTML and Markdown.
 
-MDX should make the plan easier to parse than Markdown. A plan that is mostly headings, paragraphs, and tables has failed the format choice. Put the first screen in `PlanHeader`, `SummaryGrid`, and `MetricGrid` when possible. Use prose for rationale, but move dense lists, decisions, flows, file maps, tests, and risks into renderer components.
+MDX should make the plan easier to parse than Markdown. A plan that is mostly headings, paragraphs, and tables has failed the format choice. Put the first screen in the Ask (prose), then `SummaryGrid`/`MetricGrid` when useful. Use prose for rationale, but move dense lists, decisions, flows, file maps, tests, and risks into renderer components.
 
 ### MDX is JSX, not HTML — inline markup must be JSX (FAILURE SEEN)
 
@@ -166,17 +171,30 @@ Before handoff:
 
 ## Plan Body Shape
 
-A useful local visual plan should stand alone:
+A visual plan reads as a narrative someone can act on, not a form. No
+decorative title or category-tag header — open directly with the ask; a
+separate `PlanHeader` title/subtitle/badges block restates what part 1
+already says, so skip it (see the `PlanHeader` note above).
 
-1. Objective and done criteria.
-2. Scope and explicit non-goals.
-3. Proposed approach with key decisions and rationale.
-4. File, symbol, API, or data-shape map grounded in real code.
-5. Performance boundaries for batching, caching, latency, and external I/O when they matter.
-6. Expected behaviors and verification.
-7. Risks and assumptions.
-8. Open questions at the bottom when answers would change the plan.
+1. **The Ask** — reiterate, in a sentence or two, what's actually being
+   asked. This is the document's opening.
+2. **What needs to be done, concretely — with the tests that will nail it.**
+   The concrete behavior/requirements, paired with `TestMatrix`: the names of
+   the tests you're going to write sit right next to what they're testing
+   (see `references/testing.md` for the format), not in a separate appendix.
+3. **Assumptions.** `AssumptionList` — any load-bearing assumption the design
+   depends on, flagged `verified` / `unverified` / `todo`. Never let one sit
+   in prose where it reads as an accepted fact instead of a checked one.
+4. **Approach.** Concretely, the technical design: file/symbol/data-shape map
+   (`FileMap`), `DataModel`/`Endpoint` for schema or contract changes,
+   `Diff`/`AnnotatedCode` for changes to existing files, `OptionsCompare`
+   when there were real alternatives worth showing, diagrams
+   (`DiagramNode`/`DiagramConnector`) for architecture or data-flow shifts.
+5. **Whatever else the plan needs.** Performance boundaries, risks, a single
+   bottom `question-form` for open questions. Don't force a section that has
+   nothing to say for this particular plan.
 
-The body shape describes content, not rendering. Use MDX components for the sections where visual grouping helps the reviewer scan, compare, or verify the plan.
+Use MDX components for parts 2-5; prose for part 1. A plan that's mostly
+headings and paragraphs has failed the format choice.
 
 Use `references/document-quality.md` for the document quality bar. Read `references/canvas.md` before authoring a canvas-like visual area. Read `references/wireframe.md` before authoring any wireframe. Read `references/exemplar.md` when a worked example would help calibrate quality.
