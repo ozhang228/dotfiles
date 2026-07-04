@@ -21,7 +21,11 @@ return {
   { "<leader>a", "nop", desc = "AI", mode = "v" },
   {
     "<leader>at",
-    function() require("snacks").terminal.toggle(vim.fn.getenv("AI_CLI_CMD")) end,
+    function()
+      require("snacks").terminal.toggle(vim.fn.getenv("AI_CLI_CMD"), {
+        win = { title = " AI Chat ", title_pos = "center" },
+      })
+    end,
     desc = "AI Terminal",
   },
   {

@@ -7,6 +7,8 @@ return {
       ["@lsp.type.variable"] = { fg = "text" },
       LineNr = { fg = "iris" },
       NonText = { fg = "muted" },
+      FloatBorder = { fg = "iris" },
+      FloatTitle = { fg = "gold", bold = true },
     },
   },
 }
