@@ -26,3 +26,5 @@ set -gx PROMETHEUS_MULTIPROC_DIR /tmp
 # to github.com; force the DRW enterprise host so PR views resolve here
 set -gx GH_HOST git.drwholdings.com
 
+tmux_autostart
+
