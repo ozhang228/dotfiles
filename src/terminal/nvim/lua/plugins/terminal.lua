@@ -8,7 +8,7 @@ return {
       win = {
         style = "float",
         border = "none",
-        width = 0.99,
+        width = 0.90,
         height = 0.99,
         keys = {
           term_normal = {
