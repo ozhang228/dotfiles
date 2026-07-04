@@ -9,7 +9,7 @@ return {
         style = "float",
         border = "none",
         width = 0.90,
-        height = 0.99,
+        height = 0.95,
         keys = {
           term_normal = {
             "<leader><esc>",
