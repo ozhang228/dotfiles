@@ -66,6 +66,7 @@
       "/home/ozhang/forge"
     ]
   },
+  "model": "sonnet[1m]",
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -132,6 +133,7 @@
     "clangd-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "auto"
 }
