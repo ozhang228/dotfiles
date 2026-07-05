@@ -75,3 +75,13 @@ vim.api.nvim_create_autocmd("TermRequest", {
     io.stdout:flush()
   end,
 })
+
+vim.api.nvim_create_autocmd("TermRequest", {
+  desc = "Forward OSC-52 clipboard writes from a :terminal child to the host terminal",
+  callback = function(ev)
+    local seq = type(ev.data) == "table" and ev.data.sequence or ev.data or ""
+    if seq:sub(1, 5) ~= "\027]52;" then return end
+    io.stdout:write(seq)
+    io.stdout:flush()
+  end,
+})
