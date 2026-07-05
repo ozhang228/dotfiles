@@ -14,6 +14,6 @@ dst = "~/.local/bin/kitty-load"
 id = "kitty"
 check = "command -v kitty"
 [deps.install_method]
-ubuntu = "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin && ln -sf ~/.local/kitty.app/bin/kitty ~/.local/kitty.app/bin/kitten ~/.local/bin/"
+ubuntu = "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin && ln -sf ~/.local/kitty.app/bin/kitty ~/.local/kitty.app/bin/kitten ~/.local/bin/ && sudo apt-get install -y kitty-terminfo"
 manjaro = "sudo pacman -S kitty"
 mac = "brew install kitty"
