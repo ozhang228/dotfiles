@@ -8,6 +8,7 @@ Per-language conventions live in their own files, imported once at session start
 @~/dotfiles/src/ai/rules/typescript.md
 @~/dotfiles/src/ai/rules/cpp.md
 @~/dotfiles/src/ai/rules/cli.md
+@~/dotfiles/src/ai/rules/marimo.md
 
 Each file is scoped to its language by its own header — apply a rule only when editing a file of that language or running that CLI tool. They load every session regardless of what you touch; that's the deliberate tradeoff for not running an injection hook per edit.
 
