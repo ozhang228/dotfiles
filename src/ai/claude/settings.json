@@ -130,7 +130,8 @@
     "command": "/home/ozhang/dotfiles/src/ai/claude/statusline.sh"
   },
   "enabledPlugins": {
-    "clangd-lsp@claude-plugins-official": true
+    "clangd-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
   },
   "effortLevel": "high",
   "skipDangerousModePermissionPrompt": true,
