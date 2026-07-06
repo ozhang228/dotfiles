@@ -5,8 +5,8 @@ local i = ls.insert_node
 
 return {
   s("marimonb", {
-    t({ "import marimo", "", "app = marimo.App()", "", "with app.setup:", "    import marimo as mo", "    " }),
-    i(1),
+    t({ "import marimo", "", "app = marimo.App()", "", "with app.setup:", "    " }),
+    i(1, "pass"),
     t({ "", "", "", "@app.cell", "def " }),
     i(2, "_"),
     t({ "():", "    " }),
