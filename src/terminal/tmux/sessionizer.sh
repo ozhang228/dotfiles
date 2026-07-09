@@ -99,6 +99,7 @@ fi
 
 selected=$(list_entries | fzf \
     --delimiter $'\t' --with-nth=4 \
+    --no-sort \
     --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
     --preview "$SCRIPT --preview {2} {3}" \
     --preview-window right:60%)
@@ -112,13 +113,13 @@ if [ "$kind" = "session" ]; then
     session_name="$key"
 else
     session_name=$(basename "$key" | tr '.:' '__')
-    if ! tmux has-session -t "$session_name" 2>/dev/null; then
+    if ! tmux has-session -t "=$session_name" 2>/dev/null; then
         tmux new-session -d -s "$session_name" -c "$key"
     fi
 fi
 
 if [ -n "${TMUX:-}" ]; then
-    tmux switch-client -t "$session_name"
+    tmux switch-client -t "=$session_name"
 else
-    tmux attach-session -t "$session_name"
+    tmux attach-session -t "=$session_name"
 fi
