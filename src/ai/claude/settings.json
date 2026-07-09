@@ -133,7 +133,7 @@
     "clangd-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true
   },
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "auto"
