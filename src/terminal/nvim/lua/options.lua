@@ -35,15 +35,16 @@ vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 -- vim.ui.open() shells out to xdg-open, which needs a local display.
 -- Over SSH there's no local display for it to hand off to, so xdg-open just
--- fails. Print an OSC 8 hyperlink instead: most terminal emulators render it
--- as a clickable link and open it in the browser on your actual machine.
+-- fails. Copy the URL to the clipboard instead (via the OSC 52 provider
+-- configured above) so it can be pasted into a browser on the local machine.
 if vim.env.SSH_TTY then
   local default_open = vim.ui.open
   vim.ui.open = function(path, opt)
     if not path:match("%w+:") then
       return default_open(path, opt)
     end
-    io.stdout:write(("\27]8;;%s\27\\%s\27]8;;\27\\\n"):format(path, path))
+    vim.fn.setreg("+", path)
+    vim.notify("Copied to clipboard: " .. path)
     return nil, nil
   end
 end
