@@ -99,7 +99,7 @@ fi
 
 selected=$(list_entries | fzf \
     --delimiter $'\t' --with-nth=4 \
-    --no-sort \
+    --tiebreak=index \
     --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
     --preview "$SCRIPT --preview {2} {3}" \
     --preview-window right:60%)

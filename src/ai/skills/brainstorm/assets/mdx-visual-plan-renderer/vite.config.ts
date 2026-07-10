@@ -11,6 +11,7 @@ const config = defineConfig({
     fs: {
       allow: ["."],
     },
+    allowedHosts: ["ozhang-desktop.qa.ficc.drw"],
   },
 });
 
