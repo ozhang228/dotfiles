@@ -31,7 +31,7 @@ return {
         },
       },
       jump = {
-        jumplist = false,
+        jumplist = true,
       },
       sources = {
         gh_pr = {
