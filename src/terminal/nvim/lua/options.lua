@@ -33,11 +33,18 @@ if vim.env.SSH_TTY then
 end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
--- vim.ui.open() shells out to xdg-open, which needs a local display.
--- Over SSH there's no local display for it to hand off to, so xdg-open just
--- fails. Noop instead of trying to work around it.
-if vim.env.SSH_TTY then
-  vim.ui.open = function(_, _) return nil, nil end
+local default_open = vim.ui.open
+local default_system = vim.system
+vim.ui.open = function(path, opt)
+  vim.system = function(cmd, sys_opt, _)
+    return default_system(cmd, sys_opt, function(result)
+      if result.code ~= 0 then vim.notify(("vim.ui.open: %s exited %d"):format(path, result.code), vim.log.levels.ERROR) end
+    end)
+  end
+  local job, err = default_open(path, opt)
+  vim.system = default_system
+  if err then vim.notify(err, vim.log.levels.ERROR) end
+  return job, err
 end
 
 -- A wrapped line will have same indent on every line
