@@ -35,18 +35,9 @@ vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 -- vim.ui.open() shells out to xdg-open, which needs a local display.
 -- Over SSH there's no local display for it to hand off to, so xdg-open just
--- fails. Copy the URL to the clipboard instead (via the OSC 52 provider
--- configured above) so it can be pasted into a browser on the local machine.
+-- fails. Noop instead of trying to work around it.
 if vim.env.SSH_TTY then
-  local default_open = vim.ui.open
-  vim.ui.open = function(path, opt)
-    if not path:match("%w+:") then
-      return default_open(path, opt)
-    end
-    vim.fn.setreg("+", path)
-    vim.notify("Copied to clipboard: " .. path)
-    return nil, nil
-  end
+  vim.ui.open = function(_, _) return nil, nil end
 end
 
 -- A wrapped line will have same indent on every line
