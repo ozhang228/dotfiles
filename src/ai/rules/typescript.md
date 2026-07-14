@@ -22,6 +22,12 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
   - `{ lines: ConstructedLine[] | undefined }` — the key must exist, but may be `undefined`.
   - Choose the form that matches your intent.
 
+## React State
+
+- Don't sync state with `useEffect`. If a child's state change needs to affect a sibling or parent, hoist the state up to their common ancestor instead of reading it back down through an effect. Reserve `useEffect` for synchronizing with something truly external (a subscription, a DOM API, a non-React library) — not for keeping two pieces of your own component tree in sync.
+- Don't call `setState` inside a loop. Compute the final value first, then call `setState` once — either by reducing outside the call, or by doing the loop inside a single functional updater (`setState(prev => ...)`). Looped `setState` calls can trigger a re-render per iteration and are hard to follow regardless.
+- If you notice a single user action driving more than two or three state variables through a chain of effects and handlers, that's a sign the state is split across too many places — look for a way to collapse it into fewer, more directly-derived pieces of state before adding another effect to the chain.
+
 ## Testing
 
 - Do not use logic to compute the expected value. Hard-code expected values.

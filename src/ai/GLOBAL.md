@@ -4,11 +4,13 @@
 
 Per-language conventions live in their own files, imported once at session start:
 
+@~/dotfiles/src/ai/rules/general.md
 @~/dotfiles/src/ai/rules/python.md
 @~/dotfiles/src/ai/rules/typescript.md
 @~/dotfiles/src/ai/rules/cpp.md
 @~/dotfiles/src/ai/rules/cli.md
 @~/dotfiles/src/ai/rules/marimo.md
+@~/dotfiles/src/ai/rules/jupyter.md
 @~/dotfiles/src/ai/rules/work-knowledge.md
 
 Each file is scoped to its language by its own header — apply a rule only when editing a file of that language or running that CLI tool. They load every session regardless of what you touch; that's the deliberate tradeoff for not running an injection hook per edit.
@@ -73,6 +75,12 @@ Test stubs are set up for convenience, not to reflect real production configurat
 When reasoning about what the real app does (e.g. what pricer type a desk uses, whether a flag is set, what config is active), trace the actual prod code path rather than inferring from test fixtures. If the prod configuration isn't visible in the codebase, say so and ask Oscar.
 
 Be explicit when making inferences vs stating verified facts. Say "I'm inferring this from the test stub but haven't verified what prod uses" rather than stating it as fact.
+
+---
+
+## Editing Existing Prose
+
+When reformatting or refactoring prose someone else (human or AI) already wrote — docs, comments, PR descriptions — preserve the specific caveats and explanations already present. Rewriting for style or structure is fine; dropping a detail because it didn't fit the new structure is not. If a rewrite would cut something, call it out explicitly rather than silently losing it.
 
 ---
 
