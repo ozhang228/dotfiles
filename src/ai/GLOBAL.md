@@ -23,6 +23,12 @@ You must always read and prefer **project-specific instructions** (e.g., `CLAUDE
 
 ---
 
+## Where to Save Learned Patterns
+
+When a task reveals a technique, gotcha, or convention worth documenting, default to writing it here (this file) or to the relevant file in `~/dotfiles/src/ai/rules/` — not to a project's own `ai_rules/`/`CLAUDE.md`. Most lessons are about how to work (verification habits, git/tooling technique, review process) and apply across every repo Oscar touches, not just the one open right now. Only write to a project's local instructions file when the lesson is genuinely tied to that codebase's own conventions, architecture, or domain rules — something that wouldn't make sense to apply anywhere else.
+
+---
+
 ## Skills Before Planning
 
 A matching skill takes priority over built-in workflow tools. When a request has real design space (a new feature, component, script/tool, or system design), invoke the `brainstorm` skill BEFORE `EnterPlanMode` or any implementation. Plan mode designs a solution; brainstorm first challenges the premise and pins down expected behaviors, which is the step that catches wrong assumptions early.
