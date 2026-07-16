@@ -59,6 +59,14 @@ manjaro = "cargo install tree-sitter-cli"
 mac = "cargo install tree-sitter-cli"
 
 [[deps]]
+id = "clang"
+check = "command -v clang"
+[deps.install_method]
+ubuntu = "sudo apt install clang"
+manjaro = "sudo pacman -S clang"
+mac = "brew install llvm"
+
+[[deps]]
 id = "mmdc"
 check = "command -v mmdc"
 [deps.install_method]
