@@ -34,6 +34,8 @@ def strip_chrome_nodes(nodes):
             n["nodes"] = strip_chrome_nodes(n["nodes"])
         if is_chrome_swallow(n) and not n.get("nodes"):
             continue
+        if "swallows" not in n and not n.get("nodes"):
+            continue
         kept.append(n)
     return kept
 

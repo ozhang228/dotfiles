@@ -28,18 +28,19 @@ workspace 3 output DP-2
 
 # Autostart
 exec_always --no-startup-id $compositor
-# use autorandr monitor setup, then get a random wallpaper and launch my bar
-exec_always --no-startup-id "autorandr --change && bash $HOME/dotfiles/src/linux/i3/wallpaper.sh && bash $HOME/dotfiles/src/linux/polybar/launch.sh"
 
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
 
-# restore saved workspace layouts on login (everything except Chrome)
-exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh"
-
-# Chrome restores its own windows (one process, one SSO). i3-resurrect can't
-# distinguish its windows, so it's stripped from the saved state; launch once here.
-exec --no-startup-id $browser
+# Run autorandr once, then chain everything that depends on monitor layout being
+# settled: wallpaper/bar, saved-layout restore (kitty/slack), and Chrome. Chrome
+# restores its own windows (one process, one SSO) — i3-resurrect can't distinguish
+# its windows, so it's stripped from the saved state and launched here instead.
+exec --no-startup-id 'autorandr --change && \
+    bash $HOME/dotfiles/src/linux/i3/wallpaper.sh && \
+    bash $HOME/dotfiles/src/linux/polybar/launch.sh && \
+    $HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh && \
+    '"$browser"
 
 bindsym $mod+Return exec $terminal
 bindsym $mod+$smod+Return exec $browser
