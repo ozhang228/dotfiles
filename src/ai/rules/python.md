@@ -50,6 +50,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Assertions must match the exact semantic: use `assert result == expected_value`, not `assert result`, `assert len(result)`, or `assert result is not None` when the contract is a specific value. A passing emptiness/truthiness check is not evidence the output is correct.
 - No redundant tests: two tests that exercise the same code path with no new branch or edge case add noise, not coverage. Prefer one well-named test per distinct behavior.
 - Assert behavior, not implementation: tests should break when the observable output changes, not when internal details (call counts, intermediate state, private method names) change.
+- See `general.md`'s "Recurring bad-test patterns" for cross-language test-quality failure modes (trivial-by-default, tautological-by-construction, unverified test names, unverified secondary inputs).
 
 ## Dash
 
