@@ -25,6 +25,11 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  desc = "Start treesitter highlighting for filetypes with an installed parser",
+  callback = function(ev) pcall(vim.treesitter.start, ev.buf) end,
+})
+
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight when yanking (copying) text",
   group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
