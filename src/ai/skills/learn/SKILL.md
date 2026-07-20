@@ -54,6 +54,7 @@ Three principles make the spec good for learning:
 - **Self-contained**: a step can be picked up and worked on without re-reading earlier steps or chasing the links to understand *what* to do. The links are for understanding the internals deeply, not for basic comprehension of the task.
 - **Builds on the previous step**: each step names what it inherits from the one before (the "Starting point") and ends with a checkpoint that proves it works. Verifying each step before moving on stops bugs from compounding across the chain.
 - **Learn the rationale by feeling the pain**: this is the most important one. For the load-bearing design decisions, do NOT explain the rationale up front. Build it the naive/obvious way first, let a later feature make Oscar personally hit the wall that naive choice creates, then have a step rebuild it the way the real system does. The "why they model it this way" lands on its own because he just lived the problem it solves.
+- **State behavior, not mechanism**: a Goal describes what the system does — the observable contract a test could assert on — never the language construct that gets you there. Naming the construct hands over the design decision the step exists to teach. Don't write "a struct with fields ticker/quantity/price" — write what a caller can observe (e.g. "a trade records what was traded, how much, and at what price, and can report their product"). Don't write "an enum, matched with `match`" — describe the buy/sell behavior needed and let him land on the enum himself. This applies to every step, not just pain-arc ones: even a plain "get this working" step should describe outcomes, not name the struct/enum/HashMap/trait/Result to reach for.
 
 **Designing the pain-first arc.** This is the core of the spec, not a decoration. When you scope the project, pick the 1-3 design decisions that are the real reason the technology is interesting, and sequence each as a three-beat arc spread across the steps:
 
@@ -84,7 +85,7 @@ Format:
 ## Steps
 
 ### 1. <Step name>
-**Goal:** <What the system does when this step is complete — behavior, not implementation.>
+**Goal:** <What the system does when this step is complete — an observable behavior/contract, never the language construct (struct/enum/match/HashMap/trait/Result) used to build it.>
 **Why it matters:** <Per the beat: withhold rationale on naive-build steps, give full rationale on rebuild steps, one line otherwise. See the altitude guidance above.>
 **Starting point:** <What's already in place from the previous step that this builds on. For step 1, the empty starting state.>
 **Checkpoint:** <A concrete thing he can run or observe to confirm this step works. On a "feel the pain" step, the checkpoint is observing the naive approach break — that's the lesson, not a failure.>
