@@ -1,6 +1,6 @@
 ---
 name: typescript-review
-description: TypeScript/React code review standards for desk-tools frontend. Invoke alongside pr-review whenever the PR touches TypeScript or TSX. Covers component architecture, testing strategy, type safety, code organization, and a pre-submit checklist. Distilled from real reviewer comments by kosterbauer.
+description: TypeScript/React code review standards for desk-tools frontend. Load for code review whenever the PR touches TypeScript or TSX. Covers component architecture, testing strategy, type safety, code organization, and a pre-submit checklist. Distilled from real reviewer comments by kosterbauer.
 ---
 
 # TypeScript Review

@@ -4,11 +4,29 @@ vim.o.shell = "/bin/fish"
 
 vim.g.have_nerd_font = true
 
+local function command_output(cmd)
+  local result = vim.system(cmd, { text = true }):wait()
+  if result.code ~= 0 then return nil end
+  return vim.trim(result.stdout)
+end
+
+local function tmux_client_value(format)
+  if not vim.env.TMUX then return nil end
+  return command_output({ "tmux", "display-message", "-p", format })
+end
+
 local function tmux_client_supports_clipboard()
-  if not vim.env.TMUX then return false end
-  local result = vim.system({ "tmux", "display-message", "-p", "#{client_termfeatures}" }, { text = true }):wait()
-  if result.code ~= 0 then return false end
-  return result.stdout:find("clipboard", 1, true) ~= nil
+  local termfeatures = tmux_client_value("#{client_termfeatures}")
+  return termfeatures ~= nil and termfeatures:find("clipboard", 1, true) ~= nil
+end
+
+local function tmux_client_is_ssh()
+  local client_pid = tmux_client_value("#{client_pid}")
+  if client_pid == nil or client_pid == "" then return false end
+  local parent_pid = command_output({ "ps", "-o", "ppid=", "-p", client_pid })
+  if parent_pid == nil or parent_pid == "" then return false end
+  local parent_command = command_output({ "ps", "-o", "comm=", "-p", parent_pid })
+  return parent_command == "sshd"
 end
 
 local function cached_osc52_provider()
@@ -58,11 +76,11 @@ vim.o.smartindent = true
 -- Sync clipboard between OS and Neovim.
 -- Over SSH, use OSC 52 so yanks land in the terminal emulator's clipboard.
 -- In a reattached tmux pane, SSH_TTY may be absent even though the active
--- client supports terminal clipboard operations.
+-- SSH client supports terminal clipboard operations.
 -- Locally, fall through to the default provider (xclip/wl-copy) — OSC 52
 -- paste triggers a per-paste permission prompt in most terminals.
 -- See `:help 'clipboard'`
-if vim.env.SSH_TTY or tmux_client_supports_clipboard() then
+if vim.env.SSH_TTY or (tmux_client_is_ssh() and tmux_client_supports_clipboard()) then
   vim.g.clipboard = cached_osc52_provider()
 end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)

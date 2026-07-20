@@ -1,6 +1,6 @@
 ---
 name: python-review
-description: Python-specific code review standards for desk-tools and related FIO Python repos. Invoke alongside pr-review whenever the PR touches Python code. Covers idiomatic Python, constructor discipline, logging, config hygiene, and a pre-submit checklist. Distilled from real reviewer comments by pnickols, alchen, ajyang, abedra, opyper, thoueland.
+description: Python-specific code review standards for desk-tools and related FIO Python repos. Load for code review whenever the PR touches Python code. Covers idiomatic Python, constructor discipline, logging, config hygiene, and a pre-submit checklist. Distilled from real reviewer comments by pnickols, alchen, ajyang, abedra, opyper, thoueland.
 ---
 
 # Python Review
