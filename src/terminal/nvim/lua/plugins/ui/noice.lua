@@ -7,6 +7,9 @@ return {
         enabled = true,
       },
     },
+    notify = {
+      enabled = false,
+    },
   },
   dependencies = {
     "MunifTanjim/nui.nvim",
