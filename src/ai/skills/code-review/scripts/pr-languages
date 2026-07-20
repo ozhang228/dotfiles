@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Print which languages are changed in the current branch vs its merge base,
-# and which language-specific review skills to invoke.
+# and which language-specific review references to load.
 # Usage: pr-languages [base-branch]   (default: the remote's actual default branch)
 set -euo pipefail
 
@@ -56,9 +56,9 @@ for lang in "${!langs[@]}"; do
 done | sort
 
 echo ""
-echo "Skills to invoke:"
-[[ -n "${langs[python]:-}" ]]     && echo "  python-review"
-[[ -n "${langs[typescript]:-}" ]] && echo "  typescript-review"
+echo "References to load:"
+[[ -n "${langs[python]:-}" ]]     && echo "  references/python.md"
+[[ -n "${langs[typescript]:-}" ]] && echo "  references/typescript.md"
 if [[ -z "${langs[python]:-}" && -z "${langs[typescript]:-}" ]]; then
     echo "  (none — no Python or TypeScript files changed)"
 fi

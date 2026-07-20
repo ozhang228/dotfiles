@@ -14,12 +14,13 @@ Per-language conventions live in their own files, imported once at session start
 @~/dotfiles/src/ai/rules/work-knowledge.md
 
 Each file is scoped to its language by its own header — apply a rule only when editing a file of that language or running that CLI tool. They load every session regardless of what you touch; that's the deliberate tradeoff for not running an injection hook per edit.
+If the current client shows the `@...` lines literally instead of expanding them into context, read each referenced file manually before proceeding.
 
 ---
 
 ## Project-Specific Instructions Take Priority
 
-You must always read and prefer **project-specific instructions** (e.g., `CLAUDE.md` in the project root) over these global rules.
+You must always read and prefer **project-specific instructions** (e.g., `AGENTS.md` or `CLAUDE.md` in the project root) over these global rules.
 
 ---
 

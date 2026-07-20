@@ -5,7 +5,7 @@ description: Python-specific code review standards for desk-tools and related FI
 
 # Python Review
 
-Use this alongside the `pr-review` skill for any Python PR. These are the patterns reviewers in this codebase flag consistently.
+Use this alongside the `code-review` skill for any Python PR. These are the patterns reviewers in this codebase flag consistently.
 
 ---
 

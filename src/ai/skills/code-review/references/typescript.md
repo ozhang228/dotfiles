@@ -5,7 +5,7 @@ description: TypeScript/React code review standards for desk-tools frontend. Inv
 
 # TypeScript Review
 
-Use this alongside the `pr-review` skill for any TypeScript/React PR. These are the patterns kosterbauer flags consistently.
+Use this alongside the `code-review` skill for any TypeScript/React PR. These are the patterns kosterbauer flags consistently.
 
 ---
 
