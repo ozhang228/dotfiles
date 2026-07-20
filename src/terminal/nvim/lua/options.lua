@@ -4,6 +4,13 @@ vim.o.shell = "/bin/fish"
 
 vim.g.have_nerd_font = true
 
+local function tmux_client_supports_clipboard()
+  if not vim.env.TMUX then return false end
+  local result = vim.system({ "tmux", "display-message", "-p", "#{client_termfeatures}" }, { text = true }):wait()
+  if result.code ~= 0 then return false end
+  return result.stdout:find("clipboard", 1, true) ~= nil
+end
+
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.tabstop = 4
@@ -15,10 +22,12 @@ vim.o.smartindent = true
 
 -- Sync clipboard between OS and Neovim.
 -- Over SSH, use OSC 52 so yanks land in the terminal emulator's clipboard.
+-- In a reattached tmux pane, SSH_TTY may be absent even though the active
+-- client supports terminal clipboard operations.
 -- Locally, fall through to the default provider (xclip/wl-copy) — OSC 52
 -- paste triggers a per-paste permission prompt in most terminals.
 -- See `:help 'clipboard'`
-if vim.env.SSH_TTY then
+if vim.env.SSH_TTY or tmux_client_supports_clipboard() then
   vim.g.clipboard = {
     name = "OSC 52",
     copy = {
