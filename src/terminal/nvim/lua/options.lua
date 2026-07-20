@@ -11,6 +11,41 @@ local function tmux_client_supports_clipboard()
   return result.stdout:find("clipboard", 1, true) ~= nil
 end
 
+local function cached_osc52_provider()
+  local osc52 = require("vim.ui.clipboard.osc52")
+  local cached_registers = {
+    ["+"] = { lines = {}, regtype = "v" },
+    ["*"] = { lines = {}, regtype = "v" },
+  }
+
+  local function copy(reg)
+    local osc52_copy = osc52.copy(reg)
+    return function(lines, regtype)
+      cached_registers[reg] = { lines = lines, regtype = regtype }
+      osc52_copy(lines, regtype)
+    end
+  end
+
+  local function paste(reg)
+    return function()
+      local cached_register = cached_registers[reg]
+      return { cached_register.lines, cached_register.regtype }
+    end
+  end
+
+  return {
+    name = "OSC 52",
+    copy = {
+      ["+"] = copy("+"),
+      ["*"] = copy("*"),
+    },
+    paste = {
+      ["+"] = paste("+"),
+      ["*"] = paste("*"),
+    },
+  }
+end
+
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.tabstop = 4
@@ -28,17 +63,7 @@ vim.o.smartindent = true
 -- paste triggers a per-paste permission prompt in most terminals.
 -- See `:help 'clipboard'`
 if vim.env.SSH_TTY or tmux_client_supports_clipboard() then
-  vim.g.clipboard = {
-    name = "OSC 52",
-    copy = {
-      ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-    },
-    paste = {
-      ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-      ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
-    },
-  }
+  vim.g.clipboard = cached_osc52_provider()
 end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
