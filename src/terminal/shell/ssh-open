@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+target="${1:-}"
+if [ -z "$target" ]; then
+    printf 'usage: ssh-open <url>\n' >&2
+    exit 2
+fi
+
+encoded=$(printf '%s' "$target" | base64 | tr -d '\n')
+printf '\033]52;c;%s\a' "$encoded" > /dev/tty
+printf 'Copied URL to the SSH client clipboard: %s\n' "$target" >&2

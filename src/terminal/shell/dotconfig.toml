@@ -6,6 +6,10 @@ supported_distros = ["manjaro", "mac", "ubuntu"]
 src = "~/dotfiles/src/terminal/shell/fish"
 dst = "~/.config/fish"
 
+[[symlinks]]
+src = "~/dotfiles/src/terminal/shell/ssh-open"
+dst = "~/.local/bin/ssh-open"
+
 [[deps]]
 id = "default_shell"
 check = "echo $SHELL | grep -q fish"

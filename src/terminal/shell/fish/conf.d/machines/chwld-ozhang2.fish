@@ -2,6 +2,12 @@
 set -gx AI_CLI_CMD "codex-branch-resume || codex"
 set -gx ANTHROPIC_MODEL "vertex-claude-sonnet-5[1m]"
 
+if set -q SSH_CONNECTION
+    set -e DISPLAY
+    set -e WAYLAND_DISPLAY
+    set -gx BROWSER $HOME/.local/bin/ssh-open
+end
+
 # Load local Claude credentials (not in git — create ~/.local/share/claude_credentials.fish)
 test -f ~/.local/share/claude_credentials.fish && source ~/.local/share/claude_credentials.fish
 
@@ -28,4 +34,3 @@ set -gx PROMETHEUS_MULTIPROC_DIR /tmp
 set -gx GH_HOST git.drwholdings.com
 
 tmux_autostart
-
