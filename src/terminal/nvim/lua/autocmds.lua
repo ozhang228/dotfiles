@@ -61,32 +61,7 @@ vim.api.nvim_create_autocmd("BufLeave", {
     local bufnr = ev.buf
     if vim.bo[bufnr].buftype ~= "" or vim.bo[bufnr].modified then return end
     vim.schedule(function()
-      if vim.api.nvim_buf_is_valid(bufnr) and #vim.fn.win_findbuf(bufnr) == 0 then
-        pcall(vim.api.nvim_buf_delete, bufnr, { force = false })
-      end
+      if vim.api.nvim_buf_is_valid(bufnr) and #vim.fn.win_findbuf(bufnr) == 0 then pcall(vim.api.nvim_buf_delete, bufnr, { force = false }) end
     end)
-  end,
-})
-
-vim.api.nvim_create_autocmd("TermRequest", {
-  desc = "Notify when a :terminal child emits OSC-9 (e.g. Claude Stop hook)",
-  callback = function(ev)
-    local seq = type(ev.data) == "table" and ev.data.sequence or ev.data or ""
-    local msg = seq:match("\027%]9;(.-)\007") or seq:match("\027%]9;(.-)\027\\") or seq:match("\027%]9;(.+)")
-    if not msg then return end
-    if vim.api.nvim_get_current_buf() == ev.buf then return end
-    vim.notify(msg, vim.log.levels.INFO, { title = "Terminal" })
-    io.stdout:write("\a")
-    io.stdout:flush()
-  end,
-})
-
-vim.api.nvim_create_autocmd("TermRequest", {
-  desc = "Forward OSC-52 clipboard writes from a :terminal child to the host terminal",
-  callback = function(ev)
-    local seq = type(ev.data) == "table" and ev.data.sequence or ev.data or ""
-    if seq:sub(1, 5) ~= "\027]52;" then return end
-    io.stdout:write(seq)
-    io.stdout:flush()
   end,
 })

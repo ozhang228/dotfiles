@@ -35,7 +35,7 @@ If the premise looks shaky, raise it early — before clarifying questions, not 
 ## Exception: throwaway experiment or context handoff
 
 - Skip when the user just wants to *try something out* — a throwaway probe, a `tmp/` experiment, a "let me see if this works" spike with no intent to ship. Design process on a disposable experiment is friction with no payoff. If the experiment graduates to real work, re-enter the flow then.
-- Skip when the user wants a **context handoff or summary for another agent/session** ("write up what we did so another Claude can pick this up", "summarize the state for a handoff"). That's a documentation task, not a design task — produce the handoff, don't run the visual plan workflow.
+- Skip when the user wants a **context handoff or summary for another agent/session** ("write up what we did so another session can pick this up", "summarize the state for a handoff"). That's a documentation task, not a design task — produce the handoff, don't run the visual plan workflow.
 
 ## Local Visual Plan Artifact
 

@@ -29,12 +29,6 @@ local function tmux_client_is_ssh()
   return parent_command == "sshd"
 end
 
-local function ssh_client_is_kitty()
-  if not vim.env.SSH_TTY and not tmux_client_is_ssh() then return false end
-  local termname = tmux_client_value("#{client_termname}") or vim.env.TERM
-  return termname == "xterm-kitty"
-end
-
 local function cached_osc52_provider()
   local osc52 = require("vim.ui.clipboard.osc52")
   local cached_registers = {
@@ -88,27 +82,6 @@ vim.o.smartindent = true
 -- See `:help 'clipboard'`
 if vim.env.SSH_TTY or (tmux_client_is_ssh() and tmux_client_supports_clipboard()) then vim.g.clipboard = cached_osc52_provider() end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
-
-local default_open = vim.ui.open
-local default_system = vim.system
-vim.ui.open = function(path, opt)
-  if ssh_client_is_kitty() and path:match("^%a[%w+.-]*://") then
-    local job = default_system({ "env", "-u", "KITTY_LISTEN_ON", "kitty", "@", "action", "--self", "open_url", path }, {}, function(result)
-      if result.code ~= 0 then vim.notify(("vim.ui.open: %s exited %d"):format(path, result.code), vim.log.levels.ERROR) end
-    end)
-    return job, nil
-  end
-
-  vim.system = function(cmd, sys_opt, _)
-    return default_system(cmd, sys_opt, function(result)
-      if result.code ~= 0 then vim.notify(("vim.ui.open: %s exited %d"):format(path, result.code), vim.log.levels.ERROR) end
-    end)
-  end
-  local job, err = default_open(path, opt)
-  vim.system = default_system
-  if err then vim.notify(err, vim.log.levels.ERROR) end
-  return job, err
-end
 
 -- A wrapped line will have same indent on every line
 vim.o.breakindent = true

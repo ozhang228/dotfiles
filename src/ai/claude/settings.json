@@ -93,7 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_notification.sh"
+            "command": "/home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh notification"
           }
         ]
       },
@@ -111,7 +111,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/claude_code_stop.sh"
+            "command": "env AI_BRANCH_SESSION_DIR=/home/ozhang/.claude/branch-sessions /home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh stop"
           }
         ]
       },

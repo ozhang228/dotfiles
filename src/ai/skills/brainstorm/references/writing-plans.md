@@ -15,8 +15,8 @@ Format and rules for the implementation plan produced at the end of brainstormin
 
 ## Execution options (offered after plan is saved)
 
-1. **Subagent-driven** (recommended) — fresh subagent per task, review between tasks
-2. **Inline execution** — executes tasks in the current session with checkpoints
+1. **Delegated execution** (recommended when available) — fresh reviewer per task, review between tasks
+2. **Inline execution** — executes tasks in the current session with checkpoints when delegation is unavailable
 
 ## Key quality rules
 

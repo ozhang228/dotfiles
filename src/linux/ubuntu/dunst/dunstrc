@@ -51,10 +51,10 @@
     format = "<b><span foreground='#eb6f92'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
     timeout = 0
 
-[claude_code]
-    summary = "Claude Code"
+[ai_assistant]
+    summary = "AI Assistant"
     script = ~/.config/dunst/play_sound.sh
 
-[claude_code_permission]
-    summary = "Claude Code (waiting)"
+[ai_assistant_waiting]
+    summary = "AI Assistant (waiting)"
     script = ~/.config/dunst/play_sound_permission.sh
