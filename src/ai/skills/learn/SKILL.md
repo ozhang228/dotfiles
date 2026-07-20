@@ -55,6 +55,7 @@ Three principles make the spec good for learning:
 - **Builds on the previous step**: each step names what it inherits from the one before (the "Starting point") and ends with a checkpoint that proves it works. Verifying each step before moving on stops bugs from compounding across the chain.
 - **Learn the rationale by feeling the pain**: this is the most important one. For the load-bearing design decisions, do NOT explain the rationale up front. Build it the naive/obvious way first, let a later feature make Oscar personally hit the wall that naive choice creates, then have a step rebuild it the way the real system does. The "why they model it this way" lands on its own because he just lived the problem it solves.
 - **State behavior, not mechanism**: a Goal describes what the system does — the observable contract a test could assert on — never the language construct that gets you there. Naming the construct hands over the design decision the step exists to teach. Don't write "a struct with fields ticker/quantity/price" — write what a caller can observe (e.g. "a trade records what was traded, how much, and at what price, and can report their product"). Don't write "an enum, matched with `match`" — describe the buy/sell behavior needed and let him land on the enum himself. This applies to every step, not just pain-arc ones: even a plain "get this working" step should describe outcomes, not name the struct/enum/HashMap/trait/Result to reach for.
+- **Every step earns its place**: a standalone step must teach a new concept, expose a design limitation Oscar can actually observe, or verify a meaningful behavior. Setup, data entry, fixture creation, and other chores are not learning steps. Fold them into the step whose lesson they enable. If a step's only answer to "what will I understand after this?" is that it prepares for a later step, merge it into that later step.
 
 **Designing the pain-first arc.** This is the core of the spec, not a decoration. When you scope the project, pick the 1-3 design decisions that are the real reason the technology is interesting, and sequence each as a three-beat arc spread across the steps:
 
@@ -63,6 +64,8 @@ Three principles make the spec good for learning:
 3. **Rebuild the real way** — the next step rebuilds it how the actual system does, and *now* the spec states the rationale, because it'll click instead of being memorized. (e.g. switch to an append-only log with per-consumer offsets — replayable, multi-subscriber, the actual Kafka model.)
 
 Sequence the steps so the pain arrives through a feature he'd naturally want next, not a contrived one. The whole point is that the rationale is discovered, not told.
+
+The pain must be real at the project's scale. Don't ask Oscar to manufacture dozens of repetitive examples merely to claim an approach is inefficient. Use a natural feature that makes the limitation visible, an assertion or measurement that demonstrates it, or omit the pain arc when the project cannot expose it honestly.
 
 The **"Why it matters" field** depends on which beat the step is:
 - Naive-build steps: say what to build, and *withhold* the rationale (don't hint the naive way is wrong — that spoils the discovery).
