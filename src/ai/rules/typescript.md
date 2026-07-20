@@ -30,7 +30,6 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
 
 ## Testing
 
-- Do not use logic to compute the expected value. Hard-code expected values.
 - Hoist variables relevant to why a test passes or fails into the test itself, not shared state.
 - Test stub generators must populate all fields with random data by default. The caller passes in only the fields that matter.
 
@@ -45,4 +44,6 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
     };
   }
   ```
+
+- See `general.md`'s "Recurring bad-test patterns" for the cross-language test-quality checklist, including hardcoding expected values instead of computing them with the same logic under test (tautological-by-construction).
 
