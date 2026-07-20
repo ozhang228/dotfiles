@@ -80,9 +80,7 @@ vim.o.smartindent = true
 -- Locally, fall through to the default provider (xclip/wl-copy) — OSC 52
 -- paste triggers a per-paste permission prompt in most terminals.
 -- See `:help 'clipboard'`
-if vim.env.SSH_TTY or (tmux_client_is_ssh() and tmux_client_supports_clipboard()) then
-  vim.g.clipboard = cached_osc52_provider()
-end
+if vim.env.SSH_TTY or (tmux_client_is_ssh() and tmux_client_supports_clipboard()) then vim.g.clipboard = cached_osc52_provider() end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 local default_open = vim.ui.open

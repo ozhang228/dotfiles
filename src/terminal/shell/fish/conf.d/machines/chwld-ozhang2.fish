@@ -1,4 +1,5 @@
-set -gx AI_CLI_CMD "claude-branch-resume --dangerously-skip-permissions || claude --dangerously-skip-permissions"
+# set -gx AI_CLI_CMD "claude-branch-resume --dangerously-skip-permissions || claude --dangerously-skip-permissions"
+set -gx AI_CLI_CMD "codex-branch-resume || codex"
 set -gx ANTHROPIC_MODEL "vertex-claude-sonnet-5[1m]"
 
 # Load local Claude credentials (not in git — create ~/.local/share/claude_credentials.fish)
