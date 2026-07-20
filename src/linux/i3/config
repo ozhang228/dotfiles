@@ -11,7 +11,7 @@ set $key_up           k
 set $key_right        l
 
 set $terminal         kitty
-set $browser          google-chrome --profile-directory="Profile 1" --restore-last-session
+set $browser          google-chrome --profile-directory='Profile 1' --restore-last-session
 set $app_launcher     rofi -show drun
 set $compositor       picom
 
@@ -36,11 +36,11 @@ exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
 # settled: wallpaper/bar, saved-layout restore (kitty/slack), and Chrome. Chrome
 # restores its own windows (one process, one SSO) — i3-resurrect can't distinguish
 # its windows, so it's stripped from the saved state and launched here instead.
-exec --no-startup-id 'autorandr --change && \
+exec --no-startup-id "autorandr --change && \
     bash $HOME/dotfiles/src/linux/i3/wallpaper.sh && \
     bash $HOME/dotfiles/src/linux/polybar/launch.sh && \
     $HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh && \
-    '"$browser"
+    $browser"
 
 bindsym $mod+Return exec $terminal
 bindsym $mod+$smod+Return exec $browser
