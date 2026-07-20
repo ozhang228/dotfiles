@@ -86,10 +86,9 @@ vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 local default_open = vim.ui.open
 vim.ui.open = function(path, opt)
   if (vim.env.SSH_TTY or tmux_client_is_ssh()) and path:match("^%a[%w+.-]*://") then
-    local job = vim.system({ vim.env.HOME .. "/.local/bin/ssh-open", path }, {}, function(result)
-      if result.code ~= 0 then vim.notify(("vim.ui.open: %s exited %d"):format(path, result.code), vim.log.levels.ERROR) end
-    end)
-    return job, nil
+    require("vim.ui.clipboard.osc52").copy("+")({ path })
+    vim.api.nvim_echo({ { "URL copied to the SSH client clipboard" } }, false, {})
+    return nil, nil
   end
   return default_open(path, opt)
 end
