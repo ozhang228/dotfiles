@@ -28,7 +28,10 @@ return {
     },
     {
       "gd",
-      function() Snacks.picker.lsp_definitions() end,
+      function()
+        vim.cmd("normal! m'")
+        Snacks.picker.lsp_definitions({ jump = { reuse_win = false } })
+      end,
       desc = "Go to Definition",
     },
     {

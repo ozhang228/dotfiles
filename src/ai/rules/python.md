@@ -15,6 +15,8 @@ skip_if: Working in TypeScript, C++, or any non-Python language
   def create_user(*, first_name: str, last_name: str, email: str) -> User: ...
   ```
 
+- Use keyword arguments at call sites when two consecutive parameters share a type or the function takes more than three parameters.
+
 - Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation.
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
@@ -58,4 +60,3 @@ skip_if: Working in TypeScript, C++, or any non-Python language
   - Must be PascalCase.
   - Must be pure — no side effects, no callback registration inside them.
 - Each component should have a `register_<feature>_callback` function.
-

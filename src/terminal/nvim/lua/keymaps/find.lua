@@ -2,7 +2,10 @@ return {
   { "<leader>f", "<nop>", desc = "Find" },
   {
     "<leader>ff",
-    function() Snacks.picker.smart({ multi = { "recent", "files" } }) end,
+    function()
+      vim.cmd("normal! m'")
+      Snacks.picker.smart({ multi = { "recent", "files" } })
+    end,
     desc = "Files (smart)",
   },
   {
