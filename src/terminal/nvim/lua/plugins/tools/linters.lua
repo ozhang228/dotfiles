@@ -57,6 +57,8 @@ return {
       -- Misc
       json = { "eslint_d" },
       makefile = { "checkmake" },
+      astro = { "eslint_d" },
+      mdx = { "eslint_d" },
     }
   end,
 }

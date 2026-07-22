@@ -17,6 +17,7 @@ return {
           "lua",
           "luadoc",
           "rust",
+          "astro",
           "json",
           "yaml",
           "vim",

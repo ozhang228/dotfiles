@@ -29,6 +29,9 @@ return {
 
         "rust-analyzer",
 
+        "astro-language-server",
+        "mdx-analyzer",
+
         "jq",
         "checkmake",
         "marksman",
