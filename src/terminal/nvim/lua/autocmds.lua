@@ -1,21 +1,3 @@
--- Keep kitty tab title in sync with git branch while nvim is running.
--- fish_title only fires at the shell prompt, so branch changes inside nvim
--- (e.g. lazygit checkout) never update it. We set the title directly via
--- vim.o.titlestring instead, mirroring fish_title's format.
-vim.o.title = true
-local function update_title()
-  local tab_label = os.getenv("KITTY_TAB_TITLE") or ""
-  local branch = vim.b.gitsigns_head or ""
-  local label = tab_label ~= "" and tab_label or vim.fn.fnamemodify(vim.fn.getcwd(), ":~")
-  vim.o.titlestring = branch ~= "" and (label .. " [" .. branch .. "]") or label
-end
-
-vim.api.nvim_create_autocmd({ "WinEnter", "DirChanged", "User" }, {
-  desc = "Sync kitty tab title with git branch",
-  pattern = { "*", "*", "GitSignsUpdate" },
-  callback = update_title,
-})
-
 vim.api.nvim_create_autocmd("FileType", {
   desc = "Enable spellcheck for prose filetypes",
   pattern = { "markdown", "tex", "gitcommit", "text" },
