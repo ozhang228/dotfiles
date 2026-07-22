@@ -25,6 +25,10 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- No dedicated mdx parser exists; highlight .mdx with the markdown grammar.
+vim.filetype.add({ extension = { mdx = "mdx" } })
+vim.treesitter.language.register("markdown", "mdx")
+
 vim.api.nvim_create_autocmd("FileType", {
   desc = "Start treesitter highlighting for filetypes with an installed parser",
   callback = function(ev) pcall(vim.treesitter.start, ev.buf) end,
