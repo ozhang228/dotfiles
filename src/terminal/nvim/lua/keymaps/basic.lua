@@ -52,6 +52,7 @@ return {
     { "<leader>w", "<cmd>w<cr>", desc = "Save Buffer" },
     { "<leader>q", "<cmd>close<cr>", desc = "Close Window" },
     { "<leader>c", "<cmd>bd<cr>", desc = "Close Buffer" },
+    { "<leader>C", "<cmd>%bd<cr>", desc = "Close All Buffers" },
     {
       "<leader>o",
       function()

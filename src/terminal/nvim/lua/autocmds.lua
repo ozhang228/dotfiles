@@ -40,14 +40,3 @@ vim.api.nvim_create_autocmd("User", {
   callback = function(event) require("snacks").rename.on_rename_file(event.data.from, event.data.to) end,
   desc = "LSP Rename on mini files changes",
 })
-
-vim.api.nvim_create_autocmd("BufLeave", {
-  desc = "Delete normal file buffers once no window shows them, so they don't pile up without tabs",
-  callback = function(ev)
-    local bufnr = ev.buf
-    if vim.bo[bufnr].buftype ~= "" or vim.bo[bufnr].modified then return end
-    vim.schedule(function()
-      if vim.api.nvim_buf_is_valid(bufnr) and #vim.fn.win_findbuf(bufnr) == 0 then pcall(vim.api.nvim_buf_delete, bufnr, { force = false }) end
-    end)
-  end,
-})
