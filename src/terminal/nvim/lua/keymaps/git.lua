@@ -17,5 +17,10 @@ return {
       function() Snacks.picker.gh_pr({ author = "@me" }) end,
       desc = "GH PRs (mine)",
     },
+    {
+      "<leader>go",
+      function() Snacks.gitbrowse({ what = "permalink" }) end,
+      desc = "Open on GitHub",
+    },
   },
 }
