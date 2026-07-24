@@ -11,7 +11,9 @@ return {
         "tsgo",
         "vtsls",
         "eslint_d",
+        "oxlint",
 
+        "oxfmt",
         "prettierd",
         "prettier",
 

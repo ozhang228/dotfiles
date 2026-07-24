@@ -1,3 +1,39 @@
+local oxlint_config_files = {
+  ".oxlintrc.json",
+  ".oxlintrc.jsonc",
+  "oxlint.config.ts",
+  "oxlint.config.mts",
+}
+
+local oxlint_filetypes = {
+  javascript = true,
+  javascriptreact = true,
+  typescript = true,
+  typescriptreact = true,
+}
+
+local function lint_buffer(event)
+  local lint = require("lint")
+  local filetype = vim.bo[event.buf].filetype
+  if not oxlint_filetypes[filetype] then
+    lint.try_lint()
+    return
+  end
+
+  local buffer_directory = vim.fs.dirname(vim.api.nvim_buf_get_name(event.buf))
+  local oxlint_root = vim.fs.root(buffer_directory, oxlint_config_files)
+  local package_root = vim.fs.root(buffer_directory, "package.json")
+
+  if oxlint_root then
+    vim.diagnostic.reset(lint.get_namespace("eslint_d"), event.buf)
+    lint.try_lint("oxlint", { cwd = package_root or oxlint_root })
+    return
+  end
+
+  vim.diagnostic.reset(lint.get_namespace("oxlint"), event.buf)
+  lint.try_lint(nil, { cwd = package_root })
+end
+
 vim.api.nvim_create_autocmd("FileType", {
   desc = "Enable spellcheck for prose filetypes",
   pattern = { "markdown", "tex", "gitcommit", "text" },
@@ -32,7 +68,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
   desc = "Run lint after write and on buffer enter",
-  callback = function() require("lint").try_lint() end,
+  callback = lint_buffer,
 })
 
 vim.api.nvim_create_autocmd("User", {
