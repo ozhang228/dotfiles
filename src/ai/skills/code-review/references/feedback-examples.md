@@ -105,3 +105,102 @@ Lesson: Before approving a feature driven by a desk ask, verify the ask is actua
 "What is the process to run e.g. crude or centerbook risk viewer locally now? How many processes need to run concurrently?"
 
 Lesson: Ask about operational impact, not just code correctness. A change that makes local development significantly harder is worth flagging even if the code is correct.
+
+---
+
+"What are `products`/`expiries`? Can we use richer types and avoid symbology in this function?"
+
+Lesson: Question vague collection names and string identifiers together. Rich domain types can clarify both what the values mean and which inputs are valid.
+
+---
+
+"Can we add some higher-level tests here too, like
+- theo increases when YTE increases
+- call/put delta is monotonic
+- strikes/SDs round-trip
+
+generally, exercising pricing calls against the skew model"
+
+Lesson: Test domain invariants in addition to examples. Monotonicity and round trips cover broad behavior without coupling tests to implementation details.
+
+---
+
+"We should have a better constructor ex. `new` classmethod so we don't need to have private kwargs"
+
+Lesson: If normal construction requires callers to know private fields, ask for a public constructor that owns those invariants.
+
+---
+
+"Can we put this on `SabrSwaptionSkew` so we aren't as exposed to the raw dictionary API?"
+
+Lesson: Keep unstructured library representations behind the domain object that owns them. This reduces how much application code depends on a fragile raw API.
+
+---
+
+"Why are there two different implementations of `_is_shorter_tenor`?"
+
+Lesson: Call out duplicated domain logic directly. Two implementations of the same rule can drift even when both look correct today.
+
+---
+
+"Is this mapping always what people want for each currency? If not, we should let callers pass this in"
+
+Lesson: Separate universal rules from caller-specific policy. Ask whether a hardcoded mapping is truly invariant before moving it into configuration.
+
+---
+
+"Let's move this to luna/clients/sol so the data fetching isn't coupled with our domain"
+
+Lesson: Place code according to ownership. Fetching belongs at the client boundary so domain logic does not become coupled to an external system.
+
+---
+
+"Sorry, I am blind. I am confused though why this is getting called in more than one place - can we tidy up the control flow so it looks something like
+
+```py
+
+def swaption_expiry(self, ...):
+    if _is_shorter_tenor(tenor, SwaptionTenorCutoff, reference_dt):
+        ...
+    elif _is_shorter_tenor(tenor, ShortTenorSwaptionTenorCutoff, reference_dt):
+        ...
+    else:
+        ...
+
+```
+
+Also, why do we compare against `ShortTenorSwaptionTenorCutoff` after `SwaptionTenorCutoff`? This is a complicated function that is basically doing refdata - how do we know it's correct?"
+
+Lesson: Pair a concrete control-flow simplification with the deeper correctness question. For complicated reference-data logic, readable branching helps review but does not replace evidence that the rules are authoritative.
+
+---
+
+"as in, knowing that we're pushing more and more things into cpp (skew models included), we're effectively writing everything twice (in python, then convert to cpp with nanobinding, then optionally get rid of the python version for consistency). If that's the case, we can consider just go directly to the end state, circumventing the intermediate step to avoid duplicative work for anything that doesn't have migration risk.
+
+But if we think this might still need some iterations / might not be stable / can benefit from python iteration speeds, I think this is fine in python for now. But once we start to move orchestration layer to cpp for apps in general (which is one of the primary reasons to move to cpp in the first place - python doesn't allow us to use more than 1 core, orchestration is hands-tied), we'll need this in cpp. We can do a mechanical port then"
+
+Lesson: Evaluate an intermediate implementation against the known end state. Make the tradeoff explicit: avoid duplicate work when the design is stable, but preserve iteration speed when migration risk is still high.
+
+---
+
+"I think this \"stringly-typed\" logic (and what we do in one_day_length_metrics.py) is kind of brittle. Can we express this as a mapping of `ForwardYteKind` to `Yte`, where `ForwardYteKind` is an enum over VoltimeEOD Voltime24H etc.?"
+
+Lesson: Do not stop at calling strings brittle. Propose the domain key, value type, and data structure that make invalid states harder to express.
+
+---
+
+"this is a breaking change for desk-tools, but I like this a lot more - do you have a sense yet of what the desk-tools changes will look like yet?"
+
+Lesson: Acknowledge that an API improvement is directionally right while still requiring a concrete downstream migration story.
+
+---
+
+"Why `fill_null(0.0)` / if we don't have any nonzero values, don't we want it to be NaN (therefore show up as orange cell to the user)?"
+
+Lesson: Challenge fallback values by tracing them to visible behavior. Zero and missing are different domain states, and the UI may rely on that distinction.
+
+---
+
+"I think this assumes that underlying prices are never actually zero which is not always true (ex. spread underlyings). Can we do something like `first_not_nan` and use nan as the nullish value?"
+
+Lesson: Disprove a sentinel assumption with a real counterexample, then suggest a representation that preserves legitimate zero values.

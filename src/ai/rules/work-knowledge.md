@@ -64,8 +64,11 @@ Event Horizon `CALENDAR_TIME` is not plain a365 wall-clock time. It appears mark
 Event Horizon's live and ad hoc year-fraction APIs are not interchangeable. `get_year_fractions` follows the product's live calculation type, while `get_adhoc_year_fractions` without an explicit request configuration can return user-weight voltime even when product metadata says `CALENDAR_TIME`. For cross-app theta parity, identify which API each app calls and query both over the exact same interval.
 
 EORV theta reconciliation facts:
-- Risk Viewer `theta_24h_total` matches prod edo-risk `theta-new`; both are the desk's voltime theta, despite the misleading prod name.
-- Do not compare to prod `theta-vt-new`; it is a different voltime construction.
+- Edo-risk PIP `theta-new` is annual Sol `Theta / 252`, with legacy non-positive and negative-theo floors. `theta-vt-new` is separately scaled by the configured Event Horizon one-business-day fraction.
+- The existing EORV downstream publisher selects different edo-risk fields by complex: NG uses `theta-vt-new`, while TTF uses `theta-new`.
+- Risk Viewer analytical theta divided by 252 matches edo `theta-new` for both NG and TTF. Risk Viewer 24h caltime and voltime are finite-difference repricings; use NG voltime only when targeting NG's separately selected edo `theta-vt-new`. Do not switch Risk Viewer from ad hoc to configured Event Horizon to reconcile TTF.
+- The closer Risk Viewer construction for NG edo `theta-vt-new` is analytical business-day theta multiplied by `365 * forward_ytes[VOLTIME_24H]`. Use the stored year fraction from `PricingInputs.forward_ytes_by_listing`; a finite-difference voltime/caltime ratio is only a diagnostic proxy.
+- Theta PnL is a separate start-to-live attribution path and does not consume the displayed 24h theta fields.
 - `theta_eod` is a partial-day horizon and should be dropped from 24h comparisons.
 - `prod.energyoptionsrv.total.main.ngf` is NG complex only; TTF is `prod.energyoptionsrv.ttf-total.main.ngf` in a separate deployment.
 - Prod OPXL snap timestamps are settle/EOD, not live. Only live totals compare cleanly until as-ofs are aligned.
