@@ -83,6 +83,17 @@ Before adding a helper, search `notebooks/utils` for an existing domain module. 
 - If a probe mutates production state, stop and get explicit approval first.
 - If the issue cannot be reproduced, leave the attempted inputs, observed result, and next discriminating probe in the Result section.
 
+## Prune to the proof
+
+Once the root cause is established, make a dedicated deletion pass. The final notebook is a reusable proof, not a transcript of the investigation.
+
+- Keep only the failing reproducer, the smallest control that validates units or assumptions, the evidence that distinguishes the root cause, final verification, and concrete handoff steps.
+- Delete raw schema and payload dumps, broad source-column inventories, candidate matrices, samples, top-N difference tables, and disproven probes unless they prevent a likely repeat investigation.
+- Collapse repeated evidence into the smallest table that shows the control and failure side by side. Preserve timestamps, formulas, exact source identifiers, and pinned values needed to interpret it.
+- Remove unused fields and incident-specific behavior from shared utilities. Keep only typed, reusable I/O plumbing with explicit inputs.
+- Include copy-paste reproduction commands and name the exact production files and tests the next agent should change.
+- Re-run the pruned notebook. Deletion is complete only when the minimal artifact still proves the conclusion end to end.
+
 ## Workflow
 
 1. Read target and Forge instructions.
@@ -91,10 +102,11 @@ Before adding a helper, search `notebooks/utils` for an existing domain module. 
 4. Reproduce the symptom with the smallest live path.
 5. Add one evidence-producing probe at a time until the root cause is supported.
 6. Extract reusable plumbing only after its reusable boundary is clear.
-7. Fix the target repository and add focused regression tests there.
-8. Re-run the notebook against the fixed behavior or record why verification must differ.
-9. Complete the Root cause, Resolution, and Result sections.
-10. Validate from `/home/ozhang/forge`:
+7. Prune the notebook and utilities to the minimal proof.
+8. Fix the target repository and add focused regression tests there.
+9. Re-run the notebook against the fixed behavior or record why verification must differ.
+10. Complete the Root cause, Resolution, and Result sections.
+11. Validate from `/home/ozhang/forge`:
 
 ```bash
 uv run marimo check --strict notebooks/<name>.py
