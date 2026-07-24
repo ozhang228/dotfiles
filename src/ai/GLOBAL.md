@@ -4,14 +4,14 @@
 
 Per-language conventions live in their own files, imported once at session start:
 
-@~~/dotfiles/src/ai/rules/general.md
-@~~/dotfiles/src/ai/rules/python.md
-@~~/dotfiles/src/ai/rules/typescript.md
-@~~/dotfiles/src/ai/rules/cpp.md
-@~~/dotfiles/src/ai/rules/cli.md
-@~~/dotfiles/src/ai/rules/marimo.md
-@~~/dotfiles/src/ai/rules/jupyter.md
-@~~/dotfiles/src/ai/rules/work-knowledge.md
+@~/dotfiles/src/ai/rules/general.md
+@~/dotfiles/src/ai/rules/python.md
+@~/dotfiles/src/ai/rules/typescript.md
+@~/dotfiles/src/ai/rules/cpp.md
+@~/dotfiles/src/ai/rules/cli.md
+@~/dotfiles/src/ai/rules/marimo.md
+@~/dotfiles/src/ai/rules/jupyter.md
+@~/dotfiles/src/ai/rules/work-knowledge.md
 
 Each file is scoped to its language by its own header — apply a rule only when editing a file of that language or running that CLI tool. They load every session regardless of what you touch; that's the deliberate tradeoff for not running an injection hook per edit.
 If the current client shows the `@...` lines literally instead of expanding them into context, read each referenced file manually before proceeding.
@@ -138,7 +138,7 @@ When Oscar references another codebase or pattern as justification ("X does it t
 
 This applies during code review, when exploring a new codebase, and when Oscar asks "what does this do?"
 
-Before implementing a suggested change — a reviewer comment, Oscar's instruction, or your own proposal — verify its load-bearing premise against _this_ codebase first. "Use `strikes_from_sds`" / "isn't there an outright type for this?" / "X already does this" are premises, not facts: grep for the type, read the helper, check what the sibling actually does. An existing type, accessor, or convention often settles the question before you write anything, and a premise that turns out false (the canonical helper computes something different, no outright exists, the sibling diverges) means the edit you were about to make is wrong. Reversing a change you made on an unchecked premise costs more than the check. This holds for pushback too: verify before you defend.
+Before implementing a suggested change — a reviewer comment, Oscar's instruction, or your own proposal — verify its load-bearing premise against *this* codebase first. "Use `strikes_from_sds`" / "isn't there an outright type for this?" / "X already does this" are premises, not facts: grep for the type, read the helper, check what the sibling actually does. An existing type, accessor, or convention often settles the question before you write anything, and a premise that turns out false (the canonical helper computes something different, no outright exists, the sibling diverges) means the edit you were about to make is wrong. Reversing a change you made on an unchecked premise costs more than the check. This holds for pushback too: verify before you defend.
 
 ---
 
