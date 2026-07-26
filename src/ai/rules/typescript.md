@@ -5,6 +5,7 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
 
 # TypeScript
 
+- Hard-pin every dependency version in `package.json` (exact version, no `^` or `~` range). Never specify a lower bound only — pin the exact version pnpm/npm actually resolved.
 - No anonymous functions at module level.
 - Functions with more than two parameters of a shared type must take a single options object instead.
 - Follow Google's TypeScript style guide.
