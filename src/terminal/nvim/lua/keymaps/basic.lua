@@ -86,23 +86,7 @@ return {
     { "N", "Nzz", desc = "Previous search result with cursor centered" },
     { "<C-D>", "<C-D>zz", desc = "Scroll down with cursor centered" },
     { "<C-U>", "<C-U>zz", desc = "Scroll up with cursor centered" },
-    {
-      "K",
-      function()
-        local line = vim.fn.line(".") - 1
-        local diagnostics = vim.diagnostic.get(0, {
-          lnum = line,
-          severity = { min = vim.diagnostic.severity.WARN },
-        })
-
-        if #diagnostics > 0 then
-          vim.diagnostic.open_float(nil, { focus = true })
-        else
-          vim.lsp.buf.hover()
-        end
-      end,
-      desc = "Diagnostic / Hover",
-    },
+    { "K", function() vim.lsp.buf.hover() end, desc = "Hover" },
     {
       "<leader>|",
       function() vim.cmd("vsplit " .. vim.api.nvim_buf_get_name(0)) end,
