@@ -1,6 +1,7 @@
 dist/unix/hypr/hyprpaper.conf
 /core/Dygma/Backups/Defy
 __pycache__/
+/src/terminal/nvim/spell/*.spl
 /Dygma/Backups/Defy/bf4cf3be2591348e
 /src/terminal/shell/fish/fish_variables
 /src/terminal/copyq/copyq-monitor.ini
