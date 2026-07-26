@@ -131,8 +131,19 @@
   },
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "basedpyright-lsp@oscar-lsp-plugins": true,
+    "tsgo-lsp@oscar-lsp-plugins": true
   },
+  "extraKnownMarketplaces": {
+    "oscar-lsp-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "/home/ozhang/dotfiles/src/ai/claude/plugins"
+      }
+    }
+  },
+  "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "auto"
