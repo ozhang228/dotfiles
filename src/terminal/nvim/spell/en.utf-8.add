@@ -1,2 +1,15 @@
 V8
 libuv
+runtime
+Deno
+filesystem
+DNS
+crypto
+zlib
+DOM
+JS
+Microtask
+Macrotask
+Prototypal
+prototypal
+APIs
