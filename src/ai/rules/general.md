@@ -32,6 +32,10 @@ git stash pop                                              # restore the rest of
 
 If this surfaces a break in a "later PR" file, the fix (usually a rename or a narrowing `match`) belongs in the *earlier* PR, since that PR must leave the tree green standalone — don't defer it just because the plan said that file belongs later.
 
+## Restart live processes after branch changes
+
+When live verification spans a branch split, switch, or rebase, stop and restart long-running services from the final checkout before recording results. A running process keeps previously imported code and can make the new branch appear verified when it is not.
+
 ## Benchmarking
 
 Benchmark the full production call path (real clients, real config, real data volume), not an isolated function in a microbenchmark. Only drill into a subfunction once the end-to-end run has identified it as the actual hotspot — an isolated benchmark can look damning while being irrelevant to real throughput.

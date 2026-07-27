@@ -22,14 +22,20 @@ local function lint_buffer(event)
 
   local buffer_directory = vim.fs.dirname(vim.api.nvim_buf_get_name(event.buf))
   local oxlint_root = vim.fs.root(buffer_directory, oxlint_config_files)
-  local package_root = vim.fs.root(buffer_directory, "package.json")
 
   if oxlint_root then
     vim.diagnostic.reset(lint.get_namespace("eslint_d"), event.buf)
-    lint.try_lint("oxlint", { cwd = package_root or oxlint_root })
+    local oxlint_binary = vim.fs.joinpath(oxlint_root, "node_modules", ".bin", "oxlint")
+    if vim.uv.fs_stat(oxlint_binary) then
+      lint.linters.oxlint.cmd = oxlint_binary
+    else
+      lint.linters.oxlint.cmd = "oxlint"
+    end
+    lint.try_lint("oxlint", { cwd = oxlint_root })
     return
   end
 
+  local package_root = vim.fs.root(buffer_directory, "package.json")
   vim.diagnostic.reset(lint.get_namespace("oxlint"), event.buf)
   lint.try_lint(nil, { cwd = package_root })
 end
