@@ -7,9 +7,9 @@ skip_if: Never — this always applies
 
 ## Draft pull requests
 
-Always create new pull requests as drafts (for example, `gh pr create --draft`). Never open a ready-for-review pull request unless Oscar explicitly asks to publish an existing draft.
+Always create new pull requests as drafts (for example, `gh pr create --draft`). Never mark Oscar's pull requests ready for review, including when asked to publish or finalize one.
 
-Before creating a GitHub pull request, search the repository for a pull request template. If one exists, use its sections and prompts for the PR body, including for draft pull requests.
+Before creating a GitHub pull request, search the repository for a pull request template. Use the template exactly as an empty form for Oscar to fill out; do not complete, summarize, or remove its prompts. If the repository has no template, create the PR with an empty body.
 
 ## Naming
 
@@ -80,4 +80,6 @@ These apply in any language — the failure is in the test's *logic*, not a lang
 - **Unverified secondary input:** when a test isolates one input to prove behavior is independent of it (e.g. "vol is normal regardless of beta"), the *other* inputs in the setup must be load-bearing, not decorative. Run the test with a default/simplified value for each supporting input and confirm it actually fails — if it still passes, that input isn't proving anything and should either be justified or removed. A "regardless of X" test with an unverified secondary input can pass by construction rather than by the invariant it claims to check.
 - **Redundant test coverage:** two tests that would fail for the same reason test nothing extra — they add maintenance cost, not confidence. Before adding a test, check whether an existing test already fails for the same root cause; if so, keep the better-named one and drop the other.
 - **Brittle-to-refactor test:** asserting on implementation details (mock call counts, private/internal state, exact intermediate data structures) instead of observable output makes a test fail on a harmless refactor even though behavior didn't change. A test should only break when the public, observable contract changes — not when you rename a helper, reorder internal calls, or swap an internal data structure that isn't part of the return value.
+- **Routing-only test:** don't test that a value was routed through a particular field, config object, dependency, or helper when the type system already proves the wiring and a happy-path test pins the resulting value. Put a distinctive input into the happy path and assert the public output instead. Keep a dedicated routing test only when routing itself is runtime behavior with independently observable branches that the happy path cannot distinguish.
+- **Config-shape test:** don't add tests that only construct or parse typed configuration and assert that validation succeeds. Static type checking covers code-owned construction, while the application startup path covers deployed serialized config. Add a config test only for custom validation or transformation logic with behavior beyond the declared types.
 - **Untestable-by-construction test:** before trusting a test, check whether it can actually fail given the available stubs/fixtures. If a stub returns identical data across the branches a test is meant to distinguish, any assertion comparing them is trivially green regardless of whether the code under test is correct. A test that cannot fail is worse than no test — it looks like coverage without being any.

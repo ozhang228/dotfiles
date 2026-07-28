@@ -36,7 +36,7 @@ The rendered `plan.mdx` should be a focused review surface, not a marketing page
 - `Split` with `Panel`: side-by-side decisions, tradeoffs, or current/target comparisons. Also the before/after primitive — two `Panel`s inside one `Split`.
 - `Flow`: actual data flow or user flow. Use only when sequence matters.
 - `FileMap`: real files, symbols, data shapes, and ownership boundaries grounded in local code. Pass `change` on an item (`added`/`modified`/`removed`/`renamed`) when the plan extends an existing file, not just for net-new ones.
-- `TestMatrix`: 3-5 core behaviors and why each test exists.
+- `BehaviorMatrix`: core behaviors, their verification class, and why that level of evidence is sufficient. Use `TestMatrix` only for older plans where every entry is genuinely a new test.
 - `Callout`: non-answerable risks, gates, hard constraints, or no-open-question statements.
 - `Diff` / `AnnotatedCode`: real before/after code for a proposed change to an existing file, or the shape of a genuinely new file. See "Diff, data-model, and API components" below.
 - `DataModel` / `Endpoint`: proposed schema or API contract, with per-field `change` flags.
@@ -123,7 +123,7 @@ Passing the wrong prop *shape* to a renderer component throws at render and blan
 
 - `PlanHeader badges` — array of **plain strings**, not objects. No per-badge tone exists.
 - `SummaryCard tone` — one of `default | good | warn | bad`. `Callout tone` — `info | good | warn | bad`. There is **no `"ok"` or `"info"` on SummaryCard**; an unknown tone silently yields a dead className (no crash, but no styling either), so it won't error but also won't look right.
-- `Metric` takes `label` + `value` strings; `Flow steps` / `FileMap items` / `TestMatrix tests` each take arrays of objects with the exact keys defined in the file — anything else renders blank.
+- `Metric` takes `label` + `value` strings; `Flow steps` / `FileMap items` / `BehaviorMatrix behaviors` each take arrays of objects with the exact keys defined in the file — anything else renders blank.
 - `change` on `FileMap items` / `DataModel fields` / `Endpoint params` / `Endpoint` itself is one of `"added" | "modified" | "removed" | "renamed"` — exact strings, they're also the CSS badge class names.
 - `Diff before`/`after` and `AnnotatedCode lines` are arrays of `{ ln?, type, code, note? }` — `type` must be exactly `"ctx" | "add" | "del" | "blank"`; any other string renders an unstyled row instead of failing loudly.
 - `Endpoint examples[].json` takes a **real JS value** (object/array/string/number), not a JSON string — passing a string double-encodes it inside the `<pre>`.
@@ -172,10 +172,10 @@ already says, so skip it (see the `PlanHeader` note above).
 
 1. **The Ask** — reiterate, in a sentence or two, what's actually being
    asked. This is the document's opening.
-2. **What needs to be done, concretely — with the tests that will nail it.**
-   The concrete behavior/requirements, paired with `TestMatrix`: the names of
-   the tests you're going to write sit right next to what they're testing
-   (see `references/testing.md` for the format), not in a separate appendix.
+2. **What needs to be done, concretely, and how each behavior will be verified.**
+   Pair concrete requirements with `BehaviorMatrix`. Mark each as a new
+   regression test, documented invariant, or manual check so the plan keeps
+   design intent without promising redundant tests (see `references/testing.md`).
 3. **Assumptions.** `AssumptionList` — any load-bearing assumption the design
    depends on, flagged `verified` / `unverified` / `todo`. Never let one sit
    in prose where it reads as an accepted fact instead of a checked one.

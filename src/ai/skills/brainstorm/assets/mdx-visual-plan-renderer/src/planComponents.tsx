@@ -159,6 +159,34 @@ export function TestMatrix({ tests }: TestMatrixProps) {
   return <section className="testMatrix">{tests.map(renderTestItem)}</section>;
 }
 
+type Verification = "regression test" | "documented invariant" | "manual check";
+
+type BehaviorItem = {
+  name: string;
+  what: string;
+  why: string;
+  verification: Verification;
+};
+
+type BehaviorMatrixProps = {
+  behaviors: BehaviorItem[];
+};
+
+export function BehaviorMatrix({ behaviors }: BehaviorMatrixProps) {
+  return <section className="testMatrix">{behaviors.map(renderBehaviorItem)}</section>;
+}
+
+function renderBehaviorItem({ name, what, why, verification }: BehaviorItem) {
+  return (
+    <section className="testItem" key={name}>
+      <span className="badge">{verification}</span>
+      <code>{name}</code>
+      <p>{what}</p>
+      <p>{why}</p>
+    </section>
+  );
+}
+
 function renderTestItem({ name, why }: TestItem) {
   return (
     <section className="testItem" key={name}>
@@ -566,6 +594,7 @@ export const planComponents: MDXComponents = {
   Flow,
   FileMap,
   TestMatrix,
+  BehaviorMatrix,
   Checklist,
   MetricGrid,
   Metric,

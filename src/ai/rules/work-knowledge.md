@@ -116,6 +116,8 @@ Energy `/deps` PRs should name concrete app/module names and affected DED entrie
 
 In the k8s declarative deployment repo, overlays under `overlays/desk-tools-managed/` are generated. Source of truth lives in `desk_tools/applications/`; edit the Python app definition/config source and regenerate, instead of editing generated jsonnet directly.
 
+Promote a Settings Gateway document from QA to prod with `~/forge/notebooks/utils/settings_gateway.py`. Run it without flags to compare first, then rerun with `--apply`; a differing prod document requires the explicit `--overwrite` flag. The helper reads the QA value, writes that exact document, and verifies prod by reading it back.
+
 Desk-tools image bumps should land on the app's QA/dev branch for QA testing and also update prod when applicable. Each app has its own QA branch from the QA ArgoCD Application `targetRevision`. Do not assume a shared QA branch.
 
 Current shared image tag format is `ficc/desk-tools:uv-<N>`, not the old `py311-uv-<N>` prefix. After a bump, grep the app directory for the old tag to confirm no qa/prod/per-instance override remains.
