@@ -26,37 +26,15 @@ broken artifact. Fill in real content; never ship the example values.
 
 ```css
 :root {
-  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eceef2; --line: #d8dce3;
-  --ink: #1c2129; --muted: #656d7c; --accent: #a3660a; --accent-soft: #f4e6cc;
-  --add: #1a7f37; --add-bg: #e6f4ea; --add-line: #cdeada;
-  --del: #cf222e; --del-bg: #fdedee; --del-line: #f7d3d6;
-  --warn: #9a6700; --warn-bg: #fdf3d8;
-  --radius: 8px;
-  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
-  --sans: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14171c; --surface: #1b1f27; --surface-2: #20242e; --line: #2b3140;
-    --ink: #e4e7ee; --muted: #8b93a7; --accent: #d9a441; --accent-soft: #3a2f18;
-    --add: #4bc76b; --add-bg: #12271a; --add-line: #17351f;
-    --del: #f0716a; --del-bg: #2c1618; --del-line: #3a1c1f;
-    --warn: #e0a52b; --warn-bg: #2e2712;
-  }
-}
-:root[data-theme="dark"] {
+  color-scheme: dark;
   --bg: #14171c; --surface: #1b1f27; --surface-2: #20242e; --line: #2b3140;
   --ink: #e4e7ee; --muted: #8b93a7; --accent: #d9a441; --accent-soft: #3a2f18;
   --add: #4bc76b; --add-bg: #12271a; --add-line: #17351f;
   --del: #f0716a; --del-bg: #2c1618; --del-line: #3a1c1f;
   --warn: #e0a52b; --warn-bg: #2e2712;
-}
-:root[data-theme="light"] {
-  --bg: #f4f5f7; --surface: #ffffff; --surface-2: #eceef2; --line: #d8dce3;
-  --ink: #1c2129; --muted: #656d7c; --accent: #a3660a; --accent-soft: #f4e6cc;
-  --add: #1a7f37; --add-bg: #e6f4ea; --add-line: #cdeada;
-  --del: #cf222e; --del-bg: #fdedee; --del-line: #f7d3d6;
-  --warn: #9a6700; --warn-bg: #fdf3d8;
+  --radius: 8px;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .badge {
@@ -69,11 +47,10 @@ broken artifact. Fill in real content; never ship the example values.
 .badge.renamed { color: var(--warn); background: var(--warn-bg); }
 ```
 
-Never hard-code a hex color inside a block's own markup — reference the token.
-This is what keeps every block correct in both the OS theme and the viewer's
-manual light/dark toggle (`data-theme` on the root element overrides the media
-query in both directions; style through the tokens, never inside the media
-query directly).
+This dark neutral/amber palette is the canonical visual language for local AI
+artifacts. Never hard-code a hex color inside a block's own markup; reference
+the token. Reserve green and red for semantic added/success and
+removed/failure states.
 
 ## Block: split diff (`diff`)
 

@@ -4,6 +4,10 @@ Use this reference when authoring the local visual plan artifact for the brainst
 
 ## Self-Contained Contract
 
+- Use the renderer's canonical dark neutral/amber visual language. Keep green
+  and red for semantic success/add and failure/remove states; do not introduce
+  a second decorative palette in plan content.
+
 - Keep plan content local. Read project context from local files and shell commands only.
 - Do not install target-repo packages, execute remote packages, fetch a remote schema, publish plan content, or depend on any external server. The only package setup allowed during this workflow is the global renderer setup owned by `scripts/serve-mdx-visual-plan`.
 - Use `./tmp/visual-plan-<slug>/` for scratch artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in.

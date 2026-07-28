@@ -1,18 +1,23 @@
 :root {
   color-scheme: dark;
-  /* Rosé Pine Moon */
-  --bg: #232136;
-  --panel: #2a273f;
-  --panel-2: #393552;
-  --text: #e0def4;
-  --muted: #908caa;
-  --line: #44415a;
-  --accent: #c4a7e7;
-  --accent-2: #ea9a97;
-  --ok: #9ccfd8;
-  --warn: #f6c177;
-  --bad: #eb6f92;
-  --code: #2a283e;
+  --bg: #14171c;
+  --panel: #1b1f27;
+  --panel-2: #20242e;
+  --text: #e4e7ee;
+  --muted: #8b93a7;
+  --line: #2b3140;
+  --accent: #d9a441;
+  --accent-2: #d9a441;
+  --ok: #4bc76b;
+  --warn: #e0a52b;
+  --bad: #f0716a;
+  --code: #171a21;
+  --accent-soft: #3a2f18;
+  --ok-soft: #12271a;
+  --ok-line: #17351f;
+  --warn-soft: #2e2712;
+  --bad-soft: #2c1618;
+  --bad-line: #3a1c1f;
 }
 
 * {
@@ -59,7 +64,7 @@ td {
 blockquote {
   margin: 16px 0;
   border-left: 3px solid var(--warn);
-  background: rgba(246, 193, 119, 0.08);
+  background: var(--warn-soft);
   padding: 12px 14px;
   border-radius: 6px;
 }
@@ -134,15 +139,15 @@ blockquote {
 }
 
 .summaryCard.good {
-  border-color: rgba(156, 207, 216, 0.6);
+  border-color: var(--ok-line);
 }
 
 .summaryCard.warn {
-  border-color: rgba(246, 193, 119, 0.7);
+  border-color: var(--warn);
 }
 
 .summaryCard.bad {
-  border-color: rgba(235, 111, 146, 0.65);
+  border-color: var(--bad-line);
 }
 
 .summaryCard h3,
@@ -160,7 +165,7 @@ blockquote {
 
 .callout {
   border-left: 3px solid var(--accent);
-  background: rgba(196, 167, 231, 0.08);
+  background: var(--accent-soft);
   padding: 12px 14px;
   border-radius: 6px;
   margin: 16px 0;
@@ -168,17 +173,17 @@ blockquote {
 
 .callout.good {
   border-left-color: var(--ok);
-  background: rgba(156, 207, 216, 0.08);
+  background: var(--ok-soft);
 }
 
 .callout.warn {
   border-left-color: var(--warn);
-  background: rgba(246, 193, 119, 0.08);
+  background: var(--warn-soft);
 }
 
 .callout.bad {
   border-left-color: var(--bad);
-  background: rgba(235, 111, 146, 0.08);
+  background: var(--bad-soft);
 }
 
 .callout strong {
@@ -271,20 +276,20 @@ blockquote {
 
 .badge.verification-test {
   color: var(--ok);
-  border-color: rgba(156, 207, 216, 0.5);
-  background: rgba(156, 207, 216, 0.1);
+  border-color: var(--ok-line);
+  background: var(--ok-soft);
 }
 
 .badge.verification-invariant {
   color: var(--accent);
-  border-color: rgba(196, 167, 231, 0.5);
-  background: rgba(196, 167, 231, 0.1);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .badge.verification-manual-check {
   color: var(--warn);
-  border-color: rgba(246, 193, 119, 0.5);
-  background: rgba(246, 193, 119, 0.1);
+  border-color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .testItem code {
@@ -302,7 +307,7 @@ blockquote {
 
 .checklist li {
   border-left: 3px solid var(--ok);
-  background: rgba(156, 207, 216, 0.08);
+  background: var(--ok-soft);
   border-radius: 6px;
   padding: 9px 12px;
 }
@@ -315,26 +320,26 @@ blockquote {
 
 .badge.added {
   color: var(--ok);
-  border-color: rgba(156, 207, 216, 0.5);
-  background: rgba(156, 207, 216, 0.1);
+  border-color: var(--ok-line);
+  background: var(--ok-soft);
 }
 
 .badge.removed {
   color: var(--bad);
-  border-color: rgba(235, 111, 146, 0.5);
-  background: rgba(235, 111, 146, 0.1);
+  border-color: var(--bad-line);
+  background: var(--bad-soft);
 }
 
 .badge.modified {
   color: var(--accent);
-  border-color: rgba(196, 167, 231, 0.5);
-  background: rgba(196, 167, 231, 0.1);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .badge.renamed {
   color: var(--warn);
-  border-color: rgba(246, 193, 119, 0.5);
-  background: rgba(246, 193, 119, 0.1);
+  border-color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .fileMapPath {
@@ -414,7 +419,7 @@ blockquote {
 }
 
 .diffRow.add {
-  background: rgba(156, 207, 216, 0.08);
+  background: var(--ok-soft);
 }
 
 .diffRow.add .code {
@@ -422,7 +427,7 @@ blockquote {
 }
 
 .diffRow.del {
-  background: rgba(235, 111, 146, 0.08);
+  background: var(--bad-soft);
 }
 
 .diffRow.del .code {
@@ -540,7 +545,7 @@ blockquote {
   font-weight: 700;
   padding: 3px 8px;
   border-radius: 4px;
-  background: rgba(196, 167, 231, 0.15);
+  background: var(--accent-soft);
   color: var(--accent);
 }
 
@@ -641,7 +646,7 @@ blockquote {
 
 .diagramNode.hot {
   border-color: var(--accent);
-  background: rgba(196, 167, 231, 0.1);
+  background: var(--accent-soft);
 }
 
 .diagramConnector {
@@ -755,20 +760,20 @@ blockquote {
 
 .badge.status-verified {
   color: var(--ok);
-  border-color: rgba(156, 207, 216, 0.5);
-  background: rgba(156, 207, 216, 0.1);
+  border-color: var(--ok-line);
+  background: var(--ok-soft);
 }
 
 .badge.status-unverified {
   color: var(--warn);
-  border-color: rgba(246, 193, 119, 0.5);
-  background: rgba(246, 193, 119, 0.1);
+  border-color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .badge.status-todo {
   color: var(--bad);
-  border-color: rgba(235, 111, 146, 0.5);
-  background: rgba(235, 111, 146, 0.1);
+  border-color: var(--bad-line);
+  background: var(--bad-soft);
 }
 
 .plan > :first-child {
