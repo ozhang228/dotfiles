@@ -6,29 +6,29 @@ For the test-quality bar itself (tautological tests, vacuous assertions, brittle
 
 ## Verification classes
 
-- `regression test`: Write a new automated test because it uniquely catches a plausible implementation regression.
-- `documented invariant`: Preserve the behavior in the design, but do not add a test. Use this when types, framework validation, existing coverage, or a stronger test already enforces it, or when the statement guides implementation without needing independent executable coverage.
+- `test`: Write a new automated test because it uniquely exercises behavior worth pinning.
+- `invariant`: Preserve the behavior in the design, but do not add a test. Use this when types, framework validation, existing coverage, or a stronger test already enforces it, or when the statement guides implementation without needing independent executable coverage.
 - `manual check`: Verify through a running system, visual inspection, metrics, or another environment-dependent workflow that a unit test cannot represent honestly.
 
-Classify before naming. Only `regression test` entries receive `test_...` names and enter the TDD implementation plan.
+Classify before naming. Only `test` entries receive `test_...` names and enter the TDD implementation plan.
 
 ## Format
 
 A flat list, one entry per behavior:
 
 ```
-verification: regression test | documented invariant | manual check
-name: <test name only for a regression test; otherwise a short behavior label>
+verification: test | invariant | manual check
+name: <test name only for a test; otherwise a short behavior label>
   what: <the exact scenario — inputs and the specific expected observable outcome>
   why: <why the behavior matters and why this verification class is sufficient>
 ```
 
-`what` and `why` answer different questions. `what` commits to a concrete outcome, even for a documented invariant. `why` justifies both the behavior and its verification class. If a documented invariant cannot name what already covers it or why automation adds no value, reconsider whether it needs a regression test.
+`what` and `why` answer different questions. `what` commits to a concrete outcome, even for an invariant. `why` justifies both the behavior and its verification class. If an invariant cannot name what already covers it or why automation adds no value, reconsider whether it needs a test.
 
 ## Rules
 
 - One entry per behavior. If `why` reads "covers X and also Y", split it.
-- Classify framework behavior, trivial getters, type-enforced wiring, and duplicate coverage as documented invariants or omit them. Do not create tests for them.
+- Classify framework behavior, trivial getters, type-enforced wiring, and duplicate coverage as invariants or omit them. Do not create tests for them.
 - A behavior can remain in the contract even when it should not become a test. This keeps design intent visible without manufacturing low-value coverage.
 - Order from happy path to edge cases.
 - Describe observable behavior — what the user sees, receives, or what the public API returns — not how the code achieves it.
@@ -40,12 +40,12 @@ name: <test name only for a regression test; otherwise a short behavior label>
 ## Example
 
 ```
-verification: regression test
+verification: test
 name: test_parse_returns_empty_dict_for_blank_input
   what: parse("") returns {} rather than raising or returning None
   why: blank input is a common caller case and no existing validation covers the parser branch
 
-verification: documented invariant
+verification: invariant
 name: unknown configuration keys fail validation
   what: config parsing rejects unknown keys before application startup
   why: the shared strict Pydantic base already enforces this, so another app-level test would duplicate framework coverage

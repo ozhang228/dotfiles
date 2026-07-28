@@ -36,7 +36,7 @@ The rendered `plan.mdx` should be a focused review surface, not a marketing page
 - `Split` with `Panel`: side-by-side decisions, tradeoffs, or current/target comparisons. Also the before/after primitive — two `Panel`s inside one `Split`.
 - `Flow`: actual data flow or user flow. Use only when sequence matters.
 - `FileMap`: real files, symbols, data shapes, and ownership boundaries grounded in local code. Pass `change` on an item (`added`/`modified`/`removed`/`renamed`) when the plan extends an existing file, not just for net-new ones.
-- `BehaviorMatrix`: core behaviors, their verification class, and why that level of evidence is sufficient. Use `TestMatrix` only for older plans where every entry is genuinely a new test.
+- `BehaviorMatrix`: core behaviors grouped as tests, invariants, and manual checks, with why that level of evidence is sufficient. Use `TestMatrix` only for older plans where every entry is genuinely a new test.
 - `Callout`: non-answerable risks, gates, hard constraints, or no-open-question statements.
 - `Diff` / `AnnotatedCode`: real before/after code for a proposed change to an existing file, or the shape of a genuinely new file. See "Diff, data-model, and API components" below.
 - `DataModel` / `Endpoint`: proposed schema or API contract, with per-field `change` flags.
@@ -174,7 +174,7 @@ already says, so skip it (see the `PlanHeader` note above).
    asked. This is the document's opening.
 2. **What needs to be done, concretely, and how each behavior will be verified.**
    Pair concrete requirements with `BehaviorMatrix`. Mark each as a new
-   regression test, documented invariant, or manual check so the plan keeps
+   test, invariant, or manual check so the plan keeps
    design intent without promising redundant tests (see `references/testing.md`).
 3. **Assumptions.** `AssumptionList` — any load-bearing assumption the design
    depends on, flagged `verified` / `unverified` / `todo`. Never let one sit

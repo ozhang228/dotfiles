@@ -159,7 +159,7 @@ export function TestMatrix({ tests }: TestMatrixProps) {
   return <section className="testMatrix">{tests.map(renderTestItem)}</section>;
 }
 
-type Verification = "regression test" | "documented invariant" | "manual check";
+type Verification = "test" | "invariant" | "manual check";
 
 type BehaviorItem = {
   name: string;
@@ -172,14 +172,33 @@ type BehaviorMatrixProps = {
   behaviors: BehaviorItem[];
 };
 
+const VERIFICATION_GROUPS: { verification: Verification; label: string }[] = [
+  { verification: "test", label: "Tests" },
+  { verification: "invariant", label: "Invariants" },
+  { verification: "manual check", label: "Manual checks" },
+];
+
 export function BehaviorMatrix({ behaviors }: BehaviorMatrixProps) {
-  return <section className="testMatrix">{behaviors.map(renderBehaviorItem)}</section>;
+  return (
+    <section className="behaviorMatrix">
+      {VERIFICATION_GROUPS.map(({ verification, label }) => {
+        const group = behaviors.filter((behavior) => behavior.verification === verification);
+        return group.length === 0 ? undefined : (
+          <section className="behaviorGroup" key={verification}>
+            <div className="behaviorGroupHeading">
+              <span className={`badge verification-${verification.replaceAll(" ", "-")}`}>{label}</span>
+            </div>
+            <div className="testMatrix">{group.map(renderBehaviorItem)}</div>
+          </section>
+        );
+      })}
+    </section>
+  );
 }
 
-function renderBehaviorItem({ name, what, why, verification }: BehaviorItem) {
+function renderBehaviorItem({ name, what, why }: BehaviorItem) {
   return (
     <section className="testItem" key={name}>
-      <span className="badge">{verification}</span>
       <code>{name}</code>
       <p>{what}</p>
       <p>{why}</p>

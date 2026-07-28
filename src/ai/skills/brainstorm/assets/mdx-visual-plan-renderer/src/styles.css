@@ -246,6 +246,47 @@ blockquote {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.behaviorMatrix {
+  display: grid;
+  gap: 20px;
+  margin: 16px 0;
+}
+
+.behaviorGroupHeading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.behaviorGroupHeading::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+
+.behaviorGroup .testMatrix {
+  margin: 0;
+}
+
+.badge.verification-test {
+  color: var(--ok);
+  border-color: rgba(156, 207, 216, 0.5);
+  background: rgba(156, 207, 216, 0.1);
+}
+
+.badge.verification-invariant {
+  color: var(--accent);
+  border-color: rgba(196, 167, 231, 0.5);
+  background: rgba(196, 167, 231, 0.1);
+}
+
+.badge.verification-manual-check {
+  color: var(--warn);
+  border-color: rgba(246, 193, 119, 0.5);
+  background: rgba(246, 193, 119, 0.1);
+}
+
 .testItem code {
   color: var(--accent-2);
   white-space: normal;
