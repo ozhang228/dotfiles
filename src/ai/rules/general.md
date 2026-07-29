@@ -36,6 +36,10 @@ If this surfaces a break in a "later PR" file, the fix (usually a rename or a na
 
 When live verification spans a branch split, switch, or rebase, stop and restart long-running services from the final checkout before recording results. A running process keeps previously imported code and can make the new branch appear verified when it is not.
 
+## Use localhost for local app URLs
+
+When launching or sharing a local browser app, use `http://localhost:<port>` instead of `http://127.0.0.1:<port>`. Oscar's SSO configuration allowlists `localhost`; the numeric loopback address can redirect correctly but still fail the authenticated browser flow.
+
 ## Benchmarking
 
 Benchmark the full production call path (real clients, real config, real data volume), not an isolated function in a microbenchmark. Only drill into a subfunction once the end-to-end run has identified it as the actual hotspot — an isolated benchmark can look damning while being irrelevant to real throughput.

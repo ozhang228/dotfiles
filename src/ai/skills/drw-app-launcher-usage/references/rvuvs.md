@@ -1,6 +1,6 @@
 # RVUVS
 
-RVUVS is `rv-utils-viz-server`. Map friendly widget names to telemetry labels:
+RVUVS is the shared `rv-utils-viz-server` family, not an application heading in usage reports. Treat each friendly widget name below as a user-facing application. Group its `sofr`, `ust`, `rates-rv`, and `crypto-coral` deployments beneath it as instances when they have usage.
 
 | Friendly name | `labels.widget` |
 |---|---|

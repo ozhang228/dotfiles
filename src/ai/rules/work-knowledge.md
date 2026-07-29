@@ -35,6 +35,28 @@ RVUVS migration into desk-tools surface_viz has two separable layers:
 - Yield-offset moneyness axis first. UST is the long-end bond-basket path through `YieldVolClient`; SOFR short-end is simple `strike = underlying_price + offset`.
 - Delivered realized-vol overlay later. It is an edo-metrics port (`calculate_daily_vols`) with `rv`, `rv_spot`, `rv_forward`, `atm_vol_modified`, and `yte_modified`; all `sofr`, `ust`, and `rates-rv` prod instances enable it.
 
+RVUVS term-structure metrics map to Product Surface controls as follows. Let `C`, `P`, and `A` be call-wing, put-wing, and ATM vol; let `Pc`, `Pp` be OTM call and put prices. "Equivalent" means the same formula, not guaranteed live numerical parity: parity also requires the same surface snapshot, listing universe, moneyness convention, and tick conversion.
+
+| RVUVS output | Product Surface equivalent | Status |
+| --- | --- | --- |
+| `Atms` | Vol, SD `0`, Outright, no ATM normalization | Equivalent |
+| `Vols (Call)` | Vol, SD `+M`, Outright, no ATM normalization | Equivalent |
+| `Vols (Put)` | Vol, SD `-M`, Outright, no ATM normalization | Equivalent |
+| `Vols over Flat (Call)`, `C - A` | Vol, SD `+M`, Outright, Diff ATM | Equivalent |
+| `Vols over Flat (Put)`, `P - A` | Vol, SD `-M`, Outright, Diff ATM | Equivalent |
+| `Slope (Squash)`, `C - P` | Vol, SD `M`, Risk Reversal, no ATM normalization | Equivalent |
+| `Vols (Fly)`, `C + P - 2A` | None as one selection | Missing; Strangle plus Diff ATM would have the formula, but Product Surface disallows ATM normalization for non-Outright structures |
+| `Ticks (Squash)`, `Pc - Pp` | Price (ticks), SD `M`, Risk Reversal, no ATM normalization | Equivalent when tick conversion agrees |
+| `Ticks (Strangle)`, `Pc + Pp` | Price (ticks), SD `M`, Strangle, no ATM normalization | Equivalent when tick conversion agrees |
+| `Ticks over Flat (Call/Put)` | None | Missing; RVUVS reprices the same wing strike with ATM vol, while Product Surface Diff ATM subtracts the ATM option at a different strike |
+| `Forward Atms`, `Forward Vols (Call/Put)` | None | Missing forward-vol mode |
+| `Realized*`, `Realized over Atms*`, `Realized minus Atms*` | None in Product Surface | Missing realized-vol overlay |
+| `Strike (Call/Put)` | No metric equivalent | Product Surface can select strike moneyness, but does not display resolved wing strikes as the heatmap metric |
+
+The RVUVS backend still has a `wings_as_ratios` parameter that can change Vols over Flat to `wing / ATM`, Slope to `call / put`, and Fly to `(call + put) / (2 * ATM)`. Do not present those as current frontend plot modes. The current `k8s` tree has no Wings As Ratios control. Its historical App Launcher `surfaceTermStructure` widget exposed the control with a default of `False`, but that widget config was removed from `k8s` in the 2021 widget migration. Product Surface's ATM normalization is per-Outright metric and would only reproduce the backend ratio form of Vols over Flat, not ratio Squash or Fly.
+
+Product Surface Price plus Diff ATM is not `Ticks over Flat`: it computes wing option price minus ATM option price, whereas RVUVS holds the wing strike fixed and changes only its pricing vol to ATM vol.
+
 `SurfaceOptionConfiguration.underlying_pricer_type` defaults to `linear`. `linear_forward_by_rate` is specifically for deribit-like spot underlyings without yte. Do not use it just because a config is rates/treasuries.
 
 For `apps/surface_viz/product_surface`, place code by layer:
