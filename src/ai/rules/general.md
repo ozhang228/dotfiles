@@ -9,7 +9,7 @@ skip_if: Never — this always applies
 
 Always create new pull requests as drafts (for example, `gh pr create --draft`). Never mark Oscar's pull requests ready for review, including when asked to publish or finalize one.
 
-Before creating a GitHub pull request, search the repository for a pull request template. Use the template exactly as an empty form for Oscar to fill out; do not complete, summarize, or remove its prompts. If the repository has no template, create the PR with an empty body.
+This is a global precedence exception: it overrides project-specific instructions to fill in, summarize, or rewrite a pull request template. Before creating a GitHub pull request, search the repository for a pull request template. Use the template exactly as an empty form for Oscar to fill out; do not complete, summarize, or remove its prompts. If the repository has no template, create the PR with an empty body.
 
 ## Naming
 

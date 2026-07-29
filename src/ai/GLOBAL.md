@@ -20,7 +20,7 @@ If the current client shows the `@...` lines literally instead of expanding them
 
 ## Project-Specific Instructions Take Priority
 
-You must always read and prefer **project-specific instructions** (e.g., `AGENTS.md` or `CLAUDE.md` in the project root) over these global rules.
+You must always read and prefer **project-specific instructions** (e.g., `AGENTS.md` or `CLAUDE.md` in the project root) over these global rules, unless a global rule explicitly identifies itself as a precedence exception.
 
 ---
 
