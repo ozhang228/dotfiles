@@ -29,7 +29,6 @@ Start from this discovery query when the widget label or URL shape is unknown:
 
 ```spl
 index=ficc-web-prod labels.app=app-launcher NOT user.name="Oscar Zhang"
-| spath log
 | where isnotnull(url)
 | rex field=url "^(?<base_url>[^?]+)"
 | stats count by labels.widget, base_url
@@ -44,7 +43,6 @@ Adapt the target filter and instance extraction to the resolved application:
 
 ```spl
 index=ficc-web-prod labels.app=app-launcher labels.widget IN (<widget labels>) NOT user.name="Oscar Zhang"
-| spath log
 | where log="stream connecting" AND isnotnull(url)
 | rex field=url "^(?<base_url>[^?]+)"
 | eval application="<resolved application>", instance=base_url
@@ -57,7 +55,20 @@ index=ficc-web-prod labels.app=app-launcher labels.widget IN (<widget labels>) N
 
 Replace the placeholder application and `instance=base_url` with application-specific `rex`, `case`, or `eval` expressions once discovery identifies stable path segments. Exclude unrelated URLs that happen to carry the same widget label.
 
-If the query returns no rows, show the effective time window and filters, then say that no matching production sessions were found. Do not silently broaden the query.
+App Launcher fields (`log`, `url`, `labels.widget`, and `user.name`) are already extracted. Do not run `spath` or `spath log`: `log` is a plain message, while bare `spath` duplicates the extracted scalar fields into multivalue fields and can multiply session counts. Quote dotted field names inside expressions, for example:
+
+```spl
+| eval application=case('labels.widget'="surfaceGridByProductAndExpiration", "Product Surface")
+```
+
+If the query unexpectedly returns no rows, validate the stages before reporting zero usage:
+
+1. `| stats count by labels.widget` after the base search.
+2. Add the `log="stream connecting"` filter and `| stats count by labels.widget, url`.
+3. Add instance extraction and `| stats count by labels.widget, instance, user.name`.
+4. Add sessionization last. For a sanity check, include `count(eval(isnull(previous_time))) AS first_rows`; it should be `1` for each user/widget/instance group.
+
+Fix the first empty or malformed stage. Do not broaden the target labels, URL family, time window, or usage signal. If all stages are valid and the final query still has no rows, show the effective time window and filters, then report that no matching production sessions were found.
 
 ## Present the result
 
