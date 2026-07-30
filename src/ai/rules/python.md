@@ -21,7 +21,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields.
-- Prefer immutable collection types in return signatures (e.g. `Sequence` over `list`, `frozenset` over `set`, `Mapping` over `dict`). Reach for the mutable variants only when the API contract requires the caller to mutate.
+- In return signatures and data type fields, prefer the widest read-only collection interface that expresses the contract (`Sequence` over `list` or `tuple[T, ...]`, `frozenset` over `set`, `Mapping` over `dict`). Use a tuple type when fixed length or positional meaning is part of the contract, and mutable interfaces only when callers must mutate.
 - Prefer idiomatic dict operations: `.get(key, default)` over if/else lookups, `.pop()` over `del`.
 - When logging exceptions, use the logger's `exception` method.
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
