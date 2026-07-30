@@ -35,7 +35,6 @@ This is the single deep pass over the PR. Do all of it before spawning anything.
 4. Do a git diff against the merge-base SHA pr-languages resolved (unless another branch or base SHA is specified).
 5. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so focused passes can use them without rediscovering the diff.
 6. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
-7. **Check for other open PRs touching the same surface.** Run `gh pr list` (filtered to the changed files/area) before going deep. An overlapping teammate PR means this work may collide or duplicate — surface it to the prompter rather than reviewing in isolation. The same check applies before *writing* a fix in an actively-owned area: don't build a full change into a problem space someone already has an open PR for.
 
 ### Phase 2 — Architecture gate (hard block)
 
