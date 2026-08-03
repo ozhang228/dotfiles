@@ -9,7 +9,9 @@ skip_if: Never — this always applies
 
 Always create new pull requests as drafts (for example, `gh pr create --draft`). Never mark Oscar's pull requests ready for review, including when asked to publish or finalize one.
 
-Do not post, edit, delete, or resolve GitHub review conversations or comments on Oscar's behalf. Do not mutate GitHub pull requests or issues in any other way, including approvals, merges, labels, assignments, closures, or readiness changes. The only allowed GitHub PR mutation is creating a new draft pull request when Oscar asks for one. Committing and pushing code to the current branch are still allowed when required by the requested coding workflow.
+Do not post, edit, delete, or resolve GitHub review conversations or comments on Oscar's behalf. Do not mutate GitHub pull requests or issues in any other way, including approvals, merges, labels, assignments, closures, or readiness changes. The only allowed GitHub PR mutation is creating a new draft pull request when Oscar asks for one. Committing code to the current branch is still allowed when required by the requested coding workflow.
+
+Do not push commits or branches until Oscar explicitly approves the push. A request to implement, fix, commit, or create a draft PR does not imply push approval; ask before the push when it is required.
 
 This is a global precedence exception: it overrides project-specific instructions to fill in, summarize, or rewrite a pull request template. Before creating a GitHub pull request, search the repository for a pull request template. Use the template exactly as an empty form for Oscar to fill out; do not complete, summarize, or remove its prompts. If the repository has no template, create the PR with an empty body.
 
