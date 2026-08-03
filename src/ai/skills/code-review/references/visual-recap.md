@@ -28,12 +28,12 @@ review.
 
 `index.html` is not prose poured into HTML — it's built from the component
 library in `references/structured-blocks.md`. Read that file in full before
-authoring `index.html`; do not hand-roll a diff view, file tree, or
+authoring `index.html`; do not hand-roll a diff view or
 data-model card from memory. It defines the token CSS, the split-diff
 component (real line numbers, before/after, annotation markers), annotated
-code, key-change tabs, file tree, data-model / API-endpoint cards, before/after
-columns, and two-panel diagrams — all plain HTML/CSS with a little vanilla JS,
-no build step. Copy the CSS into `index.html`'s own `<style>` tag once.
+code, data-model / API-endpoint cards, before/after columns, and two-panel
+diagrams — all plain HTML/CSS with a little vanilla JS, no build step. Copy the
+CSS into `index.html`'s own `<style>` tag once.
 
 ## Diff → Block Mapping
 
@@ -54,13 +54,12 @@ the short version:
   lines. Never leave a diff unlabeled.
 - **Brand-new file / substantial new block** → `annotated-code` instead of a
   one-sided diff.
-- **Files added/removed/renamed** → `file-tree` with `change` flags.
-- **Several key files needing full diffs** → group under `tabs` (3-8 tabs,
-  horizontal only, one file per tab) so each split diff gets full width.
 - **Structured before/after** (schema/contract shape) → `columns`, not two
   stacked cards.
 - **Architecture or data-flow shift** → two-panel/swimlane `diagram`. Never
   reduce a structural change to one left-to-right arrow chain.
+- **Different failure handling scopes** → `boundary-matrix`, with one row per
+  failure naming the handling scope and why partial recovery is safe.
 - **Rendered UI/interaction change** → describe the before/after in prose, or
   use `columns` for a structured before/after when the states are simple
   enough to summarize as fields, not a `diagram`.
@@ -80,26 +79,35 @@ A recap reads like a review someone walks through, not a section checklist.
 No decorative title or category-tag header — open straight into the first
 part. Three parts, top to bottom:
 
-1. **Understanding the PR.** Prose, grounded in the tests (Phase 1 step 6:
-   read the tests first). Summarize succinctly what the PR does and why —
-   the behavior a reader needs before looking at a single line of the diff.
-   This is not a findings list yet; it's the same understanding the tests
-   gave you, handed to the reader.
+1. **Understanding the PR.** This is the core of the recap, not a short preface.
+   Build the reader's intuition in causal order: why the old behavior was a
+   problem, the smallest concrete scenario that exposes it, the mechanism the
+   PR introduces, and why that mechanism produces the intended behavior. Name
+   the durable unit of work, success, failure/retry, and ordering when those
+   concepts matter. Embed a focused diff, model, API, or diagram only where it
+   advances that explanation; organize around concepts and behavior, not files.
 2. **Modeling.** The deeper why: the confirmed architecture verdict from
    Phase 2, plus `data-model` / `api-endpoint` blocks wherever the PR touches
    schema or contracts, explaining the design choices and whether they hold
-   up — not just what the code does, why it's shaped this way.
-3. **The review.** `file-tree` of the changed files, then `## Key changes` —
-   one horizontal `tabs` block of `diff` / `annotated-code` with annotations
-   calling out what's important, then the grouped findings (Bugs / Testing /
-   Performance / Simplification / Nits) with stable ids, per the Output
-   Format in `SKILL.md`.
+   up. Add a `boundary-matrix` when failures are handled at different scopes;
+   partial recovery is valid only while identity, ordering, or transaction
+   state remains trustworthy.
+3. **The review.** Group findings as Bugs / Testing / Performance /
+   Simplification / Nits with stable ids, per the Output Format in `SKILL.md`.
+   Include the minimum local code context each finding needs. Do not add
+   separate Changed Files or Key Changes sections; a path list does not explain
+   the change, and detached hunks lack the intuition needed to interpret them.
+
+For a recap with more than five substantial sections, add a compact anchor
+navigation strip after the opening thesis. Skip navigation when the whole page
+already fits a short linear read.
+
+When a non-obvious test carries an important claim, explain its causal oracle:
+the broken implementation that would make it fail, deadlock, or time out. A
+test name and assertion summary alone do not explain why the evidence is strong.
 
 Budgets that keep the recap reviewable:
 
-- 3-8 key-change tabs. Fewer than 3 on a large change under-serves the
-  reviewer; more than 8 stops being a summary — trim to the truly key files
-  and let the file tree carry the rest.
 - Keep each diff/annotated-code excerpt focused — prefer under ~150 lines per
   tab; summarize or link the rest of a long file instead of dumping it.
 - Number markers only on lines with something non-obvious to say — a few

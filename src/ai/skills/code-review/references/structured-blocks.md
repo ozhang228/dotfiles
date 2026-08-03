@@ -1,24 +1,20 @@
-# Structured review blocks — single source of truth
+# Structured review blocks
 
-This file is the canonical component library for turning a diff (or a proposed
-change) into scannable HTML, shared word for word by the code-review recap
-workflow and the brainstorm visual-plan workflow. Read it in full before
-authoring any structured block; do not hand-roll a diff view, file tree, or
-data-model card from memory or improvise markup per invocation.
+This file is the canonical component library for turning a diff into the
+self-contained HTML used by code-review recaps. The brainstorm renderer mirrors
+the same concepts in React, but its prop contracts live in
+`assets/mdx-visual-plan-renderer/src/planComponents.tsx`. Read this file in full
+before authoring recap blocks; do not improvise diff or data-model
+markup per review.
 
-<!-- SHARED-CORE:structured-blocks START -->
-
-**Why plain HTML, not MDX/JSX components.** Tools like the BuilderIO Plan
-skills render blocks (`<Diff>`, `<DataModel>`, `<Endpoint>`) through a hosted
-MDX compiler and React renderer. We don't have that, and don't want it — the
-recap/plan is a static file opened directly in a browser, no build step, no
-server, no external dependency. Every block below is plain HTML + CSS, with a
-few lines of vanilla JS only where real interactivity earns its keep (tabs,
-`<details>` disclosure). It costs nothing extra to generate since the diff
-text is already in hand — no client-side diffing library needed.
+**Why plain HTML here.** A code-review recap is a static file opened directly
+in a browser, with no build step or external dependency. Every block below is
+plain HTML + CSS, with vanilla JS only where interactivity earns its keep
+(`<details>` disclosure). The diff text is already available, so no
+client-side diffing library is needed.
 
 **Copy the CSS once per artifact.** Paste the full token + component CSS block
-below into the recap/plan's own `<style>` tag. Do not link it externally, do
+below into the recap's own `<style>` tag. Do not link it externally, do
 not partially copy classes — an artifact missing a class it references is a
 broken artifact. Fill in real content; never ship the example values.
 
@@ -51,6 +47,28 @@ This dark neutral/amber palette is the canonical visual language for local AI
 artifacts. Never hard-code a hex color inside a block's own markup; reference
 the token. Reserve green and red for semantic added/success and
 removed/failure states.
+
+## Block: section navigation (`section-nav`)
+
+Use only when an artifact has more than five substantial sections. Keep it a
+compact strip of real anchor links; short documents read better without it.
+
+```css
+.section-nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.section-nav a { padding: 5px 9px; border-radius: 5px; background: var(--surface-2); color: var(--muted); text-decoration: none; font-size: 12px; }
+.section-nav a:hover { color: var(--ink); }
+```
+
+```html
+<nav class="section-nav" aria-label="Review sections">
+  <a href="#understanding">Understanding</a>
+  <a href="#modeling">Modeling</a>
+  <a href="#review">Review</a>
+</nav>
+```
+
+Every `href` must resolve to an id in the same document. Do not add links for
+minor subsections just to fill the strip.
 
 ## Block: split diff (`diff`)
 
@@ -144,78 +162,6 @@ meaningful "before") instead of an empty left pane.
 
 Reuses `.diff-row` / `.diff-notes` / `.note-marker` from the diff block —
 define those CSS rules once per artifact, not twice.
-
-## Block: key-change tabs (`tabs`)
-
-Group 3-8 key file diffs under one horizontal tab strip instead of stacking
-them vertically forever. Each tab gets full document width for its split
-diff — this is why tabs are horizontal (one file per tab), not a vertical
-side rail that would crush the diff into a narrow column.
-
-```css
-.tabs .tab-bar { display: flex; gap: 2px; background: var(--surface-2); border-bottom: 1px solid var(--line); padding: 4px 4px 0; overflow-x: auto; }
-.tabs .tab-btn { font-family: var(--mono); font-size: 12px; color: var(--muted); background: transparent; border: none; padding: 8px 14px; cursor: pointer; border-radius: 6px 6px 0 0; white-space: nowrap; }
-.tabs .tab-btn:hover { color: var(--ink); }
-.tabs .tab-btn.active { background: var(--surface); color: var(--ink); font-weight: 600; }
-.tabs .tab-panel { display: none; }
-.tabs .tab-panel.active { display: block; }
-```
-
-```html
-<div class="card tabs">
-  <div class="tab-bar">
-    <button class="tab-btn active" data-tab="t1">session.py</button>
-    <button class="tab-btn" data-tab="t2">token_rotation.py</button>
-  </div>
-  <div class="tab-panel active" data-panel="t1"><!-- diff-split for file 1 --></div>
-  <div class="tab-panel" data-panel="t2"><!-- diff-split for file 2 --></div>
-</div>
-```
-
-```js
-document.querySelectorAll(".tabs").forEach(function (tabs) {
-  tabs.querySelectorAll(".tab-btn").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      tabs.querySelectorAll(".tab-btn").forEach(function (b) { b.classList.remove("active"); });
-      tabs.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("active"); });
-      btn.classList.add("active");
-      tabs.querySelector('[data-panel="' + btn.dataset.tab + '"]').classList.add("active");
-    });
-  });
-});
-```
-
-Paste this script once at the end of the artifact body; it wires every
-`.tabs` block on the page. Budget: 3-8 tabs. Fewer than 3 doesn't need tabs
-(just stack the diffs); more than 8 stops being a summary — trim to the truly
-key files and let the file tree carry the rest.
-
-## Block: file tree (`file-tree`)
-
-The footprint of the change at a glance, before any line-level detail.
-
-```css
-.file-tree { padding: 14px 16px; font-family: var(--mono); font-size: 12.5px; }
-.file-tree ul { list-style: none; margin: 0; padding-left: 18px; }
-.file-tree > ul { padding-left: 0; }
-.file-tree li { padding: 3px 0; display: flex; align-items: center; gap: 8px; }
-.file-tree .fname { color: var(--ink); }
-.file-tree .note { color: var(--muted); font-family: var(--sans); font-size: 12px; }
-```
-
-```html
-<div class="card file-tree">
-  <ul>
-    <li><span class="badge modified">modified</span><span class="fname">auth/session.py</span><span class="note">short note on what changed</span></li>
-    <li><span class="badge added">added</span><span class="fname">auth/token_rotation.py</span></li>
-    <li><span class="badge removed">removed</span><span class="fname">auth/legacy_extend.py</span></li>
-  </ul>
-</div>
-```
-
-`change` is one of `added` / `modified` / `removed` / `renamed`, derived
-mechanically from the diff stat — never guessed. Attach a `.note` only when it
-tells the reviewer something the path doesn't already say.
 
 ## Block: data model (`data-model`)
 
@@ -327,6 +273,35 @@ shape). Use the `diff` block for **code** — it renders literal removed/added
 lines, which `columns` cannot. Don't stack two `data-model` cards vertically
 and call it a comparison when this grid exists.
 
+## Block: failure boundary matrix (`boundary-matrix`)
+
+Use when failures are handled at different scopes. It makes the recovery
+contract reviewable: what failed, how much work is discarded or retried, and
+why the remaining identity/order/transaction state is still trustworthy.
+
+```css
+.boundary-matrix { margin: 16px 0; overflow-x: auto; }
+.boundary-matrix table { min-width: 680px; width: 100%; border-collapse: collapse; font-size: 13px; }
+.boundary-matrix th { text-align: left; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+.boundary-matrix th, .boundary-matrix td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.scope-pill { display: inline-flex; padding: 2px 7px; border: 1px solid var(--accent); border-radius: 4px; background: var(--accent-soft); color: var(--accent); font-size: 12px; white-space: nowrap; }
+```
+
+```html
+<div class="card boundary-matrix">
+  <table>
+    <thead><tr><th>Failure</th><th>Handling scope</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>one known item fails validation</td><td><span class="scope-pill">item</span></td><td>its stable input id lets valid siblings remain committed</td></tr>
+      <tr><td>response loses item identity</td><td><span class="scope-pill">whole response</span></td><td>outputs can no longer be mapped safely to inputs</td></tr>
+    </tbody>
+  </table>
+</div>
+```
+
+Use real failure modes and observed handling from the diff. Do not infer that
+partial recovery is safe merely because the implementation attempts it.
+
 ## Block: diagram (two-panel / swimlane)
 
 Architecture or data-flow shifts. Plain flex boxes — no diagram library, no
@@ -382,10 +357,7 @@ line the summary got wrong.
 | API / action / route change | `api-endpoint` with request/response examples |
 | Any meaningful code hunk | `diff` (split), one-line `summary`, a few `note-marker` annotations on load-bearing lines |
 | Brand-new file / substantial new block | `annotated-code` instead of a one-sided diff |
-| Files added / removed / renamed | `file-tree` with `change` flags |
-| Several key files needing full diffs | group under `tabs`, 3-8 tabs, horizontal only |
 | Structured before/after (schema/contract shape) | `columns`, not stacked cards |
+| Different failure handling scopes | `boundary-matrix` with failure, scope, and safety rationale |
 | Architecture or data-flow shift | two-panel/swimlane `diagram`, never a single arrow chain |
 | Rendered UI / interaction change | describe the before/after in prose, or `columns` when the states summarize as fields |
-
-<!-- SHARED-CORE:structured-blocks END -->

@@ -82,30 +82,6 @@ blockquote {
   padding: 24px;
 }
 
-.planHeader {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) max-content;
-  gap: 18px;
-  align-items: start;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 18px;
-  margin-bottom: 18px;
-}
-
-.lead {
-  color: var(--muted);
-  max-width: 760px;
-  font-size: 15px;
-}
-
-.badgeRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-  max-width: 460px;
-}
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -116,6 +92,28 @@ blockquote {
   color: var(--muted);
   background: var(--panel-2);
   font-size: 12px;
+}
+
+.sectionNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sectionNav a {
+  padding: 5px 9px;
+  border-radius: 5px;
+  background: var(--panel-2);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 12px;
+}
+
+.sectionNav a:hover {
+  color: var(--text);
 }
 
 .summaryGrid,
@@ -298,18 +296,24 @@ blockquote {
   word-break: break-word;
 }
 
-.checklist {
-  display: grid;
-  gap: 8px;
-  margin-left: 0;
-  list-style: none;
+.boundaryMatrix {
+  margin: 16px 0;
+  overflow-x: auto;
 }
 
-.checklist li {
-  border-left: 3px solid var(--ok);
-  background: var(--ok-soft);
-  border-radius: 6px;
-  padding: 9px 12px;
+.boundaryMatrix table {
+  min-width: 680px;
+}
+
+.scopePill {
+  display: inline-flex;
+  padding: 2px 7px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 .metric strong {

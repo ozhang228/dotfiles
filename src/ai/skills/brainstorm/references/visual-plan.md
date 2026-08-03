@@ -13,7 +13,6 @@ Use this reference when authoring the local visual plan artifact for the brainst
 - Use `./tmp/visual-plan-<slug>/` for scratch artifacts. Use `plans/<slug>/` only when the user explicitly wants the artifact checked in.
 - The plan directory contains `plan.mdx` as the single authored source. Optional assets must live inside the same folder.
 - Render `plan.mdx` with `scripts/serve-mdx-visual-plan <plan-dir> <port>`. That wrapper owns global setup through the skill's checked-in `assets/mdx-visual-plan-renderer/` package.
-- MDX compiles to JavaScript, requires a JSX runtime, uses ESM-only packages, and needs Node.js 16 or later. The wrapper checks Node and installs the renderer package once, outside the target repo.
 - Generated HTML, cache folders, or build outputs are renderer-owned and must not become a second hand-maintained source file.
 - Feedback comes through chat or file edits. Update the local files directly.
 
@@ -31,16 +30,14 @@ Use this structure:
 
 The rendered `plan.mdx` should be a focused review surface, not a marketing page:
 
-- `PlanHeader`: rarely needed. The Plan Body Shape below opens with the ask
-  restated in prose, not a title/badge header — a separate title or category
-  tags (e.g. `badges={["auth", "backend"]}`) just restate that. Reach for it
-  only if a plan genuinely needs a status/scope strip beyond the opening ask.
+- `SectionNav`: compact anchor links for a plan with more than five substantial sections. Skip it for short plans. Give targets explicit JSX ids such as `<h2 id="boundaries">Failure boundaries</h2>`; Markdown `{#id}` heading syntax is not enabled.
 - `SummaryGrid` with `SummaryCard`: first-viewport outcome, hard guards, scope, and recommendation.
 - `MetricGrid` with `Metric`: numeric or bounded facts such as call counts, cache keys, display units, and latency boundaries.
 - `Split` with `Panel`: side-by-side decisions, tradeoffs, or current/target comparisons. Also the before/after primitive — two `Panel`s inside one `Split`.
 - `Flow`: actual data flow or user flow. Use only when sequence matters.
 - `FileMap`: real files, symbols, data shapes, and ownership boundaries grounded in local code. Pass `change` on an item (`added`/`modified`/`removed`/`renamed`) when the plan extends an existing file, not just for net-new ones.
-- `BehaviorMatrix`: core behaviors grouped as tests, invariants, and manual checks, with why that level of evidence is sufficient. Use `TestMatrix` only for older plans where every entry is genuinely a new test.
+- `BehaviorMatrix`: core behaviors grouped as tests, invariants, and manual checks, with why that level of evidence is sufficient.
+- `BoundaryMatrix`: failures that are handled at different scopes. Each row names the failure, handling scope, and why recovery at that scope is safe.
 - `Callout`: non-answerable risks, gates, hard constraints, or no-open-question statements.
 - `Diff` / `AnnotatedCode`: real before/after code for a proposed change to an existing file, or the shape of a genuinely new file. See "Diff, data-model, and API components" below.
 - `DataModel` / `Endpoint`: proposed schema or API contract, with per-field `change` flags.
@@ -123,11 +120,11 @@ Prefer the provided renderer components (`Split`/`Panel`, `Flow`, `FileMap`, etc
 
 ### Match each component's prop contract exactly (FAILURE SEEN)
 
-Passing the wrong prop *shape* to a renderer component throws at render and blanks the **entire** page, with no server-side error. The bug seen: `PlanHeader badges` is typed `string[]`, but was passed objects `[{ label, tone }]` — React tried to render an object as a child and crashed the whole plan. Before using a component, open `assets/mdx-visual-plan-renderer/src/planComponents.tsx` and read its prop types. Known gotchas:
+Passing the wrong prop *shape* to a renderer component throws at render and blanks the **entire** page, with no server-side error. Before using a component, open `assets/mdx-visual-plan-renderer/src/planComponents.tsx` and read its prop types. Known gotchas:
 
-- `PlanHeader badges` — array of **plain strings**, not objects. No per-badge tone exists.
 - `SummaryCard tone` — one of `default | good | warn | bad`. `Callout tone` — `info | good | warn | bad`. There is **no `"ok"` or `"info"` on SummaryCard**; an unknown tone silently yields a dead className (no crash, but no styling either), so it won't error but also won't look right.
 - `Metric` takes `label` + `value` strings; `Flow steps` / `FileMap items` / `BehaviorMatrix behaviors` each take arrays of objects with the exact keys defined in the file — anything else renders blank.
+- `BoundaryMatrix boundaries` takes `{ failure, scope, why }[]`. `SectionNav items` takes `{ label, href }[]`, and each `href` must match a real section id.
 - `change` on `FileMap items` / `DataModel fields` / `Endpoint params` / `Endpoint` itself is one of `"added" | "modified" | "removed" | "renamed"` — exact strings, they're also the CSS badge class names.
 - `Diff before`/`after` and `AnnotatedCode lines` are arrays of `{ ln?, type, code, note? }` — `type` must be exactly `"ctx" | "add" | "del" | "blank"`; any other string renders an unstyled row instead of failing loudly.
 - `Endpoint examples[].json` takes a **real JS value** (object/array/string/number), not a JSON string — passing a string double-encodes it inside the `<pre>`.
@@ -143,26 +140,7 @@ Before handoff:
 - Read `plan.mdx` enough to catch placeholders, stale claims, contradictions, broken anchors, or missing expected sections.
 - Check that the first viewport is componentized and scannable. If the page opens as a long text document, rewrite it with MDX components before handoff.
 - Run `scripts/serve-mdx-visual-plan <plan-dir> <port>` and inspect the rendered page enough to catch obvious layout or navigation failures. If dependencies or renderer commands are missing, report that exact missing piece.
-- **A `200` from `curl http://localhost:<port>/` does NOT mean the plan rendered, and neither does the compiled module.** The page is a client-rendered SPA: the server returns the ~500-byte Vite shell even when the MDX crashes the browser at render time and shows a blank page. Grepping the transformed module (`/.runtime/plan.mdx`) for `_createMdxContent` only proves it *parsed* — it does NOT catch render-time crashes like a bad prop shape (an object passed where a string is expected throws only when React renders it). That false-confidence check was the gap that let a blank page be reported as "verified."
-- **Verify by actually rendering the plan through the real components (SSR).** This executes every component and throws on the exact errors a browser would. Drop a script *inside* `assets/mdx-visual-plan-renderer/` (so `vite`/`react` resolve) and run it with node:
-
-  ```js
-  // _ssr-check.mjs — run from inside assets/mdx-visual-plan-renderer/, then delete it
-  import { createServer } from 'vite';
-  import React from 'react';
-  import { renderToStaticMarkup } from 'react-dom/server';
-  const vite = await createServer({ server: { middlewareMode: true }, appType: 'custom', root: process.cwd() });
-  try {
-    const plan = await vite.ssrLoadModule('<ABSOLUTE_PATH>/plan.mdx');
-    const comps = await vite.ssrLoadModule('./src/planComponents.tsx');
-    const html = renderToStaticMarkup(React.createElement(plan.default, { components: comps.planComponents }));
-    console.log('SSR_OK length=', html.length, 'HAS=', html.includes('<a distinctive phrase from your plan>'));
-  } catch (e) { console.log('SSR_ERROR:', e.message); }
-  finally { await vite.close(); }
-  ```
-
-  A clean run prints `SSR_OK length=<thousands> HAS= true`. `SSR_ERROR: ...` (e.g. "Objects are not valid as a React child") is the real failure the `200`/grep checks miss. Only proceed to serving after an `SSR_OK` with your content present.
-- **The SSR check is a headless crash test, not a preview — it has no JavaScript.** It proves the components render without throwing; it does NOT prove `Tabs` clicking works, JSON `<details>` disclosure opens, or any other interaction — `renderToStaticMarkup` produces dead HTML with no event handlers attached. Never hand the SSR output to the user as "the plan." Delete the check script after running it.
+- The serve wrapper runs the renderer type check and `scripts/check-plan.mjs`, which renders the real MDX and components through SSR. Require `SSR_OK`; an HTTP `200` from Vite alone only proves the shell loaded. SSR is a crash check, so still inspect the hydrated page for tabs, disclosure, navigation, and layout.
 - Run repo-native checks only when they already exist locally. Do not install validators.
 - **The one artifact the user actually reviews is the live `scripts/serve-mdx-visual-plan` URL.** The wrapper binds to `0.0.0.0` so the plan is reachable over the host's network interface. After the SSR check passes, run it (or confirm it's already running), verify `http://localhost:<port>/` responds locally, then resolve the host's primary reachable IP and report `http://<host-ip>:<port>/` to the user. This is a real Vite dev server serving hydrated React — tabs, disclosure, and any future interactive component work there. Report the network URL, the folder path, and the direct `plan.mdx` path. If you only ever showed the user an SSR snapshot, you have not shown them the plan.
 
@@ -170,9 +148,7 @@ Before handoff:
 ## Plan Body Shape
 
 A visual plan reads as a narrative someone can act on, not a form. No
-decorative title or category-tag header — open directly with the ask; a
-separate `PlanHeader` title/subtitle/badges block restates what part 1
-already says, so skip it (see the `PlanHeader` note above).
+decorative title or category-tag header; open directly with the ask.
 
 1. **The Ask** — reiterate, in a sentence or two, what's actually being
    asked. This is the document's opening.
@@ -183,16 +159,17 @@ already says, so skip it (see the `PlanHeader` note above).
 3. **Assumptions.** `AssumptionList` — any load-bearing assumption the design
    depends on, flagged `verified` / `unverified` / `todo`. Never let one sit
    in prose where it reads as an accepted fact instead of a checked one.
-4. **Approach.** Concretely, the technical design: file/symbol/data-shape map
+4. **Approach.** Start with the mechanism, then the files. Name the durable unit of work, success, failure/retry, and ordering. When the design changes state, concurrency, or partial failure, show the smallest concrete before/after scenario that makes the difference observable. Then give the technical design: file/symbol/data-shape map
    (`FileMap`), `DataModel`/`Endpoint` for schema or contract changes,
    `Diff`/`AnnotatedCode` for changes to existing files, `OptionsCompare`
    when there were real alternatives worth showing, diagrams
    (`DiagramNode`/`DiagramConnector`) for architecture or data-flow shifts.
-5. **Whatever else the plan needs.** Performance boundaries, risks, a single
+5. **Failure boundaries, when applicable.** Use `BoundaryMatrix` when failures are handled at more than one scope. A row must justify why identity, ordering, or transaction state remains trustworthy enough for that recovery.
+6. **Whatever else the plan needs.** Performance boundaries, risks, a single
    bottom `## Open Questions` section for anything genuinely unresolved. Don't
    force a section that has nothing to say for this particular plan.
 
-Use MDX components for parts 2-5; prose for part 1. A plan that's mostly
+Use MDX components for parts 2-6; prose for part 1. A plan that's mostly
 headings and paragraphs has failed the format choice.
 
 A plan stands alone: no "as discussed above," "this revision," or "unlike

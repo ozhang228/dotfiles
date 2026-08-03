@@ -1,6 +1,6 @@
 ---
 name: python-review
-description: Python-specific code review standards for desk-tools and related FIO Python repos. Load for code review whenever the PR touches Python code. Covers idiomatic Python, constructor discipline, logging, config hygiene, and a pre-submit checklist. Distilled from real reviewer comments by pnickols, alchen, ajyang, abedra, opyper, thoueland.
+description: Python-specific code review standards for desk-tools and related FIO Python repos. Load for code review whenever the PR touches Python code. Covers idiomatic Python, constructor discipline, logging, and config hygiene. Distilled from real reviewer comments by pnickols, alchen, ajyang, abedra, opyper, thoueland.
 ---
 
 # Python Review
@@ -164,27 +164,3 @@ These appear in the codebase already; don't gate on them unless egregious:
 - Extracting a helper used exactly once — inline is fine
 
 Mark everything else `nit:` and non-blocking. Before adding a nit, ask: "would this change make the code better in 6 months, or is this a personal preference?"
-
----
-
-## Pre-submit checklist
-
-Before approving or submitting:
-
-- [ ] No `try/except: pass` — every fallible path either returns an error type or raises
-- [ ] Errors carry breadcrumbs (operation name + parameters)
-- [ ] No magic numbers — literals in business logic have named constants with units in the name
-- [ ] No `Any`, `cast`, `# type: ignore` without an explanatory comment
-- [ ] No effectful work in `__init__` (no I/O, no threads, no clock reads)
-- [ ] No `assert` outside tests (except `assert_never`)
-- [ ] No `pytest.fixture`, no mocks, no test classes
-- [ ] Test files mirror source (`apps/foo/bar.py` ↔ `tests/apps/foo/test_bar.py`)
-- [ ] No `utils.py` / `core.py` / `helpers.py` / `shared_*.py` modules
-- [ ] No abbreviations in identifiers (`oid`, `ltt_res`, `q`, `t`)
-- [ ] No `from fio import logging` outside `main.py`
-- [ ] No hardcoded refdata, env strings, or vault paths
-- [ ] PR is one concern — no piggybacked renames/formatting/refactors
-- [ ] Tests cover new branches and edge cases, not just the happy path
-- [ ] Imports are absolute
-- [ ] `zip` uses `strict=True` where lengths must match
-- [ ] `make fmt && make check && make test` passes (run from `python/`, not repo root)

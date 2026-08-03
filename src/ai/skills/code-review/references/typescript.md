@@ -1,6 +1,6 @@
 ---
 name: typescript-review
-description: TypeScript/React code review standards for desk-tools frontend. Load for code review whenever the PR touches TypeScript or TSX. Covers component architecture, testing strategy, type safety, code organization, and a pre-submit checklist. Distilled from real reviewer comments by kosterbauer.
+description: TypeScript/React code review standards for desk-tools frontend. Load for code review whenever the PR touches TypeScript or TSX. Covers component architecture, testing strategy, type safety, and code organization. Distilled from real reviewer comments by kosterbauer.
 ---
 
 # TypeScript Review
@@ -116,23 +116,3 @@ Renames, renamings, reformatting, and "while I'm here" cleanups go in separate P
 > "Please add the JIRA and TODO before merging" (kosterbauer)
 
 For any UI change: add a screenshot or screen recording to the PR description. Reviewers can't run the frontend locally for every PR.
-
----
-
-## Pre-submit checklist
-
-Before approving or submitting a TypeScript/React PR:
-
-- [ ] Module-level functions use `function` declarations, not arrow functions
-- [ ] No type guards that could be avoided with slightly more verbose code
-- [ ] New components tested via integration test from the parent that owns the real use-case
-- [ ] Grid display layer has at least one test if column defs or row rendering changed
-- [ ] No unexplained `waitFor`/`act` additions — root cause stated if added
-- [ ] Time values in tests are ISO8601 strings or ns-since-epoch, not mixed
-- [ ] Shared utilities placed in `lib/dash/component` or equivalent, not in feature dirs
-- [ ] New project added to `pnpm-workspace.yaml` and root `Makefile` if applicable
-- [ ] Backend+frontend shipped together or explicitly coordinated if split
-- [ ] PR is one concern — no piggybacked renames or reformatting
-- [ ] Screenshots/recording in PR description for any UI change
-- [ ] PR description and JIRA link filled out
-- [ ] Screenshot test update workflow documented if Playwright tests added

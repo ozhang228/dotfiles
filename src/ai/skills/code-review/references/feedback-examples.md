@@ -66,18 +66,6 @@ Lesson: Express genuine surprise at unexpected design. Saying "I'm curious why" 
 
 ---
 
-"verified locally that if I run all 4 publishers I can still see it on frontend… and it works [images]"
-
-Lesson: Test locally and report back. A reviewer who runs the code is more credible and catches integration issues that pure code reading misses.
-
----
-
-"I prefer writing out `cumberland`, but NBD either way"
-
-Lesson: Label nits as nits before stating them. "NBD either way" tells the author to deprioritize without guessing whether a response is required.
-
----
-
 "Please change the PR title, otherwise LGTM"
 
 Lesson: Single small blocker as the only feedback signals the overall review is positive. Author knows the scope of what's needed.

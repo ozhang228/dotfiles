@@ -19,7 +19,7 @@ Run the bundled `scripts/pr-languages` first to identify which languages are in 
 | TypeScript/TSX    | `references/typescript.md`        | Any `.ts` or `.tsx` files in the diff |
 | Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
 | Local Recaps      | `references/visual-recap.md`      | Authoring self-contained local recaps |
-| Structured Blocks | `references/structured-blocks.md` | Diff, data-model, API, file-tree, tabs, diagram components |
+| Structured Blocks | `references/structured-blocks.md` | Diff, data-model, API, boundary, and navigation components |
 
 ## Review Workflow
 
@@ -35,6 +35,7 @@ This is the single deep pass over the PR. Do all of it before spawning anything.
 4. Do a git diff against the merge-base SHA pr-languages resolved (unless another branch or base SHA is specified).
 5. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so focused passes can use them without rediscovering the diff.
 6. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
+7. Identify the durable units of work, success, failure/retry, and ordering. For stateful, concurrent, or partial-failure changes, construct the smallest concrete scenario that distinguishes old from new behavior before reading the implementation as a file list.
 
 ### Phase 2 — Architecture gate (hard block)
 
@@ -42,6 +43,7 @@ Before any line-level review, decide whether the PR is even going the right way.
 
 - **"The PR is solving X"** — your one-line understanding of intent.
 - **An architecture / modeling verdict.** Is this the right approach? The right data model? Challenge implicit assumptions. Commit to a verdict — "I think the approach is sound" or "I'd push back, because Y" — not just a description of what the code does.
+- **A boundary verdict when failure scopes differ.** State which failures can be isolated and which invalidate the wider operation, and whether the code has enough identity/order information to make that distinction safely.
 
 Then **stop and wait for the user to confirm the direction.** Do not run focused line-level passes or write comments until they confirm. If they want a different approach, the line-level review may be moot — re-scope first.
 
@@ -63,7 +65,7 @@ The four passes:
 | Pass            | Sole focus                                            | Must do |
 | --------------- | ----------------------------------------------------- | ------- |
 | **Correctness** | Will this run as expected?                            | For each finding, give a **concrete triggering input** + expected-vs-actual behavior. Re-trace the path. If it can't construct a failure case, the bug isn't real, drop it or downgrade to a question. Suspected-but-unverified bugs are the top source of bad feedback. |
-| **Testing**     | Do tests document each function's behavior, and are the tests in the diff themselves correct? | Two jobs. **(a) Gaps:** map every changed function to the test(s) that pin its behavior; for each gap, **propose a concrete test as a code block**. **(b) Review the added/changed tests themselves** against our testing contract: assertions must match the exact semantic (`assert x == expected`, not `assert x` / `assert len(x)` / `assert x is not None` when the real contract is a specific value); flag redundant tests (two tests exercising the same path, over-parametrized cases that add no new branch); flag tests asserting implementation detail instead of behavior; no fixtures, mocks, or test classes (see `references/python.md`). It proposes and critiques; it does **not** write files. |
+| **Testing**     | Do tests document each function's behavior, and are the tests in the diff themselves correct? | Two jobs. **(a) Gaps:** map every changed function to the test(s) that pin its behavior; for each gap, **propose a concrete test as a code block**. For non-obvious tests, explain the causal oracle: what broken implementation would make the assertion fail, deadlock, or time out. **(b) Review the added/changed tests themselves** against our testing contract: assertions must match the exact semantic (`assert x == expected`, not `assert x` / `assert len(x)` / `assert x is not None` when the real contract is a specific value); flag redundant tests (two tests exercising the same path, over-parametrized cases that add no new branch); flag tests asserting implementation detail instead of behavior; no fixtures, mocks, or test classes (see `references/python.md`). It proposes and critiques; it does **not** write files. |
 | **Performance** | Easy wins that limit performance                      | Only report a win it **validated with a small benchmark**. Include the command and before/after absolute numbers. An unbenchmarked hunch is dropped or downgraded to a question. Reason through the allocation/call model; "looks cleaner" is not "faster". |
 | **Simplification** | What in this diff is over-engineered and can be cut?  | Hunt only complexity to delete, never correctness/security/perf. One finding per line, each tagged: `delete:` (dead code, unused flexibility, speculative feature, replacement is nothing), `stdlib:` (hand-rolled thing the standard library ships, name the function), `native:` (dep or code doing what the platform already does, name the feature), `yagni:` (abstraction with one implementation, config nobody sets, layer with one caller), `shrink:` (same logic, fewer lines, show the shorter form). **Readability is a hard floor:** never propose a `shrink:` that trades clarity for line count; a denser one-liner that's harder to read is not a win, drop it. **Never flag the single smoke test or `assert`-based self-check for deletion**, that's the minimum, not bloat. End its return with `net: -<N> lines possible`. If nothing holds up, it returns `Lean already.` and no findings. |
 

@@ -4,38 +4,6 @@ import type { MDXComponents } from "mdx/types.js";
 
 type Change = "added" | "modified" | "removed" | "renamed";
 
-type Badge = string;
-
-type PlanHeaderProps = {
-  title: string;
-  subtitle?: string;
-  badges?: Badge[];
-};
-
-export function PlanHeader({ title, subtitle, badges = [] }: PlanHeaderProps) {
-  return (
-    <header className="planHeader">
-      <div>
-        <h1>{title}</h1>
-        {subtitle === undefined ? undefined : <p className="lead">{subtitle}</p>}
-      </div>
-      {badges.length === 0 ? undefined : (
-        <div className="badgeRow">
-          {badges.map(renderBadge)}
-        </div>
-      )}
-    </header>
-  );
-}
-
-function renderBadge(badge: Badge) {
-  return (
-    <span className="badge" key={badge}>
-      {badge}
-    </span>
-  );
-}
-
 type SummaryGridProps = {
   children: ReactNode;
 };
@@ -71,6 +39,27 @@ export function Callout({ title, tone = "info", children }: CalloutProps) {
       <strong>{title}</strong>
       <div>{children}</div>
     </aside>
+  );
+}
+
+type SectionNavItem = {
+  label: string;
+  href: string;
+};
+
+type SectionNavProps = {
+  items: SectionNavItem[];
+};
+
+export function SectionNav({ items }: SectionNavProps) {
+  return (
+    <nav className="sectionNav" aria-label="Plan sections">
+      {items.map(({ label, href }) => (
+        <a href={href} key={href}>
+          {label}
+        </a>
+      ))}
+    </nav>
   );
 }
 
@@ -146,19 +135,6 @@ function renderFileMapItem({ path, action, change }: FileMapItem) {
   );
 }
 
-type TestItem = {
-  name: string;
-  why: string;
-};
-
-type TestMatrixProps = {
-  tests: TestItem[];
-};
-
-export function TestMatrix({ tests }: TestMatrixProps) {
-  return <section className="testMatrix">{tests.map(renderTestItem)}</section>;
-}
-
 type Verification = "test" | "invariant" | "manual check";
 
 type BehaviorItem = {
@@ -206,25 +182,43 @@ function renderBehaviorItem({ name, what, why }: BehaviorItem) {
   );
 }
 
-function renderTestItem({ name, why }: TestItem) {
+type Boundary = {
+  failure: string;
+  scope: string;
+  why: string;
+};
+
+type BoundaryMatrixProps = {
+  boundaries: Boundary[];
+};
+
+export function BoundaryMatrix({ boundaries }: BoundaryMatrixProps) {
   return (
-    <section className="testItem" key={name}>
-      <code>{name}</code>
-      <p>{why}</p>
+    <section className="boundaryMatrix">
+      <table>
+        <thead>
+          <tr>
+            <th>Failure</th>
+            <th>Handling scope</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>{boundaries.map(renderBoundary)}</tbody>
+      </table>
     </section>
   );
 }
 
-type ChecklistProps = {
-  items: string[];
-};
-
-export function Checklist({ items }: ChecklistProps) {
-  return <ul className="checklist">{items.map(renderChecklistItem)}</ul>;
-}
-
-function renderChecklistItem(item: string) {
-  return <li key={item}>{item}</li>;
+function renderBoundary({ failure, scope, why }: Boundary) {
+  return (
+    <tr key={failure}>
+      <td>{failure}</td>
+      <td>
+        <span className="scopePill">{scope}</span>
+      </td>
+      <td>{why}</td>
+    </tr>
+  );
 }
 
 type MetricGridProps = {
@@ -604,17 +598,16 @@ function renderAssumption({ text, status, note }: Assumption, index: number) {
 }
 
 export const planComponents: MDXComponents = {
-  PlanHeader,
   SummaryGrid,
   SummaryCard,
   Callout,
+  SectionNav,
   Split,
   Panel,
   Flow,
   FileMap,
-  TestMatrix,
   BehaviorMatrix,
-  Checklist,
+  BoundaryMatrix,
   MetricGrid,
   Metric,
   Diff,
