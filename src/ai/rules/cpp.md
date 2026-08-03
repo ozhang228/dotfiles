@@ -6,7 +6,7 @@ skip_if: Working in TypeScript, Python, or any non-C++ language
 # C++
 
 - Always mark meaningful return values as `[[nodiscard]]`.
-- Use domain enums and tiny types instead of vendor enums or raw scalars when values have distinct meanings. Convert to third-party types at the integration boundary.
+- In domain models, use domain enums and tiny types instead of vendor enums or raw primitives when the field name supplies meaning that the type does not, such as price, vol, rate, amount, quantity, ID, convention, loading, YTE, or strike. Search for and reuse the canonical domain type first. Preserve the type inside `optional`, `vector`, `variant`, and result types. A Python binding is still a domain boundary: use transparent casters there instead of weakening the C++ model. Keep primitives for local arithmetic, indices/counts, flags, error or serialized payloads, and exact third-party calls; unwrap tiny values only at that boundary. Use an enum, not a tiny string, for a closed set of values.
 - Make failure types match the operation: return `outcome::result<T, E>` for all-or-nothing work, and expose per-item results only when partial success is intentional and usable.
 - Keep absence explicit until an integration boundary. If an upstream API requires a sentinel such as a default-constructed date, isolate that conversion and make the sentinel contract clear.
 - Let an abstraction retain the resources it owns. Do not keep a second lifetime-only handle when the fiber, executor, or similar object already owns the dependency; inline one-use default arguments that add no domain meaning.
