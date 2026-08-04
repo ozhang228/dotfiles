@@ -23,6 +23,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields.
 - In return signatures and data type fields, prefer the widest read-only collection interface that expresses the contract (`Sequence` over `list` or `tuple[T, ...]`, `frozenset` over `set`, `Mapping` over `dict`). Use a tuple type when fixed length or positional meaning is part of the contract, and mutable interfaces only when callers must mutate.
 - Prefer idiomatic dict operations: `.get(key, default)` over if/else lookups, `.pop()` over `del`.
+- Don't manually splice batch results into input order with `iter()` and `next()`. Track input indices and pair results with `zip(..., strict=True)` so ordering is explicit.
 - When logging exceptions, use the logger's `exception` method.
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
 - New 3rd-party libraries must be added in conda-meta rather than depended on directly.

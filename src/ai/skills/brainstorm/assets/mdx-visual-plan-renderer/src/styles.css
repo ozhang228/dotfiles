@@ -8,11 +8,13 @@
   --line: #2b3140;
   --accent: #d9a441;
   --accent-2: #d9a441;
+  --info: #5ca9ff;
   --ok: #4bc76b;
   --warn: #e0a52b;
   --bad: #f0716a;
   --code: #171a21;
   --accent-soft: #3a2f18;
+  --info-soft: #14263b;
   --ok-soft: #12271a;
   --ok-line: #17351f;
   --warn-soft: #2e2712;
@@ -172,6 +174,11 @@ blockquote {
 .callout.good {
   border-left-color: var(--ok);
   background: var(--ok-soft);
+}
+
+.callout.info {
+  border-left-color: var(--info);
+  background: var(--info-soft);
 }
 
 .callout.warn {
@@ -790,7 +797,7 @@ blockquote {
 
 .plan h1 {
   margin: 0 0 8px;
-  font-size: 28px;
+  font-size: 34px;
   line-height: 1.2;
   letter-spacing: 0;
 }

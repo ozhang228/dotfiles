@@ -105,7 +105,7 @@ source of truth.
 
 `plan.mdx` is the source-of-truth document for the user and the agent. Keep the prose, diagrams, structured sections, and open questions in that one file so revisions do not require syncing parallel HTML and Markdown.
 
-MDX should make the plan easier to parse than Markdown. A plan that is mostly headings, paragraphs, and tables has failed the format choice. Put the first screen in the Ask (prose), then `SummaryGrid`/`MetricGrid` when useful. Use prose for rationale, but move dense lists, decisions, flows, file maps, tests, and risks into renderer components.
+MDX should make the plan easier to parse than Markdown. A plan that is mostly headings, paragraphs, and tables has failed the format choice. Start with a descriptive H1 title, then make the Ask visually prominent with a short `Callout` or a 2-4 item list before `SummaryGrid`/`MetricGrid`. Do not leave the Ask as an unlabelled prose sentence that is easy to skip. Use prose for rationale, but move dense lists, decisions, flows, file maps, tests, and risks into renderer components.
 
 ### MDX is JSX, not HTML — inline markup must be JSX (FAILURE SEEN)
 
@@ -147,11 +147,12 @@ Before handoff:
 
 ## Plan Body Shape
 
-A visual plan reads as a narrative someone can act on, not a form. No
-decorative title or category-tag header; open directly with the ask.
+A visual plan reads as a narrative someone can act on, not a form. Open with
+a descriptive H1 title, not a decorative category tag, followed by the ask.
 
-1. **The Ask** — reiterate, in a sentence or two, what's actually being
-   asked. This is the document's opening.
+1. **Title and the Ask** — use a descriptive H1 title, then reiterate what's
+   being asked in a short `Callout` or 2-4 item list. The first viewport must
+   make the requested outcome easy to identify before the summary cards.
 2. **What needs to be done, concretely, and how each behavior will be verified.**
    Pair concrete requirements with `BehaviorMatrix`. Mark each as a new
    test, invariant, or manual check so the plan keeps
@@ -169,7 +170,7 @@ decorative title or category-tag header; open directly with the ask.
    bottom `## Open Questions` section for anything genuinely unresolved. Don't
    force a section that has nothing to say for this particular plan.
 
-Use MDX components for parts 2-6; prose for part 1. A plan that's mostly
+Use MDX components for parts 2-6 and usually the Ask callout. A plan that's mostly
 headings and paragraphs has failed the format choice.
 
 A plan stands alone: no "as discussed above," "this revision," or "unlike

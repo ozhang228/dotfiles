@@ -12,6 +12,19 @@ escape_markup() {
     printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
 }
 
+track_branch_session() {
+    session_id=$(json_value '.session_id // empty')
+    if [ -z "${AI_BRANCH_SESSION_DIR:-}" ] || [ -z "$session_id" ] || [ -z "$raw_branch" ]; then
+        return
+    fi
+
+    remote=$(git -C "$repo" config --get remote.origin.url 2>/dev/null || true)
+    [ -n "$remote" ] || remote="$repo"
+    branch_key=$(printf '%s:%s' "$remote" "$raw_branch" | sha1sum | cut -c1-12)
+    mkdir -p "$AI_BRANCH_SESSION_DIR"
+    printf '%s\n' "$session_id" > "$AI_BRANCH_SESSION_DIR/$branch_key"
+}
+
 cwd=$(json_value '.workspace.current_dir // .cwd // empty')
 [ -n "$cwd" ] || cwd="$PWD"
 repo=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || true)
@@ -33,17 +46,14 @@ fi
 
 case "${1:-notification}" in
     stop)
-        session_id=$(json_value '.session_id // empty')
-        if [ -n "${AI_BRANCH_SESSION_DIR:-}" ] && [ -n "$session_id" ] && [ -n "$raw_branch" ]; then
-            remote=$(git -C "$repo" config --get remote.origin.url 2>/dev/null || true)
-            [ -n "$remote" ] || remote="$repo"
-            branch_key=$(printf '%s:%s' "$remote" "$raw_branch" | sha1sum | cut -c1-12)
-            mkdir -p "$AI_BRANCH_SESSION_DIR"
-            printf '%s\n' "$session_id" > "$AI_BRANCH_SESSION_DIR/$branch_key"
-        fi
+        track_branch_session
         title='AI Assistant'
         urgency='low'
         message='finished'
+        ;;
+    track-session)
+        track_branch_session
+        exit 0
         ;;
     notification)
         title='AI Assistant (waiting)'

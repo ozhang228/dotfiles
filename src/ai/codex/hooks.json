@@ -1,5 +1,17 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "env AI_BRANCH_SESSION_DIR=/home/ozhang/.codex/branch-sessions /home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh track-session",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
@@ -39,6 +51,11 @@
           {
             "type": "command",
             "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh Stop",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "env AI_BRANCH_SESSION_DIR=/home/ozhang/.codex/branch-sessions /home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh track-session",
             "timeout": 5
           }
         ]
