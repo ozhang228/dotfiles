@@ -23,6 +23,8 @@ This is a global precedence exception: it overrides project-specific instruction
 
 ## Splitting one branch into multiple PRs
 
+When Oscar asks to split an existing PR, preserve that PR and its branch. Remove the extracted scope from the existing PR, then create exactly one new draft PR for that scope. Never replace the existing PR with two new PRs.
+
 When a plan splits a large diff into sequential PRs by file scope (e.g. "PR2 gets these whole files, PR3 gets the rest"), staging exactly the planned files is not enough validation. A type/name change in an early PR (e.g. renaming a class into a union member) can break files nominally scoped to a *later* PR — they still reference the old name, or access a now-narrower attribute without a match/isinstance guard — but this won't show up if the later PR's files sit unstaged in the same working tree, since the test runner and type checker read files off disk regardless of git staging.
 
 Before committing an earlier PR in the split, isolate its exact tree:
