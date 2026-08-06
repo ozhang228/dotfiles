@@ -36,6 +36,8 @@ This is the single deep pass over the PR. Do all of it before spawning anything.
 5. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so focused passes can use them without rediscovering the diff.
 6. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
 7. Identify the durable units of work, success, failure/retry, and ordering. For stateful, concurrent, or partial-failure changes, construct the smallest concrete scenario that distinguishes old from new behavior before reading the implementation as a file list.
+8. **Audit scope before details.** Classify every hunk as core behavior, required support, or incidental. Flag wrappers with one caller, duplicate fields or code paths, generalized types without a second valid case, no-op rewrites, and noisy config/format churn. If the diff contains independently reviewable behavior, recommend a causal split before reviewing the combined implementation.
+9. **Audit conventions dimensionally.** For every conversion involving prices, vols, rates, ticks, currency, time, or dates, trace source units through each operation to the consumer. Treat unexplained scale factors and inferred desk conventions as correctness risks even when tests pass. Check external-library semantics and production configuration rather than inferring them from stubs.
 
 ### Phase 2 — Architecture gate (hard block)
 
@@ -43,6 +45,7 @@ Before any line-level review, decide whether the PR is even going the right way.
 
 - **"The PR is solving X"** — your one-line understanding of intent.
 - **An architecture / modeling verdict.** Is this the right approach? The right data model? Challenge implicit assumptions. Commit to a verdict — "I think the approach is sound" or "I'd push back, because Y" — not just a description of what the code does.
+- **A scope verdict.** Is this one coherent review unit, or are unrelated behavior, speculative abstraction, and cleanup making the PR harder to validate? Name the split if one is needed.
 - **A boundary verdict when failure scopes differ.** State which failures can be isolated and which invalidate the wider operation, and whether the code has enough identity/order information to make that distinction safely.
 
 Then **stop and wait for the user to confirm the direction.** Do not run focused line-level passes or write comments until they confirm. If they want a different approach, the line-level review may be moot — re-scope first.
@@ -88,6 +91,7 @@ When the work is the reverse — you're the author addressing comments on your o
 - **Verify the comment's premise before agreeing or building.** "Use `strikes_from_sds`", "isn't there an outright type for this?", "X already does it this way" are premises, not facts. Grep for the type, read the helper, check what the sibling actually does — *then* act. A premise that turns out false (the canonical helper computes something different, no outright type exists, the sibling diverges) means the change you were about to make is wrong, and reversing an applied change costs more than the check. This holds for pushback too: verify before you defend. The reviewer being senior doesn't make the premise true.
 - **Lead placement decisions with ownership, not the import graph.** When a comment is "this doesn't belong here," decide where a thing lives by *what conceptually owns it* (a port belongs with its consumer; an interface with its domain), then use cycle-avoidance to break ties — never let "what imports cleanly" drive the call. Shuffling a file through three locations chasing an import cycle is the symptom of optimizing the graph instead of the ownership.
 - **Branch hygiene under concurrent pushes.** When the author (you or Oscar) may be pushing in parallel, re-check `HEAD` vs `origin/<branch>` before every commit and push — a clean-looking `git diff <base>` can be base-ahead churn rather than your change, and a published merge commit must never be amended. Land each fix on the PR/branch that *owns* the file it touches, not whichever branch is checked out.
+- **Re-audit every stacked PR after history rewrites.** A clean rebase only proves patches applied; it does not prove a fix lives in the intended branch or disappeared from earlier ones. Inspect each branch's exact merge-base diff and grep the final trees for corrected symbols before pushing bottom-up. When a base PR merges, rebuild the remaining stack from that merged commit and repeat the per-PR diff audit.
 
 ## Local Visual Recap Surface
 
