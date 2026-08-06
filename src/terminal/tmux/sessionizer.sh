@@ -119,7 +119,11 @@ else
 fi
 
 if [ -n "${TMUX:-}" ]; then
-    tmux switch-client -t "=$session_name"
+    if [ -n "${TMUX_SESSIONIZER_CLIENT:-}" ]; then
+        tmux switch-client -c "$TMUX_SESSIONIZER_CLIENT" -t "=$session_name"
+    else
+        tmux switch-client -t "=$session_name"
+    fi
 else
     tmux attach-session -t "=$session_name"
 fi
