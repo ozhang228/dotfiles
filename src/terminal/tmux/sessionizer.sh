@@ -97,12 +97,19 @@ if [ "${1:-}" = "--preview" ]; then
     exit 0
 fi
 
+fzf_status=0
 selected=$(list_entries | fzf \
     --delimiter $'\t' --with-nth=4 \
     --tiebreak=index \
     --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
     --preview "$SCRIPT --preview {2} {3}" \
-    --preview-window right:60%)
+    --preview-window right:60%) || fzf_status=$?
+
+case "$fzf_status" in
+    0) ;;
+    1|130) exit 0 ;;
+    *) exit "$fzf_status" ;;
+esac
 
 [ -z "$selected" ] && exit 0
 
