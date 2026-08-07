@@ -7,7 +7,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 
 - Follow Google's Python style guide.
 - Do not use timezone-naive datetimes, ever.
-- Use type annotations wherever possible.
+- Prefer inferred types per `general.md`; annotate parameters, empty collections, ambiguous values, and other places where the type checker cannot recover the intended type.
 - Prefer `Self` from `typing_extensions` instead of forward-referencing the class name.
 - When a function has two or more consecutive parameters of the same type, force keyword arguments using `*` to prevent accidental transposition.
 

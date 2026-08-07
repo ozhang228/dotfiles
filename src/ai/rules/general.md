@@ -21,6 +21,10 @@ This is a global precedence exception: it overrides project-specific instruction
 - If a name undersells fallible behavior (e.g. `query`, `get`, `fetch` for something that can raise or return an error), prefer a name that signals it, or route it through the project's established fallible-call convention.
 - When picking between two reasonable names, prefer the one a new reader could guess the behavior of without opening the file.
 
+## Type annotations
+
+Prefer type inference. Add an explicit annotation only when the language or type checker cannot infer the intended type accurately enough; most local variables and obvious return values do not need one.
+
 ## Parse at boundaries
 
 When downstream code repeatedly checks or raises for a state that should be impossible, treat that as a modeling smell. Parse or narrow the value once at the owning boundary and expose a type that makes the invariant explicit, so consumers can operate directly on valid data. Keep explicit errors for genuinely fallible external operations and valid domain failures; do not hide those failures to make code look simpler.

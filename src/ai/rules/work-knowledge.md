@@ -2,6 +2,8 @@
 
 Terminology, repo map, and durable DRW/FICC desk facts for Oscar's work. Applies whenever discussing these systems, regardless of which repo is open.
 
+For Sol API semantics and quantitative or business-context questions, consult Polaris before drawing conclusions or changing behavior. Ask it to separate documented facts, runtime evidence, and inference, then verify the repository's configured production path when that can differ from the general domain answer.
+
 ## Terminology
 
 - **PIP** is ambiguous. Context decides whether it means "Pricing Inputs Publisher" or the `pricing-inputs` Kafka topic prefix.
@@ -28,6 +30,8 @@ All repos live under `~/drw/`.
 ## Surface Viz and RVUVS
 
 RVUVS deployed instances include `sofr`, `ust`, `rates-rv`, `otc`, and `crypto`. Rates migration stakeholders: `sofr`/`ust` are Eric Chai; `otc`/`rates-rv` are Eric Chai and Jerry Li.
+
+RVUVS OTC outright and interpolated-expiry pricing use `sol.americanOptionNormal`, not European forward-normal pricing. RVUVS supplies forward, strike, and normal vol in the same price-point scale, then multiplies `Price` by `100` to display ticks. The equivalent Desk Tools path prices decimal-rate inputs, converts decimal theo to percentage points, then applies the configured fixed points-to-ticks conversion. Keep the model and both unit conversions distinct when checking parity.
 
 Confirmed SOFR prod snap from `k8s/overlays/rv-utils-viz-server/sofr/base/config/desk.libsonnet`: `15:59:50 America/Chicago`. Snapshot time is per instance, so check that instance's `desk.libsonnet`. `product_surface` only accepts `"HH:MM"` snap times, so truncate seconds (`15:59:50` -> `"15:59"`), do not round.
 
@@ -156,6 +160,8 @@ The 2026-04-13 ARS partition-merge bug was caused by a protobuf/schema version b
 
 ## Luna, Sol Skews, and Clownfish
 
+When adding a luna wrapper around a Sol function in the `research` repository, default to wrapping the function's complete output rather than exposing only the subset needed by the first caller. The wrapper is the typed Sol boundary; preserving the full result avoids repeated binding changes as callers need additional fields.
+
 For local desk-tools testing against an unpublished luna branch, temporarily add an editable `fio-luna` source in `python/pyproject.toml`:
 
 ```toml
@@ -170,6 +176,8 @@ Do not warm `Skew.sol_skew` on real `PricingInputs` objects that flow into desk-
 `clownfish` pins `fio-conda-meta >=179`, `desk-tools ==1624`, and `luna ==565` as a coupled set. Do not bump desk-tools above 1624 or luna above 565 without a full luna migration. The old luna function `bfo_implied_strike_vols_with_delivery_probabilities` exists only in luna <=565, while newer desk-tools moved to the new luna/YieldVol result shape.
 
 Sol's real API docs live at `https://gqma.drw/sol-api-docs/index.html` (Doxygen, reachable via plain `curl`, no auth needed from a DRW-networked shell). The Python docstrings surfaced via `help(sol.foo)` in solpy are a subset and often omit field-level semantics — e.g. `sol.getModel`'s `ModelBuildMethods` dict fields (`SwaptionTenorCutoff`, `ShortTenorSwaptionTenorCutoff`, `ShortTenorSwaptionConvention`, `FundingIndex`, etc.) aren't documented anywhere in `solpy/__init__.py`, only on the corresponding C++ class page on this site (e.g. `class_sol_1_1_model_build_method_s_a_b_r.html` for `ModelBuildMethodSABR`). The site also serves a full offline mirror as a zip (`soldocumentation.zip`, linked from the index page, ~600 HTML pages) — download and grep that locally instead of guessing page URLs or scraping the live site page-by-page, since the live site's per-page URLs use opaque Doxygen hashes that aren't guessable from a symbol name.
+
+`solpy.swaptionExpiryDate` has an incomplete datetime contract in the docs. Sol documents that a swaption convention's `ExpiryTime` is expressed in its `TimeZone`; runtime checks on Sol 2.71.0 across USD, GBP, JPY, AUD, and EUR establish the Python binding details. On input, Sol ignores Python `tzinfo` and reads the raw calendar fields, so convert an `Instant` to the convention's timezone before calling it. On output, it returns a naive datetime at the convention-local `ExpiryTime`; attach the convention's IANA `TimeZone` before converting back to `Instant`, which supplies the correct DST offset. Keep the documented facts and empirically verified binding behavior distinct when explaining this boundary.
 
 Confirmed via `ModelBuildMethodSABR`'s doc page: `SwaptionTenorCutoff` (default `1Y`) is genuinely a sol-documented three-tier threshold, not something rv-utils invented — below it, sol treats the tenor as a caplet on the funding index (not a swaption at all); `ShortTenorSwaptionConvention`/`ShortTenorSwaptionTenorCutoff` is a second, higher cutoff for a short-tenor swaption convention distinct from the main `SwaptionConvention`. Sol's own worked example uses EUR-EURIBOR-6M with `SwaptionTenorCutoff=1Y`, `ShortTenorSwaptionTenorCutoff=2Y` — matching live `SABR-EUR-EURIBOR-6M` model data exactly. So code that checks `SwaptionTenorCutoff` before `ShortTenorSwaptionTenorCutoff` (lower threshold first) is implementing sol's documented tiering correctly, not an arbitrary/unverified port.
 
