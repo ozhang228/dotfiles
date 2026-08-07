@@ -8,6 +8,7 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
 - Hard-pin every dependency version in `package.json` (exact version, no `^` or `~` range). Never specify a lower bound only — pin the exact version pnpm/npm actually resolved.
 - Prefer `type` over `interface`.
 - No anonymous functions at module level.
+- Avoid IIFEs. Prefer a named function or direct initialization so the control flow is explicit.
 - Functions with more than two parameters of a shared type must take a single options object instead.
 - Follow Google's TypeScript style guide.
 - No default exports.
@@ -48,4 +49,3 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
   ```
 
 - See `general.md`'s "Recurring bad-test patterns" for the cross-language test-quality checklist, including hardcoding expected values instead of computing them with the same logic under test (tautological-by-construction).
-
