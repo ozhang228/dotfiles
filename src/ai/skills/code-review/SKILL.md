@@ -54,6 +54,8 @@ Then **stop and wait for the user to confirm the direction.** Do not run focused
 
 Run up to four focused passes, each focused on exactly one thing. Use the host's delegation mechanism if it exists; if not, do the same passes in the main thread and record that delegation was unavailable. **You decide which passes to run**: skip a pass with no surface area (a docs/config-only PR skips Performance; a pure refactor with full existing coverage may skip Testing; a one-line bugfix skips Simplification) and record the skip + reason for the report. Run delegated passes in parallel when the host supports it.
 
+Review work must retain the primary thread's selected model and reasoning quality. When delegating a focused review pass, inherit the parent model and effort; do not route review, architecture, finding validation, or recap synthesis to the cheaper implementation model.
+
 Each delegated reviewer gets a **context packet** so it doesn't re-investigate:
 
 - the "PR is solving X" summary and your confirmed architecture verdict
@@ -86,7 +88,9 @@ The focused passes find; you decide what survives.
 
 ## Resolving review comments (author side)
 
-When the work is the reverse — you're the author addressing comments on your own PR, not producing a review — three failure modes recur:
+When the work is the reverse — you're the author addressing comments on your own PR, not producing a review — apply these rules:
+
+- **Route implementation separately from review.** The primary thread verifies the comment's premise and decides the fix. For a nontrivial accepted fix, delegate implementation to one subagent using `gpt-5.6-terra` with `medium` reasoning, providing the validated finding, expected behavior, exact repository scope, and required tests. Keep tiny mechanical edits local. Afterward, inspect the complete diff and run the real tests in the primary thread; send defects back to the same worker when practical.
 
 - **Verify the comment's premise before agreeing or building.** "Use `strikes_from_sds`", "isn't there an outright type for this?", "X already does it this way" are premises, not facts. Grep for the type, read the helper, check what the sibling actually does — *then* act. A premise that turns out false (the canonical helper computes something different, no outright type exists, the sibling diverges) means the change you were about to make is wrong, and reversing an applied change costs more than the check. This holds for pushback too: verify before you defend. The reviewer being senior doesn't make the premise true.
 - **Lead placement decisions with ownership, not the import graph.** When a comment is "this doesn't belong here," decide where a thing lives by *what conceptually owns it* (a port belongs with its consumer; an interface with its domain), then use cycle-avoidance to break ties — never let "what imports cleanly" drive the call. Shuffling a file through three locations chasing an import cycle is the symptom of optimizing the graph instead of the ownership.

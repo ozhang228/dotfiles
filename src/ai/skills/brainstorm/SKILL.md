@@ -50,6 +50,13 @@ Use a self-contained local visual plan as the user-facing design artifact when t
 
 Follow these phases in order:
 
+### Model routing
+
+- Keep discovery, grilling, design, behavior contracts, plan authoring, and plan review in the primary thread on the user's selected model and reasoning effort. Do not delegate planning to a cheaper model.
+- After design approval, delegate nontrivial implementation to one implementation-focused subagent using `gpt-5.6-terra` with `medium` reasoning when the host supports explicit subagent model overrides. Give it the approved visual plan, implementation plan when present, exact behavior contract, and instruction to edit the working tree and run the relevant tests.
+- Keep a clearly mechanical edit in the primary thread when spawning an agent would cost more than the work. If delegation is unavailable, implement in the primary thread rather than blocking.
+- The primary thread owns acceptance: inspect the worker's complete diff, verify it implemented the approved design, run the real test suite rather than only static checks, and send defects back to the same worker when practical. Do not accept a worker's summary as verification.
+
 - Explore project context - check files. **Look for sibling/reference implementations** in this repo or related repos (e.g. how does `vol_surface` / `product_surface` / `rv-utils` solve the same shape of problem?). Reading them up front prevents reinventing patterns. **But do not accept them at face value** — for each pattern you'd borrow, ask "why did they do it that way, and does that reason apply here?" If the answer is "because X does it this way," that's not a justification. Expect to argue the pattern's merits before adopting it.
   - **Verify the rails the design will stand on, don't assume them.** Two recurring misses: (1) designing a new field/column/plumbing path when an existing one already carries the value — grep for the canonical field first (`listing`, `name`, `ns`, etc.). (2) designing on top of a claim like "downstream X handles entity Y" or "this value has one consumer" — read X's actual code path and trace every consumer before building on it. A visual plan that asserts an existing-rails fact it never checked is the same bug as a load-bearing tradeoff left unverified.
   - **Anchor on committed state, not in-conversation edits.** Before writing a design or plan, confirm the branch's actual committed state — earlier edits in this conversation, a teammate's merge, or a reset may have moved it. Don't design against a phantom state you only believe is live.
