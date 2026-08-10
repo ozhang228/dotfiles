@@ -42,6 +42,7 @@ gui:
     rate: 60
 
 git:
+  localBranchSortOrder: recency
   pagers:
     - colorArg: always
       pager: "delta --side-by-side --paging=never"

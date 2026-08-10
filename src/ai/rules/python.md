@@ -19,7 +19,25 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 
 - Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation.
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
+- Do not use `typing.Annotated`. For Pydantic constraints, declare the type normally and assign `Field(...)`, for example `count: int = Field(gt=0)`.
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
+- Put logic fully owned by a dataclass on the dataclass. If a value is completely determined by the instance's other fields, expose it as a property instead of passing or recomputing it at construction sites. Keep it stored when it carries independent state that cannot be reconstructed.
+
+  ```python
+  @dataclass(frozen=True)
+  class StringMetricValue:
+      value: str | None
+      errors: frozenset[str]
+
+      @property
+      def status(self) -> StringMetricStatus:
+          if self.errors:
+              return StringMetricStatus.ERROR
+          if self.value is None:
+              return StringMetricStatus.MISSING
+          return StringMetricStatus.OK
+  ```
+
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields.
 - In return signatures and data type fields, prefer the widest read-only collection interface that expresses the contract (`Sequence` over `list` or `tuple[T, ...]`, `frozenset` over `set`, `Mapping` over `dict`). Use a tuple type when fixed length or positional meaning is part of the contract, and mutable interfaces only when callers must mutate.
 - Prefer idiomatic dict operations: `.get(key, default)` over if/else lookups, `.pop()` over `del`.
