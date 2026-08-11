@@ -118,6 +118,22 @@ Known consumers of prod EORV OPXL keys in `energy`: `eorv_scripts` publishers an
 
 For EORV display hierarchy comparisons, PH/NP/HP/NH roll into NG by delivery month on the Risk Viewer side while edo may keep child underlyings. Check aggregate reconciliation before per-underlying diffs, and normalize grouping before joining.
 
+## PIP Client Selection
+
+Use `PIPSource` when a caller needs an independent point snapshot or historical
+range and does not need to retain live state between calls. It suits reports,
+dashboards, polling jobs, and batch calculations that fetch data, compute a
+result, and discard the source state. It can read recent Kafka data and older
+EventStore/Delta data through `fio.streams.UnifiedReader`; lookback is relative
+to the requested `asof`. It does not require startup, catch-up, warming, or a
+particular call order.
+
+Use `UnifiedPricingInputsClient` when a long-running process needs a continuously
+maintained live table, update notifications, retained near-live history, or its
+pricing-client interface across live and historical data. Start it and wait for
+catch-up before trusting live results. Catch-up establishes live-state readiness;
+it does not make historical DB data more complete.
+
 ## Energy Migration and Testing
 
 In `energy`, checked-in notebooks are production consumers, not scratch. Count `.ipynb` callers in dep-kill/migration audits and keep their behavior working.
