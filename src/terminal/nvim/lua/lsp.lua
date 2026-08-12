@@ -5,6 +5,8 @@ if vim.env.PATH and not vim.env.PATH:find(cargo_bin, 1, true) then vim.env.PATH 
 -- enable all lsps in /lsp
 local disabled = { "vtsls" }
 
+vim.lsp.config("*", { flags = { exit_timeout = 0 } })
+
 local lsp_configs = {}
 for _, f in pairs(vim.api.nvim_get_runtime_file("lsp/*.lua", true)) do
   local server_name = vim.fn.fnamemodify(f, ":t:r")

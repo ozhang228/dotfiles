@@ -6,6 +6,8 @@ return {
     ui = {
       style = "modern",
     },
+    priorities = {},
+    priority_groups = {},
     window = {
       dimensions = function()
         return {
@@ -19,6 +21,9 @@ return {
       toggle_window = false,
       open_project_todo = false,
       show_due_notification = false,
+      toggle_todo = false,
+      toggle_priority = false,
+      edit_priorities = false,
       new_todo = "n",
       create_nested_task = "N",
       edit_todo = "i",
@@ -29,30 +34,16 @@ return {
     require("dooing").setup(opts)
 
     local state = require("dooing.state")
-    local toggle_todo = state.toggle_todo
-
-    state.toggle_todo = function(index)
-      toggle_todo(index)
-
-      local completed = state.todos[index]
-      if not completed or not completed.done then return end
-
-      local deleted_ids = { [completed.id] = true }
-      local found_descendant = true
-      while found_descendant do
-        found_descendant = false
-        for _, todo in ipairs(state.todos) do
-          if todo.parent_id and deleted_ids[todo.parent_id] and not deleted_ids[todo.id] then
-            deleted_ids[todo.id] = true
-            found_descendant = true
-          end
-        end
-      end
-
-      for todo_index = #state.todos, 1, -1 do
-        if deleted_ids[state.todos[todo_index].id] then state.delete_todo(todo_index) end
-      end
+    local function compare_todos_alphabetically(a, b)
+      local a_text = a.todo.text:lower()
+      local b_text = b.todo.text:lower()
+      if a_text ~= b_text then return a_text < b_text end
+      if a.todo.text ~= b.todo.text then return a.todo.text < b.todo.text end
+      return a.todo.id < b.todo.id
     end
+
+    state.compare_todos = compare_todos_alphabetically
+    state.compare_todos_ignore_completion = compare_todos_alphabetically
 
     local dooing_keymaps = require("dooing.ui.keymaps")
     local setup_keymaps = dooing_keymaps.setup_keymaps
@@ -60,15 +51,23 @@ return {
       setup_keymaps()
 
       local constants = require("dooing.ui.constants")
-      vim.keymap.set("n", "X", function()
+      local function todo_at_cursor()
         local todo_index = require("dooing.ui.utils").todo_index_at_cursor()
-        local todo = todo_index and state.todos[todo_index]
-        if not todo or not todo.in_progress then return end
+        return todo_index and state.todos[todo_index]
+      end
 
-        todo.in_progress = false
+      local function render_todos() require("dooing.ui.rendering").render_todos() end
+
+      vim.keymap.set("n", "x", function()
+        local todo = todo_at_cursor()
+        if not todo then return end
+
+        todo.done = false
+        todo.in_progress = not todo.in_progress
+        todo.completed_at = nil
         state.save_todos()
-        require("dooing.ui.rendering").render_todos()
-      end, { buffer = constants.buf_id, desc = "Move Todo Back to Pending", nowait = true })
+        render_todos()
+      end, { buffer = constants.buf_id, desc = "Toggle Todo Progress", nowait = true })
     end
   end,
   keys = {
