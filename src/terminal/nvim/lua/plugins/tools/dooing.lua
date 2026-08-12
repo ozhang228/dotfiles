@@ -11,8 +11,8 @@ return {
     window = {
       dimensions = function()
         return {
-          width = math.min(math.max(80, math.floor(vim.o.columns * 0.7)), vim.o.columns - 4),
-          height = math.min(math.max(30, math.floor(vim.o.lines * 0.7)), vim.o.lines - 4),
+          width = math.floor(vim.o.columns * 0.98),
+          height = math.floor(vim.o.lines * 0.98),
         }
       end,
       position = "center",
