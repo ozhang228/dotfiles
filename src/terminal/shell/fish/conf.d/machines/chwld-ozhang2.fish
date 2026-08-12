@@ -15,7 +15,7 @@ test -f ~/.local/share/claude_credentials.fish && source ~/.local/share/claude_c
 fish_add_path $HOME/.local/share/pnpm/bin $HOME/.local/share/pnpm
 
 # >>> conda initialize >>>
-if test -f /home/ozhang/miniconda3/bin/conda
+if status is-interactive; and test -f /home/ozhang/miniconda3/bin/conda
     eval /home/ozhang/miniconda3/bin/conda "shell.fish" "hook" $argv | source
 end
 # <<< conda initialize <<<

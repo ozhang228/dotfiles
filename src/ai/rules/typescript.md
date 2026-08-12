@@ -35,6 +35,7 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
 
 - For application-owned components, prefer tests through the real parent flow and assert user-visible behavior. Use direct component-level `rerender()` tests for shared component contracts or when the application flow would be disproportionately expensive to reproduce.
 - Hoist variables relevant to why a test passes or fails into the test itself, not shared state.
+- Do not throw in tests solely to narrow a value returned by a test helper. Type the helper to return the exact variant it constructs so callers can use the result directly.
 - Test stub generators must populate all fields with random data by default. The caller passes in only the fields that matter.
 
   ```typescript
