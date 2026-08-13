@@ -58,6 +58,10 @@ When live verification spans a branch split, switch, or rebase, stop and restart
 
 When launching or sharing a local browser app, use `http://localhost:<port>` instead of `http://127.0.0.1:<port>`. Oscar's SSO configuration allowlists `localhost`; the numeric loopback address can redirect correctly but still fail the authenticated browser flow.
 
+## Bind hosted servers to all interfaces
+
+When hosting any local app, notebook, recap, or other development server for Oscar, bind the listener to `0.0.0.0`, never `127.0.0.1` or another loopback-only address, so it is reachable over the host's network interface. This controls the server bind address, not the browser URL: continue to use `localhost` for authenticated local URLs when SSO requires it, and share the host's reachable network URL when remote access is needed.
+
 ## Benchmarking
 
 Benchmark the full production call path (real clients, real config, real data volume), not an isolated function in a microbenchmark. Only drill into a subfunction once the end-to-end run has identified it as the actual hotspot — an isolated benchmark can look damning while being irrelevant to real throughput.
