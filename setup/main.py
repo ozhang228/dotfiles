@@ -11,20 +11,20 @@ from steps.dependencies import install_package
 from steps.symlink import perform_symlink
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-ANVIL_DIR = Path.home() / "anvil"
 
 
 class Arguments(BaseModel):
     do_symlink: bool = Field(alias="symlink")
     do_packages: bool = Field(alias="packages")
     distro: Distro | None = None
+    file: Path | None = None
 
 
 console = Console()
 
 
-def run_packages(distro: Distro) -> None:
-    packages = load_packages([ROOT_DIR / "packages.json", ANVIL_DIR / "packages.json"])
+def run_packages(distro: Distro, file: Path | None) -> None:
+    packages = load_packages([file or ROOT_DIR / "packages.json"])
     failures: list[tuple[str, str]] = []
 
     console.print(f"[bold]Packages ({distro})[/bold]")
@@ -53,8 +53,8 @@ def run_packages(distro: Distro) -> None:
         console.print("\n[green]All packages installed[/green]")
 
 
-def run_symlinks(distro: Distro) -> None:
-    symlinks = load_symlinks([ROOT_DIR / "symlinks.json", ANVIL_DIR / "symlinks.json"])
+def run_symlinks(distro: Distro, file: Path | None) -> None:
+    symlinks = load_symlinks([file or ROOT_DIR / "symlinks.json"])
     failures: list[tuple[str, str]] = []
 
     console.print("[bold]Symlinks[/bold]")
@@ -86,10 +86,10 @@ def main(args: Arguments) -> None:
             return
 
     if args.do_packages:
-        run_packages(distro)
+        run_packages(distro, args.file)
 
     if args.do_symlink:
-        run_symlinks(distro)
+        run_symlinks(distro, args.file)
 
 
 if __name__ == "__main__":
@@ -100,5 +100,10 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--symlink", action="store_true", default=False)
     parser.add_argument("-p", "--packages", action="store_true", default=False)
     parser.add_argument("--distro", choices=[d.value for d in Distro], default=None)
+    parser.add_argument(
+        "--file",
+        default=None,
+        help="Use this packages.json/symlinks.json instead of the repo root's, e.g. --file ~/anvil/symlinks.json",
+    )
     args = Arguments.model_validate(vars(parser.parse_args()))
     main(args)
