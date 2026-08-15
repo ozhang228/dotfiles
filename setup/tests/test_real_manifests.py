@@ -2,11 +2,11 @@ from pathlib import Path
 
 from domain.config import load_packages, load_symlinks
 
-SETUP_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
 
 def test_real_packages_json_parses_and_leads_with_yay_and_node() -> None:
-    packages = load_packages([SETUP_ROOT / "packages.json"])
+    packages = load_packages([REPO_ROOT / "packages.json"])
 
     ids = list(packages.keys())
     assert ids[0] == "yay"
@@ -16,7 +16,7 @@ def test_real_packages_json_parses_and_leads_with_yay_and_node() -> None:
 
 
 def test_real_symlinks_json_parses() -> None:
-    symlinks = load_symlinks([SETUP_ROOT / "symlinks.json"])
+    symlinks = load_symlinks([REPO_ROOT / "symlinks.json"])
 
     assert len(symlinks) > 0
     mac_only = [s for s in symlinks if s.distros == ["mac"]]

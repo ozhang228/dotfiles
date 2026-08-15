@@ -10,8 +10,8 @@ from result import Err, Ok
 from steps.dependencies import install_package
 from steps.symlink import perform_symlink
 
-SETUP_DIR = Path(__file__).resolve().parent
-ANVIL_SETUP_DIR = Path.home() / "anvil" / "setup"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+ANVIL_DIR = Path.home() / "anvil"
 
 
 class Arguments(BaseModel):
@@ -24,7 +24,7 @@ console = Console()
 
 
 def run_packages(distro: Distro) -> None:
-    packages = load_packages([SETUP_DIR / "packages.json", ANVIL_SETUP_DIR / "packages.json"])
+    packages = load_packages([ROOT_DIR / "packages.json", ANVIL_DIR / "packages.json"])
     failures: list[tuple[str, str]] = []
 
     console.print(f"[bold]Packages ({distro})[/bold]")
@@ -54,7 +54,7 @@ def run_packages(distro: Distro) -> None:
 
 
 def run_symlinks(distro: Distro) -> None:
-    symlinks = load_symlinks([SETUP_DIR / "symlinks.json", ANVIL_SETUP_DIR / "symlinks.json"])
+    symlinks = load_symlinks([ROOT_DIR / "symlinks.json", ANVIL_DIR / "symlinks.json"])
     failures: list[tuple[str, str]] = []
 
     console.print("[bold]Symlinks[/bold]")
