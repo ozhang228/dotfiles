@@ -5,3 +5,11 @@ description = "Setup dependencies"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = ["pydantic>=2.12.5", "rich>=14.3.3"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

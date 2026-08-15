@@ -1,18 +1,12 @@
 import subprocess
+from typing import Literal
 
-from pydantic import BaseModel
-
-from domain.distro import Distro
+from domain.config import Package
 from result import Err, Ok, Result
 
 InstallCommand = str
 CheckCommand = str
-
-
-class Dependency(BaseModel):
-    id: str
-    install_method: dict[Distro, InstallCommand]
-    check: CheckCommand | None = None
+InstallStatus = Literal["installed", "already_present"]
 
 
 def _already_installed(check_cmd: CheckCommand) -> bool:
@@ -22,20 +16,12 @@ def _already_installed(check_cmd: CheckCommand) -> bool:
     return result.returncode == 0
 
 
-def install_dependency(
-    dep: Dependency, install_cmd: InstallCommand
-) -> Result[str, str]:
-    if dep.check and _already_installed(dep.check):
-        return Ok(f"{dep.id} already installed, skipping")
-    try:
-        result = subprocess.run(
-            install_cmd,
-            shell=True,
-            text=True,
-            check=True,
-        )
-        return Ok(result.stdout)
-    except subprocess.CalledProcessError as e:
-        return Err(f"Installation failed: {e.stderr}")
-    except Exception as e:
-        return Err(f"Error: {e}")
+def install_package(package: Package, install_cmd: InstallCommand) -> Result[InstallStatus, str]:
+    if package.check and _already_installed(package.check):
+        return Ok("already_present")
+
+    result = subprocess.run(install_cmd, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout or f"exited {result.returncode}").strip()
+        return Err(detail)
+    return Ok("installed")

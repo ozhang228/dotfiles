@@ -10,7 +10,10 @@ class Distro(StrEnum):
     MAC = "mac"
 
 
-def detect_distro() -> Result[Distro, str]:
+def detect_distro(*, override: Distro | None = None) -> Result[Distro, str]:
+    if override is not None:
+        return Ok(override)
+
     if platform.system() == "Darwin":
         return Ok(Distro.MAC)
     elif platform.system() == "Linux":

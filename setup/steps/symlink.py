@@ -1,15 +1,8 @@
 import os
 import shutil
-from pathlib import Path
 
-from pydantic import BaseModel
-
+from domain.config import Symlink
 from result import Err, Ok, Result
-
-
-class Symlink(BaseModel):
-    src: Path
-    dst: Path
 
 
 def perform_symlink(symlink: Symlink, overwrite: bool = False) -> Result[None, str]:
