@@ -12,7 +12,7 @@ SCRIPT=$(realpath "$0")
 
 list_entries() {
     candidates=()
-    for root in ~/forge ~/dotfiles ~/blog; do
+    for root in ~/forge ~/dotfiles ~/blog ~/anvil; do
         [ -d "$root" ] && candidates+=("$root")
     done
 
