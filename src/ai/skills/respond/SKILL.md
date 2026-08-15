@@ -1,5 +1,5 @@
 ---
-name: respond-to-feedback
+name: respond
 description: Evaluate incoming PR or code-review feedback with the author one comment at a time. Use when the user pastes review comments, links to PR feedback, asks to go through feedback, decide whether a reviewer is right, or address comments interactively. Verify each claim against the current code, explain the context and tradeoffs, wait for the user's decision before editing, and collect durable lessons for a later dotfiles update. Not for proactively reviewing a diff.
 ---
 

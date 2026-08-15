@@ -10,7 +10,7 @@ Format and rules for the implementation plan produced at the end of brainstormin
 
 ## Where plans are saved
 
-`cwd/docs/PLAN.md`
+`cwd/tmp/PLAN.md`
 
 ## Key quality rules
 

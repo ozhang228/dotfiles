@@ -1,5 +1,5 @@
 ---
-name: revise-message
+name: revise
 description: Revise short work messages (Slack DMs, stakeholder emails, announcements, pitches, signoff requests, re-pings) so they read clearly and land the ask. Applies Oscar's writing rules, cuts hedges that undermine the point, and concretizes vague phrases. Not for PR descriptions, commit messages, or code.
 allowed-tools: Read
 disable-model-invocation: true

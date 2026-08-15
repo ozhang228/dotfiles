@@ -1,5 +1,5 @@
 ---
-name: drw-app-launcher-usage
+name: applauncher-use
 description: Query and chart production App Launcher widget usage through the Splunk MCP, grouped by application instance and user. Use for requests about who uses an App Launcher application or widget, how often they use it, or production usage comparisons. Includes known mappings for rv-utils-viz-server widgets such as Product Surface, Vol Surface, Event Weights, and Surface Term Structure.
 ---
 
