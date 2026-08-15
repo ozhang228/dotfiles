@@ -17,7 +17,6 @@ An explicit `/debug` invocation always uses this workflow. Without an explicit i
 - Search existing notebooks before creating anything. Extend a notebook when it investigates the same system and class of failure.
 - Keep the production fix and its tests in the target repository. The notebook reproduces and explains the issue; it does not replace regression tests.
 - Do not create a temporary script first. Start with the notebook and use its cells for probes.
-- Do not extract reusable utilities and do not prune the notebook here — both happen later in `postmortem`, once the investigation is actually over. Optimize this workflow for reaching the root cause quickly, not for producing a clean artifact.
 
 ## Naming and title
 
