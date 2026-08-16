@@ -9,6 +9,9 @@ def perform_symlink(symlink: Symlink, overwrite: bool = False) -> Result[None, s
     src = symlink.src.expanduser()
     dst = symlink.dst.expanduser()
     try:
+        if dst.is_symlink() and dst.resolve() == src.resolve():
+            return Ok(None)
+
         if dst.exists() or dst.is_symlink():
             if not overwrite:
                 response = input(f"Path {dst} already exists. Overwrite? (y/n): ")
