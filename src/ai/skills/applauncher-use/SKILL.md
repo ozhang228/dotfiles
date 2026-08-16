@@ -1,6 +1,6 @@
 ---
 name: applauncher-use
-description: Query and chart production App Launcher widget usage through the Splunk MCP, grouped by application instance and user. Use for requests about who uses an App Launcher application or widget, how often they use it, or production usage comparisons. Includes known mappings for rv-utils-viz-server widgets such as Product Surface, Vol Surface, Event Weights, and Surface Term Structure.
+description: Query and chart production App Launcher widget usage through the Splunk MCP, grouped by application instance and user
 ---
 
 # DRW App Launcher Usage
@@ -12,12 +12,6 @@ Query production App Launcher telemetry and report sessionized usage by applicat
 Use a known application reference when one exists:
 
 - For RVUVS, Product Surface, Vol Surface, Event Weights, or Surface Term Structure, read [references/rvuvs.md](references/rvuvs.md).
-
-For any other application:
-
-1. Use an explicit `labels.widget` value or URL supplied by the user.
-2. If only a friendly name is supplied, run a small discovery query over `labels.app=app-launcher` to identify candidate widget labels and URLs. Show ambiguous candidates instead of guessing.
-3. Resolve the user-facing application from the widget label and its instances from stable URL path segments. A shared server or application family is not the reporting application when it hosts several distinct user-facing apps. Strip query parameters because they can contain transient widget state.
 
 Use the last 30 days by default. Honor an explicit time window through the Splunk MCP `earliest_time` and `latest_time` parameters.
 
