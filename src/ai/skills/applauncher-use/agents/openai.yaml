@@ -1,9 +1,0 @@
-interface:
-  display_name: "DRW App Launcher Usage"
-  short_description: "Chart production App Launcher usage by user"
-  default_prompt: "Use $drw-app-launcher-usage to chart production App Launcher usage for the last 30 days."
-dependencies:
-  tools:
-    - type: "mcp"
-      value: "splunk"
-      description: "Run production App Launcher telemetry searches"

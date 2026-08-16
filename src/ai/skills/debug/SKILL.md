@@ -66,7 +66,9 @@ The Result section is required before finishing. Write it into the notebook afte
 - Start with the reported symptom, then add probes that distinguish hypotheses. Do not dump unrelated system state into the notebook.
 - Keep credentials out of cells and outputs. Use the established clients and credential providers.
 - Redact tokens, user data, and oversized payloads before rendering results.
-- If a probe mutates production state, stop and get explicit approval first.
+- Default mutation-capable notebooks to dry run or read-only. Before any write,
+  get explicit approval, require an explicit environment confirmation, snapshot
+  the current state, reject concurrent changes, and verify exact readback.
 - If the issue cannot be reproduced, leave the attempted inputs, observed result, and next discriminating probe in the Result section.
 
 ## Workflow

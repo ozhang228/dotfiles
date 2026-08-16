@@ -5,20 +5,24 @@ description: Use when Oscar says a debugging investigation is done, or invokes /
 
 # Postmortem
 
-Takes a finished `debug` notebook and produces three things: a pruned notebook, audited reusable utilities, and a dated markdown summary. `debug` optimizes for reaching the root cause fast and does none of this itself — invoke this only once Oscar confirms the investigation is actually over, never automatically at the end of a `debug` session.
+Takes a finished `debug` notebook and produces audited reusable utilities, a
+dated markdown summary, and an explicit notebook retention decision. `debug`
+optimizes for reaching the root cause fast and does none of this itself. Invoke
+this only once Oscar confirms the investigation is actually over, never
+automatically at the end of a `debug` session.
 
 ## Input
 
 The notebook path from the relevant `debug` session. Ask if ambiguous — search `~/anvil/notebooks` for the most recently modified file matching the discussed system/symptom.
 
-## Step 1: Prune to the proof
+## Step 1: Audit and prune to the proof
 
 Make a dedicated deletion pass on the notebook. The final notebook is a reusable proof, not a transcript of the investigation.
 
 - Keep only the failing reproducer, the smallest control that validates units or assumptions, the evidence that distinguishes the root cause, final verification, and concrete handoff steps.
 - Delete raw schema and payload dumps, broad source-column inventories, candidate matrices, samples, top-N difference tables, and disproven probes unless they prevent a likely repeat investigation.
 - Collapse repeated evidence into the smallest table that shows the control and failure side by side. Preserve timestamps, formulas, exact source identifiers, and pinned values needed to interpret it.
-- Re-run the pruned notebook from `~/anvil`: `uv run marimo check --strict notebooks/<name>.py`. Deletion is complete only when the minimal artifact still proves the conclusion end to end.
+- Re-run the pruned notebook from `~/anvil`: `uv run marimo check --strict notebooks/<name>.py`. Pruning is complete only when the minimal artifact still proves the conclusion end to end.
 
 ## Step 2: Extract and audit reusable utilities
 
@@ -59,10 +63,31 @@ Format:
 
 Pull the content from the notebook's own Problem/Root cause/Result sections rather than re-investigating — postmortem summarizes, it doesn't re-derive.
 
+## Step 4: Keep or delete the notebook
+
+Keep the notebook only when another investigation can change its inputs and use
+it for the same active application, failure shape, guarded operation, or parity
+workflow. The retained notebook must remain a runnable proof, not an incident
+transcript.
+
+Delete the notebook when the investigation is static and complete, provided:
+
+- the postmortem preserves every unique diagnostic query, conclusion, and safe
+  operator boundary;
+- reusable common actions or external-system plumbing live in `~/anvil/utils`;
+- no repository file still references or imports the notebook; and
+- the notebook's Git state is understood, so deletion does not discard unrelated
+  work.
+
+For a deleted notebook, write `**Source notebook:**` in the postmortem and state
+that it was deleted after its durable content was preserved. Never bulk-delete
+notebooks by name, age, or category.
+
 ## Workflow
 
 1. Identify the notebook.
-2. Prune it to the minimal proof (Step 1); re-run to confirm it still proves the conclusion.
-3. Extract and audit reusable utilities (Step 2).
-4. Write the postmortem markdown (Step 3).
-5. Report the postmortem path, the notebook path, and a one-line summary of what changed in each (pruned by how much, any utils extracted or consolidated).
+2. Audit and prune it to the minimal proof; re-run retained notebooks to confirm they still prove the conclusion.
+3. Extract and audit reusable utilities.
+4. Write the postmortem markdown.
+5. Apply the keep-or-delete decision only after the postmortem and utilities preserve the durable content.
+6. Report the postmortem path, whether the notebook was kept or deleted, and any utilities extracted or consolidated.
