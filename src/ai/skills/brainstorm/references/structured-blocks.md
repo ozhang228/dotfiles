@@ -1,1 +1,1 @@
-../../_shared/structured-blocks.md
+../../../_shared/structured-blocks.md
