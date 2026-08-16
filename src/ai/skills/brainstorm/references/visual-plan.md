@@ -4,31 +4,16 @@ Use this reference when authoring the local visual plan artifact for the brainst
 
 ## Self-Contained Contract
 
-- Use the canonical dark neutral/amber token system from
-  `references/structured-blocks.md`. Do not add light-mode overrides or a
-  separate decorative palette.
-
-- Keep plan content local. Read project context from local files and shell
-  commands only.
-- Do not install packages, execute remote packages, fetch a remote schema,
-  publish plan content, or depend on any external server.
-- Use `./tmp/visual-plan-<slug>/` for scratch artifacts. Use `plans/<slug>/`
-  only when the user explicitly wants the artifact checked in.
-- The plan directory contains `plan.html` as the primary review UI and
-  `plan.md` as the source-of-truth text fallback. Optional assets must live
-  inside the same folder.
-- The HTML must be self-contained: inline CSS, no external CDN, no remote
-  fonts, no remote scripts, and no runtime dependency outside a browser
-  opening the file.
+- Use the canonical dark neutral/amber token system from `references/structured-blocks.md`. 
+- Do not install packages, execute remote packages, fetch a remote schema, publish plan content, or depend on any external server.
+- `tmp/plan.html` is the primary review UI; `tmp/plan.md` is the source-of-truth text fallback.
 - Feedback comes through chat or file edits. Update the local files directly.
 
-## Structured blocks, not text-on-a-page
+## Structured blocks
 
-`plan.html` is not prose poured into HTML — it's built from the component
-library in `references/structured-blocks.md` (shared with `code-review` -
-that file is the single canonical copy). Read that file in full before
-authoring `plan.html`; do not hand-roll a summary card or comparison table
-from memory.
+Build `plan.html` from the component library in `references/structured-blocks.md`
+(shared with `code-review` - that file is the single canonical copy). Read it
+in full before authoring `plan.html`; never hand-roll a block from memory.
 
 Brainstorm reaches for: `summary-card`, `callout`, `options-compare`,
 `assumption-list`, `api-endpoint`, `columns`, and `boundary-matrix`. Copy only
@@ -63,15 +48,6 @@ navigation strip.
   real code line-by-line, that's a signal the work has moved from design into
   implementation — hand it off as a `tmp/PLAN.md` step instead of expanding
   the visual plan.
-
-## Folder Shape
-
-```text
-<plan-dir>/
-  plan.html
-  plan.md
-  assets/       # optional local images or generated files
-```
 
 ## Plan Body Shape
 
@@ -137,8 +113,8 @@ Before handoff:
   handoff.
 - Run repo-native checks only when they already exist locally. Do not install
   validators.
-- Serve the plan directory with an already-available local static server
+- Serve `tmp/` with an already-available local static server
   (e.g. `python3 -m http.server`), bound to `0.0.0.0`, and report the
   reachable URL. If serving fails, report the failure and still provide the
   direct file path.
-- Report the folder path and direct `plan.html` path.
+- Report the `tmp/plan.html` path.
