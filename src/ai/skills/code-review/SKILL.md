@@ -5,9 +5,9 @@ description: Review PRs, diffs, and uncommitted code changes, or produce a guide
 
 # Code Review
 
-You own the review. At its core this skill explains a PR to the user, in reading order, well enough that they deeply understand it, not just a bug list. Do the only deep investigation pass yourself, gate on whether the PR's direction is even right, then run up to four focused line-level review passes. Use host delegation if it exists; otherwise run the same focused passes yourself. Merge and validate everything before showing it to the user.
+You own the review: explain the PR to the user in reading order, not just a bug list. Do the deep investigation pass yourself, gate on architecture direction, then run up to four focused line-level review passes. Use host delegation if it exists; otherwise run the passes yourself. Merge and validate everything before showing it to the user.
 
-**No diff to review?** Same skill, same investigative instinct, pointed at an existing system/feature/concept instead of a PR ("explain how X works", "walk me through the auth flow"). Skip the diff-specific mechanics: merge-base resolution, the architecture gate, focused review passes, and the Bugs/Testing/Performance/Simplification findings sections. Produce the reading order itself: identify prerequisites (invariants, vocabulary, abstractions the code assumes), then write `## Prerequisites` followed by `## Reading Tour` with ordered `file:line` stops, each explaining what to look for and why it comes at this point, with your opinions inline (confusing naming, a better structure, why it's built this way). End by inviting the user to read and come back with questions. Push toward a verdict ("does this design make sense to you?", "what would you do differently?"), not just comprehension. Length follows the concept: some systems need 3 stops, some need 12. Give `file:line` anchors rather than pasting large snippets, since the user reads the real code.
+**No diff to review?** Same skill, pointed at an existing system/feature/concept instead of a PR ("explain how X works", "walk me through the auth flow"). Skip merge-base resolution, the architecture gate, focused review passes, and the Bugs/Testing/Performance/Simplification sections. Identify prerequisites (invariants, vocabulary, abstractions the code assumes), write `## Prerequisites` then `## Reading Tour` with ordered `file:line` stops, each explaining what to look for, with opinions inline (confusing naming, a better structure, why it's built this way). End by inviting the user to read and come back with questions. Push toward a verdict ("does this design make sense to you?", "what would you do differently?"), not just comprehension. Length follows the concept: 3 stops or 12. Give `file:line` anchors, not large pasted snippets.
 
 ## Reference Guide
 
@@ -23,33 +23,33 @@ Run the bundled `scripts/pr-languages` first to identify which languages are in 
 
 ## Review Workflow
 
-The flow is four phases: **you alone** investigate (1) and gate on architecture (2); then you run up to four focused review passes (3) and merge what they return (4). Investigation happens exactly once in the main thread. Focused passes never repeat it; you hand them what they need.
+Four phases: **you alone** investigate (1) and gate on architecture (2); then run up to four focused review passes (3) and merge what they return (4). Investigation happens once, in the main thread; hand focused passes what they need instead of letting them repeat it.
 
 ### Phase 1 — Investigation (main thread only)
 
 This is the single deep pass over the PR. Do all of it before spawning anything.
 
-1. **Confirm the repo/branch matches the user's active context.** If you're reviewing a branch in one repo while the user's CWD is a different repo or branch, edits during the walkthrough land in the wrong place. Surface any mismatch before proceeding.
-2. **Diff against the merge base, not the moving base branch tip.** Resolve the review base with `git -C <repo> merge-base <base> HEAD` and use that SHA for `git diff`, `git diff --stat`, and changed-file discovery. You may note that the branch is behind `<base>`, but do not stop to ask whether to merge before reviewing unless the user explicitly asked for an up-to-date integration review.
-3. Run the bundled `scripts/pr-languages` by resolved filesystem path. It computes which languages are changed vs the merge base and auto-detects the repo's real base branch. Note which language references (`references/python.md`, `references/typescript.md`) apply; load them yourself for the architecture verdict and pass them to any delegated review.
+1. **Confirm the repo/branch matches the user's active context.** Surface any mismatch before proceeding.
+2. **Diff against the merge base, not the moving base branch tip.** Resolve the review base with `git -C <repo> merge-base <base> HEAD` and use that SHA for `git diff`, `git diff --stat`, and changed-file discovery. Note if the branch is behind `<base>`, but do not stop to ask about merging unless the user explicitly asked for an up-to-date integration review.
+3. Run the bundled `scripts/pr-languages` by resolved filesystem path. Note which language references (`references/python.md`, `references/typescript.md`) apply; load them yourself for the architecture verdict and pass them to any delegated review.
 4. Do a git diff against the merge-base SHA pr-languages resolved (unless another branch or base SHA is specified).
-5. Read full files and related files for context. You are the only actor that reads broadly — record exact `file_path:line` ranges for the changed surface so focused passes can use them without rediscovering the diff.
-6. **Read the tests first.** Tests encode the expected behavior of the PR. They show what the author thinks the code should do. Flag any expected behavior that looks weird, surprising, or wrong _before_ looking at the implementation. Then check the implementation against this understanding.
+5. Read full files and related files for context. Record exact `file_path:line` ranges for the changed surface for focused passes to use.
+6. **Read the tests first.** Flag any expected behavior that looks weird, surprising, or wrong before looking at the implementation, then check the implementation against it.
 7. Identify the durable units of work, success, failure/retry, and ordering. For stateful, concurrent, or partial-failure changes, construct the smallest concrete scenario that distinguishes old from new behavior before reading the implementation as a file list.
 8. **Audit scope before details.** Classify every hunk as core behavior, required support, or incidental. Flag wrappers with one caller, duplicate fields or code paths, generalized types without a second valid case, no-op rewrites, and noisy config/format churn. If the diff contains independently reviewable behavior, recommend a causal split before reviewing the combined implementation.
-9. **Audit local consistency.** For adjacent branches or expressions implementing the same concept, match the existing syntax and structure unless a semantic difference requires divergence. Treat a second spelling of the same operation as avoidable mental overhead.
+9. **Audit local consistency.** For adjacent branches or expressions implementing the same concept, match the existing syntax and structure unless a semantic difference requires divergence.
 10. **Audit conventions dimensionally.** For every conversion involving prices, vols, rates, ticks, currency, time, or dates, trace source units through each operation to the consumer. Treat unexplained scale factors and inferred desk conventions as correctness risks even when tests pass. Check external-library semantics and production configuration rather than inferring them from stubs.
 
 ### Phase 2 — Architecture gate (hard block)
 
-Before any line-level review, decide whether the PR is even going the right way. If the direction is wrong, line-level findings are wasted effort. Write to the chat:
+Before any line-level review, decide whether the PR is going the right way. Write to the chat:
 
 - **"The PR is solving X"** — your one-line understanding of intent.
 - **An architecture / modeling verdict.** Is this the right approach? The right data model? Challenge implicit assumptions. Commit to a verdict — "I think the approach is sound" or "I'd push back, because Y" — not just a description of what the code does.
 - **A scope verdict.** Is this one coherent review unit, or are unrelated behavior, speculative abstraction, and cleanup making the PR harder to validate? Name the split if one is needed.
 - **A boundary verdict when failure scopes differ.** State which failures can be isolated and which invalidate the wider operation, and whether the code has enough identity/order information to make that distinction safely.
 
-Then **stop and wait for the user to confirm the direction.** Do not run focused line-level passes or write comments until they confirm. If they want a different approach, the line-level review may be moot — re-scope first.
+Then **stop and wait for the user to confirm the direction.** Do not run focused line-level passes or write comments until they confirm. If they want a different approach, re-scope first.
 
 ### Phase 3 — Focused passes (only after confirmation)
 
@@ -70,7 +70,7 @@ The four passes:
 
 | Pass            | Sole focus                                            | Must do |
 | --------------- | ----------------------------------------------------- | ------- |
-| **Correctness** | Will this run as expected?                            | For each finding, give a **concrete triggering input** + expected-vs-actual behavior. Re-trace the path. If it can't construct a failure case, the bug isn't real, drop it or downgrade to a question. Suspected-but-unverified bugs are the top source of bad feedback. |
+| **Correctness** | Will this run as expected?                            | For each finding, give a **concrete triggering input** + expected-vs-actual behavior. Re-trace the path. If it can't construct a failure case, the bug isn't real, drop it or downgrade to a question. |
 | **Testing**     | Do tests document each function's behavior, and are the tests in the diff themselves correct? | Two jobs. **(a) Gaps:** map every changed function to the test(s) that pin its behavior; for each gap, **propose a concrete test as a code block**. For non-obvious tests, explain the causal oracle: what broken implementation would make the assertion fail, deadlock, or time out. **(b) Review the added/changed tests themselves** against our testing contract: assertions must match the exact semantic (`assert x == expected`, not `assert x` / `assert len(x)` / `assert x is not None` when the real contract is a specific value); flag redundant tests (two tests exercising the same path, over-parametrized cases that add no new branch); flag tests asserting implementation detail instead of behavior; no fixtures, mocks, or test classes (see `references/python.md`). It proposes and critiques; it does **not** write files. |
 | **Performance** | Easy wins that limit performance                      | Only report a win it **validated with a small benchmark**. Include the command and before/after absolute numbers. An unbenchmarked hunch is dropped or downgraded to a question. Reason through the allocation/call model; "looks cleaner" is not "faster". |
 | **Simplification** | What in this diff is over-engineered and can be cut?  | First audit every hunk against the PR's core behavior. Flag incidental lint cleanup, equivalent refactors, and any other change that can be reverted without affecting that behavior. Hunt only complexity to delete, never correctness/security/perf. One finding per line, each tagged: `delete:` (dead code, unrelated diff hunks, unused flexibility, speculative feature, replacement is nothing), `stdlib:` (hand-rolled thing the standard library ships, name the function), `native:` (dep or code doing what the platform already does, name the feature), `yagni:` (abstraction with one implementation, config nobody sets, layer with one caller), `shrink:` (same logic, fewer lines, show the shorter form). **Readability is a hard floor:** never propose a `shrink:` that trades clarity for line count; a denser one-liner that's harder to read is not a win, drop it. **Never flag the single smoke test or `assert`-based self-check for deletion**, that's the minimum, not bloat. End its return with `net: -<N> lines possible`. If nothing holds up, it returns `Lean already.` and no findings. |
@@ -81,11 +81,11 @@ The four passes:
 
 The focused passes find; you decide what survives.
 
-- **Validate every finding before accepting it.** Re-trace correctness claims against the code you already read. Confirm proposed tests target genuine gaps. Sanity-check that perf numbers are plausible and the benchmark measured the right thing. Drop or downgrade anything that doesn't hold up, since the anti-false-positive bar lives here, in the main thread.
-- **Close delegated reviewers once their results are merged** if the host provides a close mechanism. Completed reviewers can still count against the concurrency limit.
-- **Drop functionally-equivalent rewrites.** A focused pass will sometimes propose a "tightening" or "cleaner" rewrite that compiles to the same behavior and is no clearer to read: same logic, different spelling. That's not a finding. Before accepting any simplification/nit, ask "does the new version actually change behavior, fix a bug, or materially improve readability?" If it's just an equivalent restatement, cut it. Don't relay it to the user.
+- **Validate every finding before accepting it.** Re-trace correctness claims against the code you already read. Confirm proposed tests target genuine gaps. Sanity-check that perf numbers are plausible and the benchmark measured the right thing. Drop or downgrade anything that doesn't hold up.
+- **Close delegated reviewers once their results are merged** if the host provides a close mechanism.
+- **Drop functionally-equivalent rewrites** — same logic, different spelling, no clearer to read. Before accepting any simplification/nit, ask "does this change behavior, fix a bug, or materially improve readability?" If not, cut it; don't relay it to the user.
 - **Dedup across passes.** If two passes flag the same line, write one comment.
-- **Add style nits yourself.** Naming, clarity, dead code, conventions. This stays a main-thread job because it needs whole-PR context the single-focus passes don't have.
+- **Add style nits yourself.** Naming, clarity, dead code, conventions.
 
 ## Resolving review comments (author side)
 
@@ -93,10 +93,10 @@ When the work is the reverse — you're the author addressing comments on your o
 
 - **Route implementation separately from review.** The primary thread verifies the comment's premise and decides the fix. For a nontrivial accepted fix, delegate implementation to one subagent using `gpt-5.6-terra` with `medium` reasoning, providing the validated finding, expected behavior, exact repository scope, and required tests. Keep tiny mechanical edits local. Afterward, inspect the complete diff and run the real tests in the primary thread; send defects back to the same worker when practical.
 
-- **Verify the comment's premise before agreeing or building.** "Use `strikes_from_sds`", "isn't there an outright type for this?", "X already does it this way" are premises, not facts. Grep for the type, read the helper, check what the sibling actually does — *then* act. A premise that turns out false (the canonical helper computes something different, no outright type exists, the sibling diverges) means the change you were about to make is wrong, and reversing an applied change costs more than the check. This holds for pushback too: verify before you defend. The reviewer being senior doesn't make the premise true.
-- **Lead placement decisions with ownership, not the import graph.** When a comment is "this doesn't belong here," decide where a thing lives by *what conceptually owns it* (a port belongs with its consumer; an interface with its domain), then use cycle-avoidance to break ties — never let "what imports cleanly" drive the call. Shuffling a file through three locations chasing an import cycle is the symptom of optimizing the graph instead of the ownership.
-- **Branch hygiene under concurrent pushes.** When the author (you or Oscar) may be pushing in parallel, re-check `HEAD` vs `origin/<branch>` before every commit and push — a clean-looking `git diff <base>` can be base-ahead churn rather than your change, and a published merge commit must never be amended. Land each fix on the PR/branch that *owns* the file it touches, not whichever branch is checked out.
-- **Re-audit every stacked PR after history rewrites.** A clean rebase only proves patches applied; it does not prove a fix lives in the intended branch or disappeared from earlier ones. Inspect each branch's exact merge-base diff and grep the final trees for corrected symbols before pushing bottom-up. When a base PR merges, rebuild the remaining stack from that merged commit and repeat the per-PR diff audit.
+- **Verify the comment's premise before agreeing or building.** "Use `strikes_from_sds`", "isn't there an outright type for this?", "X already does it this way" are premises, not facts. Grep for the type, read the helper, check what the sibling actually does — *then* act. This holds for pushback too: verify before you defend.
+- **Lead placement decisions with ownership, not the import graph.** When a comment is "this doesn't belong here," decide where a thing lives by *what conceptually owns it* (a port belongs with its consumer; an interface with its domain), then use cycle-avoidance to break ties — never let "what imports cleanly" drive the call.
+- **Branch hygiene under concurrent pushes.** When the author (you or Oscar) may be pushing in parallel, re-check `HEAD` vs `origin/<branch>` before every commit and push. A published merge commit must never be amended. Land each fix on the PR/branch that *owns* the file it touches, not whichever branch is checked out.
+- **Re-audit every stacked PR after history rewrites.** Inspect each branch's exact merge-base diff and grep the final trees for corrected symbols before pushing bottom-up. When a base PR merges, rebuild the remaining stack from that merged commit and repeat the per-PR diff audit.
 
 ## Local Visual Recap Surface
 

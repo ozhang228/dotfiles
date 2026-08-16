@@ -5,16 +5,15 @@ description: Use when the user invokes /debug or when diagnosing a reproducible 
 
 # Debug
 
-Turn debugging work into a reproducible Marimo investigation instead of a sequence of terminal probes or a throwaway script. The one goal here is root cause, found fast — cleanup is a separate, explicitly-invoked step (`postmortem`), not part of this workflow.
+Turn debugging work into a reproducible Marimo investigation instead of a sequence of terminal probes or a throwaway script. The one goal here is root cause, found fast without care for future use or doing things in a "clean way"
 
-An explicit `/debug` invocation always uses this workflow. Without an explicit invocation, use it when the investigation needs live-system queries, data comparisons, repeated probes, or a local script. Skip it for obvious one-line fixes, build errors with a known cause, and mechanical lint/type failures.
+Use it when the investigation needs live-system queries, data comparisons, repeated probes, or a local script. Skip it for obvious one-line fixes, build errors with a known cause, and mechanical lint/type failures.
 
 ## Artifact ownership
 
-- Put every notebook in `/home/ozhang/anvil/notebooks`, never in the target project.
-- Run notebook commands from `/home/ozhang/anvil` with its checked-in environment: `uv run marimo ...`.
-- Read the target repository's instructions before investigating.
-- Search existing notebooks before creating anything. Extend a notebook when it investigates the same system and class of failure.
+- Put every notebook in `~/anvil/notebooks`, never in the target project.
+- Run notebook commands from `~/anvil` with its checked-in environment: `uv run marimo ...`.
+- Search existing notebooks and postmortems before creating anything. Extend a notebook when it investigates the same system and class of failure. When multiple candidates match, prioritize the most recently updated ones first.
 - Keep the production fix and its tests in the target repository. The notebook reproduces and explains the issue; it does not replace regression tests.
 - Do not create a temporary script first. Start with the notebook and use its cells for probes.
 
@@ -51,7 +50,6 @@ The Result section is required before finishing. Write it into the notebook afte
 ## Marimo rules
 
 - Follow the global Marimo rules in `~/dotfiles/src/ai/rules/marimo.md`.
-- Put all imports in `with app.setup:`.
 - Default cell-local names to a leading underscore. Return only values consumed by another cell.
 - Give each UI control its own cell.
 - Put a Markdown heading before each investigation phase.
@@ -93,4 +91,4 @@ Run the notebook when its dependencies and live-system access are available. Use
 uv run marimo edit notebooks/<name>.py --host 0.0.0.0 --headless --watch
 ```
 
-Keep the server running while Oscar reviews the investigation, and report the reachable workstation URL with its token. Also report the notebook path, the root cause, the production verification performed, and any live checks that could not be run. Tell Oscar the investigation is ready for `postmortem` once he's satisfied — don't run it yourself.
+Keep the server running while Oscar reviews the investigation, and report the reachable workstation URL with its token. Also report the notebook path, the root cause, the production verification performed, and any live checks that could not be run

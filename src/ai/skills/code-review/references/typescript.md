@@ -94,8 +94,6 @@ Do not turn an architectural preference into a blocking comment without checking
 
 Module-level named functions should use `function` declarations, not arrow-function assignments. Arrow functions are fine for callbacks, inline handlers, and component props.
 
-Avoid IIFEs. Prefer direct initialization or a named function whose purpose is visible at the call site.
-
 Style guide reference: https://wiki.drwholdings.com/spaces/FIO/pages/495308909/DAT+Developer#DATDeveloper-TypeScript%2FReact
 
 ---
@@ -142,7 +140,7 @@ Set stubs and expected server behavior before rendering when the component can i
 
 ## Testing: keep causal inputs local
 
-Generate irrelevant fixture fields through a builder with randomized defaults and pass explicit overrides for the values that cause the expected behavior. Construct the fixture in the test body so the input-to-output relationship is visible without jumping to module-level constants.
+Construct the fixture in the test body, not a module-level constant, so the input-to-output relationship is visible without jumping to a non-local variable.
 
 > "test data should be randomly generated with a util function that allows passing in overrides -- this prevents implicit reliance in tests on hard-coded data" (kosterbauer, PR #3397)
 

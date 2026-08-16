@@ -5,11 +5,7 @@ description: Use when Oscar says a debugging investigation is done, or invokes /
 
 # Postmortem
 
-Takes a finished `debug` notebook and produces audited reusable utilities, a
-dated markdown summary, and an explicit notebook retention decision. `debug`
-optimizes for reaching the root cause fast and does none of this itself. Invoke
-this only once Oscar confirms the investigation is actually over, never
-automatically at the end of a `debug` session.
+Takes a finished `debug` notebook and produces audited reusable utilities, a dated markdown summary, and an explicit notebook retention decision. `debug` optimizes for reaching the root cause fast and does none of this itself. Invoke this only once Oscar confirms the investigation is actually over, never automatically at the end of a `debug` session.
 
 ## Input
 
@@ -83,6 +79,15 @@ For a deleted notebook, write `**Source notebook:**` in the postmortem and state
 that it was deleted after its durable content was preserved. Never bulk-delete
 notebooks by name, age, or category.
 
+## Step 5: Retire stale or misleading archive entries
+
+While searching `~/anvil/notebooks` and `~/anvil/postmortems`, flag any existing
+notebook or postmortem that no longer applies — the system was decommissioned,
+the described failure can no longer occur, or the recorded root cause was since
+found wrong or superseded — and would mislead a future `debug` search. Verify
+each one individually before removing it; never bulk-delete by name, age, or
+category.
+
 ## Workflow
 
 1. Identify the notebook.
@@ -90,4 +95,5 @@ notebooks by name, age, or category.
 3. Extract and audit reusable utilities.
 4. Write the postmortem markdown.
 5. Apply the keep-or-delete decision only after the postmortem and utilities preserve the durable content.
-6. Report the postmortem path, whether the notebook was kept or deleted, and any utilities extracted or consolidated.
+6. Check nearby archive entries encountered during the search for staleness; retire any that would mislead a future search.
+7. Report the postmortem path, whether the notebook was kept or deleted, any utilities extracted or consolidated, and any stale archive entries retired.
