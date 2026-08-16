@@ -7,7 +7,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 
 - Follow Google's Python style guide.
 - Do not use timezone-naive datetimes, ever.
-- Prefer inferred types per `general.md`; annotate parameters, empty collections, ambiguous values, and other places where the type checker cannot recover the intended type.
+- Prefer inferred types per `GLOBAL.md`; annotate parameters, empty collections, ambiguous values, and other places where the type checker cannot recover the intended type.
 - Prefer `Self` from `typing_extensions` instead of forward-referencing the class name.
 - When a function has two or more consecutive parameters of the same type, force keyword arguments using `*` to prevent accidental transposition.
 
@@ -69,7 +69,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - NEVER use fixtures. Use cached functions instead.
 - Maximize code coverage using interfaces and stub implementations.
 - Avoid IO in tests to prevent production load and flakiness.
-- See `general.md`'s "Recurring bad-test patterns" for the cross-language test-quality checklist (vacuous assertions, tautological/trivial-by-default tests, redundant coverage, brittle-to-refactor tests, unverified test names and secondary inputs).
+- See `GLOBAL.md`'s "Recurring bad-test patterns" for the cross-language test-quality checklist (vacuous assertions, tautological/trivial-by-default tests, redundant coverage, brittle-to-refactor tests, unverified test names and secondary inputs).
 
 ## Dash
 

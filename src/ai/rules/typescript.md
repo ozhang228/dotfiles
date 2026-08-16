@@ -5,31 +5,29 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
 
 # TypeScript
 
-- Hard-pin every dependency version in `package.json` (exact version, no `^` or `~` range). Never specify a lower bound only — pin the exact version pnpm/npm actually resolved.
+- Hard-pin every dependency version in `package.json` (exact version, no `^` or `~` range).
 - Prefer `type` over `interface`.
 - No anonymous functions at module level.
 - Avoid IIFEs. Prefer a named function or direct initialization so the control flow is explicit.
 - Functions with more than two parameters of a shared type must take a single options object instead.
-- Follow Google's TypeScript style guide.
 - No default exports.
-- Prefer pure, framework-agnostic functions over hooks. Minimize hook logic; extract testable helpers.
+- Prefer pure, framework-agnostic functions over hooks.
 - Destructure props in React component signatures.
 - Self-close React components that have no children.
-- Use destructured arguments rather than patterns like `args: {}`.
 - Prefer `undefined` over `null`. Convert `null` from browser/library APIs to `undefined` at the boundary.
 - Prefer default parameter values over nullish coalescing (`??`) when possible.
-- Never use type assertions (`as`, `var!`). Maintain type safety. Use `checkExists` instead.
+- Never use type assertions (`as`, `var!`). Maintain type safety. 
 - Always annotate caught errors as `unknown` and assert them through a helper (e.g. `assertIsError`).
 - Be intentional with optional properties:
   - `{ lines?: ConstructedLine[] }` — the key may be omitted.
   - `{ lines: ConstructedLine[] | undefined }` — the key must exist, but may be `undefined`.
-  - Choose the form that matches your intent.
 
 ## React State
 
-- Don't sync state with `useEffect`. If a child's state change needs to affect a sibling or parent, hoist the state up to their common ancestor instead of reading it back down through an effect. Reserve `useEffect` for synchronizing with something truly external (a subscription, a DOM API, a non-React library) — not for keeping two pieces of your own component tree in sync.
-- Don't call `setState` inside a loop. Compute the final value first, then call `setState` once — either by reducing outside the call, or by doing the loop inside a single functional updater (`setState(prev => ...)`). Looped `setState` calls can trigger a re-render per iteration and are hard to follow regardless.
-- If you notice a single user action driving more than two or three state variables through a chain of effects and handlers, that's a sign the state is split across too many places — look for a way to collapse it into fewer, more directly-derived pieces of state before adding another effect to the chain.
+- Don't sync state with `useEffect`. If a child's state change needs to affect a sibling or parent, hoist the state up to their common ancestor.
+- Reserve `useEffect` for synchronizing with something truly external (a subscription, a DOM API, a non-React library) 
+- Don't call `setState` inside a loop. Compute the final value first, then call `setState` once
+- If you notice a single user action driving more than two or three state variables through a chain of effects and handlers, that's a sign the state is split across too many places, look for a way to collapse it into fewer, more directly-derived pieces of state 
 
 ## Testing
 
@@ -50,4 +48,4 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
   }
   ```
 
-- See `general.md`'s "Recurring bad-test patterns" for the cross-language test-quality checklist, including hardcoding expected values instead of computing them with the same logic under test (tautological-by-construction).
+- See `GLOBAL.md`'s "Recurring bad-test patterns" for the cross-language test-quality checklist, including hardcoding expected values instead of computing them with the same logic under test (tautological-by-construction).
