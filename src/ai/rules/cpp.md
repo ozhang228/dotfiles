@@ -13,6 +13,3 @@ skip_if: Working in TypeScript, Python, or any non-C++ language
 - Centralize lazy Python C API initialization. Propagate initialization exceptions, and reserve a caster's `false` return for an ordinary type mismatch rather than swallowing setup failures.
 - Treat successful `PyDateTime_IMPORT` as a hard precondition for every `PyDate_*` and `PyDateTime_*` C API macro. Check `PyDateTimeAPI` after import and propagate failure before calling any datetime API; accessing those macros with a null API pointer is undefined behavior.
 - When asserting on `std::expected` in tests, pipe the error into the assertion so failures are readable:
-  ```cpp
-  ASSERT_TRUE(result.has_value()) << result.error();
-  ```
