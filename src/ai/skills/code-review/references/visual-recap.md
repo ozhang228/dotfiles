@@ -27,13 +27,14 @@ review.
 ## Structured blocks, not text-on-a-page
 
 `index.html` is not prose poured into HTML — it's built from the component
-library in `references/structured-blocks.md`. Read that file in full before
-authoring `index.html`; do not hand-roll a diff view or
-data-model card from memory. It defines the token CSS, the split-diff
-component (real line numbers, before/after, annotation markers), annotated
-code, data-model / API-endpoint cards, before/after columns, and two-panel
-diagrams — all plain HTML/CSS with a little vanilla JS, no build step. Copy the
-CSS into `index.html`'s own `<style>` tag once.
+library in `references/structured-blocks.md` (shared with `brainstorm` -
+that file is the single canonical copy). Read that file in full before
+authoring `index.html`; do not hand-roll a diff view or API-endpoint card
+from memory. It defines the token CSS, the split-diff component (real line
+numbers, before/after, annotation markers), annotated code, API-endpoint
+cards, before/after columns, and two-panel diagrams — all plain HTML/CSS with
+a little vanilla JS, no build step. Copy the CSS into `index.html`'s own
+`<style>` tag once.
 
 ## Diff → Block Mapping
 
@@ -42,13 +43,11 @@ from the actual diff — never invented, rounded, or approximated. Full block
 definitions and the choice table are in `references/structured-blocks.md`;
 the short version:
 
-- **Schema/migration change** → `data-model` card, field-level `change` flags
-  (`added`/`modified`/`removed`/`renamed`), `was →` for anything that changed
-  shape. This is the headline; reach for a literal SQL diff only when the
-  exact statement still matters.
+- **Schema/migration change** → `diff` block on the migration file itself;
+  there's no dedicated schema-card block.
 - **API/action/route change** → `api-endpoint` card with the method, path,
-  and real request/response JSON. Flag changed params the same way a
-  data-model field is flagged.
+  and real request/response JSON. Flag changed params with a `badge` +
+  `.was` + arrow, same pattern as other change flags in this library.
 - **Any meaningful code hunk** → `diff` block, split (side-by-side), with a
   one-line `summary` and a few `note-marker` annotations on the load-bearing
   lines. Never leave a diff unlabeled.
@@ -87,8 +86,9 @@ part. Three parts, top to bottom:
    concepts matter. Embed a focused diff, model, API, or diagram only where it
    advances that explanation; organize around concepts and behavior, not files.
 2. **Modeling.** The deeper why: the confirmed architecture verdict from
-   Phase 2, plus `data-model` / `api-endpoint` blocks wherever the PR touches
-   schema or contracts, explaining the design choices and whether they hold
+   Phase 2, plus `api-endpoint` blocks (and a `diff` on any migration file)
+   wherever the PR touches schema or contracts, explaining the design
+   choices and whether they hold
    up. Add a `boundary-matrix` when failures are handled at different scopes;
    partial recovery is valid only while identity, ordering, or transaction
    state remains trustworthy.
