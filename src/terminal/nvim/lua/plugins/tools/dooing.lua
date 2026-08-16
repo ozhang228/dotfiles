@@ -1,7 +1,7 @@
 return {
   "atiladefreitas/dooing",
   opts = {
-    save_path = vim.fn.expand("~/forge/dooing_todos.json"),
+    save_path = vim.fn.expand("~/anvil/dooing_todos.json"),
     pretty_print_json = true,
     ui = {
       style = "modern",
