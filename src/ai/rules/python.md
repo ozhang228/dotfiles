@@ -15,7 +15,8 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
 - Put logic fully owned by a dataclass on the dataclass. If a value is completely determined by the instance's other fields, expose it as a property instead of passing or recomputing it at construction sites
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields.
-- In return signatures and data type fields, prefer the widest read-only collection interface that expresses the contract (`Sequence` over `list` or `tuple[T, ...]`, `frozenset` over `set`, `Mapping` over `dict`). 
+- For function parameters, return types, and dataclass or Pydantic fields, use the widest read-only collection type that preserves the required invariants. Prefer `Sequence[T]` over `list[T]` or `tuple[T, ...]`, and `Mapping[K, V]` over `dict[K, V]`, when every permitted implementation is valid.
+- A read-only interface does not guarantee an immutable value: `Sequence[T]` can be a mutable `list[T]`. Python has no general frozen-sequence type, so use `tuple[T, ...]` when ordered values must be immutable or hashable, including fields on frozen objects used as mapping or cache keys. Use `frozenset[T]` when unordered values must be immutable.
 - Prefer idiomatic dict operations: `.get(key, default)` over if/else lookups, `.pop()` over `del`.
 - Don't manually splice batch results into input order with `iter()` and `next()`. Track input indices and pair results with `zip(..., strict=True)` 
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
