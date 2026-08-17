@@ -21,6 +21,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
 - In projects that use UV, run `uv lock` after adding, removing, or changing a dependency and include the regenerated `uv.lock` in the same change.
 - Every `match` statement must end with `case _ as unreachable: assert_never(unreachable)` on the matched value. This adds exhaustive matching
+- Keep internal-package `__init__.py` files empty. Re-export names from `__init__.py` only when the package intentionally defines a public-facing library API.
 
 ## Testing
 
