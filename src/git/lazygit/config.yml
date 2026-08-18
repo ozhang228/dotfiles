@@ -61,16 +61,20 @@ keybinding:
 customCommands:
   - key: "N"
     context: "localBranches"
-    description: "New worktree for branch (sibling dir: {repo}_{branch})"
+    description: "New worktree + branch (sibling dir: {repo}_{name})"
+    prompts:
+      - type: "input"
+        title: "New branch / worktree name"
+        key: "Name"
     command: >-
       bash -c '
       set -e;
-      branch="{{.SelectedLocalBranch.Name}}";
+      name="{{.Form.Name}}";
       repo_root="$(git rev-parse --show-toplevel)";
       repo_dir="$(basename "$repo_root")";
       parent="$(dirname "$repo_root")";
-      safe_branch="${branch//\//-}";
-      git worktree add "$parent/${repo_dir}_${safe_branch}" "$branch"
+      safe_name="${name//\//-}";
+      git worktree add -b "$name" "$parent/${repo_dir}_${safe_name}"
       '
     loadingText: "Creating worktree..."
   - key: "D"
