@@ -27,7 +27,7 @@ list_entries() {
     while IFS=$'\t' read -r name ts path; do
         session_activity["$name"]="$ts"
         session_path["$name"]="$path"
-    done < <(tmux list-sessions -F '#{session_name}	#{session_activity}	#{session_path}' 2>/dev/null)
+    done < <(tmux list-sessions -F '#{session_name}	#{session_activity}	#{pane_current_path}' 2>/dev/null)
 
     cur_session=""
     [ -n "${TMUX:-}" ] && cur_session=$(tmux display-message -p '#{session_name}')
@@ -51,6 +51,7 @@ list_entries() {
             esac
         done
         [ "${#icons[@]}" -gt 0 ] && printf '%s' "${icons[*]}"
+        return 0
     }
 
     entries=()

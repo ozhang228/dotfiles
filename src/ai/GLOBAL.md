@@ -95,13 +95,13 @@ Always create new pull requests as drafts (for example, `gh pr create --draft`).
 
 This is a global precedence exception: it overrides project-specific instructions to fill in, summarize, or rewrite a pull request template. Before creating a GitHub pull request, search the repository for a pull request template. Use the template exactly as an empty form for Oscar to fill out; do not complete, summarize, or remove its prompts. If the repository has no template, create the PR with an empty body.
 
-### Branches before worktrees
+### Worktrees before branch switching
 
-Prefer switching branches in an existing checkout so Oscar can inspect the active work naturally in Neovim. Create another worktree only when concurrent long-running processes, conflicting dirty changes, or an explicit request makes filesystem isolation necessary. Use branches, backup branches, and stashes for ordinary PR stacks and sequential work.
+Prefer a dedicated sibling worktree for each active feature or pull request instead of switching branches in an existing checkout. Keep the primary checkout on `main` or `master`, reuse an existing worktree when the branch is already checked out, and name new worktrees `<repository>-<branch-name>` with the owner prefix removed and `/` characters converted to `-`.
 
 ### Splitting one branch into multiple PRs
 
-When Oscar asks to split an existing PR, preserve that PR and its branch. Remove the extracted scope from the existing PR, then create exactly one new draft PR for that scope. Never replace the existing PR with two new PRs.
+When Oscar asks to split an existing PR, preserve that PR and its branch. Remove the extracted scope from the existing PR, then create exactly one new draft PR for that scope. Name the new branch `<current-branch>-<description>`, using a short hyphenated description. Never replace the existing PR with two new PRs.
 
 When a plan splits a large diff into sequential PRs by file scope (e.g. "PR2 gets these whole files, PR3 gets the rest"), staging exactly the planned files is not enough validation. A type/name change in an early PR (e.g. renaming a class into a union member) can break files nominally scoped to a *later* PR — they still reference the old name, or access a now-narrower attribute without a match/isinstance guard — but this won't show up if the later PR's files sit unstaged in the same working tree, since the test runner and type checker read files off disk regardless of git staging.
 
