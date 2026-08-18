@@ -57,3 +57,27 @@ quitOnTopLevelReturn: true
 keybinding:
   universal:
     return: <c-q>
+
+customCommands:
+  - key: "N"
+    context: "localBranches"
+    description: "New worktree for branch (sibling dir: {repo}_{branch})"
+    command: >-
+      bash -c '
+      set -e;
+      branch="{{.SelectedLocalBranch.Name}}";
+      repo_root="$(git rev-parse --show-toplevel)";
+      repo_dir="$(basename "$repo_root")";
+      parent="$(dirname "$repo_root")";
+      safe_branch="${branch//\//-}";
+      git worktree add "$parent/${repo_dir}_${safe_branch}" "$branch"
+      '
+    loadingText: "Creating worktree..."
+  - key: "D"
+    context: "worktrees"
+    description: "Force remove worktree"
+    command: "git worktree remove --force {{.SelectedWorktree.Path}}"
+    prompts:
+      - type: "confirm"
+        title: "Force remove worktree"
+        body: "Discard any uncommitted changes in {{.SelectedWorktree.Path}} and remove it?"
