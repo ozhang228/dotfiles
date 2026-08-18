@@ -78,10 +78,20 @@ customCommands:
       '
     loadingText: "Creating worktree..."
   - key: "D"
-    context: "worktrees"
-    description: "Force remove worktree"
-    command: "git worktree remove --force {{.SelectedWorktree.Path}}"
+    context: "localBranches"
+    description: "Force remove worktree for branch (sibling dir: {repo}_{branch})"
     prompts:
       - type: "confirm"
+        key: "Confirm"
         title: "Force remove worktree"
-        body: "Discard any uncommitted changes in {{.SelectedWorktree.Path}} and remove it?"
+        body: "Remove the worktree for branch {{.SelectedLocalBranch.Name}}? Uncommitted changes will be discarded."
+    command: >-
+      bash -c '
+      set -e;
+      branch="{{.SelectedLocalBranch.Name}}";
+      repo_root="$(git rev-parse --show-toplevel)";
+      repo_dir="$(basename "$repo_root")";
+      parent="$(dirname "$repo_root")";
+      safe_branch="${branch//\//-}";
+      git worktree remove --force "$parent/${repo_dir}_${safe_branch}"
+      '
