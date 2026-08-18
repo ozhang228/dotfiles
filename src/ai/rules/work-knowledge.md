@@ -34,3 +34,44 @@ it does not make historical DB data more complete.
 ## Deployments and K8s
 
 In the k8s declarative deployment repo, overlays under `overlays/desk-tools-managed/` are generated. Source of truth lives in `desk_tools/applications/`; edit the Python app definition/config source and regenerate, instead of editing generated jsonnet directly. Desk-tools image bumps should land on the app's QA/dev branch for QA testing and also update prod when applicable. Each app has its own QA branch from the QA ArgoCD Application `targetRevision`. Do not assume a shared QA branch.
+
+### Haruko Dropcopy (HDC)
+
+HDC avoids implementing a different booking integration for every crypto
+exchange. It polls Haruko's normalized trades and balance-adjustment APIs,
+joins the events to NERD and Cumberland refdata, converts them to DRW's trade
+format, and books them into TI through Hodor.
+
+For a new account, configure one `replicas=1` instance per Haruko instrument
+category used by the account, such as `SPOT`, `FUTURES` (perpetuals and dated
+futures), and `OPTIONS`. Confirm the exact Haruko account name, TI clearing
+account ID, desk and default trading-group IDs, NERD platform, and Haruko
+balance-adjustment types. The Haruko numeric account ID is not part of the HDC
+configuration. Never run two instances for the same account and instrument
+category because their in-memory deduplication state is not shared.
+
+To test a production Haruko account end to end without booking into production
+TI, start from its production config and create a temporary, uncommitted local
+config. Keep the production Haruko endpoint and credentials so HDC reads the
+account's real events, but repoint the TI-side dependencies to mirror:
+
+- `hodor_base_url`: `http://ti-dev/hodor-mirror`
+- `nerd_base_url`: `http://ti-dev/nerd-mirror/api`
+- `tradio_base_url`: `http://ti-dev/tradio-mirror`
+- `ti_auth_vault_path`: `/ti/qa.haruko_dropcopy`
+
+Hodor is the write boundary. NERD and Tradio are reads, but they must use the
+matching mirror environment so conversion, initial deduplication, and
+reconciliation agree with the mirror bookings. HDC has no dry-run mode, so this
+test books every eligible event in the configured lookback window into mirror.
+Run instrument categories individually, inspect the resulting mirror bookings,
+and ask the relevant desk owner to confirm the clearing account, trading group,
+product, fees, and source trade ID. For Cumberland Options, `@jquartey` is the
+current validation contact.
+
+For a brand-new account that has no positions or transactions yet, use the same
+production-Haruko, mirror-TI configuration as a startup smoke test. Run each
+configured instrument category long enough to initialize and poll its upstreams.
+If every process stays running without startup, credential, refdata, or polling
+errors, the wiring is ready to deploy. After deployment, ask the desk to book a
+controlled test trade and verify that it reaches TI with the expected fields.

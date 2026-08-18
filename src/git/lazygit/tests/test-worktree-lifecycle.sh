@@ -314,7 +314,7 @@ test_dirty_cleanup_is_refused() {
 
   if (
     cd "$repo"
-    "$CLEANUP_WORKTREE" "$worktree" "$branch"
+    printf 'n\n' | "$CLEANUP_WORKTREE" "$worktree" "$branch"
   ); then
     fail "dirty cleanup unexpectedly succeeded"
   fi
@@ -337,13 +337,34 @@ test_ignored_files_cleanup_is_refused() {
 
   if (
     cd "$repo"
-    "$CLEANUP_WORKTREE" "$worktree" "$branch"
+    printf 'n\n' | "$CLEANUP_WORKTREE" "$worktree" "$branch"
   ); then
     fail "cleanup unexpectedly deleted an ignored file"
   fi
 
   assert_exists "$worktree/.env"
   assert_branch_exists "$repo" "$branch"
+  rm -rf "$root"
+}
+
+test_confirmed_dirty_cleanup_is_deleted() {
+  local root repo branch worktree
+  root=$(new_test_root)
+  repo=$(new_repository "$root")
+  branch=feature/confirmed-dirty
+  worktree="$root/desk-tools-feature-confirmed-dirty"
+  create_feature_worktree "$repo" "$branch"
+  printf '.env\n' >>"$(git -C "$repo" rev-parse --git-common-dir)/info/exclude"
+  printf 'untracked\n' >"$worktree/untracked.txt"
+  printf 'ignored\n' >"$worktree/.env"
+
+  (
+    cd "$repo"
+    LAZYGIT_CLEANUP_CONFIRMED=1 "$CLEANUP_WORKTREE" "$branch" </dev/null
+  )
+
+  assert_missing "$worktree"
+  assert_branch_missing "$repo" "$branch"
   rm -rf "$root"
 }
 
@@ -538,6 +559,7 @@ main() {
   test_path_naming_and_clean_creation
   test_dirty_cleanup_is_refused
   test_ignored_files_cleanup_is_refused
+  test_confirmed_dirty_cleanup_is_deleted
   test_current_worktree_cleanup_is_refused
   test_cleanup_resolves_worktree_from_branch
   test_pushed_branch_is_deleted_without_confirmation

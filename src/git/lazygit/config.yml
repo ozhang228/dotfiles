@@ -78,7 +78,7 @@ customCommands:
     prompts:
       - type: "confirm"
         title: "Remove worktree and branch"
-        body: "Remove the worktree and local branch {{.SelectedLocalBranch.Name}}?"
+        body: "Remove {{.SelectedLocalBranch.Name}}? Uncommitted, untracked, and ignored files in its worktree will be deleted."
     command: "LAZYGIT_CLEANUP_CONFIRMED=1 ~/.config/lazygit/cleanup-worktree.sh {{.SelectedLocalBranch.Name | quote}}"
     description: "Remove worktree and local branch"
     loadingText: "Removing worktree and branch..."

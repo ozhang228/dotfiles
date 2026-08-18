@@ -61,9 +61,17 @@ if [[ "$branch" != "$branch_arg" ]]; then
   exit 1
 fi
 
+remove_args=()
 if [[ -n "$(git -C "$worktree" status --porcelain --ignored=matching)" ]]; then
-  printf 'Refusing to remove dirty, untracked, or ignored files from worktree: %s\n' "$worktree" >&2
-  exit 1
+  if [[ "${LAZYGIT_CLEANUP_CONFIRMED:-}" != "1" ]]; then
+    printf 'WARNING: %s contains dirty, untracked, or ignored files. Delete them? [y/N] ' "$worktree" >&2
+    read -r answer
+    if [[ "$answer" != "y" && "$answer" != "Y" ]]; then
+      printf 'Cleanup cancelled.\n' >&2
+      exit 1
+    fi
+  fi
+  remove_args+=(--force)
 fi
 
 recovery_refs=(HEAD)
@@ -103,7 +111,7 @@ session_root=${XDG_DATA_HOME:-"$HOME/.local/share"}/nvim/sessions
 current_session_name=$(percent_encode_session_name "$worktree")
 legacy_session_name=${worktree//\//%}
 
-git -C "$main_worktree" worktree remove "$worktree"
+git -C "$main_worktree" worktree remove "${remove_args[@]}" "$worktree"
 git -C "$main_worktree" branch -D "$branch"
 
 if command -v tmux >/dev/null && tmux has-session -t "=$worktree_basename" 2>/dev/null; then
