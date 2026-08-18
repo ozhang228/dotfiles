@@ -39,7 +39,7 @@ gui:
   showDivergenceFromBaseBranch: "arrowAndNumber"
   filterMode: fuzzy
   spinner:
-    rate: 60
+    rate: 16
 
 git:
   localBranchSortOrder: recency
@@ -59,39 +59,31 @@ keybinding:
     return: <c-q>
 
 customCommands:
+  - key: "W"
+    context: "localBranches"
+    command: "~/.config/lazygit/create-worktree.sh existing {{.SelectedLocalBranch.Name | quote}}"
+    description: "Create sibling worktree"
+    loadingText: "Creating worktree..."
   - key: "N"
     context: "localBranches"
-    description: "New worktree + branch (sibling dir: {repo}_{name})"
     prompts:
       - type: "input"
-        title: "New branch / worktree name"
-        key: "Name"
-    command: >-
-      bash -c '
-      set -e;
-      name="{{.Form.Name}}";
-      repo_root="$(git rev-parse --show-toplevel)";
-      repo_dir="$(basename "$repo_root")";
-      parent="$(dirname "$repo_root")";
-      safe_name="${name//\//-}";
-      git worktree add -b "$name" "$parent/${repo_dir}_${safe_name}"
-      '
-    loadingText: "Creating worktree..."
+        title: "New branch name"
+        key: "BranchName"
+    command: "~/.config/lazygit/create-worktree.sh new {{.Form.BranchName | quote}} {{.SelectedLocalBranch.Name | quote}}"
+    description: "Create branch and sibling worktree"
+    loadingText: "Creating branch and worktree..."
   - key: "D"
     context: "localBranches"
-    description: "Force remove worktree for branch (sibling dir: {repo}_{branch})"
     prompts:
       - type: "confirm"
-        key: "Confirm"
-        title: "Force remove worktree"
-        body: "Remove the worktree for branch {{.SelectedLocalBranch.Name}}? Uncommitted changes will be discarded."
-    command: >-
-      bash -c '
-      set -e;
-      branch="{{.SelectedLocalBranch.Name}}";
-      repo_root="$(git rev-parse --show-toplevel)";
-      repo_dir="$(basename "$repo_root")";
-      parent="$(dirname "$repo_root")";
-      safe_branch="${branch//\//-}";
-      git worktree remove --force "$parent/${repo_dir}_${safe_branch}"
-      '
+        title: "Remove worktree and branch"
+        body: "Remove the worktree and local branch {{.SelectedLocalBranch.Name}}?"
+    command: "LAZYGIT_CLEANUP_CONFIRMED=1 ~/.config/lazygit/cleanup-worktree.sh {{.SelectedLocalBranch.Name | quote}}"
+    description: "Remove worktree and local branch"
+    loadingText: "Removing worktree and branch..."
+  - key: "W"
+    context: "remoteBranches"
+    command: "~/.config/lazygit/create-worktree.sh remote {{.SelectedRemoteBranch.RemoteName | quote}} {{.SelectedRemoteBranch.Name | quote}} && ~/.config/lazygit/focus-local-branches.sh"
+    description: "Pull as worktree"
+    loadingText: "Pulling branch into worktree..."
