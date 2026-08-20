@@ -26,9 +26,10 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 
 ## Testing
 
-- Don't use fixtures. 
-- Maximize code coverage using interfaces and stub implementations.
-- Avoid IO in tests 
+- Test the smallest set of load-bearing public behaviors. Every test should catch a distinct production defect; if an existing test catches the same defect, keep only the clearer one.
+- Prefer representative happy paths and one representative boundary failure. Do not exhaustively test every defensive branch or error string unless it has a distinct recovery contract.
+- Do not test static typing, declared config shape, library validation, internal routing, or presentation constants. Test custom validation or transformation through observable output.
+- Don't use fixtures. Use interfaces and stubs, and avoid IO in tests.
 
 ## Dash
 
