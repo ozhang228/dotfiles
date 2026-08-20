@@ -100,7 +100,7 @@ When the work is the reverse — you're the author addressing comments on your o
 
 ## Local Visual Recap Surface
 
-Use a self-contained local visual recap as the primary review surface. Read `references/visual-recap.md` in full — it owns the self-contained contract, the structured-blocks component library, the canonical shape/budgets, and the validation and serving steps.
+Use a self-contained local visual recap as the primary review surface. Read `references/visual-recap.md` in full. It owns the self-contained contract, causal explanation, final understanding quiz, structured-blocks component library, canonical shape/budgets, and validation and serving steps.
 
 ## Output Format
 

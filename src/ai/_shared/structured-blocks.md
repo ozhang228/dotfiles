@@ -10,7 +10,8 @@ authoring any block; do not improvise diff, endpoint, or summary markup.
 **Why plain HTML here.** The output is a static file opened directly in a
 browser, with no build step or external dependency. Every block below is
 plain HTML + CSS, with vanilla JS only where interactivity earns its keep
-(`<details>` disclosure). No client-side diffing or component library needed.
+(`<details>` disclosure and quiz scoring). No client-side diffing or component
+library needed.
 
 **Copy the CSS once per artifact.** Paste the full token + component CSS
 below into the artifact's own `<style>` tag. Do not link it externally, do
@@ -19,9 +20,9 @@ broken artifact. Fill in real content; never ship the example values.
 
 **Not every skill uses every block.** `code-review` reaches for `diff`,
 `annotated-code`, `section-nav`, `api-endpoint`, `columns`, `boundary-matrix`,
-and `diagram`. `brainstorm` reaches for `summary-card`, `callout`,
+`diagram`, and `quiz`. `brainstorm` reaches for `summary-card`, `callout`,
 `options-compare`, `assumption-list`, `api-endpoint`, `columns`, and
-`boundary-matrix`. Each skill's own reference file says which
+`boundary-matrix`, plus `quiz`. Each skill's own reference file says which
 subset applies there — this file is the full shared vocabulary, not a
 per-skill checklist.
 
@@ -416,6 +417,149 @@ one can't quietly read as an accepted fact.
 </div>
 ```
 
+## Block: check your understanding (`quiz`)
+
+The final section of a visual artifact. Use 3–5 multiple-choice questions to
+test whether the reader understands the mechanism and its consequences, not
+whether they memorized the document. Each question has exactly one correct
+answer, plausible distractors, immediate scoring, and a short rationale shown
+as soon as the reader selects an answer.
+
+```css
+.quiz { padding: 18px; }
+.quiz fieldset { margin: 0; padding: 16px 0; border: 0; border-top: 1px solid var(--line); }
+.quiz fieldset:first-of-type { padding-top: 0; border-top: 0; }
+.quiz legend { padding: 0 0 10px; color: var(--ink); font-size: 14px; font-weight: 700; }
+.quiz-options { display: grid; gap: 7px; }
+.quiz-option { display: flex; gap: 9px; align-items: flex-start; padding: 9px 11px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); cursor: pointer; }
+.quiz-option:hover { color: var(--ink); background: var(--surface-2); }
+.quiz-option input { margin-top: 2px; accent-color: var(--accent); }
+.quiz-option.correct { color: var(--add); border-color: var(--add); background: var(--add-bg); }
+.quiz-option.incorrect { color: var(--del); border-color: var(--del); background: var(--del-bg); }
+.quiz-feedback { margin: 10px 0 0; color: var(--ink); font-size: 13px; }
+.quiz-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; padding-top: 14px; border-top: 1px solid var(--line); }
+.quiz button { padding: 7px 11px; border: 1px solid var(--accent); border-radius: 5px; background: var(--accent); color: var(--bg); font: 700 12px var(--sans); cursor: pointer; }
+.quiz button.quiz-secondary { background: transparent; color: var(--accent); }
+.quiz-score { color: var(--ink); font-size: 13px; font-weight: 700; }
+```
+
+```html
+<form class="card quiz">
+  <fieldset data-answer="b">
+    <legend>1. What makes the proposed behavior reliable?</legend>
+    <div class="quiz-options">
+      <label class="quiz-option"><input type="radio" name="q1" value="a">A plausible but incorrect mechanism.</label>
+      <p class="quiz-feedback" data-for="a" aria-live="polite" hidden><strong>Not quite.</strong> Explain why this specific mechanism is insufficient, then contrast it with the real mechanism.</p>
+      <label class="quiz-option"><input type="radio" name="q1" value="b">The real load-bearing mechanism from the plan or diff.</label>
+      <p class="quiz-feedback" data-for="b" aria-live="polite" hidden><strong>Correct.</strong> Explain why this mechanism matters and produces the intended behavior.</p>
+      <label class="quiz-option"><input type="radio" name="q1" value="c">A rejected alternative or likely misunderstanding.</label>
+      <p class="quiz-feedback" data-for="c" aria-live="polite" hidden><strong>Not quite.</strong> Explain the misconception in this choice and why the actual mechanism avoids it.</p>
+    </div>
+  </fieldset>
+  <fieldset data-answer="a">
+    <legend>2. Where does the important failure boundary sit?</legend>
+    <div class="quiz-options">
+      <label class="quiz-option"><input type="radio" name="q2" value="a">The actual boundary and its observable consequence.</label>
+      <p class="quiz-feedback" data-for="a" aria-live="polite" hidden><strong>Correct.</strong> Explain what is contained or rejected at this boundary and why that is safe.</p>
+      <label class="quiz-option"><input type="radio" name="q2" value="b">A broader boundary the design deliberately rejected.</label>
+      <p class="quiz-feedback" data-for="b" aria-live="polite" hidden><strong>Not quite.</strong> Explain why this boundary discards or retries more work than necessary.</p>
+      <label class="quiz-option"><input type="radio" name="q2" value="c">There is no failure boundary.</label>
+      <p class="quiz-feedback" data-for="c" aria-live="polite" hidden><strong>Not quite.</strong> Identify the real boundary and the invariant that makes it trustworthy.</p>
+    </div>
+  </fieldset>
+  <fieldset data-answer="c">
+    <legend>3. Which observation proves the change works?</legend>
+    <div class="quiz-options">
+      <label class="quiz-option"><input type="radio" name="q3" value="a">A success-shaped check that does not distinguish old from new behavior.</label>
+      <p class="quiz-feedback" data-for="a" aria-live="polite" hidden><strong>Not quite.</strong> Explain why this check can pass under the broken behavior.</p>
+      <label class="quiz-option"><input type="radio" name="q3" value="b">An implementation detail unrelated to the user-visible contract.</label>
+      <p class="quiz-feedback" data-for="b" aria-live="polite" hidden><strong>Not quite.</strong> Explain why this detail does not prove the intended outcome.</p>
+      <label class="quiz-option"><input type="radio" name="q3" value="c">The concrete result that fails before the change and passes after it.</label>
+      <p class="quiz-feedback" data-for="c" aria-live="polite" hidden><strong>Correct.</strong> Name the discriminating behavior or evidence, not merely a green command.</p>
+    </div>
+  </fieldset>
+  <div class="quiz-actions">
+    <button type="reset" class="quiz-secondary">Reset</button>
+    <output class="quiz-score" aria-live="polite"></output>
+  </div>
+</form>
+```
+
+Place this script once before `</body>`. It supports every `.quiz` form in the
+artifact without ids or dependencies.
+
+```html
+<script>
+function updateQuizScore(quiz) {
+  const questions = [...quiz.querySelectorAll("fieldset[data-answer]")];
+  const answered = questions.filter((question) => question.querySelector("input:checked"));
+  const correct = answered.filter(
+    (question) => question.querySelector("input:checked").value === question.dataset.answer,
+  );
+  quiz.querySelector(".quiz-score").textContent =
+    `${correct.length} correct · ${answered.length} of ${questions.length} answered`;
+}
+
+function answerQuestion(event) {
+  const input = event.target.closest("input[type=radio]");
+  if (!input) return;
+
+  const question = input.closest("fieldset[data-answer]");
+  for (const option of question.querySelectorAll(".quiz-option")) {
+    const optionInput = option.querySelector("input");
+    option.classList.toggle(
+      "correct",
+      optionInput.checked && optionInput.value === question.dataset.answer,
+    );
+    option.classList.toggle(
+      "incorrect",
+      optionInput.checked && optionInput.value !== question.dataset.answer,
+    );
+  }
+  for (const feedback of question.querySelectorAll(".quiz-feedback")) {
+    feedback.hidden = feedback.dataset.for !== input.value;
+  }
+  updateQuizScore(input.closest(".quiz"));
+}
+
+function resetQuiz(event) {
+  const quiz = event.currentTarget;
+  for (const option of quiz.querySelectorAll(".quiz-option")) {
+    option.classList.remove("correct", "incorrect");
+  }
+  for (const feedback of quiz.querySelectorAll(".quiz-feedback")) {
+    feedback.hidden = true;
+  }
+  quiz.querySelector(".quiz-score").textContent = "";
+}
+
+function preventQuizSubmit(event) {
+  event.preventDefault();
+}
+
+for (const quiz of document.querySelectorAll(".quiz")) {
+  quiz.addEventListener("change", answerQuestion);
+  quiz.addEventListener("reset", resetQuiz);
+  quiz.addEventListener("submit", preventQuizSubmit);
+}
+</script>
+```
+
+Question quality rules:
+
+- Test core intuition, mechanism, tradeoffs, boundaries, and evidence. Never
+  test file names, line numbers, commit hashes, diff counts, or other trivia.
+- Write distractors from the old behavior, a rejected alternative, or a likely
+  misunderstanding. Obviously absurd answers do not test understanding.
+- Keep exactly one defensible correct answer. If two options could be right
+  under different assumptions, fix the question or state the assumption.
+- Write targeted feedback for every choice. A correct choice explains why it
+  is right. Each distractor explains why that specific choice is wrong and
+  contrasts it with the correct mechanism or outcome. Show only the selected
+  choice's feedback, and replace it immediately when the selection changes.
+- Use 3 questions for a narrow artifact and up to 5 only when each additional
+  question tests a distinct, load-bearing concept.
+
 ## Grounding rule
 
 Every block in this file is **true by construction** only if built
@@ -440,4 +584,5 @@ block: a reader who trusts it may skip the exact thing it got wrong.
 | Non-negotiable constraint or unresolved risk | `callout` |
 | 3+ real alternatives before committing to an approach | `options-compare` |
 | Load-bearing assumptions the design depends on | `assumption-list` |
+| Final conceptual understanding check | `quiz` with 3–5 scored questions and answer rationales |
 | Rendered UI / interaction change | describe the before/after in prose, or `columns` when the states summarize as fields |

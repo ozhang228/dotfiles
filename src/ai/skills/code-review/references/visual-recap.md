@@ -32,9 +32,9 @@ that file is the single canonical copy). Read that file in full before
 authoring `index.html`; do not hand-roll a diff view or API-endpoint card
 from memory. It defines the token CSS, the split-diff component (real line
 numbers, before/after, annotation markers), annotated code, API-endpoint
-cards, before/after columns, and two-panel diagrams — all plain HTML/CSS with
-a little vanilla JS, no build step. Copy the CSS into `index.html`'s own
-`<style>` tag once.
+cards, before/after columns, two-panel diagrams, and the final scored `quiz`,
+all plain HTML/CSS with a little vanilla JS and no build step. Copy the CSS
+into `index.html`'s own `<style>` tag once.
 
 ## Diff → Block Mapping
 
@@ -59,6 +59,8 @@ the short version:
   reduce a structural change to one left-to-right arrow chain.
 - **Different failure handling scopes** → `boundary-matrix`, with one row per
   failure naming the handling scope and why partial recovery is safe.
+- **Final understanding check** → `quiz`, with 3–5 scored questions and answer
+  rationales.
 - **Rendered UI/interaction change** → describe the before/after in prose, or
   use `columns` for a structured before/after when the states are simple
   enough to summarize as fields, not a `diagram`.
@@ -76,15 +78,34 @@ the short version:
 
 A recap reads like a review someone walks through, not a section checklist.
 No decorative title or category-tag header — open straight into the first
-part. Three parts, top to bottom:
+part. Keep three questions distinct throughout the explanation: **Intent:**
+what outcome or constraint motivated the PR? **Why this implementation:** why
+does this design fit better than the closest alternative? **What happens:**
+how does a representative input travel through the success and relevant
+failure paths to an observable result? Four parts, top to bottom:
 
 1. **Understanding the PR.** This is the core of the recap, not a short preface.
-   Build the reader's intuition in causal order: why the old behavior was a
-   problem, the smallest concrete scenario that exposes it, the mechanism the
-   PR introduces, and why that mechanism produces the intended behavior. Name
-   the durable unit of work, success, failure/retry, and ordering when those
-   concepts matter. Embed a focused diff, model, API, or diagram only where it
-   advances that explanation; organize around concepts and behavior, not files.
+   Build the reader's intuition in causal order:
+   - Open with a one-minute summary of before, after, scope, and the essential
+     behavior. The essential behavior must connect mechanism to outcome.
+   - Introduce only the background concepts and system boundaries needed to
+     understand the diff.
+   - Walk through the smallest concrete failure scenario under the old
+     behavior.
+   - State the core intuition in one memorable idea, then trace a representative
+     input through the end-to-end flow to its observable result.
+   - Walk through the implementation by behavioral stage and ownership. When a
+     small central algorithm produces a broad diff, explain which typed,
+     process, persistence, or error-reporting boundaries force the supporting
+     changes.
+   - Explain why the strongest verification would fail under the broken
+     implementation, not just which command passed.
+
+   Omit beats that have nothing useful to say, and combine adjacent beats when
+   that reads better. Name the durable unit of work, success, failure/retry,
+   and ordering when those concepts matter. Embed a focused diff, model, API,
+   or diagram only where it advances that explanation; organize around
+   concepts and behavior, not files.
 2. **Modeling.** The deeper why: the confirmed architecture verdict from
    Phase 2, plus `api-endpoint` blocks (and a `diff` on any migration file)
    wherever the PR touches schema or contracts, explaining the design
@@ -97,10 +118,16 @@ part. Three parts, top to bottom:
    Include the minimum local code context each finding needs. Do not add
    separate Changed Files or Key Changes sections; a path list does not explain
    the change, and detached hunks lack the intuition needed to interpret them.
+4. **Check your understanding.** Always finish with a `quiz`. Ask 3–5
+   questions covering the PR's intent, its core mechanism, an important
+   modeling or design choice, what actually happens, and the critical review
+   risk or strongest test evidence. When broad supporting changes are
+   important to the explanation, include why they are necessary. Do not test
+   diff trivia.
 
 For a recap with more than five substantial sections, add a compact anchor
-navigation strip after the opening thesis. Skip navigation when the whole page
-already fits a short linear read.
+navigation strip after the opening thesis and include the Quiz anchor. Skip
+navigation when the whole page already fits a short linear read.
 
 When a non-obvious test carries an important claim, explain its causal oracle:
 the broken implementation that would make it fail, deadlock, or time out. A
@@ -131,7 +158,8 @@ value.
 `review.md` carries the same source content in plain Markdown for the agent
 and for easy regeneration — the structured findings (Bugs/Testing/etc.) plus
 a plain-text rendering of the key diffs. It should keep the same stable ids
-used in `index.html`.
+used in `index.html`. Include every quiz question, its choices, the correct
+answer, and targeted feedback for every choice.
 
 ## Validation
 
@@ -143,6 +171,12 @@ Before handoff:
 - Open `index.html` mentally against `references/structured-blocks.md`'s
   component definitions — every class referenced must be defined in the
   page's own `<style>` tag (no partial copy-paste of the token CSS).
+- Confirm the final section is a 3–5 question quiz, every question has exactly
+  one correct answer, selecting an answer immediately shows that question's
+  choice-specific feedback, changing the answer clears the previous state, and
+  Reset works without errors.
+- Confirm the questions test the mechanism and consequences rather than file
+  names, line numbers, hashes, diff counts, or other recall trivia.
 - Run repo-native checks only when they already exist locally. Do not install
   validators.
 - Serve the recap directory with an already-available local static server
