@@ -22,9 +22,9 @@ popup_during_fullscreen smart
 default_border pixel $border_size
 default_floating_border pixel $border_size
 
-workspace 1 output DP-4
-workspace 2 output DP-6
-workspace 3 output DP-2
+workspace 1 output DP-2
+workspace 2 output DP-4
+workspace 3 output DP-6
 
 # Autostart
 exec_always --no-startup-id $compositor
