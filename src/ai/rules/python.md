@@ -12,6 +12,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation.
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
 - Do not use `typing.Annotated`. For Pydantic constraints, declare the type normally and assign `Field(...)`
+- Prefer `NewType` over a plain type alias for semantically distinct scalar or identifier values that the type checker should reject when interchanged. Keep ordinary aliases for structural shapes, unions, and readability-only abbreviations where nominal distinction is not intended.
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
 - Put logic fully owned by a dataclass on the dataclass. If a value is completely determined by the instance's other fields, expose it as a property instead of passing or recomputing it at construction sites
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields.

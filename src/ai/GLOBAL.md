@@ -12,6 +12,7 @@
 
 - No em dashes, use commas, parentheses, periods, or colons instead.
 - When explaining complex topics, break things into chunks using newlines for readability, use examples to illustrate points, and give the rationale, not just the what.
+- When referring to a pull request, include both its number and title, formatted as `#3712 /feature wire realized vol into Product Surface backend`.
 
 ## Language & Task Rules
 
