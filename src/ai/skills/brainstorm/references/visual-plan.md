@@ -4,7 +4,7 @@ Use this reference when authoring the local visual plan artifact for the brainst
 
 ## Self-Contained Contract
 
-- Use the canonical dark neutral/amber token system from `references/structured-blocks.md`. 
+- Use the canonical light high-contrast token system from `references/structured-blocks.md`. 
 - Do not install packages, execute remote packages, fetch a remote schema, publish plan content, or depend on any external server.
 - `tmp/plan.html` is the primary review UI; `tmp/plan.md` is the source-of-truth text fallback.
 - Feedback comes through chat or file edits. Update the local files directly.

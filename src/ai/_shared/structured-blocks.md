@@ -30,12 +30,12 @@ per-skill checklist.
 
 ```css
 :root {
-  color-scheme: dark;
-  --bg: #14171c; --surface: #1b1f27; --surface-2: #20242e; --line: #2b3140;
-  --ink: #e4e7ee; --muted: #8b93a7; --accent: #d9a441; --accent-soft: #3a2f18;
-  --add: #4bc76b; --add-bg: #12271a; --add-line: #17351f;
-  --del: #f0716a; --del-bg: #2c1618; --del-line: #3a1c1f;
-  --warn: #e0a52b; --warn-bg: #2e2712;
+  color-scheme: light;
+  --bg: #ffffff; --surface: #e7ecf0; --surface-2: #dde3e8; --line: #d0d7de;
+  --ink: #010409; --muted: #4b535d; --accent: #0349b4; --accent-soft: #dbe9fb;
+  --add: #055d20; --add-bg: #daf7e0; --add-line: #acf2bd;
+  --del: #d1242f; --del-bg: #ffeef0; --del-line: #fdb8c0;
+  --warn: #744500; --warn-bg: #fff3d6;
   --radius: 8px;
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
   --sans: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
@@ -51,7 +51,7 @@ per-skill checklist.
 .badge.renamed { color: var(--warn); background: var(--warn-bg); }
 ```
 
-This dark neutral/amber palette is the canonical visual language for local AI
+This light high-contrast palette is the canonical visual language for local AI
 artifacts. Never hard-code a hex color inside a block's own markup; reference
 the token. Reserve green and red for semantic added/success and
 removed/failure states.
@@ -190,7 +190,7 @@ details.json-explorer[open] summary::before { content: "▾ "; }
 details.json-explorer pre { font-family: var(--mono); font-size: 12.5px; margin: 6px 0 0; padding: 10px 12px; background: var(--surface-2); border-radius: 6px; overflow-x: auto; }
 .jk { color: var(--accent); }
 .js { color: var(--add); }
-.jn { color: #4b8fd9; }
+.jn { color: #512598; }
 ```
 
 ```html

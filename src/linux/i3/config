@@ -4,7 +4,7 @@ set $smod             Shift
 set $font             pango:JetBrains Mono 14
 set $gap_width        3
 set $gap_heigth       3
-set $border_size      8
+set $border_size      4
 set $key_left         h
 set $key_down         j
 set $key_up           k
@@ -109,7 +109,7 @@ set $accent         #0349b4
 set $red_bright     #d1242f
 
 # target                title          bg             text     indicator border
-client.focused          $accent        $accent        $bg      $accent   $accent
+client.focused          $border        $border        $bg      $border   $border
 client.focused_inactive $bg_alt        $bg_alt        $fg_muted $bg_alt $bg_alt
 client.unfocused        $bg_alt        $bg_alt        $fg_muted $bg_alt $bg_alt
 client.urgent           $red_bright    $red_bright    $bg      $red_bright $red_bright

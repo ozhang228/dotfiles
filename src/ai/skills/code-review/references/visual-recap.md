@@ -5,8 +5,8 @@ review.
 
 ## Self-Contained Contract
 
-- Use the canonical dark neutral/amber token system from
-  `references/structured-blocks.md`. Do not add light-mode overrides or a
+- Use the canonical light high-contrast token system from
+  `references/structured-blocks.md`. Do not add dark-mode overrides or a
   separate decorative palette.
 
 - Keep recap content local. Read diff, stat, and source context from local
