@@ -80,7 +80,7 @@ if [ "${1:-}" = "--preview" ]; then
     kind="$2"
     key="$3"
     if [ "$kind" = "session" ]; then
-        tmux capture-pane -e -p -t "$key"
+        tmux capture-pane -p -t "$key"
     else
         ls -la --color=always "$key"
         if git -C "$key" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -99,7 +99,7 @@ selected=$(list_entries | fzf \
     --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
     --info=hidden \
     --preview "$SCRIPT --preview {2} {3}" \
-    --preview-window right:60%) || fzf_status=$?
+    --preview-window right:60%,nowrap,noinfo,border-left) || fzf_status=$?
 
 case "$fzf_status" in
     0) ;;

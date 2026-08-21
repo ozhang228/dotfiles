@@ -183,10 +183,10 @@
     }
   },
   "fzf": {
-    "check": "command -v fzf",
+    "check": "fzf --help 2>/dev/null | grep -q '\\[no\\]info'",
     "install": {
       "manjaro": "sudo pacman -S fzf",
-      "ubuntu": "sudo apt install fzf",
+      "ubuntu": "mkdir -p ~/.local/bin && curl -fsSL https://github.com/junegunn/fzf/releases/download/v0.74.3/fzf-0.74.3-linux_amd64.tar.gz | tar -xz -C ~/.local/bin",
       "mac": "brew install fzf"
     }
   },
