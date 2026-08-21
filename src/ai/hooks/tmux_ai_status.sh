@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Writes per-pane working/done state to ~/.cache/tmux-agent-status/panes/
+# Writes per-pane working/done state to ~/.cache/tmux-ai-status/panes/
 # so the sessionizer can show one status icon per running agent.
 set -euo pipefail
 exec >/dev/null
 
-STATUS_DIR="$HOME/.cache/tmux-agent-status/panes"
+STATUS_DIR="$HOME/.cache/tmux-ai-status/panes"
 mkdir -p "$STATUS_DIR"
 
 HOOK_JSON="$(cat 2>/dev/null || true)"

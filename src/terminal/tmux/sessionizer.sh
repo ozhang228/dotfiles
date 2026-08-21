@@ -2,8 +2,8 @@
 # Fuzzy-pick an existing tmux session or a project directory, and
 # switch-or-create a tmux session for it.
 #
-# - Existing sessions show as "name [branch] <agent>".
-# - Project directories without a matching session show as "name [branch]".
+# - Existing sessions show as "name <ai-status>".
+# - Project directories without a matching session show as "name".
 # - Entries are sorted by most-recently-active session first.
 # - ctrl-x kills the session under the cursor and refreshes the list.
 set -euo pipefail
@@ -23,18 +23,16 @@ list_entries() {
     fi
 
     declare -A session_activity
-    declare -A session_path
-    while IFS=$'\t' read -r name ts path; do
+    while IFS=$'\t' read -r name ts; do
         session_activity["$name"]="$ts"
-        session_path["$name"]="$path"
-    done < <(tmux list-sessions -F '#{session_name}	#{session_activity}	#{pane_current_path}' 2>/dev/null)
+    done < <(tmux list-sessions -F '#{session_name}	#{session_activity}' 2>/dev/null)
 
     cur_session=""
     [ -n "${TMUX:-}" ] && cur_session=$(tmux display-message -p '#{session_name}')
 
-    agent_icons() {
+    ai_status_icons() {
         local session="$1"
-        local pane_dir="$HOME/.cache/tmux-agent-status/panes"
+        local pane_dir="$HOME/.cache/tmux-ai-status/panes"
         [ -d "$pane_dir" ] || return 0
         local active_panes icons=()
         active_panes=$(tmux list-panes -t "$session" -F '#{pane_id}' 2>/dev/null || true)
@@ -57,21 +55,16 @@ list_entries() {
     entries=()
     for name in "${!session_activity[@]}"; do
         [ "$name" = "$cur_session" ] && continue
-        path="${session_path[$name]}"
-        branch=$(git -C "$path" branch --show-current 2>/dev/null || true)
-        agent=$(agent_icons "$name")
+        ai_status=$(ai_status_icons "$name")
         label="$name"
-        [ -n "$branch" ] && label="$label [$branch]"
-        [ -n "$agent" ]  && label="$label $agent"
+        [ -n "$ai_status" ] && label="$label $ai_status"
         entries+=("${session_activity[$name]}"$'\t'session$'\t'"$name"$'\t'"$label")
     done
 
     for dir in "${candidates[@]}"; do
         name=$(basename "$dir" | tr '.:' '__')
         [ -n "${session_activity[$name]+x}" ] && continue
-        branch=$(git -C "$dir" branch --show-current 2>/dev/null || true)
         label="$name"
-        [ -n "$branch" ] && label="$label [$branch]"
         entries+=("0"$'\t'dir$'\t'"$dir"$'\t'"$label")
     done
 
@@ -100,11 +93,12 @@ fi
 
 fzf_status=0
 selected=$(list_entries | fzf \
+    --border=none \
     --delimiter $'\t' --with-nth=4 \
     --tiebreak=index \
     --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
     --preview "$SCRIPT --preview {2} {3}" \
-    --preview-window right:60%) || fzf_status=$?
+    --preview-window right:60%,noinfo) || fzf_status=$?
 
 case "$fzf_status" in
     0) ;;

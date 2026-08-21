@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code status line — Catppuccin Mocha palette + Nerd Fonts (mirrors starship order)
+# Claude Code status line — GitHub Light High Contrast palette + Nerd Fonts (mirrors starship order)
 set -euo pipefail
 
 input=$(cat)
@@ -29,15 +29,15 @@ fi
 # Active skills (up to 10)
 skills=$(ls ~/.claude/skills/ 2>/dev/null | head -10 | paste -sd ',' | sed 's/,/, /g')
 
-# Catppuccin Mocha — same progression as starship: red peach yellow green teal blue
-c_red=$'\033[38;2;243;139;168m'      # model      #f38ba8
-c_peach=$'\033[38;2;250;179;135m'    # dir        #fab387
-c_yellow=$'\033[38;2;249;226;175m'   # branch     #f9e2af
-c_green=$'\033[38;2;166;227;161m'    # ctx normal #a6e3a1
-c_red_warn=$'\033[38;2;243;139;168m' # ctx >= 70% (back to red)
-c_teal=$'\033[38;2;148;226;213m'     # cost       #94e2d5
-c_blue=$'\033[38;2;137;180;250m'     # skills     #89b4fa
-c_muted=$'\033[38;2;127;132;156m'    # separators #7f849c (overlay1)
+# GitHub Light High Contrast — same progression as starship: red peach yellow green teal blue
+c_red=$'\033[38;2;209;36;47m'      # model      #d1242f
+c_peach=$'\033[38;2;112;44;0m'    # dir        #702c00
+c_yellow=$'\033[38;2;116;69;0m'   # branch     #744500
+c_green=$'\033[38;2;5;93;32m'   # ctx normal #055d20
+c_red_warn=$'\033[38;2;209;36;47m' # ctx >= 70% (back to red)
+c_teal=$'\033[38;2;27;124;131m'    # cost       #1b7c83
+c_blue=$'\033[38;2;3;73;180m'    # skills     #0349b4
+c_muted=$'\033[38;2;102;112;123m'    # separators #66707b
 reset=$'\033[0m'
 
 # Nerd Font icons — branch is U+F418 (matches starship config)

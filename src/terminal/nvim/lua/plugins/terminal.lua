@@ -24,8 +24,8 @@ return {
         style = "float",
         border = "rounded",
         backdrop = 60,
-        width = 0.98,
-        height = 0.98,
+        width = 0,
+        height = 0,
         on_win = nudge_terminal_resize,
         keys = {
           term_normal = {

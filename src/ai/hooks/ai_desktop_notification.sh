@@ -34,10 +34,10 @@ dir=$(escape_markup "$(basename "$cwd")")
 raw_branch=$(git -C "$repo" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null || true)
 display_branch=$(escape_markup "$raw_branch")
 
-peach='#fab387'
-yellow='#f9e2af'
-muted='#7f849c'
-text='#cdd6f4'
+peach='#702c00'
+yellow='#744500'
+muted='#66707b'
+text='#010409'
 
 loc="<span foreground='${peach}'>${dir}</span>"
 if [ -n "$display_branch" ]; then

@@ -26,27 +26,28 @@ $time\
 $line_break\
 $character"""
 
-palette = "rose-pine-moon"
+palette = "github-light-high-contrast"
 
-[palettes.rose-pine-moon]
-overlay = '#393552'
-love = '#eb6f92'
-gold = '#f6c177'
-rose = '#ea9a97'
-pine = '#3e8fb0'
-foam = '#9ccfd8'
-iris = '#c4a7e7'
+[palettes.github-light-high-contrast]
+bg_alt = '#e7ecf0'
+red = '#a0111f'
+red_bright = '#d1242f'
+yellow = '#744500'
+orange = '#702c00'
+green = '#055d20'
+accent = '#0349b4'
+purple = '#512598'
 
 [username]
 disabled = false
-format = "[](fg:overlay)[ 󰧱 $user ](bg:overlay fg:iris)[](fg:overlay) "
+format = "[](fg:bg_alt)[ 󰧱 $user ](bg:bg_alt fg:purple)[](fg:bg_alt) "
 show_always = true
-style_root = "bg:overlay fg:iris"
-style_user = "bg:overlay fg:iris"
+style_root = "bg:bg_alt fg:purple"
+style_user = "bg:bg_alt fg:purple"
 
 [directory]
-format = "[](fg:overlay)[ 󰉋 $path ](bg:overlay fg:gold)[](fg:overlay) "
-style = "bg:overlay fg:pine"
+format = "[](fg:bg_alt)[ 󰉋 $path ](bg:bg_alt fg:yellow)[](fg:bg_alt) "
+style = "bg:bg_alt fg:green"
 truncation_length = 3
 truncation_symbol = "…/"
 truncate_to_repo = true
@@ -60,17 +61,17 @@ Music = " "
 Pictures = " "
 
 [fill]
-style = "fg:overlay"
+style = "fg:bg_alt"
 symbol = " "
 
 [git_branch]
-format = "[](fg:overlay)[  $branch ](bg:overlay fg:foam)"
-style = "bg:overlay fg:foam"
+format = "[](fg:bg_alt)[  $branch ](bg:bg_alt fg:accent)"
+style = "bg:bg_alt fg:accent"
 symbol = ""
 
 [git_status]
 disabled = false
-format = '[](fg:overlay) '
+format = '[](fg:bg_alt) '
 up_to_date = ''
 untracked = ''
 stashed = ''
@@ -84,21 +85,21 @@ diverged = ''
 
 [git_metrics]
 disabled = false
-added_style = "bg:overlay fg:foam"
-deleted_style = "bg:overlay fg:love"
+added_style = "bg:bg_alt fg:accent"
+deleted_style = "bg:bg_alt fg:red"
 format = "([+$added ]($added_style)[-$deleted ]($deleted_style))"
 
 [time]
 disabled = false
-format = " [](fg:overlay)[ $time 󰴈 ](bg:overlay fg:rose)[](fg:overlay)"
-style = "bg:overlay fg:rose"
+format = " [](fg:bg_alt)[ $time 󰴈 ](bg:bg_alt fg:orange)[](fg:bg_alt)"
+style = "bg:bg_alt fg:orange"
 time_format = "%I:%M%P"
 use_12hr = true
 
 [character]
 disabled = false
-success_symbol = '[󱞪](bold fg:iris)'
-error_symbol = '[󱞪](bold fg:love)'
+success_symbol = '[󱞪](bold fg:purple)'
+error_symbol = '[󱞪](bold fg:red_bright)'
 
 [line_break]
 disabled = false
@@ -108,77 +109,77 @@ disabled = false
 [c]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [elixir]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [elm]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [golang]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [haskell]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [java]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [julia]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [nodejs]
 disabled = false
 symbol = "󰎙 "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [nim]
 disabled = false
 symbol = "󰆥 "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [rust]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [scala]
 disabled = false
 symbol = " "
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [python]
 disabled = false
 symbol = ' '
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$version( $virtualenv) ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version( $virtualenv) ](bg:bg_alt fg:green)[](fg:bg_alt)"
 
 [conda]
 disabled = false
 symbol = '🅒 '
-style = "bg:overlay fg:pine"
-format = " [](fg:overlay)[ $symbol$environment ](bg:overlay fg:pine)[](fg:overlay)"
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$environment ](bg:bg_alt fg:green)[](fg:bg_alt)"

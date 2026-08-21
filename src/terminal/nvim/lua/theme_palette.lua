@@ -1,0 +1,18 @@
+return {
+  bg = "#ffffff",
+  bg_alt = "#e7ecf0",
+  bg_selection = "#cddbf0",
+  fg = "#010409",
+  fg_muted = "#4b535d",
+  fg_subtle = "#66707b",
+  border = "#20252c",
+  accent = "#0349b4",
+  accent_bright = "#4a98fa",
+  red = "#a0111f",
+  red_bright = "#d1242f",
+  orange = "#702c00",
+  yellow = "#744500",
+  green = "#055d20",
+  cyan = "#1b7c83",
+  purple = "#512598",
+}

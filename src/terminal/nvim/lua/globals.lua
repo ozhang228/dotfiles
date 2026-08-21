@@ -1,2 +1,2 @@
-Palette = require("rose-pine.palette")
+Palette = require("theme_palette")
 Snacks = require("snacks")

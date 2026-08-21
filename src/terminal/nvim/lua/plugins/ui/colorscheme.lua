@@ -1,14 +1,18 @@
+local palette = require("theme_palette")
+
 return {
-  "rose-pine/neovim",
-  name = "rose-pine",
+  "projekt0n/github-nvim-theme",
+  name = "github-theme",
+  priority = 1000,
   opts = {
-    variant = "moon",
-    highlight_groups = {
-      ["@lsp.type.variable"] = { fg = "text" },
-      LineNr = { fg = "iris" },
-      NonText = { fg = "muted" },
-      FloatBorder = { fg = "iris" },
-      FloatTitle = { fg = "gold", bold = true },
+    groups = {
+      github_light_high_contrast = {
+        ["@lsp.type.variable"] = { fg = palette.fg },
+        LineNr = { fg = palette.purple },
+        NonText = { fg = palette.fg_subtle },
+        FloatBorder = { fg = palette.purple },
+        FloatTitle = { fg = palette.yellow, bold = true },
+      },
     },
   },
 }

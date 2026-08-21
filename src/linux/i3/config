@@ -4,7 +4,7 @@ set $smod             Shift
 set $font             pango:JetBrains Mono 14
 set $gap_width        3
 set $gap_heigth       3
-set $border_size      5
+set $border_size      8
 set $key_left         h
 set $key_down         j
 set $key_up           k
@@ -99,27 +99,19 @@ bindsym $mod+$smod+q kill
 bindsym $mod+$smod+s exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-save-all.sh"
 bindsym $mod+$smod+o exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh"
 
-# -- Theme (Rose Pine Moon)--
-set $base           #232136
-set $surface        #2a273f
-set $overlay        #393552
-set $muted          #6e6a86
-set $subtle         #908caa
-set $text           #e0def4
-set $love           #eb6f92
-set $gold           #f6c177
-set $rose           #ea9a97
-set $pine           #3e8fb0
-set $foam           #9ccfd8
-set $iris           #c4a7e7
-set $highlightlow   #2a283e
-set $highlightmed   #44415a
-set $highlighthigh  #56526e
+set $bg             #ffffff
+set $bg_alt         #e7ecf0
+set $fg_subtle      #66707b
+set $fg_muted       #4b535d
+set $fg             #010409
+set $border         #20252c
+set $accent         #0349b4
+set $red_bright     #d1242f
 
 # target                title          bg             text     indicator border
-client.focused          $love          $love          $text    $love     $love
-client.focused_inactive $surface       $surface       $subtle  $surface  $surface
-client.unfocused        $surface       $surface       $subtle  $surface  $surface
-client.urgent           $love          $love          $text    $love     $love
-client.placeholder      $base          $base          $text    $base     $base
-client.background       $base
+client.focused          $accent        $accent        $bg      $accent   $accent
+client.focused_inactive $bg_alt        $bg_alt        $fg_muted $bg_alt $bg_alt
+client.unfocused        $bg_alt        $bg_alt        $fg_muted $bg_alt $bg_alt
+client.urgent           $red_bright    $red_bright    $bg      $red_bright $red_bright
+client.placeholder      $bg            $bg            $fg      $bg       $bg
+client.background       $bg

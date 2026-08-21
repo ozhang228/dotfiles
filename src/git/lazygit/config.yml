@@ -6,32 +6,32 @@ gui:
   
   theme:
     activeBorderColor:
-      - "#3e8fb0"
+      - "#0349b4"
       - bold
     inactiveBorderColor:
-      - "#6e6a86"
+      - "#66707b"
     searchingActiveBorderColor:
-      - "#ea9a97"
+      - "#702c00"
       - bold
     optionsTextColor:
-      - "#9ccfd8"
+      - "#1b7c83"
     selectedLineBgColor:
-      - "#3e8fb0"
+      - "#0349b4"
     inactiveViewSelectedLineBgColor:
-      - "#393552"
+      - "#e7ecf0"
       - bold
     cherryPickedCommitFgColor:
-      - "#2a273f"
+      - "#ffffff"
     cherryPickedCommitBgColor:
-      - "#ea9a97"
+      - "#702c00"
     markedBaseCommitFgColor:
-      - "#9ccfd8"
+      - "#ffffff"
     markedBaseCommitBgColor:
-      - "#f6c177"
+      - "#744500"
     unstagedChangesColor:
-      - "#eb6f92"
+      - "#d1242f"
     defaultFgColor:
-      - "#e0def4"
+      - "#010409"
   
   showNumstatInFilesView: true
   showRandomTip: false

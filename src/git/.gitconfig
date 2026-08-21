@@ -15,7 +15,13 @@
 [delta]
     # use n and N to move between diff sections
     navigate = true
-    dark = true
+    light = true
+    plus-style = "syntax #daf7e0"
+    plus-emph-style = "syntax #acf2bd"
+    minus-style = "syntax #ffeef0"
+    minus-emph-style = "syntax #fdb8c0"
+    line-numbers-plus-style = "#055d20"
+    line-numbers-minus-style = "#a0111f"
 
 [pull]
     rebase = false
