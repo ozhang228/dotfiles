@@ -80,7 +80,7 @@ if [ "${1:-}" = "--preview" ]; then
     kind="$2"
     key="$3"
     if [ "$kind" = "session" ]; then
-        tmux capture-pane -p -t "$key"
+        tmux capture-pane -e -p -t "$key"
     else
         ls -la --color=always "$key"
         if git -C "$key" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
