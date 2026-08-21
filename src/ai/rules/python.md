@@ -22,6 +22,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Don't manually splice batch results into input order with `iter()` and `next()`. Track input indices and pair results with `zip(..., strict=True)` 
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
 - In projects that use UV, run `uv lock` after adding, removing, or changing a dependency and include the regenerated `uv.lock` in the same change.
+- Branch on enum values with `match`, not ternary expressions or `if`/`elif` chains, and handle every enum member explicitly.
 - Every `match` statement must end with `case _ as unreachable: assert_never(unreachable)` on the matched value. This adds exhaustive matching
 - Keep internal-package `__init__.py` files empty. Re-export names from `__init__.py` only when the package intentionally defines a public-facing library API.
 
