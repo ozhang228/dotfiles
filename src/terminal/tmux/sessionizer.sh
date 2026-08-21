@@ -97,8 +97,9 @@ selected=$(list_entries | fzf \
     --delimiter $'\t' --with-nth=4 \
     --tiebreak=index \
     --bind "ctrl-x:execute-silent(tmux kill-session -t {3} 2>/dev/null)+reload($SCRIPT --list)" \
+    --info=hidden \
     --preview "$SCRIPT --preview {2} {3}" \
-    --preview-window right:60%,noinfo) || fzf_status=$?
+    --preview-window right:60%) || fzf_status=$?
 
 case "$fzf_status" in
     0) ;;
