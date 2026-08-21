@@ -15,11 +15,6 @@ local function tmux_client_value(format)
   return command_output({ "tmux", "display-message", "-p", format })
 end
 
-local function tmux_client_supports_clipboard()
-  local termfeatures = tmux_client_value("#{client_termfeatures}")
-  return termfeatures ~= nil and termfeatures:find("clipboard", 1, true) ~= nil
-end
-
 local function tmux_client_is_ssh()
   local client_pid = tmux_client_value("#{client_pid}")
   if client_pid == nil or client_pid == "" then return false end
@@ -27,41 +22,6 @@ local function tmux_client_is_ssh()
   if parent_pid == nil or parent_pid == "" then return false end
   local parent_command = command_output({ "ps", "-o", "comm=", "-p", parent_pid })
   return parent_command == "sshd"
-end
-
-local function cached_osc52_provider()
-  local osc52 = require("vim.ui.clipboard.osc52")
-  local cached_registers = {
-    ["+"] = { lines = {}, regtype = "v" },
-    ["*"] = { lines = {}, regtype = "v" },
-  }
-
-  local function copy(reg)
-    local osc52_copy = osc52.copy(reg)
-    return function(lines, regtype)
-      cached_registers[reg] = { lines = lines, regtype = regtype }
-      osc52_copy(lines, regtype)
-    end
-  end
-
-  local function paste(reg)
-    return function()
-      local cached_register = cached_registers[reg]
-      return { cached_register.lines, cached_register.regtype }
-    end
-  end
-
-  return {
-    name = "OSC 52",
-    copy = {
-      ["+"] = copy("+"),
-      ["*"] = copy("*"),
-    },
-    paste = {
-      ["+"] = paste("+"),
-      ["*"] = paste("*"),
-    },
-  }
 end
 
 vim.o.number = true
@@ -74,13 +34,15 @@ vim.o.autoindent = true
 vim.o.smartindent = true
 
 -- Sync clipboard between OS and Neovim.
--- Over SSH, use OSC 52 so yanks land in the terminal emulator's clipboard.
--- In a reattached tmux pane, SSH_TTY may be absent even though the active
--- SSH client supports terminal clipboard operations.
--- Locally, fall through to the default provider (xclip/wl-copy) — OSC 52
--- paste triggers a per-paste permission prompt in most terminals.
+-- The tmux provider resolves the active client for every copy or paste, so a
+-- long-running Neovim can move between local Ubuntu and SSH clients safely.
+-- Outside tmux, use OSC 52 over SSH and native clipboard tools locally.
 -- See `:help 'clipboard'`
-if vim.env.SSH_TTY or (tmux_client_is_ssh() and tmux_client_supports_clipboard()) then vim.g.clipboard = cached_osc52_provider() end
+if vim.env.TMUX then
+  vim.g.clipboard = "tmux"
+elseif vim.env.SSH_TTY then
+  vim.g.clipboard = "osc52"
+end
 vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 local default_open = vim.ui.open
