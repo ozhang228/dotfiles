@@ -231,11 +231,11 @@
     }
   },
   "nerd_font": {
-    "check": "fc-list | grep -qi JetBrains",
+    "check": "if [ \"$(uname)\" = Darwin ]; then test -e ~/Library/Fonts/JetBrainsMonoNerdFontMono-Regular.ttf; else fc-list | grep -Fqi 'JetBrainsMono Nerd Font Mono'; fi",
     "install": {
-      "ubuntu": "mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts && curl -L https://github.com/JetBrains/JetBrainsMono/releases/download/v2.304/JetBrainsMono-2.304.zip -o jbm.zip && unzip -o jbm.zip && rm jbm.zip && fc-cache -f -v",
-      "manjaro": "sudo pacman -S ttf-jetbrains-mono",
-      "mac": "brew tap homebrew/cask-fonts && brew install font-jetbrains-mono"
+      "ubuntu": "mkdir -p ~/.local/share/fonts && curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.zip -o /tmp/JetBrainsMono.zip && unzip -o /tmp/JetBrainsMono.zip -d ~/.local/share/fonts && rm /tmp/JetBrainsMono.zip && fc-cache -f",
+      "manjaro": "sudo pacman -S ttf-jetbrains-mono-nerd",
+      "mac": "brew install --cask font-jetbrains-mono-nerd-font"
     }
   },
   "curl": {
