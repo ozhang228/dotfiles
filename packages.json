@@ -103,6 +103,13 @@
     "check": "command -v polybar",
     "install": { "ubuntu": "sudo apt install polybar" }
   },
+  "xdotool": {
+    "check": "command -v xdotool",
+    "install": {
+      "manjaro": "sudo pacman -S xdotool",
+      "ubuntu": "sudo apt install xdotool"
+    }
+  },
   "pavucontrol": {
     "check": "command -v pavucontrol",
     "install": { "ubuntu": "sudo apt install pavucontrol" }

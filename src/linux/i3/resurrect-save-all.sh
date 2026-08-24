@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Save every existing i3 workspace via i3-resurrect. Keep Chrome's title-aware
-# layout placeholders so its restored windows return to their saved workspaces,
-# but remove Chrome launch commands because one --restore-last-session process
-# owns restoration for every browser window.
+# Save every existing i3 workspace via i3-resurrect. Match windows by class and
+# instance so dynamic titles do not leave stale placeholders. Remove Chrome
+# launch commands because one --restore-last-session process owns restoration
+# for every browser window.
 #
 # On a per-workspace save failure, delete that workspace's previous save so a
 # stale snapshot never sits there looking valid for restore-all.sh to pick up.
@@ -23,7 +23,7 @@ saved, failed = [], []
 for ws in json.loads(os.environ["WS_JSON"]):
     name = ws["name"]
     result = subprocess.run(
-        ["i3-resurrect", "save", "-w", name, "--swallow=class,instance,title"],
+        ["i3-resurrect", "save", "-w", name, "--swallow=class,instance"],
         check=False,
     )
     if result.returncode == 0:

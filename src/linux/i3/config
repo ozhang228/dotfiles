@@ -32,13 +32,9 @@ exec_always --no-startup-id $compositor
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
 
-# Run autorandr once, then chain everything that depends on monitor layout being
-# settled: wallpaper/bar, saved-layout restore, and Chrome. i3-resurrect restores
-# title-aware Chrome placeholders, then this single process restores all browser
-# windows into those saved workspace slots.
-exec --no-startup-id "autorandr --change && \
-    bash $HOME/dotfiles/src/linux/i3/wallpaper.sh && \
-    bash $HOME/dotfiles/src/linux/polybar/launch.sh && \
+exec --no-startup-id "PYTHONWARNINGS=ignore autorandr --change; \
+    bash $HOME/dotfiles/src/linux/i3/wallpaper.sh; \
+    bash $HOME/dotfiles/src/linux/polybar/launch.sh; \
     $HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh && \
     $browser"
 
