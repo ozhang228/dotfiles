@@ -22,6 +22,7 @@
   { "src": "~/dotfiles/src/Dygma", "dst": "~/Dygma" },
   { "src": "~/dotfiles/src/git/lazygit", "dst": "~/.config/lazygit" },
   { "src": "~/dotfiles/src/git/.gitconfig", "dst": "~/.gitconfig" },
+  { "src": "~/dotfiles/src/linux/autorandr/docked/preswitch", "dst": "~/.config/autorandr/docked/preswitch", "distros": ["ubuntu"] },
   { "src": "~/dotfiles/src/linux/i3", "dst": "~/.config/i3", "distros": ["ubuntu"] },
   { "src": "~/dotfiles/src/linux/manjaro/hyprland/hypr", "dst": "~/.config/hypr", "distros": ["manjaro"] },
   { "src": "~/dotfiles/src/linux/manjaro/hyprland/hyprpanel", "dst": "~/.config/hyprpanel", "distros": ["manjaro"] },
