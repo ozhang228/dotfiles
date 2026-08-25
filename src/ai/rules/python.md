@@ -13,6 +13,8 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
 - Do not use `typing.Annotated`. For Pydantic constraints, declare the type normally and assign `Field(...)`
 - Prefer `NewType` over a plain type alias for semantically distinct scalar or identifier values that the type checker should reject when interchanged. Keep ordinary aliases for structural shapes, unions, and readability-only abbreviations where nominal distinction is not intended.
+- Model domain meaning at the element level. For example, define `UnderlyingPrice = NewType("UnderlyingPrice", float)` and annotate an immutable collection as `tuple[UnderlyingPrice, ...]`; do not introduce `UnderlyingPrices = tuple[float, ...]` merely to shorten one annotation. Name the collection itself only when it is a reusable domain concept with collection-level meaning or invariants.
+- Do not move an existing domain type solely so a new consumer can share it. Preserve the current owner's API when dependency direction permits; when lower-level reusable logic cannot depend on that owner, accept the underlying primitive at that boundary and keep the stronger type in the owning layer.
 - Prefer `frozen=True` on dataclasses where possible. Prefix internal fields with `_`.
 - Put logic fully owned by a dataclass on the dataclass. If a value is completely determined by the instance's other fields, expose it as a property instead of passing or recomputing it at construction sites
 - Use `MutableMapping` instead of `dict` for mutable dataclass fields.
