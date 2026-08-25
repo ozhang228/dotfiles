@@ -13,10 +13,32 @@ local function nudge_terminal_resize(self)
   vim.schedule(function() pcall(vim.fn.jobresize, channel, width, height) end)
 end
 
+local resize_scheduled = false
+local function resize_terminals()
+  if resize_scheduled then return end
+  resize_scheduled = true
+
+  vim.schedule(function()
+    resize_scheduled = false
+    for _, terminal in ipairs(require("snacks").terminal.list()) do
+      if terminal:win_valid() then
+        terminal:on_resize()
+        nudge_terminal_resize(terminal)
+      end
+    end
+  end)
+end
+
 return {
   "folke/snacks.nvim",
   lazy = false,
   priority = 1000,
+  init = function()
+    vim.api.nvim_create_autocmd("VimResized", {
+      group = vim.api.nvim_create_augroup("snacks_terminal_resize", { clear = true }),
+      callback = resize_terminals,
+    })
+  end,
   opts = {
     terminal = {
       enabled = true,
