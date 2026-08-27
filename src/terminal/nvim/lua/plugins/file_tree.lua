@@ -47,6 +47,9 @@ return {
       permanent_delete = false,
       use_as_default_explorer = true,
     },
+    windows = {
+      max_number = 3,
+    },
   },
   dependencies = {
     "nvim-mini/mini.icons",
