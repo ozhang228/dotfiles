@@ -49,3 +49,4 @@ SOFR
 bundlers
 transpilers
 TCP
+kafka

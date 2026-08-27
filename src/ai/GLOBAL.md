@@ -72,6 +72,7 @@ The ladder is a reflex, not a research project. Two rungs work → take the high
 - Library types: define your own abstractions, don't expose library types
 - Magic numbers: extract to named constants
 - Client state: include `version` field, group into single JSON object
+- URL state: prefer a preset or short server-side identifier over encoding large application state directly in a URL. When self-contained client-side state must be shareable, put it in `window.location.hash`, not the query string, because fragments stay in the browser while query strings pass through proxies and SSO redirects, where encoding expansion and header limits can turn valid links into errors such as 502. Reserve query parameters for values the server must receive.
 - Prefer positive ternary conditions so the branches read in direct order.
 
 ### Naming
