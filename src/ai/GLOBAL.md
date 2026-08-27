@@ -68,9 +68,11 @@ The ladder is a reflex, not a research project. Two rungs work → take the high
 
 ### Patterns
 
-- Domain code owns domain data types and pure operations over them, including transformation, calculation, normalization, comparison, and validation. A domain operation depends only on explicit inputs and has no side effects.
-- Application-specific code owns orchestration and effects, including I/O, configuration, framework integration, callbacks, caching, logging, persistence, clients, and process lifecycle. Code that is not a pure operation on domain values does not belong in the domain layer.
-- Place code under the layer that conceptually owns it. Reuse or avoiding an import cycle is not a reason to move application behavior into the domain layer.
+- Separate domain logic, application logic, and reusable utilities according to conceptual ownership rather than requiring particular directory names.
+- Domain logic owns reusable business concepts and capabilities: domain data types, invariants, transformations, calculations, validation, and interfaces or providers for business services. A domain service may perform I/O through injected dependencies; keep pure operations separate from acquisition, caching, and persistence when practical.
+- Application logic wires domain capabilities into a particular runnable application. It owns dependency construction, runtime configuration, framework integration, callbacks, view-specific orchestration, and process lifecycle.
+- Reusable utilities provide general technical functionality without business meaning. Do not put business rules in a utility merely because multiple callers need them.
+- Place code under the layer that conceptually owns it. Logging, performing I/O, reuse, or avoiding an import cycle does not by itself determine ownership.
 - Library types: define your own abstractions, don't expose library types
 - Magic numbers: extract to named constants
 - Client state: include `version` field, group into single JSON object
