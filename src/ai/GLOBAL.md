@@ -71,6 +71,8 @@ The ladder is a reflex, not a research project. Two rungs work → take the high
 - Separate domain logic, application logic, and reusable utilities according to conceptual ownership rather than requiring particular directory names.
 - Domain logic owns reusable business concepts and capabilities: domain data types, invariants, transformations, calculations, validation, and interfaces or providers for business services. A domain service may perform I/O through injected dependencies; keep pure operations separate from acquisition, caching, and persistence when practical.
 - Application logic wires domain capabilities into a particular runnable application. It owns dependency construction, runtime configuration, framework integration, callbacks, view-specific orchestration, and process lifecycle.
+- Serialized runtime configuration belongs at the application or external boundary. Parse and resolve it there, then pass domain values and dependencies inward.
+- Treat a domain import of an application `*Config` as a boundary smell to investigate, not as evidence that the config belongs in domain. When the value represents a business concept with domain invariants, model that concept separately in domain and have application config compose or resolve it.
 - Reusable utilities provide general technical functionality without business meaning. Do not put business rules in a utility merely because multiple callers need them.
 - Place code under the layer that conceptually owns it. Logging, performing I/O, reuse, or avoiding an import cycle does not by itself determine ownership.
 - Library types: define your own abstractions, don't expose library types
