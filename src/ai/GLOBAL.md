@@ -87,7 +87,9 @@ Prefer type inference. Add an explicit annotation only when the language or type
 
 ### Parse at boundaries
 
-When downstream code repeatedly checks or raises for a state that should be impossible, treat that as a modeling smell. Parse or narrow the value once at the owning boundary and expose a type that makes the invariant explicit, so consumers can operate directly on valid data. Keep explicit errors for genuinely fallible external operations and valid domain failures; do not hide those failures to make code look simpler.
+Prefer making invalid states unrepresentable over constructing broad values and validating them at runtime. Encode correlated states as explicit variants or narrower types, rather than a boolean plus data whose valid shape depends on that boolean. Make downstream APIs accept only the variant they can actually handle.
+
+Validate untyped or external data once at the owning boundary, then construct the stronger internal type so consumers can operate directly on valid data. Repeated checks, assertions, or logs for a state that should be impossible are a modeling smell. Keep runtime validation for genuinely fallible external operations, valid domain failures, and invariants the type system cannot reasonably express; do not hide those failures to make code look simpler.
 
 ## Git & PR Workflow
 
