@@ -71,12 +71,15 @@ The ladder is a reflex, not a research project. Two rungs work → take the high
 - Separate domain logic, application logic, and reusable utilities according to conceptual ownership rather than requiring particular directory names.
 - Domain logic owns reusable business concepts and capabilities: domain data types, invariants, transformations, calculations, validation, and interfaces or providers for business services. A domain service may perform I/O through injected dependencies; keep pure operations separate from acquisition, caching, and persistence when practical.
 - Application logic wires domain capabilities into a particular runnable application. It owns dependency construction, runtime configuration, framework integration, callbacks, view-specific orchestration, and process lifecycle.
-- A move-only refactor must preserve behavior, defaults, lifecycle, comments, and tests. Prefer mechanical moves and import updates. Do not mix in opportunistic deletion, redesign, or new abstractions; propose those as separate changes.
-- Before splitting a mixed module, classify each symbol by conceptual ownership and inspect every import and call site. A filename such as `config.py` does not mean every symbol in it has the same owner.
+- Organize business code by capability and conceptual ownership, not by artifact kind or a broad feature catch-all. Nest a concept only when the parent genuinely owns it; otherwise make it a sibling capability.
+- Keep a domain capability's models, service interface, implementations, and test stubs together. Calling an external system does not by itself make a business service implementation application logic; the application owns dependency construction and process lifecycle.
+- Code shared by multiple views or entry points is not automatically domain code. UI models, rendering, framework integration, telemetry, and app-specific orchestration remain application logic.
+- Use the enclosing package as naming context instead of repeating it in every module or type, but keep names explicit when needed to distinguish business concepts from technical concerns such as Prometheus metrics.
 - Serialized runtime configuration belongs at the application or external boundary. Parse and resolve it there, then pass domain values and dependencies inward.
 - Treat a domain import of an application `*Config` as a boundary smell to investigate, not as evidence that the config belongs in domain. When the value represents a business concept with domain invariants, model that concept separately in domain and have application config compose or resolve it.
 - Reusable utilities provide general technical functionality without business meaning. Do not put business rules in a utility merely because multiple callers need them.
 - Place code under the layer that conceptually owns it. Logging, performing I/O, reuse, or avoiding an import cycle does not by itself determine ownership.
+- Keep tests in a directory structure that mirrors the source package so ownership stays visible after code moves.
 - Library types: define your own abstractions, don't expose library types
 - Magic numbers: extract to named constants
 - Client state: include `version` field, group into single JSON object
