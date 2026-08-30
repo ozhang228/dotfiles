@@ -1,5 +1,6 @@
 fish_add_path "$HOME/.local/bin"
 fish_add_path /home/ozhang/.opencode/bin
+fish_add_path "$HOME/go/bin"
 
 set -gx EDITOR "nvim"
 

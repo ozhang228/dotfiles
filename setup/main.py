@@ -1,4 +1,5 @@
 import argparse
+import subprocess
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -16,6 +17,8 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 class Arguments(BaseModel):
     do_symlink: bool = Field(alias="symlink")
     do_packages: bool = Field(alias="packages")
+    do_check: bool = Field(alias="check")
+    quiet: bool = False
     distro: Distro | None = None
     file: Path | None = None
 
@@ -53,6 +56,58 @@ def run_packages(distro: Distro, file: Path | None) -> None:
         console.print("\n[green]All packages installed[/green]")
 
 
+def run_check(distro: Distro, file: Path | None, *, quiet: bool = False) -> int:
+    """Read-only: report which packages are present, without installing anything.
+
+    Returns the number of missing packages, for use as an exit code.
+    """
+    packages = load_packages([file or ROOT_DIR / "packages.json"])
+    missing: list[str] = []
+    unchecked: list[str] = []
+
+    if not quiet:
+        console.print(f"[bold]Doctor ({distro})[/bold]")
+    for package_id, package in packages.items():
+        if package.install.get(distro) is None:
+            continue
+        if package.check is None:
+            if not quiet:
+                console.print(f"  [dim]? {package_id} (no check defined)[/dim]")
+            unchecked.append(package_id)
+            continue
+
+        result = subprocess.run(
+            package.check, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        if result.returncode == 0:
+            if not quiet:
+                console.print(f"  [green]✓[/green] {package_id}")
+        else:
+            if not quiet:
+                console.print(f"  [red]✗[/red] {package_id}")
+            missing.append(package_id)
+
+    if missing:
+        if quiet:
+            console.print("[bold red]WARNING: environment is inconsistent with setup configuration defined in dotfiles[/bold red]")
+        else:
+            console.print(f"\n[bold red]Missing ({len(missing)}):[/bold red]")
+        for package_id in missing:
+            install_cmd = packages[package_id].install.get(distro)
+            console.print(f"  {package_id}: {install_cmd}")
+        if not quiet:
+            console.print(
+                f"\n[red]{len(missing)} missing[/red] — run with --packages to install, "
+                "or run the command above directly"
+            )
+    elif not quiet:
+        console.print("\n[green]Everything checked is in place[/green]")
+    if unchecked and not quiet:
+        console.print(f"[yellow]{len(unchecked)} package(s) have no check command and were skipped[/yellow]")
+
+    return len(missing)
+
+
 def run_symlinks(distro: Distro, file: Path | None) -> None:
     symlinks = load_symlinks([file or ROOT_DIR / "symlinks.json"])
     failures: list[tuple[str, str]] = []
@@ -76,20 +131,26 @@ def run_symlinks(distro: Distro, file: Path | None) -> None:
             console.print(f"  {name}: {error}")
 
 
-def main(args: Arguments) -> None:
+def main(args: Arguments) -> int:
     distro_result = detect_distro(override=args.distro)
     match distro_result:
         case Ok(distro):
             pass
         case Err(error):
             console.print(f"[red]✗ Failed to detect distro: {error}[/red]")
-            return
+            return 1
 
     if args.do_packages:
         run_packages(distro, args.file)
 
+    missing_count = 0
+    if args.do_check:
+        missing_count = run_check(distro, args.file, quiet=args.quiet)
+
     if args.do_symlink:
         run_symlinks(distro, args.file)
+
+    return 1 if missing_count else 0
 
 
 if __name__ == "__main__":
@@ -99,6 +160,14 @@ if __name__ == "__main__":
     )
     parser.add_argument("-s", "--symlink", action="store_true", default=False)
     parser.add_argument("-p", "--packages", action="store_true", default=False)
+    parser.add_argument(
+        "-c", "--check", action="store_true", default=False,
+        help="Report which packages are present without installing anything",
+    )
+    parser.add_argument(
+        "-q", "--quiet", action="store_true", default=False,
+        help="With --check: print nothing when everything is present, a one-line warning otherwise",
+    )
     parser.add_argument("--distro", choices=[d.value for d in Distro], default=None)
     parser.add_argument(
         "--file",
@@ -106,4 +175,4 @@ if __name__ == "__main__":
         help="Use this packages.json/symlinks.json instead of the repo root's, e.g. --file ~/anvil/symlinks.json",
     )
     args = Arguments.model_validate(vars(parser.parse_args()))
-    main(args)
+    raise SystemExit(main(args))

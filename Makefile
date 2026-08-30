@@ -1,4 +1,4 @@
-.PHONY: ubuntu manjaro mac symlink anvil-symlink
+.PHONY: ubuntu manjaro mac symlink anvil-symlink doctor
 
 ubuntu:
 	cd setup && uv run python main.py --packages --distro ubuntu
@@ -14,3 +14,6 @@ symlink:
 
 anvil-symlink:
 	cd setup && uv run python main.py --symlink --file ~/anvil/symlinks.json
+
+doctor:
+	cd setup && uv run python main.py --check
