@@ -3,44 +3,145 @@
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.claude/CLAUDE.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.codex/AGENTS.md" },
   { "src": "~/dotfiles/src/ai/codex/hooks.json", "dst": "~/.codex/hooks.json" },
-  { "src": "~/dotfiles/src/ai/skills/brainstorm", "dst": "~/.claude/skills/brainstorm" },
-  { "src": "~/dotfiles/src/ai/skills/brainstorm", "dst": "~/.agents/skills/brainstorm" },
-  { "src": "~/dotfiles/src/ai/skills/code-respond", "dst": "~/.claude/skills/code-respond" },
-  { "src": "~/dotfiles/src/ai/skills/code-respond", "dst": "~/.agents/skills/code-respond" },
-  { "src": "~/dotfiles/src/ai/skills/code-review", "dst": "~/.claude/skills/code-review" },
-  { "src": "~/dotfiles/src/ai/skills/code-review", "dst": "~/.agents/skills/code-review" },
+  {
+    "src": "~/dotfiles/src/ai/skills/brainstorm",
+    "dst": "~/.claude/skills/brainstorm"
+  },
+  {
+    "src": "~/dotfiles/src/ai/skills/brainstorm",
+    "dst": "~/.agents/skills/brainstorm"
+  },
+  {
+    "src": "~/dotfiles/src/ai/skills/code-respond",
+    "dst": "~/.claude/skills/code-respond"
+  },
+  {
+    "src": "~/dotfiles/src/ai/skills/code-respond",
+    "dst": "~/.agents/skills/code-respond"
+  },
+  {
+    "src": "~/dotfiles/src/ai/skills/code-review",
+    "dst": "~/.claude/skills/code-review"
+  },
+  {
+    "src": "~/dotfiles/src/ai/skills/code-review",
+    "dst": "~/.agents/skills/code-review"
+  },
   { "src": "~/dotfiles/src/ai/skills/debug", "dst": "~/.claude/skills/debug" },
   { "src": "~/dotfiles/src/ai/skills/debug", "dst": "~/.agents/skills/debug" },
-  { "src": "~/dotfiles/src/ai/skills/postmortem", "dst": "~/.claude/skills/postmortem" },
-  { "src": "~/dotfiles/src/ai/skills/postmortem", "dst": "~/.agents/skills/postmortem" },
-  { "src": "~/anvil/skills/applauncher-use", "dst": "~/.claude/skills/applauncher-use", "distros": ["ubuntu"] },
-  { "src": "~/anvil/skills/applauncher-use", "dst": "~/.agents/skills/applauncher-use", "distros": ["ubuntu"] },
-  { "src": "~/anvil/skills/learn", "dst": "~/.claude/skills/learn", "distros": ["manjaro"] },
-  { "src": "~/anvil/skills/learn", "dst": "~/.agents/skills/learn", "distros": ["manjaro"] },
-  { "src": "~/dotfiles/src/ai/claude/settings.json", "dst": "~/.claude/settings.json" },
-  { "src": "~/dotfiles/src/ai/claude/keybindings.json", "dst": "~/.claude/keybindings.json" },
+  {
+    "src": "~/dotfiles/src/ai/skills/postmortem",
+    "dst": "~/.claude/skills/postmortem"
+  },
+  {
+    "src": "~/dotfiles/src/ai/skills/postmortem",
+    "dst": "~/.agents/skills/postmortem"
+  },
+  {
+    "src": "~/anvil/skills/applauncher-use",
+    "dst": "~/.claude/skills/applauncher-use",
+    "distros": ["ubuntu"]
+  },
+  {
+    "src": "~/anvil/skills/applauncher-use",
+    "dst": "~/.agents/skills/applauncher-use",
+    "distros": ["ubuntu"]
+  },
+  {
+    "src": "~/anvil/skills/learn",
+    "dst": "~/.claude/skills/learn",
+    "distros": ["manjaro"]
+  },
+  {
+    "src": "~/anvil/skills/learn",
+    "dst": "~/.agents/skills/learn",
+    "distros": ["manjaro"]
+  },
+  {
+    "src": "~/dotfiles/src/ai/claude/settings.json",
+    "dst": "~/.claude/settings.json"
+  },
+  {
+    "src": "~/dotfiles/src/ai/claude/keybindings.json",
+    "dst": "~/.claude/keybindings.json"
+  },
   { "src": "~/dotfiles/src/Dygma", "dst": "~/Dygma" },
   { "src": "~/dotfiles/src/git/lazygit", "dst": "~/.config/lazygit" },
   { "src": "~/dotfiles/src/git/.gitconfig", "dst": "~/.gitconfig" },
-  { "src": "~/dotfiles/src/linux/autorandr/docked/preswitch", "dst": "~/.config/autorandr/docked/preswitch", "distros": ["ubuntu"] },
-  { "src": "~/dotfiles/src/linux/i3", "dst": "~/.config/i3", "distros": ["ubuntu"] },
-  { "src": "~/dotfiles/src/linux/manjaro/hyprland/hypr", "dst": "~/.config/hypr", "distros": ["manjaro"] },
-  { "src": "~/dotfiles/src/linux/manjaro/hyprland/hyprpanel", "dst": "~/.config/hyprpanel", "distros": ["manjaro"] },
-  { "src": "~/dotfiles/src/linux/rofi/", "dst": "~/.config/rofi", "distros": ["manjaro", "ubuntu"] },
-  { "src": "~/dotfiles/src/linux/ubuntu/dunst", "dst": "~/.config/dunst", "distros": ["ubuntu"] },
-  { "src": "~/dotfiles/src/linux/ubuntu/picom", "dst": "~/.config/picom", "distros": ["ubuntu"] },
-  { "src": "~/dotfiles/src/mac/.aerospace.toml", "dst": "~/.aerospace.toml", "distros": ["mac"] },
+  {
+    "src": "~/dotfiles/src/linux/autorandr/docked/preswitch",
+    "dst": "~/.config/autorandr/docked/preswitch",
+    "distros": ["ubuntu"]
+  },
+  {
+    "src": "~/dotfiles/src/linux/i3",
+    "dst": "~/.config/i3",
+    "distros": ["ubuntu"]
+  },
+  {
+    "src": "~/dotfiles/src/linux/manjaro/hyprland/hypr",
+    "dst": "~/.config/hypr",
+    "distros": ["manjaro"]
+  },
+  {
+    "src": "~/dotfiles/src/linux/manjaro/hyprland/hyprpanel",
+    "dst": "~/.config/hyprpanel",
+    "distros": ["manjaro"]
+  },
+  {
+    "src": "~/dotfiles/src/linux/rofi/",
+    "dst": "~/.config/rofi",
+    "distros": ["manjaro", "ubuntu"]
+  },
+  {
+    "src": "~/dotfiles/src/linux/ubuntu/dunst",
+    "dst": "~/.config/dunst",
+    "distros": ["ubuntu"]
+  },
+  {
+    "src": "~/dotfiles/src/linux/ubuntu/picom",
+    "dst": "~/.config/picom",
+    "distros": ["ubuntu"]
+  },
+  {
+    "src": "~/dotfiles/src/mac/.aerospace.toml",
+    "dst": "~/.aerospace.toml",
+    "distros": ["mac"]
+  },
   { "src": "~/dotfiles/src/terminal/copyq/", "dst": "~/.config/copyq/" },
   { "src": "~/dotfiles/src/terminal/kitty", "dst": "~/.config/kitty" },
-  { "src": "~/dotfiles/src/terminal/kitty/kitty-load.sh", "dst": "~/.local/bin/kitty-load" },
+  {
+    "src": "~/dotfiles/src/terminal/kitty/kitty-load.sh",
+    "dst": "~/.local/bin/kitty-load"
+  },
   { "src": "~/dotfiles/src/terminal/lsd", "dst": "~/.config/lsd" },
   { "src": "~/dotfiles/src/terminal/nvim", "dst": "~/.config/nvim" },
   { "src": "~/dotfiles/src/terminal/shell/fish", "dst": "~/.config/fish" },
-  { "src": "~/dotfiles/src/terminal/shell/ssh-open", "dst": "~/.local/bin/ssh-open" },
+  {
+    "src": "~/dotfiles/src/terminal/shell/ssh-open",
+    "dst": "~/.local/bin/ssh-open"
+  },
   { "src": "~/dotfiles/src/terminal/starship", "dst": "~/.config/starship" },
-  { "src": "~/dotfiles/src/terminal/tmux/tmux.conf", "dst": "~/.config/tmux/tmux.conf" },
-  { "src": "~/dotfiles/src/terminal/tmux/sessionizer.sh", "dst": "~/.config/tmux/sessionizer.sh" },
-  { "src": "~/dotfiles/src/terminal/tmux/theme.conf", "dst": "~/.config/tmux/theme.conf" },
-  { "src": "~/anvil/skills/interview", "dst": "~/.claude/skills/interview", "distros": ["manjaro"] },
-  { "src": "~/anvil/skills/interview", "dst": "~/.agents/skills/interview", "distros": ["manjaro"] }
+  {
+    "src": "~/dotfiles/src/terminal/tmux/tmux.conf",
+    "dst": "~/.config/tmux/tmux.conf"
+  },
+  {
+    "src": "~/dotfiles/src/terminal/tmux/sessionizer.sh",
+    "dst": "~/.config/tmux/sessionizer.sh"
+  },
+  {
+    "src": "~/dotfiles/src/terminal/tmux/theme.conf",
+    "dst": "~/.config/tmux/theme.conf"
+  },
+  {
+    "src": "~/anvil/skills/interview",
+    "dst": "~/.claude/skills/interview",
+    "distros": ["manjaro"]
+  },
+  {
+    "src": "~/anvil/skills/interview",
+    "dst": "~/.agents/skills/interview",
+    "distros": ["manjaro"]
+  }
 ]
