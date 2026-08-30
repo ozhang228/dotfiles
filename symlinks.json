@@ -40,5 +40,7 @@
   { "src": "~/dotfiles/src/terminal/starship", "dst": "~/.config/starship" },
   { "src": "~/dotfiles/src/terminal/tmux/tmux.conf", "dst": "~/.config/tmux/tmux.conf" },
   { "src": "~/dotfiles/src/terminal/tmux/sessionizer.sh", "dst": "~/.config/tmux/sessionizer.sh" },
-  { "src": "~/dotfiles/src/terminal/tmux/theme.conf", "dst": "~/.config/tmux/theme.conf" }
+  { "src": "~/dotfiles/src/terminal/tmux/theme.conf", "dst": "~/.config/tmux/theme.conf" },
+  { "src": "~/anvil/skills/interview", "dst": "~/.claude/skills/interview", "distros": ["manjaro"] },
+  { "src": "~/anvil/skills/interview", "dst": "~/.agents/skills/interview", "distros": ["manjaro"] }
 ]
