@@ -146,5 +146,5 @@
   "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
-  "theme": "auto"
+  "theme": "light"
 }
