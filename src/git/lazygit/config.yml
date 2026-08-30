@@ -3,7 +3,6 @@ gui:
   mouseEvents: true
   sidePanelWidth: 0.2
   expandFocusedSidePanel: true
-  
   theme:
     activeBorderColor:
       - "#0349b4"
@@ -32,7 +31,6 @@ gui:
       - "#d1242f"
     defaultFgColor:
       - "#010409"
-  
   showNumstatInFilesView: true
   showRandomTip: false
   nerdFontsVersion: "3"
@@ -40,24 +38,20 @@ gui:
   filterMode: fuzzy
   spinner:
     rate: 16
-
 git:
   localBranchSortOrder: recency
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: "delta --side-by-side --paging=never"
+      command: "delta --side-by-side --paging=never"
       externalDiffTool: "delta --side-by-side --paging=never"
   parseEmoji: true
-
 os:
   editPreset: nvim
-
 notARepository: quit
 quitOnTopLevelReturn: true
 keybinding:
   universal:
     return: <c-q>
-
 customCommands:
   - key: "W"
     context: "localBranches"

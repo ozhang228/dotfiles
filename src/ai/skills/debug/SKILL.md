@@ -11,7 +11,7 @@ Use it when the investigation needs live-system queries, data comparisons, repea
 
 ## Artifact ownership
 
-- Put every notebook in `~/anvil/notebooks`, never in the target project.
+- Put every notebook in `~/anvil/notebooks` unless given an explicit override
 - Run notebook commands from `~/anvil` with its checked-in environment: `uv run marimo ...`.
 - Search existing notebooks and postmortems before creating anything. Extend a notebook when it investigates the same system and class of failure. When multiple candidates match, prioritize the most recently updated ones first.
 - Keep the production fix and its tests in the target repository. The notebook reproduces and explains the issue; it does not replace regression tests.
@@ -41,9 +41,26 @@ Build a top-to-bottom narrative with these sections. Merge sections when the inv
 2. **Inputs**: standalone `mo.ui` cells for symbols, environments, dates, or other dimensions likely to vary next time.
 3. **Reproduction**: the shortest live production code path that demonstrates the symptom.
 4. **Evidence**: comparisons, intermediate values, counts, timelines, or source-by-source results that discriminate between hypotheses.
-5. **Root cause**: the evidence-backed explanation, including important disproven hypotheses when they would prevent repeated work.
+5. **Root cause**: a numbered, step-by-step trace of exactly how the failure occurs — see "Root cause must be a reproduction trace" below — plus important disproven hypotheses when they would prevent repeated work.
 6. **Resolution**: what changed in the target repository or external system.
 7. **Result**: final status, verification output, remaining limitations, and the reusable takeaway for the next investigation.
+
+### Root cause must be a reproduction trace
+
+A root cause section that states the conclusion without showing the path to it is not done. Write the Root cause section as a numbered sequence Oscar could follow and verify himself, not a paragraph asserting the answer:
+
+```markdown
+1. `refresh_session()` is called with a token that expired 3s earlier (`auth/session.py:41`).
+2. Because `SESSION_TTL` is read from the *request-time* clock instead of the
+   *issue-time* clock, the expiry check at line 44 passes even though the
+   token is already stale.
+3. The stale token is forwarded to `issue_token_hash()`, which does not
+   re-validate expiry — it trusts the caller.
+4. The downstream service receives a hash for an already-expired token and
+   returns 401, which the caller surfaces as "random session drops."
+```
+
+Each step is a concrete, checkable fact (a file:line, an observed value, a branch actually taken) — not "eventually this causes X." If a step's claim came from a debugger inspection (a variable's actual runtime value, which branch actually executed, the actual call stack at failure) rather than from reading the code, say so inline, e.g. "`token.expires_at` was `12:03:41` at the point of failure (inspected live)." Someone reading only this section should be able to reconstruct the failure mentally without re-running the notebook.
 
 The Result section is required before finishing. Write it into the notebook after the fix is verified; do not leave the conclusion only in chat. Preserve the failing reproducer alongside the fixed result when both can still be run safely.
 
@@ -56,6 +73,29 @@ The Result section is required before finishing. Write it into the notebook afte
 - Prefer tables, plots, and pinned values that make the discrepancy visible over prose claims.
 - Keep cells deterministic where possible. Show timestamps or snapshot identifiers when live data can change between runs.
 - Parameterize the meaningful dimensions, not every constant. A notebook should be reusable for the same failure class without becoming a generic framework.
+
+## Runtime inspection via the debugger (mcp-debugger)
+
+`mcp-debugger` (Python/debugpy, TypeScript-JS/js-debug, Rust/CodeLLDB) is available as an
+MCP tool. Use it as an **evidence-gathering technique**, not a user-facing workflow 
+
+- Which branch actually executes for a given live input.
+- The actual value of a variable, or the actual call stack, at the moment of failure —
+  especially when the value is computed far from where it is read.
+- Ordering/interleaving questions (be aware: pausing execution changes timing, so a
+  suspected race may not reproduce identically under the debugger — see below).
+
+Do not reach for it when a log line, a print, or reading the code already settles the question — it is the heavier tool, not the default one.
+
+**How to use it here:** attach or launch a session against the real reproduction path (the
+same one the notebook's Reproduction cell uses), inspect the specific state needed, then
+**transcribe the concrete observed values back into the notebook cell/prose as evidence** —
+a pinned value, not a description of a debugger session. The debugger session itself is
+scratch work; nothing about *how* the state was inspected belongs in the notebook except the
+short "(inspected live)" provenance note called for above.
+
+To inspect a running notebook's kernel state, have the notebook call `debugpy.listen(<port>)` once at the top (remove before finishing the investigation), then
+attach `mcp-debugger` to that port. `debugpy` must be a dependency of the notebook's own environment (`uv add --dev debugpy` in `~/anvil`), not a global install.
 
 ## Investigation standards
 
