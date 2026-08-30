@@ -1,0 +1,4 @@
+interface:
+  display_name: "Respond to Feedback"
+  short_description: "Work through review feedback one comment at a time"
+  default_prompt: "Use $respond-to-feedback to help me evaluate these review comments one at a time."

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Print which languages are changed in the current branch vs its merge base,
+# and which language-specific review references to load.
+# Usage: pr-languages [base-branch]   (default: the remote's actual default branch)
+set -euo pipefail
+
+base="${1:-}"
+if [[ -z "$base" ]]; then
+    # Ask the remote what its real default branch is, rather than guessing
+    # main-then-master — a stale local `main` ref must not win over a repo
+    # whose actual base is `master` (the false-"no changes" bug).
+    remote_head=$(git symbolic-ref --quiet refs/remotes/origin/HEAD 2>/dev/null || true)
+    if [[ -n "$remote_head" ]]; then
+        base="${remote_head#refs/remotes/origin/}"
+    elif git rev-parse --verify origin/main &>/dev/null; then
+        base="main"
+    elif git rev-parse --verify origin/master &>/dev/null; then
+        base="master"
+    elif git rev-parse --verify main &>/dev/null; then
+        base="main"
+    elif git rev-parse --verify master &>/dev/null; then
+        base="master"
+    else
+        echo "error: can't determine base branch; pass it explicitly" >&2
+        exit 1
+    fi
+fi
+
+merge_base=$(git merge-base HEAD "$base" 2>/dev/null || echo "$base")
+files=$(git diff --name-only "$merge_base" 2>/dev/null)
+
+if [[ -z "$files" ]]; then
+    echo "No changed files found vs $base"
+    exit 0
+fi
+
+declare -A langs
+while IFS= read -r f; do
+    ext="${f##*.}"
+    case "$ext" in
+        py)             langs[python]=1 ;;
+        ts|tsx)         langs[typescript]=1 ;;
+        cpp|cc|cxx|h|hpp|hxx) langs[cpp]=1 ;;
+        js|jsx)         langs[javascript]=1 ;;
+        go)             langs[go]=1 ;;
+        rs)             langs[rust]=1 ;;
+    esac
+done <<< "$files"
+
+total=$(echo "$files" | wc -l | tr -d ' ')
+echo "Changed files vs $base ($merge_base): $total"
+echo ""
+echo "Languages detected:"
+for lang in "${!langs[@]}"; do
+    echo "  $lang"
+done | sort
+
+echo ""
+echo "References to load:"
+[[ -n "${langs[python]:-}" ]]     && echo "  references/python.md"
+[[ -n "${langs[typescript]:-}" ]] && echo "  references/typescript.md"
+if [[ -z "${langs[python]:-}" && -z "${langs[typescript]:-}" ]]; then
+    echo "  (none — no Python or TypeScript files changed)"
+fi
