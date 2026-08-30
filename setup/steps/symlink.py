@@ -5,11 +5,17 @@ from domain.config import Symlink
 from result import Err, Ok, Result
 
 
+def is_symlink_correct(symlink: Symlink) -> bool:
+    dst = symlink.dst.expanduser()
+    src = symlink.src.expanduser()
+    return dst.is_symlink() and dst.resolve() == src.resolve()
+
+
 def perform_symlink(symlink: Symlink, overwrite: bool = False) -> Result[None, str]:
     src = symlink.src.expanduser()
     dst = symlink.dst.expanduser()
     try:
-        if dst.is_symlink() and dst.resolve() == src.resolve():
+        if is_symlink_correct(symlink):
             return Ok(None)
 
         if dst.exists() or dst.is_symlink():

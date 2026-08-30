@@ -1,384 +1,360 @@
 {
-    "yay": {
-        "check": "command -v yay",
-        "install": {
-            "manjaro": "sh ~/dotfiles/setup/manjaro/yay.sh"
-        }
-    },
-    "node_version_manager": {
-        "check": "test -d ~/.nvm",
-        "install": {
-            "manjaro": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash",
-            "ubuntu": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash",
-            "mac": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
-        }
-    },
-    "node_js": {
-        "check": "command -v node",
-        "install": {
-            "manjaro": "nvm install --lts",
-            "ubuntu": "nvm install --lts",
-            "mac": "nvm install --lts"
-        }
-    },
-    "vivaldi": {
-        "check": "command -v vivaldi",
-        "install": {
-            "manjaro": "sudo pacman -S vivaldi",
-            "ubuntu": "echo 'install vivaldi manually or just use chrome'",
-            "mac": "brew install --cask vivaldi"
-        }
-    },
-    "lazygit": {
-        "check": "command -v lazygit",
-        "install": {
-            "ubuntu": "sh ~/dotfiles/setup/ubuntu/lazygit.sh",
-            "manjaro": "sudo pacman -S lazygit",
-            "mac": "brew install lazygit"
-        }
-    },
-    "i3": {
-        "check": "command -v i3",
-        "install": {
-            "ubuntu": "sudo apt install i3"
-        }
-    },
-    "alsa-utils": {
-        "check": "command -v amixer",
-        "install": {
-            "ubuntu": "sudo apt install alsa-utils"
-        }
-    },
-    "flameshot": {
-        "check": "command -v flameshot",
-        "install": {
-            "ubuntu": "sudo apt install flameshot"
-        }
-    },
-    "google-chrome": {
-        "check": "command -v google-chrome || command -v google-chrome-stable",
-        "install": {
-            "ubuntu": "sudo apt install google-chrome"
-        }
-    },
-    "autorandr": {
-        "check": "command -v autorandr",
-        "install": {
-            "ubuntu": "sudo apt install autorandr"
-        }
-    },
-    "hyprland": {
-        "check": "command -v hyprland",
-        "install": {
-            "manjaro": "sudo pacman -S hyprland"
-        }
-    },
-    "hyprcursor": {
-        "check": "pacman -Q hyprcursor",
-        "install": {
-            "manjaro": "sudo pacman -S hyprcursor"
-        }
-    },
-    "hyprpaper": {
-        "check": "command -v hyprpaper",
-        "install": {
-            "manjaro": "sudo pacman -S hyprpaper"
-        }
-    },
-    "xdg-desktop-portal-hyprland": {
-        "check": "pacman -Q xdg-desktop-portal-hyprland",
-        "install": {
-            "manjaro": "sudo pacman -S xdg-desktop-portal-hyprland"
-        }
-    },
-    "xdg-desktop-portal-gtk": {
-        "check": "pacman -Q xdg-desktop-portal-gtk",
-        "install": {
-            "manjaro": "sudo pacman -S xdg-desktop-portal-gtk"
-        }
-    },
-    "hypridle": {
-        "check": "command -v hypridle",
-        "install": {
-            "manjaro": "sudo pacman -S hypridle"
-        }
-    },
-    "hyprlock": {
-        "check": "command -v hyprlock",
-        "install": {
-            "manjaro": "sudo pacman -S hyprlock"
-        }
-    },
-    "hyprpanel": {
-        "check": "command -v ags",
-        "install": {
-            "manjaro": "yay -S ags-hyprpanel-git"
-        }
-    },
-    "cursor_theme": {
-        "check": "pacman -Q bibata-cursor-theme",
-        "install": {
-            "manjaro": "yay -S bibata-cursor-theme"
-        }
-    },
-    "hyprshot": {
-        "check": "command -v hyprshot",
-        "install": {
-            "manjaro": "yay -S hyprshot"
-        }
-    },
-    "hyprpolkitagent": {
-        "check": "pacman -Q hyprpolkitagent",
-        "install": {
-            "manjaro": "sudo pacman -S hyprpolkitagent"
-        }
-    },
-    "polybar": {
-        "check": "command -v polybar",
-        "install": {
-            "ubuntu": "sudo apt install polybar"
-        }
-    },
-    "xdotool": {
-        "check": "command -v xdotool",
-        "install": {
-            "manjaro": "sudo pacman -S xdotool",
-            "ubuntu": "sudo apt install xdotool"
-        }
-    },
-    "pavucontrol": {
-        "check": "command -v pavucontrol",
-        "install": {
-            "ubuntu": "sudo apt install pavucontrol"
-        }
-    },
-    "blueman": {
-        "check": "command -v blueman-manager",
-        "install": {
-            "ubuntu": "sudo apt install blueman"
-        }
-    },
-    "rofi": {
-        "check": "command -v rofi",
-        "install": {
-            "manjaro": "sudo pacman -S rofi-wayland",
-            "ubuntu": "sudo apt install rofi"
-        }
-    },
-    "dunst": {
-        "check": "command -v dunst",
-        "install": {
-            "ubuntu": "sudo apt install dunst"
-        }
-    },
-    "feh": {
-        "check": "command -v feh",
-        "install": {
-            "ubuntu": "sudo apt install feh"
-        }
-    },
-    "picom": {
-        "check": "command -v picom",
-        "install": {
-            "ubuntu": "sudo apt install picom"
-        }
-    },
-    "aerospace": {
-        "check": "command -v aerospace",
-        "install": {
-            "mac": "brew install --cask nikitabobko/tap/aerospace"
-        }
-    },
-    "clipboard_manager": {
-        "check": "command -v copyq",
-        "install": {
-            "ubuntu": "sudo apt install copyq",
-            "manjaro": "sudo pacman -S copyq",
-            "mac": "brew install copyq"
-        }
-    },
-    "fastfetch": {
-        "check": "command -v fastfetch",
-        "install": {
-            "manjaro": "sudo pacman -S fastfetch",
-            "mac": "brew install --cask fastfetch",
-            "ubuntu": "sh ~/dotfiles/setup/ubuntu/fastfetch.sh"
-        }
-    },
-    "kitty": {
-        "check": "command -v kitty",
-        "install": {
-            "ubuntu": "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin && ln -sf ~/.local/kitty.app/bin/kitty ~/.local/kitty.app/bin/kitten ~/.local/bin/ && sudo apt-get install -y kitty-terminfo",
-            "manjaro": "sudo pacman -S kitty",
-            "mac": "brew install kitty"
-        }
-    },
-    "lsd": {
-        "check": "command -v lsd",
-        "install": {
-            "manjaro": "sudo pacman -S lsd",
-            "ubuntu": "sudo apt install lsd",
-            "mac": "brew install lsd"
-        }
-    },
-    "nvim": {
-        "check": "command -v nvim",
-        "install": {
-            "ubuntu": "sh ~/dotfiles/setup/ubuntu/nvim.sh",
-            "manjaro": "sudo pacman -S neovim",
-            "mac": "brew install neovim"
-        }
-    },
-    "ripgrep": {
-        "check": "command -v rg",
-        "install": {
-            "ubuntu": "sudo apt install ripgrep",
-            "manjaro": "sudo pacman -S ripgrep",
-            "mac": "brew install ripgrep"
-        }
-    },
-    "fzf": {
-        "check": "fzf --help 2>/dev/null | grep -q '\\[no\\]info'",
-        "install": {
-            "manjaro": "sudo pacman -S fzf",
-            "ubuntu": "mkdir -p ~/.local/bin && curl -fsSL https://github.com/junegunn/fzf/releases/download/v0.74.3/fzf-0.74.3-linux_amd64.tar.gz | tar -xz -C ~/.local/bin",
-            "mac": "brew install fzf"
-        }
-    },
-    "gh": {
-        "check": "command -v gh",
-        "install": {
-            "ubuntu": "sudo apt install gh",
-            "manjaro": "sudo pacman -S github-cli",
-            "mac": "brew install gh"
-        }
-    },
-    "clang-tidy": {
-        "check": "command -v clang-tidy",
-        "install": {
-            "ubuntu": "sudo apt install clang-tools",
-            "manjaro": "sudo pacman -S clang",
-            "mac": "brew install llvm"
-        }
-    },
-    "treesitter-cli": {
-        "check": "command -v tree-sitter",
-        "install": {
-            "ubuntu": "cargo install tree-sitter-cli",
-            "manjaro": "cargo install tree-sitter-cli",
-            "mac": "cargo install tree-sitter-cli"
-        }
-    },
-    "clang": {
-        "check": "command -v clang",
-        "install": {
-            "ubuntu": "sudo apt install clang",
-            "manjaro": "sudo pacman -S clang",
-            "mac": "brew install llvm"
-        }
-    },
-    "clipboard": {
-        "check": "command -v xclip || command -v pbcopy",
-        "install": {
-            "ubuntu": "sudo apt install xclip",
-            "manjaro": "sudo pacman -S xclip",
-            "mac": "echo 'Built-in pbcopy/pbpaste'"
-        }
-    },
-    "nerd_font": {
-        "check": "if [ \"$(uname)\" = Darwin ]; then test -e ~/Library/Fonts/JetBrainsMonoNerdFontMono-Regular.ttf; else fc-list | grep -Fqi 'JetBrainsMono Nerd Font Mono'; fi",
-        "install": {
-            "ubuntu": "mkdir -p ~/.local/share/fonts && curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.zip -o /tmp/JetBrainsMono.zip && unzip -o /tmp/JetBrainsMono.zip -d ~/.local/share/fonts && rm /tmp/JetBrainsMono.zip && fc-cache -f",
-            "manjaro": "sudo pacman -S ttf-jetbrains-mono-nerd",
-            "mac": "brew install --cask font-jetbrains-mono-nerd-font"
-        }
-    },
-    "curl": {
-        "check": "command -v curl",
-        "install": {
-            "ubuntu": "sudo apt install curl",
-            "manjaro": "sudo pacman -S curl",
-            "mac": "brew install curl"
-        }
-    },
-    "jq": {
-        "check": "command -v jq",
-        "install": {
-            "ubuntu": "sudo apt install jq",
-            "manjaro": "sudo pacman -S jq",
-            "mac": "brew install jq"
-        }
-    },
-    "luarocks": {
-        "check": "command -v luarocks",
-        "install": {
-            "ubuntu": "sudo apt install luarocks",
-            "manjaro": "sudo pacman -S luarocks",
-            "mac": "brew install luarocks"
-        }
-    },
-    "tectonic": {
-        "check": "command -v tectonic",
-        "install": {
-            "ubuntu": "sudo snap install tectonic",
-            "manjaro": "sudo pacman -S tectonic",
-            "mac": "brew install tectonic"
-        }
-    },
-    "default_shell": {
-        "check": "echo $SHELL | grep -q fish",
-        "install": {
-            "ubuntu": "chsh -s $(which fish)",
-            "manjaro": "chsh -s $(which fish)",
-            "mac": "chsh -s $(which fish)"
-        }
-    },
-    "starship": {
-        "check": "command -v starship",
-        "install": {
-            "ubuntu": "sh ~/dotfiles/setup/ubuntu/starship.sh",
-            "manjaro": "sudo pacman -S starship",
-            "mac": "brew install starship"
-        }
-    },
-    "tmux": {
-        "check": "command -v tmux",
-        "install": {
-            "manjaro": "sudo pacman -S tmux",
-            "ubuntu": "sudo apt install tmux",
-            "mac": "brew install tmux"
-        }
-    },
-    "tmux-tpm": {
-        "check": "test -d ~/.config/tmux/plugins/tpm",
-        "install": {
-            "manjaro": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh",
-            "ubuntu": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh",
-            "mac": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh"
-        }
-    },
-    "rust_analyzer_lsp": {
-        "check": "command -v rust-analyzer",
-        "install": {
-            "manjaro": "nvim --headless '+MasonInstall rust-analyzer' +qa",
-            "ubuntu": "nvim --headless '+MasonInstall rust-analyzer' +qa",
-            "mac": "nvim --headless '+MasonInstall rust-analyzer' +qa"
-        }
-    },
-    "basedpyright_lsp": {
-        "check": "command -v basedpyright-langserver",
-        "install": {
-            "manjaro": "nvim --headless '+MasonInstall basedpyright' +qa",
-            "ubuntu": "nvim --headless '+MasonInstall basedpyright' +qa",
-            "mac": "nvim --headless '+MasonInstall basedpyright' +qa"
-        }
-    },
-    "tsgo_lsp": {
-        "check": "command -v tsgo",
-        "install": {
-            "manjaro": "nvim --headless '+MasonInstall tsgo' +qa",
-            "ubuntu": "nvim --headless '+MasonInstall tsgo' +qa",
-            "mac": "nvim --headless '+MasonInstall tsgo' +qa"
-        }
+  "yay": {
+    "check": "command -v yay",
+    "install": {
+      "manjaro": "sh ~/dotfiles/setup/manjaro/yay.sh"
     }
+  },
+  "node_version_manager": {
+    "check": "test -d ~/.nvm",
+    "install": {
+      "manjaro": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash",
+      "ubuntu": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash",
+      "mac": "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash"
+    }
+  },
+  "node_js": {
+    "check": "command -v node",
+    "install": {
+      "manjaro": "nvm install --lts",
+      "ubuntu": "nvm install --lts",
+      "mac": "nvm install --lts"
+    }
+  },
+  "vivaldi": {
+    "check": "command -v vivaldi",
+    "install": {
+      "manjaro": "sudo pacman -S vivaldi",
+      "ubuntu": "echo 'install vivaldi manually or just use chrome'",
+      "mac": "brew install --cask vivaldi"
+    }
+  },
+  "lazygit": {
+    "check": "command -v lazygit",
+    "install": {
+      "ubuntu": "sh ~/dotfiles/setup/ubuntu/lazygit.sh",
+      "manjaro": "sudo pacman -S lazygit",
+      "mac": "brew install lazygit"
+    }
+  },
+  "i3": {
+    "check": "command -v i3",
+    "install": {
+      "ubuntu": "sudo apt install i3"
+    }
+  },
+  "alsa-utils": {
+    "check": "command -v amixer",
+    "install": {
+      "ubuntu": "sudo apt install alsa-utils"
+    }
+  },
+  "flameshot": {
+    "check": "command -v flameshot",
+    "install": {
+      "ubuntu": "sudo apt install flameshot"
+    }
+  },
+  "google-chrome": {
+    "check": "command -v google-chrome || command -v google-chrome-stable",
+    "install": {
+      "ubuntu": "sudo apt install google-chrome"
+    }
+  },
+  "autorandr": {
+    "check": "command -v autorandr",
+    "install": {
+      "ubuntu": "sudo apt install autorandr"
+    }
+  },
+  "hyprland": {
+    "check": "command -v hyprland",
+    "install": {
+      "manjaro": "sudo pacman -S hyprland"
+    }
+  },
+  "hyprcursor": {
+    "check": "pacman -Q hyprcursor",
+    "install": {
+      "manjaro": "sudo pacman -S hyprcursor"
+    }
+  },
+  "hyprpaper": {
+    "check": "command -v hyprpaper",
+    "install": {
+      "manjaro": "sudo pacman -S hyprpaper"
+    }
+  },
+  "xdg-desktop-portal-hyprland": {
+    "check": "pacman -Q xdg-desktop-portal-hyprland",
+    "install": {
+      "manjaro": "sudo pacman -S xdg-desktop-portal-hyprland"
+    }
+  },
+  "xdg-desktop-portal-gtk": {
+    "check": "pacman -Q xdg-desktop-portal-gtk",
+    "install": {
+      "manjaro": "sudo pacman -S xdg-desktop-portal-gtk"
+    }
+  },
+  "hypridle": {
+    "check": "command -v hypridle",
+    "install": {
+      "manjaro": "sudo pacman -S hypridle"
+    }
+  },
+  "hyprlock": {
+    "check": "command -v hyprlock",
+    "install": {
+      "manjaro": "sudo pacman -S hyprlock"
+    }
+  },
+  "hyprpanel": {
+    "check": "command -v ags",
+    "install": {
+      "manjaro": "yay -S ags-hyprpanel-git"
+    }
+  },
+  "cursor_theme": {
+    "check": "pacman -Q bibata-cursor-theme",
+    "install": {
+      "manjaro": "yay -S bibata-cursor-theme"
+    }
+  },
+  "hyprshot": {
+    "check": "command -v hyprshot",
+    "install": {
+      "manjaro": "yay -S hyprshot"
+    }
+  },
+  "hyprpolkitagent": {
+    "check": "pacman -Q hyprpolkitagent",
+    "install": {
+      "manjaro": "sudo pacman -S hyprpolkitagent"
+    }
+  },
+  "polybar": {
+    "check": "command -v polybar",
+    "install": {
+      "ubuntu": "sudo apt install polybar"
+    }
+  },
+  "xdotool": {
+    "check": "command -v xdotool",
+    "install": {
+      "manjaro": "sudo pacman -S xdotool",
+      "ubuntu": "sudo apt install xdotool"
+    }
+  },
+  "pavucontrol": {
+    "check": "command -v pavucontrol",
+    "install": {
+      "ubuntu": "sudo apt install pavucontrol"
+    }
+  },
+  "blueman": {
+    "check": "command -v blueman-manager",
+    "install": {
+      "ubuntu": "sudo apt install blueman"
+    }
+  },
+  "rofi": {
+    "check": "command -v rofi",
+    "install": {
+      "manjaro": "sudo pacman -S rofi-wayland",
+      "ubuntu": "sudo apt install rofi"
+    }
+  },
+  "dunst": {
+    "check": "command -v dunst",
+    "install": {
+      "ubuntu": "sudo apt install dunst"
+    }
+  },
+  "feh": {
+    "check": "command -v feh",
+    "install": {
+      "ubuntu": "sudo apt install feh"
+    }
+  },
+  "picom": {
+    "check": "command -v picom",
+    "install": {
+      "ubuntu": "sudo apt install picom"
+    }
+  },
+  "aerospace": {
+    "check": "command -v aerospace",
+    "install": {
+      "mac": "brew install --cask nikitabobko/tap/aerospace"
+    }
+  },
+  "clipboard_manager": {
+    "check": "command -v copyq",
+    "install": {
+      "ubuntu": "sudo apt install copyq",
+      "manjaro": "sudo pacman -S copyq",
+      "mac": "brew install copyq"
+    }
+  },
+  "fastfetch": {
+    "check": "command -v fastfetch",
+    "install": {
+      "manjaro": "sudo pacman -S fastfetch",
+      "mac": "brew install --cask fastfetch",
+      "ubuntu": "sh ~/dotfiles/setup/ubuntu/fastfetch.sh"
+    }
+  },
+  "kitty": {
+    "check": "command -v kitty",
+    "install": {
+      "ubuntu": "curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin && ln -sf ~/.local/kitty.app/bin/kitty ~/.local/kitty.app/bin/kitten ~/.local/bin/ && sudo apt-get install -y kitty-terminfo",
+      "manjaro": "sudo pacman -S kitty",
+      "mac": "brew install kitty"
+    }
+  },
+  "lsd": {
+    "check": "command -v lsd",
+    "install": {
+      "manjaro": "sudo pacman -S lsd",
+      "ubuntu": "sudo apt install lsd",
+      "mac": "brew install lsd"
+    }
+  },
+  "nvim": {
+    "check": "command -v nvim",
+    "install": {
+      "ubuntu": "sh ~/dotfiles/setup/ubuntu/nvim.sh",
+      "manjaro": "sudo pacman -S neovim",
+      "mac": "brew install neovim"
+    }
+  },
+  "ripgrep": {
+    "check": "command -v rg",
+    "install": {
+      "ubuntu": "sudo apt install ripgrep",
+      "manjaro": "sudo pacman -S ripgrep",
+      "mac": "brew install ripgrep"
+    }
+  },
+  "fzf": {
+    "check": "fzf --help 2>/dev/null | grep -q '\\[no\\]info'",
+    "install": {
+      "manjaro": "sudo pacman -S fzf",
+      "ubuntu": "mkdir -p ~/.local/bin && curl -fsSL https://github.com/junegunn/fzf/releases/download/v0.74.3/fzf-0.74.3-linux_amd64.tar.gz | tar -xz -C ~/.local/bin",
+      "mac": "brew install fzf"
+    }
+  },
+  "gh": {
+    "check": "command -v gh",
+    "install": {
+      "ubuntu": "sudo apt install gh",
+      "manjaro": "sudo pacman -S github-cli",
+      "mac": "brew install gh"
+    }
+  },
+  "clang-tidy": {
+    "check": "command -v clang-tidy",
+    "install": {
+      "ubuntu": "sudo apt install clang-tools",
+      "manjaro": "sudo pacman -S clang",
+      "mac": "brew install llvm"
+    }
+  },
+  "treesitter-cli": {
+    "check": "command -v tree-sitter",
+    "install": {
+      "ubuntu": "cargo install tree-sitter-cli",
+      "manjaro": "cargo install tree-sitter-cli",
+      "mac": "cargo install tree-sitter-cli"
+    }
+  },
+  "clang": {
+    "check": "command -v clang",
+    "install": {
+      "ubuntu": "sudo apt install clang",
+      "manjaro": "sudo pacman -S clang",
+      "mac": "brew install llvm"
+    }
+  },
+  "clipboard": {
+    "check": "command -v xclip || command -v pbcopy",
+    "install": {
+      "ubuntu": "sudo apt install xclip",
+      "manjaro": "sudo pacman -S xclip",
+      "mac": "echo 'Built-in pbcopy/pbpaste'"
+    }
+  },
+  "nerd_font": {
+    "check": "if [ \"$(uname)\" = Darwin ]; then test -e ~/Library/Fonts/JetBrainsMonoNerdFontMono-Regular.ttf; else fc-list | grep -Fqi 'JetBrainsMono Nerd Font Mono'; fi",
+    "install": {
+      "ubuntu": "mkdir -p ~/.local/share/fonts && curl -L https://github.com/ryanoasis/nerd-fonts/releases/download/v3.5.1/JetBrainsMono.zip -o /tmp/JetBrainsMono.zip && unzip -o /tmp/JetBrainsMono.zip -d ~/.local/share/fonts && rm /tmp/JetBrainsMono.zip && fc-cache -f",
+      "manjaro": "sudo pacman -S ttf-jetbrains-mono-nerd",
+      "mac": "brew install --cask font-jetbrains-mono-nerd-font"
+    }
+  },
+  "curl": {
+    "check": "command -v curl",
+    "install": {
+      "ubuntu": "sudo apt install curl",
+      "manjaro": "sudo pacman -S curl",
+      "mac": "brew install curl"
+    }
+  },
+  "jq": {
+    "check": "command -v jq",
+    "install": {
+      "ubuntu": "sudo apt install jq",
+      "manjaro": "sudo pacman -S jq",
+      "mac": "brew install jq"
+    }
+  },
+  "luarocks": {
+    "check": "command -v luarocks",
+    "install": {
+      "ubuntu": "sudo apt install luarocks",
+      "manjaro": "sudo pacman -S luarocks",
+      "mac": "brew install luarocks"
+    }
+  },
+  "tectonic": {
+    "check": "command -v tectonic",
+    "install": {
+      "ubuntu": "sudo snap install tectonic",
+      "manjaro": "sudo pacman -S tectonic",
+      "mac": "brew install tectonic"
+    }
+  },
+  "default_shell": {
+    "check": "echo $SHELL | grep -q fish",
+    "install": {
+      "ubuntu": "chsh -s $(which fish)",
+      "manjaro": "chsh -s $(which fish)",
+      "mac": "chsh -s $(which fish)"
+    }
+  },
+  "starship": {
+    "check": "command -v starship",
+    "install": {
+      "ubuntu": "sh ~/dotfiles/setup/ubuntu/starship.sh",
+      "manjaro": "sudo pacman -S starship",
+      "mac": "brew install starship"
+    }
+  },
+  "tmux": {
+    "check": "command -v tmux",
+    "install": {
+      "manjaro": "sudo pacman -S tmux",
+      "ubuntu": "sudo apt install tmux",
+      "mac": "brew install tmux"
+    }
+  },
+  "tmux-tpm": {
+    "check": "test -d ~/.config/tmux/plugins/tpm",
+    "install": {
+      "manjaro": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh",
+      "ubuntu": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh",
+      "mac": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh"
+    }
+  }
 }

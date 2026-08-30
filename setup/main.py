@@ -9,7 +9,7 @@ from domain.config import load_packages, load_symlinks
 from domain.distro import Distro, detect_distro
 from result import Err, Ok
 from steps.dependencies import install_package
-from steps.symlink import perform_symlink
+from steps.symlink import is_symlink_correct, perform_symlink
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -56,17 +56,27 @@ def run_packages(distro: Distro, file: Path | None) -> None:
         console.print("\n[green]All packages installed[/green]")
 
 
-def run_check(distro: Distro, file: Path | None, *, quiet: bool = False) -> int:
-    """Read-only: report which packages are present, without installing anything.
+def run_check(
+    distro: Distro,
+    packages_file: Path | None,
+    symlinks_file: Path | None,
+    *,
+    quiet: bool = False,
+) -> int:
+    """Read-only: report which packages and symlinks are present, without
+    installing or linking anything.
 
-    Returns the number of missing packages, for use as an exit code.
+    Returns the number of things missing, for use as an exit code.
     """
-    packages = load_packages([file or ROOT_DIR / "packages.json"])
-    missing: list[str] = []
+    packages = load_packages([packages_file or ROOT_DIR / "packages.json"])
+    symlinks = load_symlinks([symlinks_file or ROOT_DIR / "symlinks.json"])
+    missing_packages: list[str] = []
+    missing_symlinks: list[str] = []
     unchecked: list[str] = []
 
     if not quiet:
         console.print(f"[bold]Doctor ({distro})[/bold]")
+        console.print("[bold]Packages[/bold]")
     for package_id, package in packages.items():
         if package.install.get(distro) is None:
             continue
@@ -85,19 +95,37 @@ def run_check(distro: Distro, file: Path | None, *, quiet: bool = False) -> int:
         else:
             if not quiet:
                 console.print(f"  [red]✗[/red] {package_id}")
-            missing.append(package_id)
+            missing_packages.append(package_id)
 
-    if missing:
+    if not quiet:
+        console.print("[bold]Symlinks[/bold]")
+    for symlink in symlinks:
+        if symlink.distros is not None and distro not in symlink.distros:
+            continue
+
+        label = f"{symlink.src} -> {symlink.dst}"
+        if is_symlink_correct(symlink):
+            if not quiet:
+                console.print(f"  [green]✓[/green] {label}")
+        else:
+            if not quiet:
+                console.print(f"  [red]✗[/red] {label}")
+            missing_symlinks.append(label)
+
+    total_missing = len(missing_packages) + len(missing_symlinks)
+    if total_missing:
         if quiet:
             console.print("[bold red]WARNING: environment is inconsistent with setup configuration defined in dotfiles[/bold red]")
         else:
-            console.print(f"\n[bold red]Missing ({len(missing)}):[/bold red]")
-        for package_id in missing:
+            console.print(f"\n[bold red]Missing ({total_missing}):[/bold red]")
+        for package_id in missing_packages:
             install_cmd = packages[package_id].install.get(distro)
             console.print(f"  {package_id}: {install_cmd}")
+        for label in missing_symlinks:
+            console.print(f"  symlink: {label}")
         if not quiet:
             console.print(
-                f"\n[red]{len(missing)} missing[/red] — run with --packages to install, "
+                f"\n[red]{total_missing} missing[/red] — run with --packages/--symlink to fix, "
                 "or run the command above directly"
             )
     elif not quiet:
@@ -105,7 +133,7 @@ def run_check(distro: Distro, file: Path | None, *, quiet: bool = False) -> int:
     if unchecked and not quiet:
         console.print(f"[yellow]{len(unchecked)} package(s) have no check command and were skipped[/yellow]")
 
-    return len(missing)
+    return total_missing
 
 
 def run_symlinks(distro: Distro, file: Path | None) -> None:
@@ -145,7 +173,7 @@ def main(args: Arguments) -> int:
 
     missing_count = 0
     if args.do_check:
-        missing_count = run_check(distro, args.file, quiet=args.quiet)
+        missing_count = run_check(distro, args.file, args.file, quiet=args.quiet)
 
     if args.do_symlink:
         run_symlinks(distro, args.file)
