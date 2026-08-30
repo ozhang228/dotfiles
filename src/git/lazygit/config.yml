@@ -37,7 +37,7 @@ gui:
   showDivergenceFromBaseBranch: "arrowAndNumber"
   filterMode: fuzzy
   spinner:
-    rate: 16
+    rate: 100
 git:
   localBranchSortOrder: recency
   diffRenderers:
