@@ -16,17 +16,27 @@
 
 ## Language & Task Rules
 
-Per-language conventions live in their own files
+Language and task conventions live in these canonical files:
 
-@~/dotfiles/src/ai/rules/python.md
-@~/dotfiles/src/ai/rules/typescript.md
-@~/dotfiles/src/ai/rules/cpp.md
-@~/dotfiles/src/ai/rules/marimo.md
-@~/dotfiles/src/ai/rules/jupyter.md
-@~/dotfiles/src/ai/rules/work-knowledge.md
+- `~/dotfiles/src/ai/rules/python.md`
+- `~/dotfiles/src/ai/rules/typescript.md`
+- `~/dotfiles/src/ai/rules/cpp.md`
+- `~/dotfiles/src/ai/rules/marimo.md`
+- `~/dotfiles/src/ai/rules/jupyter.md`
+- `~/dotfiles/src/ai/rules/testing.md`
+- `~/dotfiles/src/ai/rules/work-knowledge.md`
 
-Each file is scoped to its language by its own header — apply a rule only when editing a file of that language or running that CLI tool.
-If the current client shows the `@...` lines literally instead of file content, read each referenced file manually before proceeding and let the user know.
+Read and apply only files whose declared scope matches the current task. Do not read all rule files by default. Tell the user which rule files you read.
+
+## Context Efficiency
+
+- Keep direct tool output at or below 2,500 tokens by default. Raise the limit to at most 5,000 only when exact broader output is necessary, and state why.
+- Search with `rg` before reading files. Start with the narrowest relevant paths and patterns.
+- Read at most 150 to 250 relevant lines initially. Continue in bounded chunks only when the first read shows more context is necessary.
+- Inspect `git diff --stat` and targeted files before a full diff. Default to `--unified=20`, increasing context only when the review requires it.
+- For successful test runs, return only the summary. For failures, return the relevant failure and a short amount of surrounding context.
+- Batch independent, bounded inspections into one orchestrated tool call. Keep steps sequential when the next command depends on the previous result.
+- Read authoritative instruction and skill files completely. Paginate them across bounded calls when they exceed the normal output limit.
 
 ## Code Design Principles
 
@@ -130,30 +140,6 @@ git stash pop                                              # restore the rest of
 ```
 
 If this surfaces a break in a "later PR" file, the fix (usually a rename or a narrowing `match`) belongs in the *earlier* PR, since that PR must leave the tree green standalone — don't defer it just because the plan said that file belongs later.
-
-## Testing
-
-### Tests as documentation
-
-For most features, a test suite's secondary job is documentation: someone unfamiliar with the code should be able to learn what a function does and doesn't guarantee by reading test names and bodies alone, without opening the implementation. That means naming and structuring each test around one specific, observable behavior, and writing the assertion so the expected outcome is legible on its own (a pinned literal, not an expression the reader has to evaluate). If you can't tell what behavior broke from a failing test's name and body without reading the code under test, the test isn't pinning down behavior, it's just exercising code — rewrite it.
-
-### Recurring bad-test patterns
-
-These apply in any language — the failure is in the test's *logic*, not a language-specific idiom.
-
-- **Trivial no-op test:** testing a function whose entire body is a stub (`raise NotImplementedError(...)`, `TODO`, a bare pass-through). There's no logic to verify, only the literal you just wrote — delete the function or delete the test, don't write a test that re-asserts the stub.
-- **Trivial-by-default test:** an argument passed into the constructor/helper under test happens to equal that helper's own default value, so the assertion holds whether or not the code path being tested is real. Caught example: a Python test called `_skew(rate_floor=0.026)` where the builder's own default `rate_floor` was already `0.026` — the assertion passed identically whether the property under test actually read `self.rate_floor` or returned a hardcoded `0.026` literal. Fix: pick an input value that differs from every default in the builder/fixture, so the assertion can only hold if the real wiring executed. If a value coincidentally matches a default, change it — don't accept the coincidence.
-- **Tautological-by-construction test:** the "expected" value is derived by calling the same function (or its exact inverse) under test, rather than an independently known number or reference. Round-trip tests (`f(g(x)) == x`) are the classic case — a consistent bug present in both directions (e.g. a sign flip in both a forward and inverse conversion) cancels out and the round trip still passes. One codebase hit exactly this class of bug (an SD sign-convention error) and then reintroduced a round-trip-only test in the same file later. Fix: pin the *intermediate* value too, with a literal computed once and reviewed, in addition to (not instead of) the round-trip check.
-- **Vacuous success-shape test:** asserting only that a call succeeded (`isinstance(result, Ok)`, `assert response.status == 200`, `np.isfinite(x)`, `assert result`, `assert len(result)`, `assert result is not None`) when the function has a real, computable expected value. Any wrong-but-successfully-shaped output satisfies these. Replace with the actual pinned value (`assert result == expected_value`) once you know what correct looks like — reserve success/error-shape assertions for cases where no single correct value exists (e.g., "this must error, but any error message is acceptable").
-- **Unverified-assumption test name:** naming a test after an assumption about the system that was never checked against real data. Caught example: a test named `..._uses_libor_fixing_path` when the model's real `FundingIndex` was `USD-SOFR`, not LIBOR — nobody grepped the fixture before naming it. Before finalizing a test name, check the real data (fixture, config, prod state) the test exercises to confirm the name's claim is actually true, not just plausible.
-- **Unverified secondary input:** when a test isolates one input to prove behavior is independent of it (e.g. "vol is normal regardless of beta"), the *other* inputs in the setup must be load-bearing, not decorative. Run the test with a default/simplified value for each supporting input and confirm it actually fails — if it still passes, that input isn't proving anything and should either be justified or removed. A "regardless of X" test with an unverified secondary input can pass by construction rather than by the invariant it claims to check.
-- **Redundant test coverage:** two tests that would fail for the same reason test nothing extra — they add maintenance cost, not confidence. Before adding a test, check whether an existing test already fails for the same root cause; if so, keep the better-named one and drop the other.
-- **Brittle-to-refactor test:** asserting on implementation details (mock call counts, private/internal state, exact intermediate data structures) instead of observable output makes a test fail on a harmless refactor even though behavior didn't change. A test should only break when the public, observable contract changes — not when you rename a helper, reorder internal calls, or swap an internal data structure that isn't part of the return value.
-- **Shared mock mutation:** don't mutate a mock response after passing it to a fake server or test harness. Build and register a new response for the next test phase so behavior doesn't depend on shared object identity or mutation timing.
-- **Routing-only test:** don't test that a value was routed through a particular field, config object, dependency, or helper when the type system already proves the wiring and a happy-path test pins the resulting value. Put a distinctive input into the happy path and assert the public output instead. Keep a dedicated routing test only when routing itself is runtime behavior with independently observable branches that the happy path cannot distinguish.
-- **Statically unreachable input test:** before adding an error-path test, identify a supported runtime input that can reach it. If code-owned types reject every supported construction, rely on the static checker instead of bypassing the types in a test. Keep validation tests at untyped or external boundaries where invalid data can actually enter.
-- **Config-shape test:** don't add tests that only construct or parse typed configuration and assert that validation succeeds. Static type checking covers code-owned construction, while the application startup path covers deployed serialized config. Add a config test only for custom validation or transformation logic with behavior beyond the declared types.
-- **Untestable-by-construction test:** before trusting a test, check whether it can actually fail given the available stubs/fixtures. If a stub returns identical data across the branches a test is meant to distinguish, any assertion comparing them is trivially green regardless of whether the code under test is correct. A test that cannot fail is worse than no test — it looks like coverage without being any.
 
 ## Verification Habits
 

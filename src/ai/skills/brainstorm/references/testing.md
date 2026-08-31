@@ -2,7 +2,7 @@
 
 Use this during brainstorm to define what must be true before deciding how each behavior should be verified. The result is a behavior contract, not automatically a test plan.
 
-For the test-quality bar itself (tautological tests, vacuous assertions, brittle-to-refactor tests, and the rest), see `GLOBAL.md`'s "Recurring bad-test patterns". See also GLOBAL.md's "Tests as documentation": the `what`/`why` format below exists specifically so the behavior list doubles as documentation of the feature, readable without opening any code. 
+For the test-quality bar itself (tautological tests, vacuous assertions, brittle-to-refactor tests, and the rest), see `~/dotfiles/src/ai/rules/testing.md`. Its "Tests as documentation" guidance is why the `what`/`why` format below doubles as readable feature documentation without opening any code.
 
 ## Verification classes
 

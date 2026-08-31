@@ -1,3 +1,8 @@
+---
+applies_to: Work under /home/ozhang/drw or tasks requiring DRW/FICC domain knowledge
+skip_if: Work outside DRW repositories that does not require DRW/FICC domain knowledge
+---
+
 # Work Knowledge
 
 Terminology, repo map, and durable DRW/FICC desk facts for Oscar's work. All repos live under `~/drw/`.
