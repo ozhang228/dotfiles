@@ -217,15 +217,15 @@ hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "l", hl.dsp.window.move({ direct
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "k", hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "j", hl.dsp.window.move({ direction = "down" }))
 hl.bind(
-	mainMod .. " + " .. "SHIFT + Control" .. " + " .. "h",
+	mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "h",
 	hl.dsp.window.resize({ x = -30, y = 0, relative = true })
 )
-hl.bind(mainMod .. " + " .. "SHIFT + Control" .. " + " .. "l", hl.dsp.window.resize({ x = 30, y = 0, relative = true }))
+hl.bind(mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "l", hl.dsp.window.resize({ x = 30, y = 0, relative = true }))
 hl.bind(
-	mainMod .. " + " .. "SHIFT + Control" .. " + " .. "k",
+	mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "k",
 	hl.dsp.window.resize({ x = 0, y = -30, relative = true })
 )
-hl.bind(mainMod .. " + " .. "SHIFT + Control" .. " + " .. "j", hl.dsp.window.resize({ x = 0, y = 30, relative = true }))
+hl.bind(mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "j", hl.dsp.window.resize({ x = 0, y = 30, relative = true }))
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "f", hl.dsp.window.fullscreen())
 
 -- Focus workspaces
