@@ -146,5 +146,6 @@
   "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
-  "theme": "light"
+  "theme": "light",
+  "agentPushNotifEnabled": true
 }

@@ -1,6 +1,6 @@
 ---
 name: brainstorm
-description: 'Use before creative implementation with real design space: features, components, scripts/tools, system designs, or proposal planning. Also trigger on "grill me", "stress-test this", and "interview me". Challenge the premise, ask one question at a time with a recommended answer, define expected behaviors, and get approval before coding. Skip direct concrete edits, mechanical type/build/lint fixes, throwaway experiments, and handoff summaries.'
+description: 'Use before creative implementation with real design space: features, components, scripts/tools, system designs, or proposal planning. Also trigger on "grill me", "stress-test this", and "interview me". Challenge the premise, ask one question at a time without proposing an answer, define expected behaviors, and get approval before coding. Skip direct concrete edits, mechanical type/build/lint fixes, throwaway experiments, and handoff summaries.'
 ---
 
 # Brainstorming
@@ -45,7 +45,7 @@ Follow these phases in order:
   - Audit ownership before proposing the file map. For every new or moved file, ask whether the capability belongs in this repository, package, and module; whether its directory makes the conceptual owner obvious; and whether an existing owner should be extended instead. Use import direction and cycle avoidance as tie-breakers, not as the primary placement rationale.
 - Grill the design, this is the default phase before any coding. Interview the user about every aspect of the plan until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one (answer the decision an upstream choice depends on before the choices that hang off it). Don't stop at the first layer of questions; keep going until there's nothing load-bearing left unresolved.
   - If a question can be answered by exploring the codebase, explore instead of asking.
-  - For each question, provide your recommended answer and the reasoning, so the user is reacting to a concrete proposal 
+  - **Ask without proposing an answer.** Let the user reason through it first — this is a two-way discussion, not the user rubber-stamping a recommendation: it tests their own understanding of the design, and their answer (including the reasoning behind it, and any constraints or context you didn't have) is what should actually shape the decision. Only give your own recommendation if the user asks for one or says they're unsure; even then, give it as a reaction to what they've said so far, not a default opener.
   - Ask one question at a time, and wait for the answer before the next.
   - Default to prose questions instead of requesting user input. 
   - Collapse scope the moment grilling reveals the work is small. Don't run the whole workflow for a trivial change
