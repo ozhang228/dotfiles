@@ -33,6 +33,35 @@ return {
   config = function(_, opts)
     require("dooing").setup(opts)
 
+    local dooing_input_titles = {
+      [" Input "] = true,
+      [" New to-do "] = true,
+      [" Edit to-do "] = true,
+      [" New sub-task "] = true,
+      [" Time estimation "] = true,
+      [" Edit tag "] = true,
+      [" Search to-dos "] = true,
+    }
+
+    local function disable_completion_in_dooing_input(args)
+      local buf = args.buf
+      if vim.bo[buf].buftype ~= "nofile" then return end
+
+      local win = vim.fn.bufwinid(buf)
+      if win == -1 then return end
+
+      local title = vim.api.nvim_win_get_config(win).title
+      if type(title) ~= "table" or type(title[1]) ~= "table" then return end
+      if not dooing_input_titles[title[1][1]] then return end
+
+      vim.b[buf].completion = false
+    end
+
+    vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
+      group = vim.api.nvim_create_augroup("dooing_completion", { clear = true }),
+      callback = disable_completion_in_dooing_input,
+    })
+
     local state = require("dooing.state")
     local function compare_todos_alphabetically(a, b)
       local a_text = a.todo.text:lower()
