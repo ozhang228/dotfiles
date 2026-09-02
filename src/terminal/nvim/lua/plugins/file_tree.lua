@@ -44,6 +44,7 @@ return {
       trim_right = ">",
     },
     options = {
+      lsp_timeout = 0,
       permanent_delete = false,
       use_as_default_explorer = true,
     },

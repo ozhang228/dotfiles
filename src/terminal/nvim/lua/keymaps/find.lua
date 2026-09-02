@@ -4,7 +4,12 @@ return {
     "<leader>ff",
     function()
       vim.cmd("normal! m'")
-      Snacks.picker.smart({ multi = { "recent", "files" } })
+      Snacks.picker.smart({
+        multi = {
+          { source = "recent", filter = { cwd = true } },
+          "files",
+        },
+      })
     end,
     desc = "Files (smart)",
   },
