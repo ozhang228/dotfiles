@@ -1,15 +1,22 @@
 ---
 name: code-respond
-description: Evaluate incoming PR or code-review feedback with the author one comment at a time. Use when the user pastes review comments, links to PR feedback, asks to go through feedback, decide whether a reviewer is right, or address comments interactively. Verify each claim against the current code, explain the context and tradeoffs, wait for the user's decision before editing, and collect durable lessons for a later dotfiles update. Not for proactively reviewing a diff.
+description: Evaluate PR or code-review feedback authored by another reviewer with the author one comment at a time. Use when the user pastes someone else's review comments, links to PR feedback, asks to go through another reviewer's feedback, decide whether that reviewer is right, or address those comments interactively. Do not use for the user's own implementation notes or review comments, which are direct instructions. Verify each external claim against the current code, explain the context and tradeoffs, wait for the user's decision before editing, and collect durable lessons for a later dotfiles update. Not for proactively reviewing a diff.
 ---
 
 # Respond to Feedback
 
-Help the author decide what to do with incoming review feedback. Treat every comment as a premise to verify, regardless of the reviewer's seniority.
+Help the author decide what to do with feedback from another reviewer. Treat every external comment as a premise to verify, regardless of the reviewer's seniority.
+
+## Scope gate
+
+- Identify who authored the feedback before applying this workflow.
+- If Oscar is supplying his own comments or implementation notes, do not enter the one-comment-at-a-time review workflow. Treat those notes as direct instructions, make the requested changes, and verify them.
+- If a message mixes Oscar's notes with another reviewer's comments, separate them. Apply Oscar's notes directly and use this workflow only for the other reviewer's comments.
+- If authorship is unclear, ask whether the feedback came from another reviewer before pausing for comment-by-comment decisions.
 
 ## Boundaries
 
-- Work one comment at a time. Batch comments only when the user explicitly asks.
+- For external review feedback, work one comment at a time. Batch comments only when the user explicitly asks.
 - Keep GitHub read-only. Never post, edit, delete, resolve, or react to comments, and never mutate PR state.
 - Do not edit code until the user decides what to do with the current comment.
 - Do not propose a patch or draft a response unless the user asks. Give the user enough verified information to make the decision.

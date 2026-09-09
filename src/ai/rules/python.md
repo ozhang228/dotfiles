@@ -7,6 +7,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 
 - Do not use timezone-naive datetimes
 - Prefer `Self` from `typing_extensions` instead of forward-referencing the class name.
+- When an API returns `fio.result.Result`, represent expected failures as `Err` and propagate them through reusable code without unwrapping; unwrap once at the application or top-level boundary.
 - When a function has two or more consecutive parameters of the same type, force keyword arguments using `*` to prevent accidental transposition.
 - Use keyword arguments at call sites when two consecutive parameters share a type or the function takes more than three parameters.
 - Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation.
