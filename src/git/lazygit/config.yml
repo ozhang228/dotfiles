@@ -40,9 +40,9 @@ gui:
     rate: 100
 git:
   localBranchSortOrder: recency
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: "delta --side-by-side --paging=never"
+      command: "delta --side-by-side --paging=never"
       externalDiffTool: "delta --side-by-side --paging=never"
   parseEmoji: true
 os:
