@@ -114,6 +114,15 @@ Validate untyped or external data once at the owning boundary, then construct th
 
 ## Git & PR Workflow
 
+### Protected default branches
+
+Never push directly to `main` or `master`, including fast-forwards, merge
+commits, and emergency reverts. Push only feature or revert branches for Oscar
+to merge through the repository's normal pull request workflow. A request to
+"fast-forward to master," "merge to master," or otherwise update a default
+branch does not authorize a direct push. If the intended branch operation is
+ambiguous, stop and ask before changing any remote branch.
+
 ### Draft pull requests
 
 Always create new pull requests as drafts (for example, `gh pr create --draft`). Never mark Oscar's pull requests ready for review, including when asked to publish or finalize one. Do not post, edit, delete, or resolve GitHub review conversations or comments on Oscar's behalf. Do not mutate GitHub pull requests or issues in any other way, including approvals, merges, labels, assignments, closures, or readiness changes. Do not push commits or branches until Oscar explicitly approves the push. A request to implement, fix, commit, or create a draft PR does not imply push approval; ask before the push when it is required.
