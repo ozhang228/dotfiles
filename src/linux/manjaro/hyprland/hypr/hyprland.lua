@@ -216,15 +216,9 @@ hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "h", hl.dsp.window.move({ direct
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "l", hl.dsp.window.move({ direction = "right" }))
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "k", hl.dsp.window.move({ direction = "up" }))
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "j", hl.dsp.window.move({ direction = "down" }))
-hl.bind(
-	mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "h",
-	hl.dsp.window.resize({ x = -30, y = 0, relative = true })
-)
+hl.bind(mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "h", hl.dsp.window.resize({ x = -30, y = 0, relative = true }))
 hl.bind(mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "l", hl.dsp.window.resize({ x = 30, y = 0, relative = true }))
-hl.bind(
-	mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "k",
-	hl.dsp.window.resize({ x = 0, y = -30, relative = true })
-)
+hl.bind(mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "k", hl.dsp.window.resize({ x = 0, y = -30, relative = true }))
 hl.bind(mainMod .. " + " .. "SHIFT + CTRL" .. " + " .. "j", hl.dsp.window.resize({ x = 0, y = 30, relative = true }))
 hl.bind(mainMod .. " + " .. "SHIFT" .. " + " .. "f", hl.dsp.window.fullscreen())
 
