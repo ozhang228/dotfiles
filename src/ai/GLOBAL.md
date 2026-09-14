@@ -106,7 +106,7 @@ The ladder is a reflex, not a research project. Two rungs work → take the high
 
 Prefer type inference. Add an explicit annotation only when the language or type checker cannot infer the intended type accurately enough; most local variables and obvious return values do not need one.
 
-For parameterized mappings, give keys and values meaningful named domain types instead of repeating raw primitive types. Give non-trivial mapping shapes a named alias, especially when nested, so annotations read in domain terms rather than as `dict[str, dict[str, float]]` or its language equivalent.
+For parameterized mappings, give keys and values meaningful named domain types instead of repeating raw primitive types. Give non-trivial mapping shapes a named alias, especially when nested, so annotations read in domain terms like `dict[Id, dict[SecondaryId, ValueAlias]]`rather than as `dict[str, dict[str, float]]` or its language equivalent. Never directly alias the entire mapping as the variable / parameter name should serve as that
 
 ### Parse at boundaries
 
