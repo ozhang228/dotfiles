@@ -106,6 +106,8 @@ The ladder is a reflex, not a research project. Two rungs work → take the high
 
 Prefer type inference. Add an explicit annotation only when the language or type checker cannot infer the intended type accurately enough; most local variables and obvious return values do not need one.
 
+For parameterized mappings, give keys and values meaningful named domain types instead of repeating raw primitive types. Give non-trivial mapping shapes a named alias, especially when nested, so annotations read in domain terms rather than as `dict[str, dict[str, float]]` or its language equivalent.
+
 ### Parse at boundaries
 
 Prefer making invalid states unrepresentable over constructing broad values and validating them at runtime. Encode correlated states as explicit variants or narrower types, rather than a boolean plus data whose valid shape depends on that boolean. Make downstream APIs accept only the variant they can actually handle.
