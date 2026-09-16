@@ -15,12 +15,18 @@ local oxlint_filetypes = {
 local function lint_buffer(event)
   local lint = require("lint")
   local filetype = vim.bo[event.buf].filetype
+  local buffer_directory = vim.fs.dirname(vim.api.nvim_buf_get_name(event.buf))
+
+  if filetype == "python" then
+    local pyproject_root = vim.fs.root(buffer_directory, "pyproject.toml")
+    lint.try_lint(nil, { cwd = pyproject_root })
+    return
+  end
+
   if not oxlint_filetypes[filetype] then
     lint.try_lint()
     return
   end
-
-  local buffer_directory = vim.fs.dirname(vim.api.nvim_buf_get_name(event.buf))
   local oxlint_root = vim.fs.root(buffer_directory, oxlint_config_files)
 
   if oxlint_root then
