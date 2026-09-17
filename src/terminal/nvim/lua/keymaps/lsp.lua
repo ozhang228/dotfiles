@@ -39,10 +39,5 @@ return {
       function() vim.lsp.buf.rename() end,
       desc = "Rename",
     },
-    {
-      "<leader>lR",
-      function() vim.lsp.stop_client(vim.lsp.get_clients()) end,
-      desc = "Restart",
-    },
   },
 }

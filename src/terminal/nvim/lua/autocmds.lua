@@ -1,3 +1,28 @@
+local function restart_lsp()
+  local names = {}
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    table.insert(names, client.name)
+    client:stop(true)
+  end
+  vim.defer_fn(function()
+    for _, name in ipairs(names) do
+      vim.lsp.enable(name, false)
+      vim.lsp.enable(name, true)
+    end
+  end, 300)
+end
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+  desc = "Restart LSP clients after a dependency manifest changes",
+  pattern = {
+    "package.json",
+    "pnpm-lock.yaml",
+    "pyproject.toml",
+    "uv.lock",
+  },
+  callback = restart_lsp,
+})
+
 local oxlint_config_files = {
   ".oxlintrc.json",
   ".oxlintrc.jsonc",
