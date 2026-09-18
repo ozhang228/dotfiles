@@ -36,7 +36,7 @@ Follow these phases in order:
 ### Model routing
 
 - Keep discovery, grilling, design, behavior contracts, plan authoring, and plan review in the primary thread on the user's selected model and reasoning effort. Do not delegate planning to a cheaper model.
-- After design approval, delegate nontrivial implementation to one implementation-focused subagent using `gpt-5.6-terra` with `medium` reasoning. Give it the approved visual plan, implementation plan when present, exact behavior contract, and instruction to edit the working tree and run the relevant tests.
+- After design approval, delegate nontrivial implementation to one implementation-focused subagent using `gpt-5.6-luna` with `high` reasoning. Give it the approved visual plan, implementation plan when present, exact behavior contract, and instruction to edit the working tree and run the relevant tests.
 - Keep a clearly mechanical edit in the primary thread when spawning an agent would cost more than the work. If delegation is unavailable, implement in the primary thread rather than blocking.
 - The primary thread owns acceptance: inspect the worker's complete diff, verify it implemented the approved design, run the test suite and static checks, and send defects back to the same worker when practical. Do not accept a worker's summary as verification.
 
