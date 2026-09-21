@@ -79,9 +79,11 @@ For parameterized mappings, give keys and values meaningful named domain types i
 
 ### Parse at boundaries
 
-Prefer making invalid states unrepresentable over constructing broad values and validating them at runtime. Encode correlated states as explicit variants or narrower types, rather than a boolean plus data whose valid shape depends on that boolean. Make downstream APIs accept only the variant they can actually handle.
+Parse, don't validate: at an untyped or external boundary, convert input into a precise internal type that preserves the facts learned. Pass that stronger type inward instead of returning `bool`, `None`, or unit and making callers repeat checks.
 
-Validate untyped or external data once at the owning boundary, then construct the stronger internal type so consumers can operate directly on valid data. Repeated checks, assertions, or logs for a state that should be impossible are a modeling smell. Keep runtime validation for genuinely fallible external operations, valid domain failures, and invariants the type system cannot reasonably express; do not hide those failures to make code look simpler.
+Make illegal states unrepresentable. Use explicit variants and constrained data structures instead of broad values plus flags, and make parser results necessary for downstream code to proceed.
+
+Avoid shotgun parsing: finish parsing before acting on input, and push the burden of proof upward as far as practical. Use private wrappers or smart constructors when the type system cannot express a constraint. Keep runtime checks for genuinely fallible operations, authorization, and dynamic invariants.
 
 ## Git & PR Workflow
 
