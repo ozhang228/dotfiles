@@ -64,6 +64,15 @@ overrides the Alp API. The `data-pip-qa` branch in `k8s` owns the mounted
 Render that instance to verify the generated ConfigMap, deployment mount, and
 Kafka destinations. The separate `fx-metals-fpp` canary has its own config.
 
+## Historical skew identities
+
+`data_gold.research_intraday_skew_fit_results` stores Coral listing IDs.
+Matrix's `/greeks` and `/refdata` do not expose that join key. Resolve it through
+Luna YARDS `coral_listing_id`, using structured `listed_year`, `listed_month`,
+and `last_trade_time_ns`. For listings expired by the end of a history window,
+query refdata at an actual observation timestamp. Platinum's fit-table option
+product is `PO`; its desk and underlying product are `PL`.
+
 ## PnL expiration
 
 Delta and PnL Scalloper cache their historical close snapshots in memory.

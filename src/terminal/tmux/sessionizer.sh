@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# Navigate from a project to one of its Git worktrees and its tmux session.
+# Fuzzy-pick a project, worktree, or existing tmux session.
 #
-# - The first picker contains one entry per project.
-# - The second picker contains every registered worktree, including stale ones.
-# - Entries are sorted by most-recently-active tmux session first.
-# - ctrl-x only removes the highlighted stale worktree registration.
+# - Worktrees are labeled as "branch [project]" in one flat list.
+# - Existing sessions, including standalone sessions such as "default", remain visible.
+# - Stale worktrees sort first and ctrl-x only removes the highlighted stale registration.
+# - All entries are ordered by stale status, then most-recently-active session.
 set -euo pipefail
 
 SCRIPT=$(realpath "$0")
 printf -v SCRIPT_Q '%q' "$SCRIPT"
+REPLY=""
 
 collect_candidates() {
     candidates=()
@@ -26,43 +27,109 @@ collect_candidates() {
 }
 
 load_session_activity() {
-    declare -gA session_activity
+    declare -gA session_activity session_paths
     session_activity=()
+    session_paths=()
 
-    while IFS='|' read -r name timestamp; do
-        [ -n "$name" ] && session_activity["$name"]="$timestamp"
-    done < <(tmux list-sessions -F '#{session_name}|#{session_activity}' 2>/dev/null || true)
+    while IFS='|' read -r name timestamp path; do
+        [ -n "$name" ] || continue
+        session_activity["$name"]="$timestamp"
+        session_paths["$name"]="$path"
+    done < <(tmux list-sessions -F '#{session_name}|#{session_activity}|#{session_path}' 2>/dev/null || true)
+
+    load_ai_statuses
+}
+
+path_basename() {
+    local path="$1"
+    path="${path%/}"
+    REPLY="${path##*/}"
 }
 
 session_name_for_path() {
-    basename "$1" | tr '.:' '__'
+    local name
+    path_basename "$1"
+    name="$REPLY"
+    name="${name//./_}"
+    name="${name//:/_}"
+    REPLY="$name"
+}
+
+git_common_dir_from_marker() {
+    local path="$1" marker="$1/.git" git_dir
+
+    if [ -d "$marker" ]; then
+        printf '%s' "$marker"
+        return 0
+    fi
+
+    [ -f "$marker" ] || return 1
+    IFS= read -r git_dir < "$marker" || return 1
+    case "$git_dir" in
+        "gitdir: "/*/.git/worktrees/*)
+            git_dir="${git_dir#gitdir: }"
+            printf '%s' "${git_dir%%/worktrees/*}"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
 }
 
 git_common_dir_for() {
-    git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null
+    git_common_dir_from_marker "$1" || \
+        git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null
+}
+
+load_ai_statuses() {
+    local pane_dir="$HOME/.cache/tmux-ai-status/panes"
+    declare -gA session_ai_statuses
+    session_ai_statuses=()
+    [ -d "$pane_dir" ] || return 0
+
+    declare -A active_panes=()
+    local session pane key f filename stem pane_id status icon
+    while IFS='|' read -r session pane; do
+        [ -n "$session" ] || continue
+        key="$session|$pane"
+        active_panes["$key"]=1
+    done < <(tmux list-panes -a -F '#{session_name}|#{pane_id}' 2>/dev/null || true)
+
+    for f in "$pane_dir"/*.status; do
+        [ -f "$f" ] || continue
+        filename="${f##*/}"
+        stem="${filename%.status}"
+        pane_id="${stem##*_}"
+        session="${stem%_$pane_id}"
+        key="$session|$pane_id"
+        [ -n "${active_panes[$key]+x}" ] || continue
+        IFS= read -r status < "$f" || status=""
+        case "$status" in
+            working) icon="⚡" ;;
+            done)    icon="✅" ;;
+            wait)    icon="⏸" ;;
+            *)       icon="" ;;
+        esac
+        [ -n "$icon" ] || continue
+        if [ -n "${session_ai_statuses[$session]+x}" ]; then
+            session_ai_statuses["$session"]+=" $icon"
+        else
+            session_ai_statuses["$session"]="$icon"
+        fi
+    done
 }
 
 ai_status_icons() {
+    REPLY="${session_ai_statuses[$1]:-}"
+}
+
+session_indicator() {
     local session="$1"
-    local pane_dir="$HOME/.cache/tmux-ai-status/panes"
-    [ -d "$pane_dir" ] || return 0
-
-    local active_panes icons=() f pane_id
-    active_panes=$(tmux list-panes -t "$session" -F '#{pane_id}' 2>/dev/null || true)
-    for f in "$pane_dir/${session}_"*.status; do
-        [ -f "$f" ] || continue
-        pane_id=$(basename "$f" .status)
-        pane_id="${pane_id#${session}_}"
-        printf '%s\n' "$active_panes" | grep -qx "$pane_id" || continue
-        case "$(cat "$f" 2>/dev/null)" in
-            working) icons+=("⚡") ;;
-            done)    icons+=("✅") ;;
-            wait)    icons+=("⏸") ;;
-        esac
-    done
-
-    [ "${#icons[@]}" -gt 0 ] && printf '%s' "${icons[*]}"
-    return 0
+    if [ -n "${session_activity[$session]+x}" ]; then
+        REPLY=$'\033[92m•\033[0m'
+    else
+        REPLY=$'\033[90m○\033[0m'
+    fi
 }
 
 # Emit: worktree path, branch/detached label, stale flag.
@@ -103,16 +170,16 @@ worktree_records() {
     flush_worktree_record
 }
 
-project_list() {
+collect_projects() {
     collect_candidates
-    load_session_activity
+    declare -gA project_git_dirs
+    declare -ga projects
+    project_git_dirs=()
+    projects=()
 
-    declare -A project_git_dirs
-    local -a projects=() entries=()
-    local dir git_dir project path branch stale session timestamp recent count label
-
+    local dir git_dir project
     for dir in "${candidates[@]}"; do
-        if git_dir=$(git_common_dir_for "$dir"); then
+        if git_dir=$(git_common_dir_from_marker "$dir"); then
             if [[ "$git_dir" == */.git ]]; then
                 project="${git_dir%/.git}"
             else
@@ -128,94 +195,152 @@ project_list() {
             project_git_dirs["$project"]="$git_dir"
         fi
     done
+}
 
-    for project in "${projects[@]}"; do
-        git_dir="${project_git_dirs[$project]}"
-        recent=0
-        count=0
+build_worktree_index() {
+    collect_projects
+    declare -gA worktree_branches worktree_stale worktree_projects
+    worktree_branches=()
+    worktree_stale=()
+    worktree_projects=()
 
-        if [ -n "$git_dir" ]; then
-            while IFS=$'\t' read -r path branch stale; do
-                [ -n "$path" ] || continue
-                count=$((count + 1))
-                session=$(session_name_for_path "$path")
-                timestamp="${session_activity[$session]:-0}"
-                if [ "$timestamp" -gt "$recent" ]; then
-                    recent="$timestamp"
-                fi
-            done < <(worktree_records "$git_dir")
-        else
-            count=1
-            session=$(session_name_for_path "$project")
-            recent="${session_activity[$session]:-0}"
+    local -a indexed_records=()
+    local project git_dir path branch stale record
+
+    # Git worktree reads are independent. Run them concurrently so one slow
+    # repository does not make every fzf reload wait behind others.
+    mapfile -t indexed_records < <(
+        for project in "${projects[@]}"; do
+            git_dir="${project_git_dirs[$project]}"
+            if [ -n "$git_dir" ]; then
+                worktree_records "$git_dir" \
+                    | while IFS=$'\t' read -r path branch stale; do
+                        [ -n "$path" ] || continue
+                        printf '%s\t%s\t%s\t%s\n' \
+                            "$project" "$path" "$branch" "$stale"
+                    done &
+            else
+                printf '%s\t%s\tdirectory\t0\n' "$project" "$project"
+            fi
+        done
+        wait
+    )
+
+    for record in "${indexed_records[@]}"; do
+        IFS=$'\t' read -r project path branch stale <<<"$record"
+        [ -n "$path" ] || continue
+        worktree_branches["$path"]="$branch"
+        worktree_stale["$path"]="$stale"
+        worktree_projects["$path"]="$project"
+    done
+}
+
+worktree_label() {
+    local branch="$1" project="$2" stale="$3" label project_name
+    path_basename "$project"
+    project_name="$REPLY"
+
+    if [ "$branch" = "directory" ]; then
+        label="$project_name"
+    else
+        label="$branch [$project_name]"
+    fi
+
+    [ "$stale" -eq 1 ] && label="🗑 stale  $label"
+    REPLY="$label"
+}
+
+label_session() {
+    local label="$1" session="$2" ai_status indicator
+    session_indicator "$session"
+    indicator="$REPLY"
+    label="$label $indicator"
+    ai_status_icons "$session"
+    ai_status="$REPLY"
+    [ -n "$ai_status" ] && label="$label $ai_status"
+    REPLY="$label"
+}
+
+list_entries() {
+    load_session_activity
+    build_worktree_index
+
+    local -a entries=()
+    local name path project branch stale session timestamp label git_dir kind indicator
+
+    # Keep every existing tmux session, even when it is not a discovered project.
+    for name in "${!session_activity[@]}"; do
+        path="${session_paths[$name]}"
+        project="${worktree_projects[$path]:-}"
+        branch="${worktree_branches[$path]:-}"
+
+        if [ -z "$project" ] && [ -d "$path" ] && git_dir=$(git_common_dir_for "$path"); then
+            if [[ "$git_dir" == */.git ]]; then
+                project="${git_dir%/.git}"
+                branch=$(git -C "$path" branch --show-current 2>/dev/null || true)
+                [ -n "$branch" ] || branch="(detached)"
+            fi
         fi
 
-        label="$(basename "$project")  ·  $count worktrees"
-        entries+=("$recent"$'\t'"$project"$'\t'"$count"$'\t'"$label")
+        if [ -n "$project" ] && [ -n "$branch" ]; then
+            worktree_label "$branch" "$project" 0
+            label="$REPLY"
+        else
+            label="$name"
+            project="-"
+        fi
+        label_session "$label" "$name"
+        label="$REPLY"
+        timestamp="${session_activity[$name]:-0}"
+        entries+=("0"$'\t'"$timestamp"$'\t'session$'\t'"$name"$'\t'"$label"$'\t'"$project")
+    done
+
+    # Add every discovered worktree that does not already have a live session.
+    for path in "${!worktree_projects[@]}"; do
+        project="${worktree_projects[$path]}"
+        branch="${worktree_branches[$path]}"
+        stale="${worktree_stale[$path]}"
+        session_name_for_path "$path"
+        session="$REPLY"
+        if [ "$stale" -eq 0 ] && [ -n "${session_activity[$session]+x}" ]; then
+            continue
+        fi
+
+        timestamp="${session_activity[$session]:-0}"
+        worktree_label "$branch" "$project" "$stale"
+        label="$REPLY"
+        session_indicator "$session"
+        indicator="$REPLY"
+        label="$label $indicator"
+        if [ "$branch" = "directory" ]; then
+            kind=directory
+        else
+            kind=worktree
+        fi
+        entries+=("$stale"$'\t'"$timestamp"$'\t'"$kind"$'\t'"$path"$'\t'"$label"$'\t'"$project")
     done
 
     printf '%s\n' "${entries[@]}" \
-        | sort -t $'\t' -k1,1rn -k4,4 \
-        | cut -f1-4
+        | sort -t $'\t' -k1,1rn -k2,2rn -k5,5 \
+        | cut -f1-6
 }
 
-worktree_list() {
-    local project="$1" git_dir path branch stale session timestamp ai_status label
-    local -a entries=()
-    load_session_activity
-
-    if git_dir=$(git_common_dir_for "$project"); then
-        while IFS=$'\t' read -r path branch stale; do
-            [ -n "$path" ] || continue
-            session=$(session_name_for_path "$path")
-            timestamp="${session_activity[$session]:-0}"
-            label="$branch  ·  $path"
-
-            if [ "$stale" -eq 1 ]; then
-                label="🗑 stale  ·  $label"
-            elif [ -n "${session_activity[$session]+x}" ]; then
-                label="$label  ·  ●"
-                ai_status=$(ai_status_icons "$session")
-                [ -n "$ai_status" ] && label="$label $ai_status"
-            fi
-
-            entries+=("$timestamp"$'\t'"$path"$'\t'"$branch"$'\t'"$label"$'\t'"$stale")
-        done < <(worktree_records "$git_dir")
-    else
-        session=$(session_name_for_path "$project")
-        timestamp="${session_activity[$session]:-0}"
-        label="directory  ·  $project"
-        if [ -n "${session_activity[$session]+x}" ]; then
-            label="$label  ·  ●"
-        fi
-        entries+=("$timestamp"$'\t'"$project"$'\t'directory$'\t'"$label"$'\t'0)
-    fi
-
-    printf '%s\n' "${entries[@]}" \
-        | sort -t $'\t' -k5,5rn -k1,1rn -k3,3 -k2,2 \
-        | cut -f1-4
-}
-
-preview_project() {
-    local project="$1" git_dir
-    ls -la --color=always -- "$project" 2>/dev/null || true
-    if git_dir=$(git_common_dir_for "$project"); then
-        echo
-        git --git-dir="$git_dir" worktree list 2>/dev/null || true
-    fi
-}
-
-preview_worktree() {
-    local project="$1" path="$2"
-    if [ ! -d "$path" ]; then
-        printf '🗑 stale worktree: %s\n' "$path"
+preview_entry() {
+    local kind="$1" key="$2"
+    if [ "$kind" = "session" ]; then
+        tmux capture-pane -e -p -t "$key" 2>/dev/null || true
         return 0
     fi
 
-    ls -la --color=always -- "$path" 2>/dev/null || true
-    if git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if [ ! -d "$key" ]; then
+        printf '🗑 stale worktree: %s\n' "$key"
+        return 0
+    fi
+
+    ls -la --color=always -- "$key" 2>/dev/null || true
+    if git -C "$key" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
         echo
-        git -C "$path" log --oneline --color=always -10 2>/dev/null || true
+        git -C "$key" log --oneline --color=always -10 2>/dev/null || true
     fi
 }
 
@@ -239,104 +364,133 @@ prune_stale_worktree() {
     git --git-dir="$git_dir" worktree remove --force -- "$selected_path" >/dev/null 2>&1 || true
 }
 
-open_worktree() {
-    local path="$1" session_name
-    session_name=$(session_name_for_path "$path")
-    if ! tmux has-session -t "=$session_name" 2>/dev/null; then
-        tmux new-session -d -s "$session_name" -c "$path"
-    fi
-
+open_session() {
+    local session="$1"
     if [ -n "${TMUX:-}" ]; then
         if [ -n "${TMUX_SESSIONIZER_CLIENT:-}" ]; then
-            tmux switch-client -c "$TMUX_SESSIONIZER_CLIENT" -t "=$session_name"
+            tmux switch-client -c "$TMUX_SESSIONIZER_CLIENT" -t "=$session"
         else
-            tmux switch-client -t "=$session_name"
+            tmux switch-client -t "=$session"
         fi
     else
-        tmux attach-session -t "=$session_name"
+        tmux attach-session -t "=$session"
     fi
 }
 
-run_worktree_picker() {
-    local project="$1" project_q selected path fzf_status
-    printf -v project_q '%q' "$project"
-
-    while true; do
-        fzf_status=0
-        selected=$(worktree_list "$project" | fzf \
-            --border=none \
-            --delimiter $'\t' --with-nth=4 \
-            --tiebreak=index \
-            --header='Enter: switch/create  |  ctrl-x: remove stale  |  Esc: projects' \
-            --bind "ctrl-x:execute-silent($SCRIPT_Q --prune-worktree $project_q {2})+reload($SCRIPT_Q --worktrees $project_q)" \
-            --info=hidden \
-            --preview "$SCRIPT_Q --preview-worktree $project_q {2}" \
-            --preview-window right:60%,nowrap,noinfo,border-left) || fzf_status=$?
-
-        case "$fzf_status" in
-            0) ;;
-            1|130) return 1 ;;
-            *) return "$fzf_status" ;;
-        esac
-
-        [ -n "$selected" ] || return 1
-        path=$(printf '%s' "$selected" | cut -f2)
-        if [ -d "$path" ]; then
-            open_worktree "$path"
-            return 0
-        fi
-    done
+open_worktree() {
+    local path="$1" session
+    session_name_for_path "$path"
+    session="$REPLY"
+    if ! tmux has-session -t "=$session" 2>/dev/null; then
+        tmux new-session -d -s "$session" -c "$path"
+    fi
+    open_session "$session"
 }
 
-run_project_picker() {
-    local selected project fzf_status worktree_status
+client_size() {
+    tmux display-message -p -t "$1" '#{client_width}x#{client_height}' 2>/dev/null
+}
 
-    while true; do
-        fzf_status=0
-        selected=$(project_list | fzf \
-            --border=none \
-            --delimiter $'\t' --with-nth=4 \
-            --tiebreak=index \
-            --header='Enter: choose project  |  Esc: exit' \
-            --info=hidden \
-            --preview "$SCRIPT_Q --preview-project {2}" \
-            --preview-window right:60%,nowrap,noinfo,border-left) || fzf_status=$?
+open_popup() {
+    local client="$1"
+    tmux display-popup \
+        -c "$client" \
+        -w 100% \
+        -h 100% \
+        -e "TMUX_SESSIONIZER_CLIENT=$client" \
+        -E "$SCRIPT_Q"
+}
 
-        case "$fzf_status" in
-            0) ;;
-            1|130) return 0 ;;
-            *) return "$fzf_status" ;;
-        esac
+run_resizing_popup() {
+    local client="$1" popup_pid size new_size pending_size pending_checks
 
-        [ -n "$selected" ] || return 0
-        project=$(printf '%s' "$selected" | cut -f2)
-        worktree_status=0
-        run_worktree_picker "$project" || worktree_status=$?
-        case "$worktree_status" in
-            0) return 0 ;;
-            1) ;;
-            *) return "$worktree_status" ;;
-        esac
+    open_popup "$client" &
+    popup_pid=$!
+    size=$(client_size "$client") || size=""
+    pending_size=""
+    pending_checks=0
+
+    while kill -0 "$popup_pid" 2>/dev/null; do
+        sleep 0.1
+        new_size=$(client_size "$client") || break
+        if [ -z "$new_size" ] || [ "$new_size" = "$size" ]; then
+            pending_size=""
+            pending_checks=0
+            continue
+        fi
+
+        if [ "$new_size" != "$pending_size" ]; then
+            pending_size="$new_size"
+            pending_checks=1
+            continue
+        fi
+
+        pending_checks=$((pending_checks + 1))
+        if [ "$pending_checks" -ge 2 ]; then
+            tmux display-popup -C -c "$client" 2>/dev/null || true
+            wait "$popup_pid" 2>/dev/null || true
+            open_popup "$client" &
+            popup_pid=$!
+            size="$new_size"
+            pending_size=""
+            pending_checks=0
+        fi
     done
+
+    wait "$popup_pid" 2>/dev/null || true
 }
 
 case "${1:-}" in
     --list)
-        project_list
+        list_entries
+        exit 0
         ;;
-    --worktrees)
-        [ "$#" -ge 2 ] && worktree_list "$2"
-        ;;
-    --preview-project)
-        [ "$#" -ge 2 ] && preview_project "$2"
-        ;;
-    --preview-worktree)
-        [ "$#" -ge 3 ] && preview_worktree "$2" "$3"
+    --preview)
+        [ "$#" -ge 3 ] && preview_entry "$2" "$3"
+        exit 0
         ;;
     --prune-worktree)
         [ "$#" -ge 3 ] && prune_stale_worktree "$2" "$3"
+        exit 0
         ;;
-    *)
-        run_project_picker
+    --popup)
+        [ "$#" -ge 2 ] || exit 2
+        run_resizing_popup "$2"
+        exit 0
         ;;
 esac
+
+fzf_status=0
+selected=""
+while true; do
+    selected=$(list_entries | fzf \
+        --border=none \
+        --ansi \
+        --delimiter $'\t' --with-nth=5 \
+        --tiebreak=index \
+        --header='Enter: switch/create live  |  ctrl-x: remove stale  |  Esc: exit' \
+        --bind "ctrl-x:execute-silent($SCRIPT_Q --prune-worktree {6} {4})+reload($SCRIPT_Q --list)" \
+        --info=hidden \
+        --preview "$SCRIPT_Q --preview {3} {4} {6}" \
+        --preview-window right:60%,nowrap,noinfo,border-left) || fzf_status=$?
+
+    case "$fzf_status" in
+        0) ;;
+        1|130) exit 0 ;;
+        *) exit "$fzf_status" ;;
+    esac
+
+    [ -n "$selected" ] || exit 0
+    stale=$(printf '%s' "$selected" | cut -f1)
+    kind=$(printf '%s' "$selected" | cut -f3)
+    key=$(printf '%s' "$selected" | cut -f4)
+
+    # Selecting a stale row does not attempt to create a session.
+    [ "$stale" -eq 0 ] || continue
+    if [ "$kind" = "session" ]; then
+        open_session "$key"
+    else
+        [ -d "$key" ] && open_worktree "$key"
+    fi
+    exit 0
+done
