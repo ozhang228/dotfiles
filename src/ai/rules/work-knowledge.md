@@ -37,9 +37,74 @@ pricing-client interface across live and historical data. Start it and wait for
 catch-up before trusting live results. Catch-up establishes live-state readiness;
 it does not make historical DB data more complete.
 
+### Snapshot timestamps
+
+A historical PIP snapshot label precedes entry assembly. A price or skew can
+arrive after the labelled second, including in the next second, before
+`entry_assembled_at_ns`. Validate source timestamps against entry assembly,
+and check assembly lag separately. A fresh snapshot label does not prove the
+skew itself is fresh; use its own timestamp.
+
+### BSKEW bid/ask statistic
+
+`atm_mean_ba_spread` comes from `SingleSkewPricingData_WithVols` in ficcpp,
+through data-utils' volatility ETL. It averages ask IV minus bid IV for eligible
+two-sided strikes with absolute SD moneyness below 0.5, weighted by
+`exp(-m*m/2)`, using the tightest eligible call/put IV quotes. Reproduction also
+depends on its quote filters, approximate ATM moneyness and IV conventions.
+Vol Manager's chart subscription exposes bid/ask IV separately; the checked
+Coral/PIP skew schema does not carry this statistic. Live chart values cannot
+replace historical observations for a daily volcube replay.
+
+### QA configuration
+
+Check `ALP_CONFIG_DIR` before changing PIP's Alp config: a mounted JSON file
+overrides the Alp API. The `data-pip-qa` branch in `k8s` owns the mounted
+`overlays/pricing_inputs_publisher/qa/pip-deployments/fx-metals/config/pricing_inputs_publisher.json`.
+Render that instance to verify the generated ConfigMap, deployment mount, and
+Kafka destinations. The separate `fx-metals-fpp` canary has its own config.
+
+## PnL expiration
+
+Delta and PnL Scalloper cache their historical close snapshots in memory.
+After repairing historical Greeks, restart an already-running process to load
+the repair. Verify the exact epoch selected by each historical provider: the
+close lookup can select the earliest snapshot in its lookback window, so
+repairing only the snapshot nearest the close can leave the reader unchanged.
+
+An option bought intraday can expire without an opening position. Preserve the
+legacy scalloper's expiration trade transfers, but calculate opening hedge
+crossings only for trades matching its expiring opening-risk universe. Inventing
+zero-opening rows changes book attribution even when total PnL is unchanged.
+Compare actual legacy position preparation and trade transfers on frozen inputs;
+matching valuation formulas on already-prepared rows does not prove book parity.
+
+For scalloper snapshot comparisons, published `delta_pnl` excludes
+`fut_spread_pnl`. Add them before inferring a contract's underlying move from
+its previous-close Delta. Gamma PnL uses that contract move with the
+previous-close skew, time and rates; a product's displayed front price alone
+does not reconstruct deferred-contract gamma. Validate instrument sums against
+aggregate reports before comparing separately published keys.
+
+For EOD PnL, `TradingCalendar.settle_date` advances at the close, before the
+next session opens. Keep reading the close feed during the daily break;
+switch same-day reruns to dated final snapshots at
+`calendar.open_time.strictly_next.get_for_ts(close)`. Calendar-date equality
+alone permits next-session data after reopening, while using settlement-date
+inequality selects snapshots before the scheduled final publisher creates them.
+
 ## Deployments and K8s
 
 In the k8s declarative deployment repo, overlays under `overlays/desk-tools-managed/` are generated. Source of truth lives in `desk_tools/applications/`; edit the Python app definition/config source and regenerate, instead of editing generated jsonnet directly. Desk-tools image bumps should land on the app's QA/dev branch for QA testing and also update prod when applicable. Each app has its own QA branch from the QA ArgoCD Application `targetRevision`. Do not assume a shared QA branch.
+
+### RTR frontend readiness
+
+RTR Breakdown can stay on `Loading...` when `/api/breakdown` fails; the loader
+logs errors without setting an error state. Check frontend HTTP status codes
+and publisher startup separately from Trade Aggregator health. The HTTP
+publisher starts its web server only after Kafka initialization, which waits
+for the first snapshot within five seconds. Check the `atomized-full-kafka`
+and `full-summary` calculators when publisher initialization fails.
 
 ### Haruko Dropcopy (HDC)
 
