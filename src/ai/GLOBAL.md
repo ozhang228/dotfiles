@@ -15,7 +15,6 @@ Language and task conventions live in these canonical files:
 - `~/dotfiles/src/ai/rules/typescript.md`
 - `~/dotfiles/src/ai/rules/cpp.md`
 - `~/dotfiles/src/ai/rules/marimo.md`
-- `~/dotfiles/src/ai/rules/jupyter.md`
 - `~/dotfiles/src/ai/rules/testing.md`
 - `~/dotfiles/src/ai/rules/work-knowledge.md`
 

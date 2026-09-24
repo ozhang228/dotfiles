@@ -73,6 +73,66 @@ and `last_trade_time_ns`. For listings expired by the end of a history window,
 query refdata at an actual observation timestamp. Platinum's fit-table option
 product is `PO`; its desk and underlying product are `PL`.
 
+For monthly fit history, resolve the future by NERD product and select its option
+family through `future_product_entity_id` and `contract_expiration_interval ==
+"MONTHLY"`. Require one matching family, then read its venue and exchange symbols
+from YARDS. Keep the job's enabled-product list separate from those reference facts.
+Use YARDS' keyed `try_get_future_product_by_nerd_product_symbol` and
+`try_get_venue_by_entity_id` lookups rather than scanning snapshots for those
+entities. `get_future_option_listings_by_option_product_entity_id` scopes listing
+retrieval to the resolved option family. The current Luna client accepts `Instant`
+directly in `query_snapshot`.
+
+Do not reconstruct expiry from floating-point fit year fractions and then round
+up to a time bucket. The legacy vol-of-vol writer's `yte * 365` reconstruction
+had nanosecond error that `.ceil("5min")` amplified into a five-minute shift.
+Use YARDS `last_trade_time_ns`. For migration parity, compare year-fraction
+endpoints as well as the formulas; equal formulas can produce different output
+when the endpoints change.
+
+## Historical Metals open interest identities
+
+`uds_legacy.settles_daily_xcec_fopt_og` carries option `usym` IDs. Matrix
+`/refdata` provides option fields but uses different instrument IDs and holds a
+current template, so it cannot resolve every contract in a historical settle
+window. Resolve each settle `usym` through Luna YARDS
+`try_get_future_option_outright_by_usym`, then use the outright's listing and
+product entity IDs for strike, payoff, listed month and year, product exchange
+symbol, and last trade date. Query refdata at a settle date for IDs missing from
+the current snapshot; current snapshots exclude recently expired options. Keep
+every settle row or fail on unresolved IDs rather than silently inner joining.
+
+## Historical volatility partitions
+
+Historical Metals constant-maturity volatility rows can have null `_month`
+partitions. UDS epoch slices add month pruning and omit those rows, even when
+the direct Delta read sees them. For writer/reader migrations, compare raw
+epoch-bounded rows with the UDS slice before claiming parity. Preserve units
+and previous-observation shifts while restoring available dates; do not carry
+the UDS month predicate into a direct ATM-history reader. September 17, 18 and
+21, 2026 exhibited this for all eight RV-writer products.
+
+Historical RV replay must retain the full input history and filter the output
+window afterward: 30-minute sampling is anchored to the first input price.
+Pivot triggers use a strict absolute-price tolerance. Backward price
+reconstruction from a later endpoint can change historical prices by a few
+floating-point ULPs without changing historical returns, flipping samples
+exactly at that tolerance. Freeze the prepared inputs for calculation parity;
+compare stored rows separately, including stored-only hedge events retained
+by upserts. A stable boundary convention is a behavior change, not a rename.
+
+For RV cutover materiality, run restored rows through the actual 10-/20-observation
+reader and compare hedge schedules after each attribution reader's minute rounding
+and session exclusions. Additional valid dates can materially change SD RV and
+attribution even with exact same-input formula parity. Reconcile stale event keys
+separately; an upsert does not replace a recalculated schedule.
+
+For a bounded Delta schedule repair, rehearse a single scoped merge that inserts
+desired events and deletes source-missing target events. Preserve before/desired
+snapshots, guard the table versions before writing, and verify the full table
+against its pre-repair version plus the approved replacement rows. Do not use a
+whole-partition overwrite when the approved scope is narrower than that partition.
+
 ## PnL expiration
 
 Delta and PnL Scalloper cache their historical close snapshots in memory.
@@ -102,6 +162,21 @@ switch same-day reruns to dated final snapshots at
 alone permits next-session data after reopening, while using settlement-date
 inequality selects snapshots before the scheduled final publisher creates them.
 
+## Metals email jobs
+
+Keep active Metals email modules under `fio/metals_options/email/` and update any
+external shell launcher when moving one. Use Desk Tools `Email` with an HTML
+`EmailMessage`; a string body is sent as plain text. Verify a new report with
+`StubEmailClient` before SMTP. For a requested live test, temporarily hardcode
+Oscar as the sole recipient, verify that To, Cc, and Bcc contain no desk
+recipients, and remove the override after testing. Label the subject as a test.
+SMTP success proves relay acceptance, not delivery to Oscar's inbox.
+
+The early exercise job uses current positions. STS supplies instrument entity
+IDs; keep them through aggregation and reject one symbol mapped to different
+IDs before joining Matrix's structured `is_option` rows. Matrix's option
+`listing_entity_id` is a different identity from STS's option entity ID.
+
 ## Deployments and K8s
 
 In the k8s declarative deployment repo, overlays under `overlays/desk-tools-managed/` are generated. Source of truth lives in `desk_tools/applications/`; edit the Python app definition/config source and regenerate, instead of editing generated jsonnet directly. Desk-tools image bumps should land on the app's QA/dev branch for QA testing and also update prod when applicable. Each app has its own QA branch from the QA ArgoCD Application `targetRevision`. Do not assume a shared QA branch.
@@ -114,6 +189,40 @@ and publisher startup separately from Trade Aggregator health. The HTTP
 publisher starts its web server only after Kafka initialization, which waits
 for the first snapshot within five seconds. Check the `atomized-full-kafka`
 and `full-summary` calculators when publisher initialization fails.
+
+### RTR QA cashflow reference data
+
+Cumberland Reference Data QA reads NERD mirror; RTR QA reads that Cumberland QA
+instance. The reference-data loader inserts cashflows only when their numeric
+NERD `id` is absent. If NERD mirror presents a different RDSID under an ID
+already stored in QA, later cron runs skip it indefinitely. Compare the
+unfiltered NERD mirror and Cumberland QA `/cash_flows` lists by both `id` and
+`rds_id`. Avoid `/cash_flows?rds_id=...` for read-only triage: a miss triggers
+an insert from NERD. RTR trade-aggregator logs and skips an intraday cashflow
+trade whose RDSID lacks a mapping; repair refdata before republishing or
+rebuilding the trade stream.
+
+### Futures mapping into Liquidation Monitor
+
+For a Basis Model instrument missing market data, first check its exact ticker
+in Select and record `sourceTicker` and destination. Then check that ticker in
+Liquidation Monitor. If absent there, search Slack (including bot messages) for
+the source symbol and "inferred", or the warning "Cumberland symbols with zero
+positions were inferred from Haruko static data". An explicit source/output
+pair in that warning identifies the refdata fallback; absence in a bounded Kafka
+tail alone does not. Repair the missing mapping and verify Liquidation Monitor
+and Basis Model readback. Reusable checks and the NIL example live in
+`~/anvil/utils/liquidation_monitor.py` and
+`~/anvil/postmortems/2026_09_24-basis_model_missing_market_data.md`.
+
+Cumberland `/futures` lists exclude ignored rows even with `include-partial` and
+`include-unmodeled`; a direct `?rds_id=<UUID>` lookup can reveal the hidden row.
+Compare its numeric NERD ID, RDS ID, RCI symbol, and future product with live
+NERD before applying a mapping. The futures loader inserts only IDs absent from
+its database, and the manual futures override updates mapping fields only. A
+stale row whose RCI identity changed needs reconciliation before a mapping
+override. Liquidation Monitor looks up futures by Haruko's exchange symbol and
+Cumberland destination, then infers a ticker from Haruko assets on a miss.
 
 ### Haruko Dropcopy (HDC)
 
