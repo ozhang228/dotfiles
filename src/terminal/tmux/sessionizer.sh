@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Fuzzy-pick a project, worktree, or existing tmux session.
 #
-# - Worktrees are labeled as "branch [project]" in one flat list.
+# - Worktrees are labeled by their filesystem directory name in one flat list.
 # - Existing sessions, including standalone sessions such as "default", remain visible.
 # - Stale worktrees sort first and ctrl-x only removes the highlighted stale registration.
 # - All entries are ordered by stale status, then most-recently-active session.
@@ -236,15 +236,9 @@ build_worktree_index() {
 }
 
 worktree_label() {
-    local branch="$1" project="$2" stale="$3" label project_name
-    path_basename "$project"
-    project_name="$REPLY"
-
-    if [ "$branch" = "directory" ]; then
-        label="$project_name"
-    else
-        label="$branch [$project_name]"
-    fi
+    local path="$1" stale="$2" label
+    path_basename "$path"
+    label="$REPLY"
 
     [ "$stale" -eq 1 ] && label="🗑 stale  $label"
     REPLY="$label"
@@ -266,7 +260,9 @@ list_entries() {
     build_worktree_index
 
     local -a entries=()
+    declare -A project_recent=()
     local name path project branch stale session timestamp label git_dir kind indicator
+    local group_timestamp index
 
     # Keep every existing tmux session, even when it is not a discovered project.
     for name in "${!session_activity[@]}"; do
@@ -283,7 +279,7 @@ list_entries() {
         fi
 
         if [ -n "$project" ] && [ -n "$branch" ]; then
-            worktree_label "$branch" "$project" 0
+            worktree_label "$path" 0
             label="$REPLY"
         else
             label="$name"
@@ -292,6 +288,9 @@ list_entries() {
         label_session "$label" "$name"
         label="$REPLY"
         timestamp="${session_activity[$name]:-0}"
+        if [ "$timestamp" -gt "${project_recent[$project]:-0}" ]; then
+            project_recent["$project"]="$timestamp"
+        fi
         entries+=("0"$'\t'"$timestamp"$'\t'session$'\t'"$name"$'\t'"$label"$'\t'"$project")
     done
 
@@ -307,7 +306,7 @@ list_entries() {
         fi
 
         timestamp="${session_activity[$session]:-0}"
-        worktree_label "$branch" "$project" "$stale"
+        worktree_label "$path" "$stale"
         label="$REPLY"
         session_indicator "$session"
         indicator="$REPLY"
@@ -317,12 +316,23 @@ list_entries() {
         else
             kind=worktree
         fi
+        if [ "$timestamp" -gt "${project_recent[$project]:-0}" ]; then
+            project_recent["$project"]="$timestamp"
+        fi
         entries+=("$stale"$'\t'"$timestamp"$'\t'"$kind"$'\t'"$path"$'\t'"$label"$'\t'"$project")
     done
 
+    # Keep the most recently used project groups first, then sort each group
+    # by its stable filesystem name so the project root precedes its worktrees.
+    for index in "${!entries[@]}"; do
+        IFS=$'\t' read -r stale timestamp kind path label project <<<"${entries[$index]}"
+        group_timestamp="${project_recent[$project]:-0}"
+        entries[$index]="$stale"$'\t'"$group_timestamp"$'\t'"$timestamp"$'\t'"$kind"$'\t'"$path"$'\t'"$label"$'\t'"$project"
+    done
+
     printf '%s\n' "${entries[@]}" \
-        | sort -t $'\t' -k1,1rn -k2,2rn -k5,5 \
-        | cut -f1-6
+        | sort -t $'\t' -k1,1rn -k2,2rn -k6,6 -k3,3rn \
+        | cut -f1,3-7
 }
 
 preview_entry() {

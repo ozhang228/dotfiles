@@ -12,7 +12,9 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Use keyword arguments at call sites when two consecutive parameters share a type or the function takes more than three parameters.
 - Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation.
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
+- Parse external JSON into Pydantic domain models at the source boundary. Keep decoded raw values local to parsing; do not pass `JsonValue` or recursive JSON aliases through internal APIs.
 - Do not use `typing.Annotated`. For Pydantic constraints, declare the type normally and assign `Field(...)`
+- When extending a `Protocol`, list `Protocol` in the bases as well. Inheriting only from another protocol creates a nominal class, so structural test stubs will not satisfy it.
 - Prefer `NewType` over a plain type alias for semantically distinct scalar or identifier values that the type checker should reject when interchanged. Keep ordinary aliases for structural shapes, unions, and readability-only abbreviations where nominal distinction is not intended.
 - Model domain meaning at the element level. For a one-use container shape, name its meaningful element types and inline the container at the use site, such as `tuple[ColumnName, Operator, Boundary]`; do not alias the whole container merely to shorten an annotation. Name the collection itself only when it is a reusable domain concept with collection-level meaning or invariants. For example, define `UnderlyingPrice = NewType("UnderlyingPrice", float)` and annotate an immutable collection as `tuple[UnderlyingPrice, ...]` instead of introducing `UnderlyingPrices = tuple[float, ...]`.
 - Do not move an existing domain type solely so a new consumer can share it. Preserve the current owner's API when dependency direction permits; when lower-level reusable logic cannot depend on that owner, accept the underlying primitive at that boundary and keep the stronger type in the owning layer.
@@ -28,3 +30,4 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Branch on enum values with `match`, not ternary expressions or `if`/`elif` chains, and handle every enum member explicitly.
 - Every `match` statement must end with `case _ as unreachable: assert_never(unreachable)` on the matched value. This adds exhaustive matching
 - Keep internal-package `__init__.py` files empty. Re-export names from `__init__.py` only when the package intentionally defines a public-facing library API.
+- For Linux subprocess memory replays, read `VmRSS` and `VmHWM` from `/proc/self/status` inside the child. `resource.getrusage(RUSAGE_SELF).ru_maxrss` can carry a parent's earlier high-water mark across `fork`/`exec`; report the greater of `VmHWM` and sampled `VmRSS` as the observed peak, since the high-water reading can lag a sample.

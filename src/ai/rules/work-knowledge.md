@@ -45,6 +45,35 @@ arrive after the labelled second, including in the next second, before
 and check assembly lag separately. A fresh snapshot label does not prove the
 skew itself is fresh; use its own timestamp.
 
+For a settle-to-settle current future return derived from option PIP rows,
+match the canonical `underlying_products` to exactly one target future product.
+Membership alone can select a multi-underlying spread: the CL/BZ `ABV` listing
+`BYX2026` contained `(XNYM, CL)` in live PIP but lacked historical underlying
+identity at the prior CL settlement. The older Metals dashboard classified
+option listings through instrument specs; it rejected that spread and accepted
+the nearer weekly CL listing `NL5U2026`, so restricting CL to monthly `LO`
+also changes its selection. Keep the same listing for live and historical
+prices, and surface missing-current-return errors while retaining stored RV.
+
+For live Matrix Greeks dashboards, `select_option_listing_inputs` rejects
+skews more than ten minutes older than Matrix publication by default.
+`skew_forward_fill=True` is useful for counting omitted listings and their
+skew ages; it can also admit days-old surfaces, so do not use it to price a
+live heatmap without an explicit policy change. The gamma-efficiency cutover
+showed 99 legacy listings, 98 fresh Matrix listings, and 107 Matrix listings
+with forward fill in a near-time capture. Freeze the same inputs when checking
+formula parity, and show excluded coverage and the freshness limit at the
+dashboard boundary.
+For the gamma-efficiency Plotly heatmaps, `hovertemplate` only controls hover
+details; printed cell values require `texttemplate="%{z:.2f}"` and a readable
+`textfont`. Moving precomputed charts into a Dash callback moves the initial
+Matrix fetch and SOL pricing onto page load unless the default selection is
+warmed in the background. Serve warmed figures and their matching snapshot
+metadata and version in the initial Dash layout so the browser can render them
+without waiting for a callback. Keep the empty-cache path able to load and let
+the first callback fill it. Measure server work and browser rendering separately
+when diagnosing a slower first view.
+
 ### BSKEW bid/ask statistic
 
 `atm_mean_ba_spread` comes from `SingleSkewPricingData_WithVols` in ficcpp,
@@ -55,6 +84,37 @@ depends on its quote filters, approximate ATM moneyness and IV conventions.
 Vol Manager's chart subscription exposes bid/ask IV separately; the checked
 Coral/PIP skew schema does not carry this statistic. Live chart values cannot
 replace historical observations for a daily volcube replay.
+
+For volcube cutover checks, inspect the actual Delta file statistics and read an
+epoch-bounded slice before assuming BSKEW covers a requested period. As of
+2026-09-24, all eight monthly BSKEW input tables and all 40 saved volcube
+output tables end on 2025-04-15; none contains rows for 2026-07-24 through
+2026-09-23. The constant-maturity reader's 2021 source cutoff is a reader
+policy, not the BSKEW ingestion end date. A recent PIP replay can prove new
+runtime behavior, but it cannot establish direct numerical parity with absent
+legacy rows. On 2025-04-15 the legacy `atm_mean_ba_spread` column was populated
+for every inspected volcube row across the eight products, while historical
+PIP does not supply that statistic.
+The old scheduled writer overrides the library defaults with `max_t=0.8` for
+daily and multiday PnL, and its persisted constant-maturity cubes include the
+1-day tenor. For FX daily PnL it also stamps 18:00-19:30 rows using the first
+quote after the 19:30 exclusion; a replacement driven only by observed start
+timestamps drops seven labels per listing and session. Check the writer call
+sites and stored row keys, not just the calculation function defaults.
+The legacy 15-minute simulation grid also emits 17:00-17:45 reopening labels
+on Sundays and holidays before a business day. It uses the first later eligible
+quote for missing labels, and its final `groupby.sum` writes zero for a horizon
+with no quote before its target. Replay row keys and null patterns on matched
+inputs; counting only observed PIP timestamps misses both behaviors.
+The archived `is_ffill` flag marks rows whose BSKEW surface or underlying
+price failed quality filters and was forward-filled. A PIP skew-age flag does
+not have the same meaning, even when both are stored under `is_ffill`.
+Near expiry, SOL can return no implied strike for extreme attribution deltas:
+the 2026-09-23 `4JYU2026` PIP skew returned NaN for 1% and 2% call deltas in
+both scalar and vector inversion. The legacy attribution writer retains those
+delta rows, and the saved schema permits null strike and initial Greeks. Keep
+the row keys and make the unavailable pricing visible rather than failing the
+whole product or silently dropping the deltas.
 
 ### QA configuration
 
@@ -90,6 +150,15 @@ Use YARDS `last_trade_time_ns`. For migration parity, compare year-fraction
 endpoints as well as the formulas; equal formulas can produce different output
 when the endpoints change.
 
+The vol-of-vol writer samples hourly fit rows and needs a valid 15:00 Chicago
+fit for each listing's daily implied metrics. A fit can report `success=true`
+while `bad_input_data=true`; the provider correctly excludes it. A valid 15:05
+fit is also excluded by the hourly minute filter. When a daily partition is
+empty, check `input_data_errors_string` and exact fit timestamps, then compare
+realized rows with the implied-metric merge before its final `dropna()`.
+If using a later fit for a scoped repair, preserve its actual timestamp and
+verify complete row keys and numeric values before writing.
+
 ## Historical Metals open interest identities
 
 `uds_legacy.settles_daily_xcec_fopt_og` carries option `usym` IDs. Matrix
@@ -101,6 +170,35 @@ product entity IDs for strike, payoff, listed month and year, product exchange
 symbol, and last trade date. Query refdata at a settle date for IDs missing from
 the current snapshot; current snapshots exclude recently expired options. Keep
 every settle row or fail on unresolved IDs rather than silently inner joining.
+The total-open-interest heatmap includes options whose last-trade date is the
+current Chicago date. The old RD API supplied a datetime and compared it with
+today at midnight; Luna supplies a date, so use an inclusive date boundary.
+Compare rendered expiry/strike bins with the old view as well as raw settle
+identities: equal row counts and strikes do not prove the displayed totals.
+
+## Intraday futures trade writers
+
+`uds_legacy.fut_trades_{product}` and
+`uds_legacy.metals_options_lead_future_screen_trade_data_{product}` are physical
+Delta tables whose `epoch` column is UTC nanoseconds as `int64`; derive their
+`_month` partition from that UTC epoch. Their catalog metadata lacks
+`generated_partition`, so use `DeltaClient.merge_data` with the existing keys
+instead of `get_delta_resource`. The preliminary ten-second futures bars use
+`px_exchange_best_implied` and `qty_exchange_best_implied` for fallback quotes;
+the standard ten-second bars use `px_implied` and `qty_implied`.
+
+Blockworm's short symbol year digit is ambiguous: resolve the full listed year
+from a historical YARDS future snapshot before querying bars. Tickster can
+publish several fills with the same trade ID and timestamp but different
+prices. The old screen writer sorts on timestamp alone and selects its `last`
+price, so equal-timestamp order can change the stored price. Compare keyed
+quantity and venue fields separately from price, inspect the fill sequence for
+price differences, and settle an explicit price rule before a writer cutover.
+The futures table's merge key includes `epoch`. When later fills move an
+aggregate's final epoch, a merge inserts the new key but leaves the earlier
+aggregate behind. For stored-only rows, match symbol, trade ID, resting flag,
+and type against the candidate before treating them as missing source trades;
+remove only exact verified stale keys after the current aggregate is present.
 
 ## Historical volatility partitions
 
@@ -126,6 +224,21 @@ reader and compare hedge schedules after each attribution reader's minute roundi
 and session exclusions. Additional valid dates can materially change SD RV and
 attribution even with exact same-input formula parity. Reconcile stale event keys
 separately; an upsert does not replace a recalculated schedule.
+
+During the RV writer cutover, inspect Delta commit provenance as well as the
+latest rows. The DED writer commits with `app=write-metals-rv-data` once per
+product and table; the archived external writer uses `app=datahub` and makes
+six RV plus four hedge merges per product. Compare table versions immediately
+after the DED run and after later commits: the older writer can change past RV
+values and add hedge keys even when the latest session still matches.
+
+For App Launcher impact checks, RV Forecast Cross Product Viz is served by a
+separate Research service. Its production config reads each product's UDS
+`/realized_var_forecasts/settle_settle/auto_baseline/{MIC}/FUT/{product}`
+`voltime_prompt` field and a sibling `5_day` path; its trailing realized values
+come from settle-price bars. Do not equate those forecast datasets with Metals
+`metals_options_realized_vol_data` or `metals_options_hedging_data` merely
+because both are labeled RV.
 
 For a bounded Delta schedule repair, rehearse a single scoped merge that inserts
 desired events and deletes source-missing target events. Preserve before/desired
@@ -176,10 +289,30 @@ The early exercise job uses current positions. STS supplies instrument entity
 IDs; keep them through aggregation and reject one symbol mapped to different
 IDs before joining Matrix's structured `is_option` rows. Matrix's option
 `listing_entity_id` is a different identity from STS's option entity ID.
+STS also exposes positions it cannot tag with refdata. Merge those by the full
+RDS ID, trading group, trading desk, and clearing account key; one RDS ID can
+span accounts. Resolve their instrument kind through structured refdata where
+possible, and make any unresolved population visible at the report boundary.
+The archived report rewrites `VolPathSlope` before Sol repricing near expiry,
+while Matrix prices the PIP skew. A matching price does not establish matching
+adjusted delta or candidate membership; compare both against the 0.995 delta
+and product tick thresholds on frozen, same-time inputs.
+For a same-input early-exercise replay, query the archived SOD UDS window and
+select its earliest epoch in the 61 minutes before previous close, as the old
+loader does. SOD `yte < 1/252` sets the listing's manual multiplier to zero;
+the live path applies that multiplier times its calculated ATM slope only when
+live `yte <= 1/252`. Matrix clips Sol delta to `[0, 1]` for calls and
+`[-1, 0]` for puts. Compare candidate membership and numeric price/delta
+separately. This replay uses common frozen Matrix inputs; full old-job parity
+also needs opening holdings and a synchronized EdgeServer snapshot.
 
 ## Deployments and K8s
 
 In the k8s declarative deployment repo, overlays under `overlays/desk-tools-managed/` are generated. Source of truth lives in `desk_tools/applications/`; edit the Python app definition/config source and regenerate, instead of editing generated jsonnet directly. Desk-tools image bumps should land on the app's QA/dev branch for QA testing and also update prod when applicable. Each app has its own QA branch from the QA ArgoCD Application `targetRevision`. Do not assume a shared QA branch.
+
+### Kafka retention during incident replay
+
+Before computing historical rates with `offsets_for_times`, compare the requested start with the timestamp of the first retained record in every partition. Once retention advances past that start, the lookup can return the current low offset and make expired minutes appear empty instead of failing. Pin broker evidence while it is retained; use EventStore for older windows and check its offload coverage before treating recent archived counts as complete.
 
 ### RTR frontend readiness
 
