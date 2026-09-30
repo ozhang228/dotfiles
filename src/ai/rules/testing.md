@@ -5,6 +5,10 @@ skip_if: The task does not add, change, or review tests
 
 # Testing
 
+Run the repository's build test recipe before reporting push readiness. A
+targeted source type check can miss protocol mismatches and method assignments
+in tests; include test-directory type checks when the build recipe requires them.
+
 ## Tests as documentation
 
 For most features, a test suite's secondary job is documentation: someone unfamiliar with the code should be able to learn what a function does and doesn't guarantee by reading test names and bodies alone, without opening the implementation. That means naming and structuring each test around one specific, observable behavior, and writing the assertion so the expected outcome is legible on its own (a pinned literal, not an expression the reader has to evaluate). If you can't tell what behavior broke from a failing test's name and body without reading the code under test, the test isn't pinning down behavior, it's just exercising code, rewrite it.

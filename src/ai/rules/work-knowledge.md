@@ -21,6 +21,26 @@ Terminology, repo map, and durable DRW/FICC desk facts for Oscar's work. All rep
 
 ## PIP 
 
+### GLD inputs for Matrix Greeks
+
+A read-only check on 2026-09-30 found zero GLD rows in live `fx-metals`,
+`equity-indices`, and CHIP-enabled `eito` PIP snapshots. GLD's dedicated stack
+uses MDN `prod-chipx-metals`, trading VM `prod-ficc-metals-equity`, reference VM
+`prod-ficc-metals-equity-ref`, rates `prod-ficc-metals-equity`, and Event Horizon
+`prod-ficc-metals-equities`. Both VMs returned 29 structured expiry terms;
+a sampled approved valuation supplied an equity model, SOL skew, pricing YTE,
+rates, carry, and Andersen analytics. Reuse Luna's Coral decoders; the older
+FEJ `Pricer` does not support that equity model. The inspected VM/Mini configs
+set `kafka.enabled=false`. Recheck live coverage before assuming this persists.
+
+VM `get_listing_strikes` returned an unsupported API field. Its pricing and
+SOL-skew payloads did not establish source timestamps, full contract identity,
+or independent live spot. The vol-path reference price is not proof of fresh
+spot, and `calendarYteNotForPricingDirectly=-1` is a sentinel. Keep GLD source
+access and normalization in one provider so a future upstream replacement
+does not spread transport or source-specific parsing through Matrix. Evidence:
+`~/anvil/notebooks/matrix_greeks_gld_inputs.py`.
+
 ### Client Selection 
 
 Use `PIPSource` when a caller needs an independent point snapshot or historical
@@ -111,6 +131,14 @@ After changing Dash callback output IDs, an already-open tab keeps the old
 callback graph and can receive HTTP 500 for its old callback request. Reload
 the tab before validating the new behavior; an aggregate 5xx count alone
 cannot attribute the failure to that tab.
+
+For DED jobs using `TradingCalendars.load()`, inspect the library's connection
+path before claiming mounted-credential startup works. The current calendar
+SDK calls Vault inside `DatabaseConnection` even when DED mounted the
+trading-hours secret. Metals' `data_access.trading_calendar` builds the same
+calendar and database cache from the mounted read-only credential, with a
+local Vault fallback. Verify deployed startup with Vault disabled; a successful
+local calendar query exercises a different authentication path.
 
 ## Edge Server metadata
 
