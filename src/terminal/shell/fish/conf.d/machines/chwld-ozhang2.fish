@@ -6,6 +6,8 @@ if set -q SSH_CONNECTION
     set -e DISPLAY
     set -e WAYLAND_DISPLAY
     set -gx BROWSER $HOME/.local/bin/ssh-open
+else if test "$BROWSER" = "$HOME/.local/bin/ssh-open"
+    set -e BROWSER
 end
 
 # Load local Claude credentials (not in git — create ~/.local/share/claude_credentials.fish)

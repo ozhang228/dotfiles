@@ -12,7 +12,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - Use keyword arguments at call sites when two consecutive parameters share a type or the function takes more than three parameters.
 - Prefer `ValidatedDataFrameMixin` (polars) over raw `pd.DataFrame` for typed schema validation.
 - Use Pydantic dataclasses for external data needing validation. Use standard `dataclasses.dataclass` for internal, vetted data types.
-- Parse external JSON into Pydantic domain models at the source boundary. Keep decoded raw values local to parsing; do not pass `JsonValue` or recursive JSON aliases through internal APIs.
+- Parse external JSON source records into Pydantic domain models at the data-access boundary. Keep decoded JSON local to parsing; do not pass `JsonValue` or recursive JSON aliases through provider APIs.
 - Do not use `typing.Annotated`. For Pydantic constraints, declare the type normally and assign `Field(...)`
 - When extending a `Protocol`, list `Protocol` in the bases as well. Inheriting only from another protocol creates a nominal class, so structural test stubs will not satisfy it.
 - Prefer `NewType` over a plain type alias for semantically distinct scalar or identifier values that the type checker should reject when interchanged. Keep ordinary aliases for structural shapes, unions, and readability-only abbreviations where nominal distinction is not intended.

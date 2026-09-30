@@ -45,6 +45,13 @@ arrive after the labelled second, including in the next second, before
 and check assembly lag separately. A fresh snapshot label does not prove the
 skew itself is fresh; use its own timestamp.
 
+`PIPSource.stream_snapshots` bulk history materializes all selected snapshots
+before yielding. For sparse event replays, push exact target seconds into a
+`PIPSnapshotFilter.to_delta_expression` and apply the same test in
+`accepts_snapshot`; filtering only after iteration still decodes the full minute
+grid. A five-day CU attribution replay improved from 267 seconds and 6.8 GiB
+peak RSS to 219 seconds and 4.1 GiB after target-time filtering.
+
 For a settle-to-settle current future return derived from option PIP rows,
 match the canonical `underlying_products` to exactly one target future product.
 Membership alone can select a multi-underlying spread: the CL/BZ `ABV` listing
@@ -64,6 +71,20 @@ showed 99 legacy listings, 98 fresh Matrix listings, and 107 Matrix listings
 with forward fill in a near-time capture. Freeze the same inputs when checking
 formula parity, and show excluded coverage and the freshness limit at the
 dashboard boundary.
+
+The Metals vol-path publisher writes four OPXL tables rooted at `fd_metals_vp`
+in PROD, `qa_fd_metals_vp` in QA, and `local_fd_metals_vp` locally. Its `ENV`
+selects the prefix through `opxl_key_prefix`. The RV/IV/PnL dashboard reads the
+matching environment root through `VolPathProvider`, falling back to the old
+`metals_vp` root only while the new summary key is absent. Koi Risk calculates
+its own vol path from option data.
+The old OPXL DataFrame helper includes an unnamed index column, read back as
+`None`; `OpxlClient.publish_df` only sends explicit columns, so materialize
+that column when preserving the wire shape. The fitted history assigns a new
+trading-date bucket at 15:00 Chicago by evaluating the date at timestamp plus
+two hours. Compare summary rows by `(listing, horizon)` and raw rows by
+`(listing, timestamp)`; the synthetic row ordinal can change with listing order.
+
 For the gamma-efficiency Plotly heatmaps, `hovertemplate` only controls hover
 details; printed cell values require `texttemplate="%{z:.2f}"` and a readable
 `textfont`. Moving precomputed charts into a Dash callback moves the initial
@@ -73,6 +94,26 @@ metadata and version in the initial Dash layout so the browser can render them
 without waiting for a callback. Keep the empty-cache path able to load and let
 the first callback fill it. Measure server work and browser rendering separately
 when diagnosing a slower first view.
+
+## Edge Server metadata
+
+`EdgeServerMetadataClient.subscribe` replaces its subscription. Pass all needed
+tool scopes and exchange symbols together, then poll once; separate subscriptions
+repeat Redis reads. `poll().entries` contains FlatBuffers: use
+`entry.key.toolScope` and `entry.key.exchangeSymbol`, then
+`entry.value.EdgeResult().BidEdges(i).Edge()` and `.MaxSize()` (and the matching
+ask methods). Its `to_pandas()` shape is not the per-contract API.
+
+Matrix Greeks supplies live option exchange symbols, delta, strike, point value,
+and underlying identity for the Edge Monitor, but does not publish numeric
+exchange security IDs needed to register ad hoc structures. For historical
+Edge Monitor panels, use read-only `luna.toad.ToadClient` with
+`ToadQueryBuilder`: add base trades with quote info, leg data, PnL markouts,
+and opportunity before aggregating. PnL markouts require leg data in the
+installed Luna client. `FILL_INFO` can split one event across rows, so sum
+edge and quantity by `event_uuid` before ranking top trades. In DED, mount the
+desk's `kv/clickhouse/prod/toad-clickhouse-ro-*` secret and pass its password
+to `ToadClient`; the deployed process should not need Vault authentication.
 
 ### BSKEW bid/ask statistic
 
@@ -143,12 +184,27 @@ entities. `get_future_option_listings_by_option_product_entity_id` scopes listin
 retrieval to the resolved option family. The current Luna client accepts `Instant`
 directly in `query_snapshot`.
 
+Attribution needs all option families, including FX weeklies. Resolve each
+fit-table `(mic, product_code, coral_listing_id)` against its YARDS option
+product and listing, and use the structured `rci_short` as the output listing
+identity. Synthesizing `underlying product + month + year` collapses distinct
+weekly and monthly contracts into the same name. Keep the monthly-only
+vol-of-vol selection separate.
+
 Do not reconstruct expiry from floating-point fit year fractions and then round
 up to a time bucket. The legacy vol-of-vol writer's `yte * 365` reconstruction
 had nanosecond error that `.ceil("5min")` amplified into a five-minute shift.
 Use YARDS `last_trade_time_ns`. For migration parity, compare year-fraction
 endpoints as well as the formulas; equal formulas can produce different output
 when the endpoints change.
+
+Legacy fitted-skew attribution is a specific exception for pricing parity:
+it prices to `ceil("5min")` of each scalar `skew_datetime +
+pd.Timedelta(days=fit_yte * 365)`. Vector `pd.to_timedelta(..., unit="D")`
+rounds differently at some five-minute boundaries and changes Event Horizon
+fractions and path PnL. Keep the actual YARDS last-trade instant for source
+identity and validity checks; use the reconstructed endpoint only in this
+legacy attribution calculation.
 
 The vol-of-vol writer samples hourly fit rows and needs a valid 15:00 Chicago
 fit for each listing's daily implied metrics. A fit can report `success=true`
@@ -232,6 +288,15 @@ six RV plus four hedge merges per product. Compare table versions immediately
 after the DED run and after later commits: the older writer can change past RV
 values and add hedge keys even when the latest session still matches.
 
+Hedge history can also gain an event after an attribution partition stops
+being recalculated. An EC hedge event timestamped September 17, 2026 at
+12:27:20 UTC was absent in hedge-table version 9007 (September 23 commit) and
+present in version 9050 (September 24 commit). The stored September 10 EC
+five-day attribution already had its old value by September 18. Including
+the late event changed `sdrv_0.8_5d` from 0.045290566 to 0.049202525;
+removing that event from the replay exactly reproduced the stored value.
+Compare input-table versions before changing event logic to fit stored output.
+
 For App Launcher impact checks, RV Forecast Cross Product Viz is served by a
 separate Research service. Its production config reads each product's UDS
 `/realized_var_forecasts/settle_settle/auto_baseline/{MIC}/FUT/{product}`
@@ -269,11 +334,21 @@ does not reconstruct deferred-contract gamma. Validate instrument sums against
 aggregate reports before comparing separately published keys.
 
 For EOD PnL, `TradingCalendar.settle_date` advances at the close, before the
-next session opens. Keep reading the close feed during the daily break;
-switch same-day reruns to dated final snapshots at
-`calendar.open_time.strictly_next.get_for_ts(close)`. Calendar-date equality
-alone permits next-session data after reopening, while using settlement-date
-inequality selects snapshots before the scheduled final publisher creates them.
+next session opens. The PnL Scalloper can replace the live `fd_` close feed ten
+minutes before reopening. The final publisher must save the dated close report
+before that preopen window; the later Metals EOD email reads that dated final
+for both scheduled runs and reruns. The FX email runs earlier and still reads
+the live feed. `publish_final_pnl --date` reads an existing dated final after
+reopening, so it can replay one but cannot reconstruct a missing final. A true
+historical backfill requires the historical Scalloper inputs. Keep the source
+epoch bound: accepting next-session PnL as a close result changes the report.
+The raw `fd_` Metals, expiration, and FX OPXL keys had no dated snapshots for
+September 21-28, 2026, so a missing final could not be recovered from them.
+For a replay, preserve the Scalloper's earliest-snapshot selection within the
+61-minute close window; later Delta snapshots can differ by nearly an hour.
+Historical Delta Greeks retain pricing inputs but lack strike and put/call, so
+recover those from structured historical instruments or refdata and prove
+per-group parity against an existing dated final before publishing a repair.
 
 ## Metals email jobs
 

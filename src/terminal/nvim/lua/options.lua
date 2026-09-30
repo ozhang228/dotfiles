@@ -24,6 +24,12 @@ local function tmux_client_is_ssh()
   return parent_command == "sshd"
 end
 
+local function client_is_ssh()
+  -- A tmux pane can retain SSH_TTY after a local client attaches.
+  if vim.env.TMUX then return tmux_client_is_ssh() end
+  return vim.env.SSH_TTY ~= nil
+end
+
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.tabstop = 4
@@ -47,7 +53,7 @@ vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 
 local default_open = vim.ui.open
 vim.ui.open = function(path, opt)
-  if (vim.env.SSH_TTY or tmux_client_is_ssh()) and path:match("^%a[%w+.-]*://") then
+  if client_is_ssh() and path:match("^%a[%w+.-]*://") then
     require("vim.ui.clipboard.osc52").copy("+")({ path })
     vim.api.nvim_echo({ { "URL copied to the SSH client clipboard" } }, false, {})
     return nil, nil
