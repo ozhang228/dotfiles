@@ -55,6 +55,12 @@
       "ubuntu": "sudo apt install flameshot"
     }
   },
+  "shottr": {
+    "check": "test -d /Applications/Shottr.app",
+    "install": {
+      "mac": "brew install --cask shottr"
+    }
+  },
   "google-chrome": {
     "check": "command -v google-chrome || command -v google-chrome-stable",
     "install": {
