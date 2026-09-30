@@ -22,10 +22,10 @@ outer.top = 4
 outer.right = 4
 
 [mode.main.binding]
-alt-h = 'focus --boundaries-action wrap-around-the-workspace left'
-alt-j = 'focus --boundaries-action wrap-around-the-workspace down'
-alt-k = 'focus --boundaries-action wrap-around-the-workspace up'
-alt-l = 'focus --boundaries-action wrap-around-the-workspace right'
+alt-h = 'focus left'
+alt-j = 'focus down'
+alt-k = 'focus up'
+alt-l = 'focus right'
 
 alt-shift-h = 'move left'
 alt-shift-j = 'move down'
@@ -36,6 +36,7 @@ alt-shift-f = 'fullscreen'
 
 alt-shift-q = 'close'
 alt-enter = 'exec-and-forget open -a kitty'
+alt-shift-enter = 'exec-and-forget open -a "Google Chrome" --args --profile-directory="Profile 1" --restore-last-session'
 
 alt-1 = 'workspace 1'
 alt-2 = 'workspace 2'
@@ -59,4 +60,4 @@ alt-shift-8 = ['move-node-to-workspace 8', "workspace 8"]
 alt-shift-9 = ['move-node-to-workspace 9', "workspace 9"]
 alt-shift-0 = ['move-node-to-workspace 10', "workspace 10"]
 
-alt-shift-c = 'reload-config'
+alt-shift-r = 'reload-config'
