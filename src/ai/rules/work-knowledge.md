@@ -252,13 +252,18 @@ Use YARDS `last_trade_time_ns`. For migration parity, compare year-fraction
 endpoints as well as the formulas; equal formulas can produce different output
 when the endpoints change.
 
-Legacy fitted-skew attribution is a specific exception for pricing parity:
+Legacy fitted-skew attribution and EOD RR skew are specific exceptions for pricing parity:
 it prices to `ceil("5min")` of each scalar `skew_datetime +
 pd.Timedelta(days=fit_yte * 365)`. Vector `pd.to_timedelta(..., unit="D")`
 rounds differently at some five-minute boundaries and changes Event Horizon
 fractions and path PnL. Keep the actual YARDS last-trade instant for source
-identity and validity checks; use the reconstructed endpoint only in this
-legacy attribution calculation.
+identity and validity checks; use the reconstructed endpoint only in these
+legacy attribution and RR skew calculations. RR skew selects the monthly
+14:00 Chicago fit nearest `fit_yte = 0.25` before converting to voltime.
+Its Delta `app=write-demo` provenance is a client label, not an external job
+identity or proof of the running source revision. Compare the replacement
+against the archived calculation on frozen fits, and report stored-only
+listing keys separately from numerical parity.
 
 The vol-of-vol writer samples hourly fit rows and needs a valid 15:00 Chicago
 fit for each listing's daily implied metrics. A fit can report `success=true`

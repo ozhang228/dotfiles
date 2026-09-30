@@ -74,29 +74,6 @@ The Result section is required before finishing. Write it into the notebook afte
 - Keep cells deterministic where possible. Show timestamps or snapshot identifiers when live data can change between runs.
 - Parameterize the meaningful dimensions, not every constant. A notebook should be reusable for the same failure class without becoming a generic framework.
 
-## Runtime inspection via the debugger (mcp-debugger)
-
-`mcp-debugger` (Python/debugpy, TypeScript-JS/js-debug, Rust/CodeLLDB) is available as an
-MCP tool. Use it as an **evidence-gathering technique**, not a user-facing workflow 
-
-- Which branch actually executes for a given live input.
-- The actual value of a variable, or the actual call stack, at the moment of failure —
-  especially when the value is computed far from where it is read.
-- Ordering/interleaving questions (be aware: pausing execution changes timing, so a
-  suspected race may not reproduce identically under the debugger — see below).
-
-Do not reach for it when a log line, a print, or reading the code already settles the question — it is the heavier tool, not the default one.
-
-**How to use it here:** attach or launch a session against the real reproduction path (the
-same one the notebook's Reproduction cell uses), inspect the specific state needed, then
-**transcribe the concrete observed values back into the notebook cell/prose as evidence** —
-a pinned value, not a description of a debugger session. The debugger session itself is
-scratch work; nothing about *how* the state was inspected belongs in the notebook except the
-short "(inspected live)" provenance note called for above.
-
-To inspect a running notebook's kernel state, have the notebook call `debugpy.listen(<port>)` once at the top (remove before finishing the investigation), then
-attach `mcp-debugger` to that port. `debugpy` must be a dependency of the notebook's own environment (`uv add --dev debugpy` in `~/anvil`), not a global install.
-
 ## Investigation standards
 
 - Reproduce through the real production path before claiming what production does. Test fixtures and stubs are not evidence of production configuration.

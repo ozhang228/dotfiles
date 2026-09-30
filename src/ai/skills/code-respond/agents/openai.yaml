@@ -1,4 +1,0 @@
-interface:
-  display_name: "Respond to Feedback"
-  short_description: "Work through another reviewer's feedback"
-  default_prompt: "Use $respond-to-feedback to help me evaluate feedback from another reviewer."
