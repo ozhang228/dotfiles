@@ -1,5 +1,5 @@
 # set -gx AI_CLI_CMD "claude-branch-resume --dangerously-skip-permissions || claude --dangerously-skip-permissions"
-set -gx AI_CLI_CMD "codex-branch-resume || codex"
+set -gx AI_CLI_CMD "codex-branch-resume --no-daemon || codex --no-daemon"
 set -gx ANTHROPIC_MODEL "vertex-claude-sonnet-5[1m]"
 
 if set -q SSH_CONNECTION
