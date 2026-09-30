@@ -33,13 +33,66 @@ rates, carry, and Andersen analytics. Reuse Luna's Coral decoders; the older
 FEJ `Pricer` does not support that equity model. The inspected VM/Mini configs
 set `kafka.enabled=false`. Recheck live coverage before assuming this persists.
 
-VM `get_listing_strikes` returned an unsupported API field. Its pricing and
-SOL-skew payloads did not establish source timestamps, full contract identity,
-or independent live spot. The vol-path reference price is not proof of fresh
-spot, and `calendarYteNotForPricingDirectly=-1` is a sentinel. Keep GLD source
+VM `get_listing_strikes` returned an unsupported API field. MDN's GLD snapshot
+returned the equity and 7,868 options with structured strike, payoff, expiry,
+underlying links, and 100-share option point value. VM's `product_listings_info`
+subscription provides a separate underlying price; `get_last_fit_time` supplies
+approved pricing metadata's creation time. Book-event timestamp semantics remain
+unverified. The vol-path reference price is not proof of fresh spot, and
+`calendarYteNotForPricingDirectly=-1` is a sentinel. Keep GLD source
 access and normalization in one provider so a future upstream replacement
 does not spread transport or source-specific parsing through Matrix. Evidence:
 `~/anvil/notebooks/matrix_greeks_gld_inputs.py`.
+
+PIP's current Coral adapter consumes Kafka, not VM WebSockets. Its existing skew
+processor decoded a saved live GLD equity valuation without errors. The real
+reducer/serializer at `7653070` composed that skew with synthetic canonical
+refdata and price, preserving independent timestamps; a mismatched underlying
+left price unavailable. This is local composition proof, not production coverage.
+Current listing joins use expiration, despite the legacy `last_trade_time_ms`
+wire name. Onboarding
+still needs approved GLD Kafka publication, canonical equity refdata, and an
+underlying-price mapping: the main YARDS endpoint used by PIP returned no GLD,
+and its current index-underlying adapter routes through crypto spot pairs with a
+Deribit MIC. Live broker metadata listed no Metals-equity skew topic. Complete
+two-minute reads found no GLD in the `ficc-metals` and `metalsauto` Coral feeds
+or `nms.chipx` book snapshots (1,534 distinct symbols). These bounded checks are
+not broker-wide absence proof. `eito`'s CHIP config alone cannot supply GLD.
+The deprecated `VolManager.get_listing_strikes` call generated a VM deserialization
+error and has been removed from the investigation. Matrix's futures-only template
+also needs an equity path;
+adding GLD to PIP alone does not make Matrix emit its contracts.
+
+PIP is not architecturally bound to YARDS: `resolve_refdata_generators` uses
+legacy OPDS/instrument-service modules when `yards_client_env` is unset.
+That branch is not verified GLD support; the skew processor still requires
+a canonical underlying mapping. David Adeboye's September 25 update reports
+actual-equity engineering/modeling work in PIP handled by Ian Adam:
+https://drw.enterprise.slack.com/archives/C04FTV54EJZ/p1790350384189419.
+Distinguish decoding and reducer composition from production equity readiness.
+
+Saved September 30 GLD MDN/VM snapshots aligned all 29 expiration instants
+to exactly one trading-VM term. All 7,868 MDN options resolve to the one
+GLD equity, with no duplicate MDN IDs. These source IDs are not YARDS entity
+IDs; position joins may need separately verified NERD/RDS mappings. The
+inspected MDN Option schema exposes expiration but no distinct last-trade
+time. Do not equate those timestamps or NMS with a booking venue by inference.
+
+The local contained GLD provider and Matrix integration were verified on
+September 30: 7,868 MDN options, 29 approved VM terms, and 7,344 eligible
+options plus the share in Arrow, all model-valid. Matrix's existing two-year
+pricing window excludes longer terms from `/greeks`, while `/refdata` keeps
+the full chain. Same-input regressions match Luna's standalone American
+pricer for price, delta, gamma, vega, and theta. GLD uses the actual MDN
+exchange symbols and numeric IDs; these are not canonical RCI/YARDS position
+identities. YARDS IDs, distinct last-trade times, EH voltime and CME B252
+caltime stay null. Stock point value is one per share; the observed options
+have MDN point value 100. VM spot has no source timestamp, so the observation
+time and approved skew fit time must remain separate. Arrow's existing
+microsecond skew timestamp explicitly floors the provider's nanosecond fit.
+VM batch requests execute sequentially in the inspected Java API handler;
+bracket approved valuation reads with equal last-fit timestamps and validate
+response IDs. These were local checks, not a production deployment.
 
 ### Client Selection 
 
