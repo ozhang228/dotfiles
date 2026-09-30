@@ -75,9 +75,14 @@ dashboard boundary.
 The Metals vol-path publisher writes four OPXL tables rooted at `fd_metals_vp`
 in PROD, `qa_fd_metals_vp` in QA, and `local_fd_metals_vp` locally. Its `ENV`
 selects the prefix through `opxl_key_prefix`. The RV/IV/PnL dashboard reads the
-matching environment root through `VolPathProvider`, falling back to the old
-`metals_vp` root only while the new summary key is absent. Koi Risk calculates
-its own vol path from option data.
+matching environment root through `VolPathProvider` without a legacy fallback.
+Populate and read back the new key before the dashboard starts; it loads VP
+data during startup. Koi Risk calculates its own vol path from option data.
+`MetalsPIPClient.get_snapshot_history` supports a bounded range, listings,
+snapshot interval, and configurable stream sample frequency. The VP publisher
+uses one-minute PIP history with a five-minute filter. An immediate OPXL
+`get_df` after `publish_df` can still return the previous table, so wait for
+the intended epoch and row keys before comparing or cutting over.
 The old OPXL DataFrame helper includes an unnamed index column, read back as
 `None`; `OpxlClient.publish_df` only sends explicit columns, so materialize
 that column when preserving the wire shape. The fitted history assigns a new
@@ -95,6 +100,18 @@ without waiting for a callback. Keep the empty-cache path able to load and let
 the first callback fill it. Measure server work and browser rendering separately
 when diagnosing a slower first view.
 
+For a Dash dashboard that caches live data in the server process, fetching
+the layout does not itself refresh that cache. If the polling callback has
+`prevent_initial_call=True`, it waits for the first timer tick before fetching
+live data. Have charts depend on the completed refresh output so they redraw
+when the new snapshot arrives, rather than waiting for an independent timer.
+Check the browser callback request and source timestamp separately when a
+reported delay is longer than the configured timers.
+After changing Dash callback output IDs, an already-open tab keeps the old
+callback graph and can receive HTTP 500 for its old callback request. Reload
+the tab before validating the new behavior; an aggregate 5xx count alone
+cannot attribute the failure to that tab.
+
 ## Edge Server metadata
 
 `EdgeServerMetadataClient.subscribe` replaces its subscription. Pass all needed
@@ -105,15 +122,52 @@ repeat Redis reads. `poll().entries` contains FlatBuffers: use
 ask methods). Its `to_pandas()` shape is not the per-contract API.
 
 Matrix Greeks supplies live option exchange symbols, delta, strike, point value,
-and underlying identity for the Edge Monitor, but does not publish numeric
-exchange security IDs needed to register ad hoc structures. For historical
-Edge Monitor panels, use read-only `luna.toad.ToadClient` with
+and underlying identity for the Edge Monitor. For historical Edge Monitor
+panels, use read-only `luna.toad.ToadClient` with
 `ToadQueryBuilder`: add base trades with quote info, leg data, PnL markouts,
 and opportunity before aggregating. PnL markouts require leg data in the
 installed Luna client. `FILL_INFO` can split one event across rows, so sum
 edge and quantity by `event_uuid` before ranking top trades. In DED, mount the
 desk's `kv/clickhouse/prod/toad-clickhouse-ro-*` secret and pass its password
 to `ToadClient`; the deployed process should not need Vault authentication.
+
+For Edge Monitor ad hoc legs, YARDS `security_id` is the numeric exchange
+security ID expected by the ad hoc instrument API. A read-only comparison on
+2026-09-30 matched YARDS to TOAD for four Metals options and two futures.
+Publish that ID from Matrix as `exchange_security_id`, require it for selected
+legs before registration, and deploy Matrix before a dashboard that consumes
+the new field. Keep the MIC paired with the exchange ID.
+
+The Metals Table View's ATM Cty uses the desk's quote grid: round the
+underlying to the nearest 25 for GC, 1 for SI, or 0.05 for CU, then select
+the published Matrix call nearest that target. Picking the closest listed
+strike to the unrounded underlying changes the displayed contract.
+
+The legacy production Edge Monitor builds its PIP/EasyPricer Table View
+contract cache at startup. Both `Refresh Edge` and `Refresh Strikes` reuse the
+same EasyPricer, whose input providers close over that original PIP snapshot.
+The latter recomputes strikes but does not fetch new prices or YTE; a process
+restart is needed to refresh them. When production and a Matrix-based
+replacement show different Cty or DTE values, compare the displayed
+strike-refresh time and live PIP and Matrix inputs before changing strike
+selection.
+
+The Edge Monitor's TOAD Summary uses the full electronic desk breakdown,
+including PL. The live Tool selector has a narrower product set (GC, SI, and
+CU), so applying its product mapping to historical TOAD aggregates silently
+removes valid Summary rows. Keep tool-specific selection separate from the
+historical product universe.
+
+The legacy TOAD MCP breakdown defaults to live pricing fallback and a
+150-tick market-edge filter. Preserve both when moving Edge Monitor Summary
+to `ToadQueryBuilder`: add `LIVE_PRICING` before `PNL_MARKOUTS`, then set
+`use_live_override=True` and `max_market_edge_ticks=150`. Without fallback,
+outstanding EOD markouts omit current-trade P&L while fill edge still includes
+those trades, changing regular and active/passive retention. Luna ignores a
+second `with_annotation()` call for an already-added annotation, so adding
+live pricing after P&L and trying to reconfigure P&L does not enable fallback.
+The recent-trades path still needs the P&L annotation because it also computes
+the market edge used for ranking.
 
 ### BSKEW bid/ask statistic
 
@@ -256,6 +310,20 @@ aggregate behind. For stored-only rows, match symbol, trade ID, resting flag,
 and type against the candidate before treating them as missing source trades;
 remove only exact verified stale keys after the current aggregate is present.
 
+Keep full destination-row parity comparisons in pre-cutover validation, not in
+scheduled writers. The deployed writers validate and merge prepared rows; a
+narrow key ownership check prevents one venue from overwriting the other's
+trade in the shared futures table.
+
+Blockworm can include supported and unsupported futures security groups in one
+event, such as an HG leg paired with HGS. The legacy writer filters to GC, SI,
+and HG before requesting quote mids. Preserve that filter before quote lookup
+or one unresolved HGS identity can fail the whole HG date. A preliminary
+ten-second bar can also have a zero-size ask and no implied quote while the
+standard bar at that same epoch has usable implied sides. Keep preliminary
+quotes for valid bars and request the standard bar only as an explicit fallback
+for an invalid preliminary mid; do not treat a zero-size side as a price of zero.
+
 ## Historical volatility partitions
 
 Historical Metals constant-maturity volatility rows can have null `_month`
@@ -349,6 +417,26 @@ For a replay, preserve the Scalloper's earliest-snapshot selection within the
 Historical Delta Greeks retain pricing inputs but lack strike and put/call, so
 recover those from structured historical instruments or refdata and prove
 per-group parity against an existing dated final before publishing a repair.
+
+## Multiday option attribution parity
+
+The old PIP interval writer selects initial listings with `yte > 1e-5`; the
+PIP hedge-event writer uses `yte > 1e-6` and emits a start only after its
+first full business-day horizon is available. The fitted-skew event writer
+retains starts with an entry observation but no complete horizon and null PnL.
+For near-expiry rows whose implied strike is null, the old calculation can still
+store zero delta, vega, vanna, rho, and skew components while option PnL,
+gamma, and theta remain null.
+Compare row keys and null locations as well as shared non-null values before
+merging a replacement into the existing Delta tables.
+Pandas can convert a union of fitted-skew timestamps (pytz Chicago) and
+schedule timestamps (`ZoneInfo` Chicago) to UTC. Convert each timestamp back
+to Chicago before applying a time-of-day session filter; otherwise the 12:30
+and 14:30 Chicago entry fits on September dates become 17:30 and 19:30 UTC
+and fall into that excluded range.
+At 01:00 Chicago, the prior business day's 14:30 entry has not completed its
+first business-day horizon, so a PIP hedge-event batch should end one eligible
+day earlier.
 
 ## Metals email jobs
 
@@ -472,3 +560,13 @@ configured instrument category long enough to initialize and poll its upstreams.
 If every process stays running without startup, credential, refdata, or polling
 errors, the wiring is ready to deploy. After deployment, ask the desk to book a
 controlled test trade and verify that it reaches TI with the expected fields.
+
+The vol-of-vol OPXL publisher preserves desk monthly labels such as `CUU2026`,
+while YARDS can use the option-family RCI symbol. Resolve that identity from
+PIP's structured MIC, option product, and last-trade time, then YARDS' listed
+month/year; filter the publisher's eligible YTE range before refdata lookup.
+For hourly PIP history, allow entry assembly beyond the final snapshot label
+and stop once that labelled snapshot arrives. Shared `OpxlClient.publish_df`
+requires timestamps as strings and omits the dataframe index, so explicitly
+materialize both when preserving the legacy vol-of-vol wire table. Verify the
+published epoch and all row values after OPXL propagation before cutover.
