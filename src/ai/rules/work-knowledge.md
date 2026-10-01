@@ -94,6 +94,34 @@ VM batch requests execute sequentially in the inspected Java API handler;
 bracket approved valuation reads with equal last-fit timestamps and validate
 response IDs. These were local checks, not a production deployment.
 
+### GLD in the new Koi Risk app
+
+The local September 30 implementation targets `dashboard/koi_risk/dashboard_risk.py`.
+Keep MDN/VM/NERD translation in `data_access/equity_options.py`; Koi reads Matrix.
+NERD's structured `external_symbol` matches MDN's OCC symbol, allowing verified
+RCI translation without parsing symbols. A saved 7,344-option snapshot mapped
+7,000 options; 344 had no NERD booking record. Preserve their exchange identity.
+GLD price/scenario units are USD/share, delta is shares, and PnL is USD.
+The equity calculator preserves approved VM vol-path and Andersen parameters;
+it does not refit the commodity vol-path. Matrix exposes serialized Luna
+`american_analytics_params` as an additive Arrow field. GLD inclusion is opt-in
+with `--include-gld`. Koi local flags are `--matrix-url`, `--port`, and `--read-only`.
+GLD is excluded from the established Metals OPXL publication contract.
+No GLD trading-calendar mapping was found; close-based theta and DTE lean
+remain unavailable, and PIP historical overrides cannot serve GLD. Later live
+startup returned `No Data` for approved `GLDV2026_1` pricing, despite an earlier
+successful read. October 1 fixes preserve typed GLD availability and cached
+refdata, publish `product:GLD:error`, and retain healthy metals rows when GLD
+pricing fails. Matrix and Koi expire GLD observations after two minutes;
+approved skew fit age is distinct. Missing holdings use Matrix refdata with
+matching trading dates, and unsupported STS holdings remain visible to coverage
+checks. The read-only app on port 3011 uses local Matrix on 3010; the labelled
+saved/synthetic preview is on 3013 with a frozen clock. Live VM later returned
+`No Data` for `GLDH2027_19`. `lxml` is needed by Koi's existing attribution
+HTML reader and is declared for uv and Conda. The full recipe passed 961 tests.
+Local saved UI verification does not establish live GLD readiness. No push or
+deployment occurred.
+
 ### Client Selection 
 
 Use `PIPSource` when a caller needs an independent point snapshot or historical
@@ -185,13 +213,14 @@ callback graph and can receive HTTP 500 for its old callback request. Reload
 the tab before validating the new behavior; an aggregate 5xx count alone
 cannot attribute the failure to that tab.
 
-For DED jobs using `TradingCalendars.load()`, inspect the library's connection
-path before claiming mounted-credential startup works. The current calendar
-SDK calls Vault inside `DatabaseConnection` even when DED mounted the
-trading-hours secret. Metals' `data_access.trading_calendar` builds the same
-calendar and database cache from the mounted read-only credential, with a
-local Vault fallback. Verify deployed startup with Vault disabled; a successful
-local calendar query exercises a different authentication path.
+For DED jobs using `TradingCalendars.load()`, inspect the installed library's
+connection path before claiming mounted-credential startup works. Calendar
+167 calls Vault even when DED mounted the trading-hours secret. The local
+calendar branch `mounted-calendar-credentials` adds mount-first handling in
+`DatabaseConnection`, keeping the public loader unchanged. Release that change
+before removing Metals' adapter; the follow-on worktree is
+`~/drw/metals-options-gamma-theta-calendar-loader`. Verify deployed startup
+with Vault disabled; a successful local query exercises different authentication.
 
 ## Edge Server metadata
 
@@ -410,6 +439,27 @@ standard bar at that same epoch has usable implied sides. Keep preliminary
 quotes for valid bars and request the standard bar only as an explicit fallback
 for an invalid preliminary mid; do not treat a zero-size side as a price of zero.
 
+
+## Delta attribution commit conflicts
+
+An October 1, 2026 local reproduction copied the production PL attribution
+schema, planned a timestamp-equality merge, committed overlapping rows through
+another Delta handle, and executed the first merge. Delta/DataFusion raised
+`arrow_cast should have been simplified to cast` while checking the conflict.
+The fio wrapper reports this as probably concurrent. Reread the destination,
+revalidate retained values, and rebuild the merge for bounded retries; do not
+repeat the stale transaction plan. Setting `max_commit_retries=0` instead made
+an ordinary copied-table merge fail with `Failed to commit transaction: 0`.
+
+Recalculation can omit stored attribution entry keys: research-fx CU September
+21 had 2,632 stored keys versus 2,604 recalculated keys, with 28 omitted
+H3EV2026 deltas at 07:00 Chicago. An upsert preserves those existing rows;
+report them as unrecalculated rather than deleting them or claiming freshness.
+Read and verify whole Chicago dates using local-midnight UTC boundaries,
+including daylight-saving transitions. Commit provenance identifies which
+writer produced output; another writer's latest rows do not prove the new job
+completed. Evidence: `~/anvil/notebooks/metals_merged_writers_output_audit.py`.
+
 ## Historical volatility partitions
 
 Historical Metals constant-maturity volatility rows can have null `_month`
@@ -503,6 +553,15 @@ For a replay, preserve the Scalloper's earliest-snapshot selection within the
 Historical Delta Greeks retain pricing inputs but lack strike and put/call, so
 recover those from structured historical instruments or refdata and prove
 per-group parity against an existing dated final before publishing a repair.
+
+Changing a live PnL Scalloper's DED `git_ref` from `master` to `production`
+changes its Argo Application identity. On September 30, 2026, Argo began
+deleting both old Metals Scalloper applications at 20:40 UTC and created the
+replacement new Scalloper application at 21:07 UTC, after the 21:00 GC close.
+The live Metals PnL key stopped updating at 20:41. Keep ref-changing rollouts
+outside the close window; a post-close final publisher must reject a feed last
+published while the market was still open. Its source calculation epoch can
+reflect the earlier settlement window, so check publication time separately.
 
 ## Multiday option attribution parity
 
