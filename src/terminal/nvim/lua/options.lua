@@ -21,7 +21,7 @@ local function tmux_client_is_ssh()
   local parent_pid = command_output({ "ps", "-o", "ppid=", "-p", client_pid })
   if parent_pid == nil or parent_pid == "" then return false end
   local parent_command = command_output({ "ps", "-o", "comm=", "-p", parent_pid })
-  return parent_command == "sshd"
+  return parent_command ~= nil and parent_command:match("^sshd") ~= nil
 end
 
 local function client_is_ssh()

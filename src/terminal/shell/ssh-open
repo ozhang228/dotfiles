@@ -7,6 +7,20 @@ if [ -z "$target" ]; then
     exit 2
 fi
 
+# A long-running tmux pane can keep BROWSER=ssh-open after a desktop client attaches.
+if [ -n "${TMUX:-}" ]; then
+    client_pid=$(tmux display-message -p '#{client_pid}' 2>/dev/null || true)
+    if [[ "$client_pid" =~ ^[0-9]+$ ]]; then
+        parent_pid=$(ps -o ppid= -p "$client_pid" 2>/dev/null || true)
+        parent_command=$(ps -o comm= -p "$parent_pid" 2>/dev/null || true)
+        if [ -n "$parent_command" ] && [[ "$parent_command" != sshd* ]]; then
+            exec env -u BROWSER xdg-open "$target"
+        fi
+    fi
+elif [ -z "${SSH_TTY:-}" ]; then
+    exec env -u BROWSER xdg-open "$target"
+fi
+
 encoded=$(printf '%s' "$target" | base64 | tr -d '\n')
 printf '\033]52;c;%s\a' "$encoded" > /dev/tty
 printf 'Copied URL to the SSH client clipboard: %s\n' "$target" >&2

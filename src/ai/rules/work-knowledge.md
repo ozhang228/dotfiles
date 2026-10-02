@@ -96,6 +96,15 @@ response IDs. These were local checks, not a production deployment.
 
 ### GLD in the new Koi Risk app
 
+GLD holding coverage can still flicker when STS introduces a new unsupported
+RDS identity, even after previously verified identities are cached. October 2
+sampling saw two new non-equity identities classify in 28ms, but the cache
+returned pending immediately. Reuse same-date refdata and let the background
+refresh wait up to 100ms outside its lock for the matching request. Slow or
+unknown holdings still fail visibly. The reducer regression pins 10 shares
+delta while a new non-equity RDS lookup completes with refdata offline.
+Evidence: `~/anvil/notebooks/koi_risk_gld_holding_error.py`.
+
 The local September 30 implementation targets `dashboard/koi_risk/dashboard_risk.py`.
 Keep MDN/VM/NERD translation in `data_access/equity_options.py`; Koi reads Matrix.
 NERD's structured `external_symbol` matches MDN's OCC symbol, allowing verified
