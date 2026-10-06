@@ -26,8 +26,8 @@ return {
       GruvboxOrangeSign = { fg = palette.orange, bg = palette.bg },
       RenderMarkdownSign = { bg = palette.bg },
       RenderMarkdownH1Bg = { fg = palette.fg, bg = palette.bg_selection },
-      RenderMarkdownCodeInline = { fg = palette.fg, bg = palette.bg_alt },
-      ["@markup.raw.markdown_inline"] = { fg = palette.fg },
+      RenderMarkdownCodeInline = { fg = palette.fg, bg = palette.bg_selection },
+      ["@markup.raw.markdown_inline"] = { fg = palette.fg, bg = palette.bg_selection },
       MiniFilesNormal = { fg = palette.fg, bg = palette.bg },
       MiniFilesCursorLine = { bg = palette.bg_alt },
 
