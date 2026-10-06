@@ -49,6 +49,9 @@ return {
         width = 0,
         height = 0,
         on_win = nudge_terminal_resize,
+        wo = {
+          winhighlight = "Normal:Normal,NormalNC:Normal,WinBar:SnacksWinBar,WinBarNC:SnacksWinBarNC,FloatTitle:SnacksTitle,FloatFooter:SnacksFooter,WinSeparator:SnacksWinSeparator",
+        },
         keys = {
           term_normal = {
             "<leader><esc>",

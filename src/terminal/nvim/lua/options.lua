@@ -1,5 +1,6 @@
 vim.o.mouse = "a"
-vim.cmd.colorscheme("github_light_high_contrast")
+vim.o.background = "light"
+vim.cmd.colorscheme("gruvbox")
 vim.o.shell = "/bin/fish"
 
 vim.g.have_nerd_font = true

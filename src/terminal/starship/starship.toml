@@ -26,17 +26,17 @@ $time\
 $line_break\
 $character"""
 
-palette = "github-light-high-contrast"
+palette = "gruvbox-light-hard"
 
-[palettes.github-light-high-contrast]
-bg_alt = '#e7ecf0'
-red = '#a0111f'
-red_bright = '#d1242f'
-yellow = '#744500'
-orange = '#702c00'
-green = '#055d20'
-accent = '#0349b4'
-purple = '#512598'
+[palettes.gruvbox-light-hard]
+bg_alt = '#ebdbb2'
+red = '#9d0006'
+red_bright = '#cc241d'
+yellow = '#82560e'
+orange = '#a63703'
+green = '#67630c'
+accent = '#076678'
+purple = '#8f3f71'
 
 [username]
 disabled = false

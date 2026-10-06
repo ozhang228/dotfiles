@@ -1,18 +1,19 @@
-# Reference palette for all themed dotfiles 
+# Reference palette for all themed dotfiles (Gruvbox light, hard contrast)
+# https://github.com/morhetz/gruvbox: light0_hard background, faded accents
 
-bg = "#ffffff"
-bg_alt = "#e7ecf0"
-bg_selection = "#cddbf0"
-fg = "#010409"
-fg_muted = "#4b535d"
-fg_subtle = "#66707b"
-border = "#20252c"
-accent = "#0349b4"
-accent_bright = "#4a98fa" # background/decorative use only — fails WCAG as foreground text
-red = "#a0111f"
-red_bright = "#d1242f"
-orange = "#702c00"
-yellow = "#744500"
-green = "#055d20"
-cyan = "#1b7c83"
-purple = "#512598"
+bg = "#f9f5d7"
+bg_alt = "#ebdbb2"
+bg_selection = "#d5c4a1"
+fg = "#282828"
+fg_muted = "#504945"
+fg_subtle = "#665c54"
+border = "#3c3836"
+accent = "#076678"
+accent_bright = "#458588" # background/decorative use only, fails WCAG as foreground text
+red = "#9d0006"
+red_bright = "#cc241d"
+orange = "#a63703"
+yellow = "#82560e"
+green = "#67630c"
+cyan = "#38694b"
+purple = "#8f3f71"

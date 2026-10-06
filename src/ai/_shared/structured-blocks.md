@@ -31,11 +31,11 @@ per-skill checklist.
 ```css
 :root {
   color-scheme: light;
-  --bg: #ffffff; --surface: #e7ecf0; --surface-2: #dde3e8; --line: #d0d7de;
-  --ink: #010409; --muted: #4b535d; --accent: #0349b4; --accent-soft: #dbe9fb;
-  --add: #055d20; --add-bg: #daf7e0; --add-line: #acf2bd;
-  --del: #d1242f; --del-bg: #ffeef0; --del-line: #fdb8c0;
-  --warn: #744500; --warn-bg: #fff3d6;
+  --bg: #f9f5d7; --surface: #ebdbb2; --surface-2: #d5c4a1; --line: #bdae93;
+  --ink: #282828; --muted: #504945; --accent: #076678; --accent-soft: #d5e0c9;
+  --add: #67630c; --add-bg: #e6e2b9; --add-line: #d3ce9b;
+  --del: #cc241d; --del-bg: #ebd0b8; --del-line: #ddab98;
+  --warn: #82560e; --warn-bg: #efe2ba;
   --radius: 8px;
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
   --sans: -apple-system, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
@@ -190,7 +190,7 @@ details.json-explorer[open] summary::before { content: "▾ "; }
 details.json-explorer pre { font-family: var(--mono); font-size: 12.5px; margin: 6px 0 0; padding: 10px 12px; background: var(--surface-2); border-radius: 6px; overflow-x: auto; }
 .jk { color: var(--accent); }
 .js { color: var(--add); }
-.jn { color: #512598; }
+.jn { color: #8f3f71; }
 ```
 
 ```html

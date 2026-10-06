@@ -16,12 +16,12 @@
     # use n and N to move between diff sections
     navigate = true
     light = true
-    plus-style = "syntax #daf7e0"
-    plus-emph-style = "syntax #acf2bd"
-    minus-style = "syntax #ffeef0"
-    minus-emph-style = "syntax #fdb8c0"
-    line-numbers-plus-style = "#055d20"
-    line-numbers-minus-style = "#a0111f"
+    plus-style = "syntax #e6e2b9"
+    plus-emph-style = "syntax #d3ce9b"
+    minus-style = "syntax #ebd0b8"
+    minus-emph-style = "syntax #ddab98"
+    line-numbers-plus-style = "#67630c"
+    line-numbers-minus-style = "#9d0006"
 
 [pull]
     rebase = false

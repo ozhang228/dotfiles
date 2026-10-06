@@ -19,5 +19,5 @@ set fish_greeting
 
 set -gx JQ_COLORS "0;37:0;31:0;32:0;33:0;33:0;35:0;36:0;34"
 
-# GitHub Light High Contrast — keeps fzf's own picker readable against the light terminal bg
-set -gx FZF_DEFAULT_OPTS '--cycle --layout=reverse --border --height=90% --info=hidden --preview-window=wrap,border-left,noinfo --marker="*" --color=fg:#010409,bg:#ffffff,hl:#512598,fg+:#010409,bg+:#e7ecf0,hl+:#0349b4,info:#1b7c83,prompt:#0349b4,pointer:#d1242f,marker:#055d20,spinner:#744500,header:#4b535d,border:#66707b,preview-border:#66707b,label:#010409'
+# Gruvbox Light Hard — keeps fzf's own picker readable against the light terminal bg
+set -gx FZF_DEFAULT_OPTS '--cycle --layout=reverse --border --height=90% --info=hidden --preview-window=wrap,border-left,noinfo --marker="*" --color=fg:#282828,bg:#f9f5d7,hl:#8f3f71,fg+:#282828,bg+:#ebdbb2,hl+:#076678,info:#38694b,prompt:#076678,pointer:#cc241d,marker:#67630c,spinner:#82560e,header:#504945,border:#665c54,preview-border:#665c54,label:#282828'

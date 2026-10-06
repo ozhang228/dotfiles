@@ -95,14 +95,14 @@ bindsym $mod+$smod+q kill
 bindsym $mod+$smod+s exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-save-all.sh"
 bindsym $mod+$smod+o exec --no-startup-id "$HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh"
 
-set $bg             #ffffff
-set $bg_alt         #e7ecf0
-set $fg_subtle      #66707b
-set $fg_muted       #4b535d
-set $fg             #010409
-set $border         #20252c
-set $accent         #0349b4
-set $red_bright     #d1242f
+set $bg             #f9f5d7
+set $bg_alt         #ebdbb2
+set $fg_subtle      #665c54
+set $fg_muted       #504945
+set $fg             #282828
+set $border         #3c3836
+set $accent         #076678
+set $red_bright     #cc241d
 
 # target                title          bg             text     indicator border
 client.focused          $border        $border        $bg      $border   $border
