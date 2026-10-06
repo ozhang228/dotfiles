@@ -9,5 +9,5 @@
     foreground:     #282828FF;
     selected:       #076678FF;
     active:         #67630cFF;
-    urgent:         #cc241dFF;
+    urgent:         #9d0006FF;
 }
