@@ -51,6 +51,15 @@ return {
       CursorLineNr = { fg = palette.yellow, bg = "#f2e5bc" },
       MiniFilesNormal = { fg = palette.fg, bg = palette.bg },
       MiniFilesCursorLine = { bg = palette.bg_alt },
+      DooingText = { link = "NormalFloat" },
+      SnacksNotifierInfo = { link = "NormalFloat" },
+      SnacksNotifierWarn = { link = "NormalFloat" },
+      SnacksNotifierError = { link = "NormalFloat" },
+      SnacksNotifierDebug = { link = "NormalFloat" },
+      SnacksNotifierTrace = { link = "NormalFloat" },
+      SnacksNotifierIconInfo = { link = "DiagnosticInfo" },
+      SnacksNotifierIconWarn = { link = "DiagnosticWarn" },
+      SnacksNotifierIconError = { link = "DiagnosticError" },
 
       ["@lsp.type.variable"] = { fg = palette.fg },
 
