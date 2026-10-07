@@ -582,9 +582,6 @@ When an expired option is absent from ending pricing history, use the live
 underlying price for both its spot and forward when setting `pricing_yte_live`
 to zero. A missing forward can reach SOL volatility queries as NaN; orjson then
 serializes a generated non-finite volatility bump as null, which SOL rejects.
-The August 8, 2025 Rerun PnL replay reproduced this for nine GC/SI positions in
-Prop books. The captured-input replay completed after filling the forward;
-this was local validation and did not publish a repair.
 
 ## Multiday option attribution parity
 

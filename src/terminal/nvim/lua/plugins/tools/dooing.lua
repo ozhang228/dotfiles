@@ -21,7 +21,7 @@ return {
       toggle_window = false,
       open_project_todo = false,
       show_due_notification = false,
-      toggle_todo = false,
+      toggle_todo = "<CR>",
       toggle_priority = false,
       edit_priorities = false,
       new_todo = "n",
@@ -31,6 +31,9 @@ return {
     },
   },
   config = function(_, opts)
+    vim.loader.reset(vim.fn.stdpath("config"))
+    local cache = package.loaded["lazy.core.cache"]
+    if cache then cache.reset(vim.fn.stdpath("config")) end
     require("dooing").setup(opts)
 
     local dooing_input_titles = {
@@ -86,6 +89,44 @@ return {
       end
 
       local function render_todos() require("dooing.ui.rendering").render_todos() end
+
+      vim.keymap.set("n", "<CR>", function()
+        local todo = todo_at_cursor()
+        if not todo then return end
+
+        todo.done = not todo.done
+        todo.in_progress = false
+        todo.completed_at = todo.done and os.time() or nil
+        state.save_todos()
+        render_todos()
+      end, { buffer = constants.buf_id, desc = "Toggle Todo Done", nowait = true })
+
+      vim.keymap.set("n", "m", function() require("dooing_diagram").open() end, {
+        buffer = constants.buf_id,
+        desc = "Open Todo Diagram (auto refresh)",
+        nowait = true,
+      })
+
+      vim.keymap.set("n", require("dooing.config").options.keymaps.toggle_help, function()
+        require("dooing.ui.components").create_help_window()
+        local buf = constants.help_buf_id
+        if not buf or not vim.api.nvim_buf_is_valid(buf) then return end
+        local count = vim.api.nvim_buf_line_count(buf)
+        vim.bo[buf].modifiable = true
+        vim.api.nvim_buf_set_lines(buf, 0, 0, false, {
+          " CUSTOM KEYS",
+          "   m   Open live diagram (auto refresh)",
+          "   x   Toggle in progress",
+          "   Enter   Toggle done",
+          "",
+        })
+        vim.bo[buf].modifiable = false
+        vim.api.nvim_buf_add_highlight(buf, constants.ns_id, "DooingSectionTitle", 0, 0, -1)
+        vim.api.nvim_buf_add_highlight(buf, constants.ns_id, "DooingQuickKey", 1, 3, 4)
+        local window = vim.api.nvim_win_get_config(constants.help_win_id)
+        window.height = math.min(count + 5, vim.o.lines - 4)
+        vim.api.nvim_win_set_config(constants.help_win_id, window)
+      end, { buffer = constants.buf_id, desc = "Todo Help", nowait = true })
 
       vim.keymap.set("n", "x", function()
         local todo = todo_at_cursor()

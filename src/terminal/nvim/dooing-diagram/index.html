@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dooing · Todo diagram</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #f9f5d7;
+      color: #282828;
+      font:
+        15px system-ui,
+        sans-serif;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 14px 24px;
+      background: #f9f5d7;
+      border-bottom: 1px solid #d5c4a1;
+      z-index: 1;
+    }
+    header strong {
+      margin-right: auto;
+    }
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .legend span {
+      padding: 4px 8px;
+      border-radius: 5px;
+    }
+    .pending {
+      background: #ebdbb2;
+    }
+    .progress {
+      background: #fae5a3;
+    }
+    .done {
+      background: #d5e2ba;
+    }
+    button {
+      background: #ebdbb2;
+      color: inherit;
+      border: 1px solid #bdae93;
+      border-radius: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    #status {
+      font-size: 12px;
+      color: #665c54;
+      padding: 8px 24px;
+    }
+    #viewport {
+      overflow: auto;
+      height: calc(100vh - 100px);
+      padding: 20px;
+    }
+    #diagram {
+      width: max-content;
+      min-width: 100%;
+      text-align: center;
+    }
+    #diagram svg {
+      max-width: none !important;
+    }
+  </style>
+  <header>
+    <strong>Todos</strong>
+    <div class="legend">
+      <span class="pending">Pending</span><span class="progress">In progress</span
+      ><span class="done">Done</span>
+    </div>
+    <button id="out" aria-label="Zoom out">−</button><button id="fit">Fit</button
+    ><button id="in" aria-label="Zoom in">+</button>
+  </header>
+  <div id="status">Loading…</div>
+  <main id="viewport"><div id="diagram"></div></main>
+  <script src="/mermaid.js"></script>
+  <script>
+    const diagram = document.getElementById("diagram");
+    const status = document.getElementById("status");
+    const viewport = document.getElementById("viewport");
+    let lastSource;
+    let scale = 1;
+    let sequence = 0;
+    let dimensions;
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      themeVariables: {
+        background: "#f9f5d7",
+        primaryColor: "#ebdbb2",
+        primaryTextColor: "#282828",
+        primaryBorderColor: "#665c54",
+        lineColor: "#665c54",
+        fontFamily: "system-ui, sans-serif",
+      },
+      flowchart: { htmlLabels: false, curve: "basis", useMaxWidth: false },
+    });
+
+    function resizeDiagram() {
+      const svg = diagram.querySelector("svg");
+      if (!svg || !dimensions) return;
+      svg.style.width = `${dimensions.width * scale}px`;
+      svg.style.height = `${dimensions.height * scale}px`;
+    }
+    function fitDiagram() {
+      if (!dimensions) return;
+      scale = Math.min(1, (viewport.clientWidth - 40) / dimensions.width);
+      resizeDiagram();
+    }
+    function zoomIn() {
+      scale = Math.min(3, scale * 1.25);
+      resizeDiagram();
+    }
+    function zoomOut() {
+      scale = Math.max(0.1, scale / 1.25);
+      resizeDiagram();
+    }
+    document.getElementById("in").addEventListener("click", zoomIn);
+    document.getElementById("out").addEventListener("click", zoomOut);
+    document.getElementById("fit").addEventListener("click", fitDiagram);
+
+    async function refresh() {
+      try {
+        const response = await fetch("/diagram", { cache: "no-store" });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error);
+        if (result.source !== lastSource) {
+          const first = lastSource === undefined;
+          const rendered = await mermaid.render(`todos-${sequence++}`, result.source);
+          diagram.innerHTML = rendered.svg;
+          const box = diagram.querySelector("svg").viewBox.baseVal;
+          dimensions = { width: box.width, height: box.height };
+          lastSource = result.source;
+          if (first) fitDiagram();
+          else resizeDiagram();
+        }
+        status.textContent = "Live · updates automatically";
+      } catch (error) {
+        status.textContent = `Unable to refresh: ${error.message}`;
+      }
+      setTimeout(refresh, 1000);
+    }
+    refresh();
+  </script>
+</html>
