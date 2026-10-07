@@ -51,6 +51,7 @@ return {
       CursorLineNr = { fg = palette.yellow, bg = "#f2e5bc" },
       MiniFilesNormal = { fg = palette.fg, bg = palette.bg },
       MiniFilesCursorLine = { bg = palette.bg_alt },
+      NormalFloat = { fg = palette.fg, bg = palette.bg },
       DooingText = { link = "NormalFloat" },
       SnacksNotifierInfo = { link = "NormalFloat" },
       SnacksNotifierWarn = { link = "NormalFloat" },
