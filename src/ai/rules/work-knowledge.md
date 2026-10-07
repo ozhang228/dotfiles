@@ -7,6 +7,15 @@ skip_if: Work outside DRW repositories that does not require DRW/FICC domain kno
 
 Terminology, repo map, and durable DRW/FICC desk facts for Oscar's work. All repos live under `~/drw/`.
 
+## Maintaining this file
+
+Apply the Durable Knowledge rules in `~/dotfiles/src/ai/GLOBAL.md`. Keep current,
+verified facts useful across future tasks; update the relevant section rather
+than appending task recaps. Omit incident timelines, snapshot counts, validation
+logs, and completed retirement details. Document the supported approach after a
+deprecation, retaining old details only for an explicit active compatibility or
+rollback requirement.
+
 ## Terminology
 
 - **PIP** is ambiguous. Context decides whether it means "Pricing Inputs Publisher" or the `pricing-inputs` Kafka topic prefix.
@@ -33,9 +42,8 @@ rates, carry, and Andersen analytics. Reuse Luna's Coral decoders; the older
 FEJ `Pricer` does not support that equity model. The inspected VM/Mini configs
 set `kafka.enabled=false`. Recheck live coverage before assuming this persists.
 
-VM `get_listing_strikes` returned an unsupported API field. MDN's GLD snapshot
-returned the equity and 7,868 options with structured strike, payoff, expiry,
-underlying links, and 100-share option point value. VM's `product_listings_info`
+MDN supplies GLD equity and option refdata with structured strike, payoff,
+expiry, underlying links, and 100-share option point value. VM's `product_listings_info`
 subscription provides a separate underlying price; `get_last_fit_time` supplies
 approved pricing metadata's creation time. Book-event timestamp semantics remain
 unverified. The vol-path reference price is not proof of fresh spot, and
@@ -58,9 +66,7 @@ Deribit MIC. Live broker metadata listed no Metals-equity skew topic. Complete
 two-minute reads found no GLD in the `ficc-metals` and `metalsauto` Coral feeds
 or `nms.chipx` book snapshots (1,534 distinct symbols). These bounded checks are
 not broker-wide absence proof. `eito`'s CHIP config alone cannot supply GLD.
-The deprecated `VolManager.get_listing_strikes` call generated a VM deserialization
-error and has been removed from the investigation. Matrix's futures-only template
-also needs an equity path;
+Matrix's futures-only template also needs an equity path;
 adding GLD to PIP alone does not make Matrix emit its contracts.
 
 PIP is not architecturally bound to YARDS: `resolve_refdata_generators` uses
@@ -572,12 +578,30 @@ outside the close window; a post-close final publisher must reject a feed last
 published while the market was still open. Its source calculation epoch can
 reflect the earlier settlement window, so check publication time separately.
 
+When an expired option is absent from ending pricing history, use the live
+underlying price for both its spot and forward when setting `pricing_yte_live`
+to zero. A missing forward can reach SOL volatility queries as NaN; orjson then
+serializes a generated non-finite volatility bump as null, which SOL rejects.
+The August 8, 2025 Rerun PnL replay reproduced this for nine GC/SI positions in
+Prop books. The captured-input replay completed after filling the forward;
+this was local validation and did not publish a repair.
+
 ## Multiday option attribution parity
 
 The old PIP interval writer selects initial listings with `yte > 1e-5`; the
 PIP hedge-event writer uses `yte > 1e-6` and emits a start only after its
-first full business-day horizon is available. The fitted-skew event writer
+first full business-day horizon is available. The fitted-skew interval writer
 retains starts with an entry observation but no complete horizon and null PnL.
+The fitted-skew event calculation skips incomplete horizons; its old wrapper
+catches a failed date and continues to later dates/products. Preserve that
+batch-progress behavior explicitly for expected incomplete input rather than
+allowing an immature final date to abort all remaining products.
+Only classify an empty calculation as an incomplete horizon after input and
+listing-selection validation, when eligible history ends before the first
+horizon. Log both timestamps and skip the merge; invalid input must still fail.
+Apply this shared event-horizon policy to both PIP hedging and Research-FX.
+Interval profiles retain entry rows with null unfinished PnL instead of skipping.
+An October 7 fixed-clock 06:30 replay skipped GC and reached SI with no writes.
 For near-expiry rows whose implied strike is null, the old calculation can still
 store zero delta, vega, vanna, rho, and skew components while option PnL,
 gamma, and theta remain null.
@@ -591,6 +615,21 @@ and fall into that excluded range.
 At 01:00 Chicago, the prior business day's 14:30 entry has not completed its
 first business-day horizon, so a PIP hedge-event batch should end one eligible
 day earlier.
+
+For current attribution health, inspect `app=write-pnl-attribution` MERGE
+predicates and source-row counts separately for every profile/product. A table
+snapshot can include retained legacy rows, and a job can stop between products.
+Repeat the commit check before calling a slow job failed: on October 7 hedging
+CU advanced while PIP interval CU and research-FX GC remained unchanged.
+Research-FX's next GC entry reproduced `No attribution rows were calculated`
+with history ending before all first horizons; the user later supplied that
+deployed traceback and reported PIP interval `OOMKilled`. Raising the latter's
+configured memory limit adds headroom but does not prove the next batch completes.
+
+An Efficiency Argo `Healthy` status does not establish signal publication.
+Check the intended tool's current per-instrument metadata, Kafka broker rate,
+and retained batch timestamps separately. When Kafka has equal low/high offsets,
+there is no retained batch to date; use Eventstore evidence for earlier activity.
 
 ## Metals email jobs
 
