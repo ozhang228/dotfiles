@@ -1,7 +1,7 @@
 return {
   {
     "mason-org/mason.nvim",
-    opts = {},
+    opts = { ui = { backdrop = 100 } },
   },
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",

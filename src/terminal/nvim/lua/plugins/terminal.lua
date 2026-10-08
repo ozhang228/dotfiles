@@ -45,7 +45,7 @@ return {
       win = {
         style = "float",
         border = "rounded",
-        backdrop = 60,
+        backdrop = false,
         width = 0,
         height = 0,
         on_win = nudge_terminal_resize,
