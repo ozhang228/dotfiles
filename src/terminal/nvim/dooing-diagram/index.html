@@ -66,9 +66,10 @@
       padding: 20px;
     }
     #diagram {
-      width: max-content;
-      min-width: 100%;
-      text-align: center;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 32px;
     }
     #diagram svg {
       max-width: none !important;
@@ -93,7 +94,7 @@
     let lastSource;
     let scale = 1;
     let sequence = 0;
-    let dimensions;
+    let trees = [];
     mermaid.initialize({
       startOnLoad: false,
       securityLevel: "strict",
@@ -106,18 +107,19 @@
         lineColor: "#665c54",
         fontFamily: "system-ui, sans-serif",
       },
-      flowchart: { htmlLabels: false, curve: "basis", useMaxWidth: false },
+      flowchart: { htmlLabels: false, wrappingWidth: 1000, curve: "basis", useMaxWidth: false },
     });
 
     function resizeDiagram() {
-      const svg = diagram.querySelector("svg");
-      if (!svg || !dimensions) return;
-      svg.style.width = `${dimensions.width * scale}px`;
-      svg.style.height = `${dimensions.height * scale}px`;
+      for (const { svg, width, height } of trees) {
+        svg.style.width = `${width * scale}px`;
+        svg.style.height = `${height * scale}px`;
+      }
     }
     function fitDiagram() {
-      if (!dimensions) return;
-      scale = Math.min(1, (viewport.clientWidth - 40) / dimensions.width);
+      if (trees.length === 0) return;
+      const widest = Math.max(...trees.map((tree) => tree.width));
+      scale = Math.min(1, (viewport.clientWidth - 40) / widest);
       resizeDiagram();
     }
     function zoomIn() {
@@ -137,13 +139,23 @@
         const response = await fetch("/diagram", { cache: "no-store" });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error);
-        if (result.source !== lastSource) {
+        const key = JSON.stringify(result.sources);
+        if (key !== lastSource) {
           const first = lastSource === undefined;
-          const rendered = await mermaid.render(`todos-${sequence++}`, result.source);
-          diagram.innerHTML = rendered.svg;
-          const box = diagram.querySelector("svg").viewBox.baseVal;
-          dimensions = { width: box.width, height: box.height };
-          lastSource = result.source;
+          const rendered = [];
+          for (const source of result.sources) {
+            rendered.push(await mermaid.render(`todos-${sequence++}`, source));
+          }
+          diagram.replaceChildren();
+          trees = rendered.map(({ svg }) => {
+            const holder = document.createElement("div");
+            holder.innerHTML = svg;
+            diagram.append(holder);
+            const element = holder.querySelector("svg");
+            const box = element.viewBox.baseVal;
+            return { svg: element, width: box.width, height: box.height };
+          });
+          lastSource = key;
           if (first) fitDiagram();
           else resizeDiagram();
         }

@@ -107,6 +107,12 @@ return {
         nowait = true,
       })
 
+      vim.keymap.set("n", "M", function() require("dooing_diagram").stop() end, {
+        buffer = constants.buf_id,
+        desc = "Stop Todo Diagram server",
+        nowait = true,
+      })
+
       vim.keymap.set("n", require("dooing.config").options.keymaps.toggle_help, function()
         require("dooing.ui.components").create_help_window()
         local buf = constants.help_buf_id
@@ -115,7 +121,8 @@ return {
         vim.bo[buf].modifiable = true
         vim.api.nvim_buf_set_lines(buf, 0, 0, false, {
           " CUSTOM KEYS",
-          "   m   Open live diagram (auto refresh)",
+          "   m   Open live diagram (starts a fresh server if stopped)",
+          "   M   Stop diagram server",
           "   x   Toggle in progress",
           "   Enter   Toggle done",
           "",
@@ -123,8 +130,9 @@ return {
         vim.bo[buf].modifiable = false
         vim.api.nvim_buf_add_highlight(buf, constants.ns_id, "DooingSectionTitle", 0, 0, -1)
         vim.api.nvim_buf_add_highlight(buf, constants.ns_id, "DooingQuickKey", 1, 3, 4)
+        vim.api.nvim_buf_add_highlight(buf, constants.ns_id, "DooingQuickKey", 2, 3, 4)
         local window = vim.api.nvim_win_get_config(constants.help_win_id)
-        window.height = math.min(count + 5, vim.o.lines - 4)
+        window.height = math.min(count + 6, vim.o.lines - 4)
         vim.api.nvim_win_set_config(constants.help_win_id, window)
       end, { buffer = constants.buf_id, desc = "Todo Help", nowait = true })
 

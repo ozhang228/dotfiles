@@ -53,6 +53,17 @@ function M.open()
   viewer = process
 end
 
+function M.stop()
+  if not viewer then
+    vim.notify("Todo diagram server is not running")
+    return
+  end
+  local process = viewer
+  viewer, url, active_path = nil, nil, nil
+  process:kill(15)
+  vim.notify("Todo diagram server stopped")
+end
+
 vim.api.nvim_create_autocmd("VimLeavePre", {
   group = vim.api.nvim_create_augroup("dooing_diagram", { clear = true }),
   callback = function()
