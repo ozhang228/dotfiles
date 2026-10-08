@@ -4,7 +4,11 @@ return {
   opts = {
     views = {
       popup = { win_options = { winblend = 0 } },
-      hover = { win_options = { winblend = 0 } },
+      hover = {
+        border = { style = "rounded" },
+        position = { row = 2, col = 0 },
+        win_options = { winblend = 0 },
+      },
       mini = { win_options = { winblend = 0 } },
     },
     lsp = {
