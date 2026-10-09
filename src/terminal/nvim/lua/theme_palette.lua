@@ -2,6 +2,7 @@ return {
   bg = "#f9f5d7",
   bg_alt = "#ebdbb2",
   bg_selection = "#d5c4a1",
+  bg_cursorline = "#f2e5bc",
   fg = "#282828",
   fg_muted = "#504945",
   fg_subtle = "#665c54",
