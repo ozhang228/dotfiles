@@ -146,6 +146,6 @@
   "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
-  "theme": "custom:gruvbox-light-hard",
+  "theme": "custom:catppuccin-macchiato",
   "agentPushNotifEnabled": true
 }

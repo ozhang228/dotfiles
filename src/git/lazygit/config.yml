@@ -5,32 +5,32 @@ gui:
   expandFocusedSidePanel: true
   theme:
     activeBorderColor:
-      - "#076678"
+      - "#8aadf4"
       - bold
     inactiveBorderColor:
-      - "#665c54"
+      - "#939ab7"
     searchingActiveBorderColor:
-      - "#a63703"
+      - "#f5a97f"
       - bold
     optionsTextColor:
-      - "#38694b"
+      - "#8bd5ca"
     selectedLineBgColor:
-      - "#076678"
+      - "#494d64"
     inactiveViewSelectedLineBgColor:
-      - "#ebdbb2"
+      - "#363a4f"
       - bold
     cherryPickedCommitFgColor:
-      - "#f9f5d7"
+      - "#24273a"
     cherryPickedCommitBgColor:
-      - "#a63703"
+      - "#f5a97f"
     markedBaseCommitFgColor:
-      - "#f9f5d7"
+      - "#24273a"
     markedBaseCommitBgColor:
-      - "#82560e"
+      - "#eed49f"
     unstagedChangesColor:
-      - "#cc241d"
+      - "#ee99a0"
     defaultFgColor:
-      - "#282828"
+      - "#cad3f5"
   showNumstatInFilesView: true
   showRandomTip: false
   nerdFontsVersion: "3"

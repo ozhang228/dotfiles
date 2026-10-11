@@ -15,13 +15,17 @@
 [delta]
     # use n and N to move between diff sections
     navigate = true
-    light = true
-    plus-style = "syntax #e6e2b9"
-    plus-emph-style = "syntax #d3ce9b"
-    minus-style = "syntax #ebd0b8"
-    minus-emph-style = "syntax #ddab98"
-    line-numbers-plus-style = "#67630c"
-    line-numbers-minus-style = "#9d0006"
+    dark = true
+    syntax-theme = Catppuccin Macchiato
+    plus-style = "syntax #2d3440"
+    plus-emph-style = "syntax #364047"
+    minus-style = "syntax #322e40"
+    minus-emph-style = "syntax #403447"
+    line-numbers-zero-style = "#939ab7"
+    line-numbers-left-style = "#939ab7"
+    line-numbers-right-style = "#939ab7"
+    line-numbers-plus-style ="#a6da95"
+    line-numbers-minus-style = "#ed8796"
 
 [pull]
     rebase = false

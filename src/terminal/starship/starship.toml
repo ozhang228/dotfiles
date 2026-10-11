@@ -26,17 +26,17 @@ $time\
 $line_break\
 $character"""
 
-palette = "gruvbox-light-hard"
+palette = "catppuccin-macchiato"
 
-[palettes.gruvbox-light-hard]
-bg_alt = '#ebdbb2'
-red = '#9d0006'
-red_bright = '#cc241d'
-yellow = '#82560e'
-orange = '#a63703'
-green = '#67630c'
-accent = '#076678'
-purple = '#8f3f71'
+[palettes.catppuccin-macchiato]
+bg_alt = '#363a4f'
+red = '#ed8796'
+red_bright = '#ee99a0'
+yellow = '#eed49f'
+orange = '#f5a97f'
+green = '#a6da95'
+accent = '#8aadf4'
+purple = '#c6a0f6'
 
 [username]
 disabled = false

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude Code status line — Gruvbox Light Hard palette + Nerd Fonts (mirrors starship order)
+# Claude Code status line — Catppuccin Macchiato palette + Nerd Fonts (mirrors starship order)
 set -euo pipefail
 
 input=$(cat)
@@ -29,15 +29,15 @@ fi
 # Active skills (up to 10)
 skills=$(ls ~/.claude/skills/ 2>/dev/null | head -10 | paste -sd ',' | sed 's/,/, /g')
 
-# Gruvbox Light Hard — same progression as starship: red peach yellow green teal blue
-c_red=$'\033[38;2;204;36;29m'      # model      #cc241d
-c_peach=$'\033[38;2;166;55;3m'    # dir        #a63703
-c_yellow=$'\033[38;2;130;86;14m'   # branch     #82560e
-c_green=$'\033[38;2;103;99;12m'   # ctx normal #67630c
-c_red_warn=$'\033[38;2;204;36;29m' # ctx >= 70% (back to red)
-c_teal=$'\033[38;2;56;105;75m'    # cost       #38694b
-c_blue=$'\033[38;2;7;102;120m'    # skills     #076678
-c_muted=$'\033[38;2;102;92;84m'    # separators #665c54
+# Catppuccin Macchiato — same progression as starship: red peach yellow green teal blue
+c_red=$'\033[38;2;238;153;160m'      # model      #ee99a0
+c_peach=$'\033[38;2;245;169;127m'    # dir        #f5a97f
+c_yellow=$'\033[38;2;238;212;159m'   # branch     #eed49f
+c_green=$'\033[38;2;166;218;149m'   # ctx normal #a6da95
+c_red_warn=$'\033[38;2;237;135;150m' # ctx >= 70% (back to red)
+c_teal=$'\033[38;2;139;213;202m'    # cost       #8bd5ca
+c_blue=$'\033[38;2;138;173;244m'    # skills     #8aadf4
+c_muted=$'\033[38;2;147;154;183m'    # separators #939ab7
 reset=$'\033[0m'
 
 # Nerd Font icons — branch is U+F418 (matches starship config)

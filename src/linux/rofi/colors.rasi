@@ -4,10 +4,10 @@
  **/
 
 * {
-    background:     #f9f5d7FF;
-    background-alt: #ebdbb2FF;
-    foreground:     #282828FF;
-    selected:       #076678FF;
-    active:         #67630cFF;
-    urgent:         #9d0006FF;
+    background:     #24273aFF;
+    background-alt: #363a4fFF;
+    foreground:     #cad3f5FF;
+    selected:       #8aadf4FF;
+    active:         #a6da95FF;
+    urgent:         #ed8796FF;
 }

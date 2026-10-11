@@ -72,9 +72,9 @@ function diagramFromTodos(value) {
   });
   const header = [
     "flowchart TD",
-    "classDef pending fill:#ebdbb2,stroke:#665c54,color:#282828",
-    "classDef progress fill:#fae5a3,stroke:#82560e,color:#282828",
-    "classDef done fill:#d5e2ba,stroke:#67630c,color:#282828",
+    "classDef pending fill:#363a4f,stroke:#939ab7,color:#cad3f5",
+    "classDef progress fill:#504d50,stroke:#eed49f,color:#cad3f5",
+    "classDef done fill:#3e4b4c,stroke:#a6da95,color:#cad3f5",
   ];
   const trees = new Map();
   for (const todo of todos) {
