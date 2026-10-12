@@ -22,6 +22,13 @@ skip_if: Working in Python, C++, or any non-TypeScript/JavaScript language
   - `{ lines?: ConstructedLine[] }` — the key may be omitted.
   - `{ lines: ConstructedLine[] | undefined }` — the key must exist, but may be `undefined`.
 
+## React Component Tests
+
+- Test bodies never contain raw selectors or DOM traversal: no `querySelector`, `querySelectorAll`, `closest`, `children`, class or tag selectors, or `data-testid` strings.
+- Every component test file defines a page object: a `renderXyz(props)` function that renders the component and returns an object describing how a user sees and interacts with it (for example `page.title.getText()`, `page.getLink("PRs").click()`, `page.getLink("PRs").getKeybinding()`). Tests read as behavior and only call the page object.
+- Selectors live only inside the page object. Prefer accessible queries (role, name, label, text). If an element has no accessible handle, keep the one unavoidable structural selector inside the page object rather than spreading it across tests.
+- Assert on pinned literals returned by the page object (`["⇧", "P"]`), not on counts or truthiness of elements.
+
 ## React State
 
 - Don't sync state with `useEffect`. If a child's state change needs to affect a sibling or parent, hoist the state up to their common ancestor.
