@@ -628,6 +628,23 @@ Check the intended tool's current per-instrument metadata, Kafka broker rate,
 and retained batch timestamps separately. When Kafka has equal low/high offsets,
 there is no retained batch to date; use Eventstore evidence for earlier activity.
 
+## STS and Slasher position reconciliation
+
+When current positions disagree, check trades with `book_date > as_of_date`
+without an upper book-date bound; erroneous bookings can be months ahead.
+Use Sharp's Slasher UI or `~/anvil/utils/tradio.py`. Filtering trades entered
+today or bookings in the next few days can miss the cause. Compare book date,
+entry timestamp and settlement date separately, preserving UTS/source IDs,
+quantity and the full RDS/desk/group/account key.
+
+STS's public trade snapshot exposes new business, while its opening position
+can include buffered opening trade updates after a Tradio refresh. An empty
+trade view does not prove that opening adjustments are absent. Compare the
+consumer's actual Slasher stream and deployed Tradio request construction;
+local Java source or an HTTP report may differ from the deployed binary or
+live stream payload. For Metals, Sneagle uses `FXOptions.FICCMetalsPositions`
+directly; FXOptions STS uses `FEJ.FXOptionsTrades` plus Tradio.
+
 ## Metals email jobs
 
 Keep active Metals email modules under `fio/metals_options/email/` and update any
