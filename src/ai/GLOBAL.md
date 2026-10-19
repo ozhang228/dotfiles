@@ -121,6 +121,12 @@ If this surfaces a break in a "later PR" file, the fix (usually a rename or a na
 
 ## Verification Habits
 
+### Operational alerts
+
+- Put alerts on the service that owns the failing source or calculation. Alert on the underlying cause and remove duplicate downstream alerts for the same failure; downstream consumers should retry and show unavailable or stale data explicitly. Keep downstream alerts for independent failures they own.
+- Alert titles state what is happening. Keep descriptions short: state the effect, then possible causes, and nothing else. Put diagnostic and recovery steps in a linked runbook.
+- Measure freshness from the source or published snapshot timestamp, not a successful poll or process heartbeat. Use persistence thresholds and automatic resolution to avoid transient and repeated noise.
+
 ### Test stubs vs prod
 
 Test stubs are set up for convenience, not to reflect real production configuration. Don't use stub values to make claims about what the app does in prod.

@@ -108,9 +108,3 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
   desc = "Run lint after write and on buffer enter",
   callback = lint_buffer,
 })
-
-vim.api.nvim_create_autocmd("User", {
-  pattern = "MiniFilesActionRename",
-  callback = function(event) require("snacks").rename.on_rename_file(event.data.from, event.data.to) end,
-  desc = "LSP Rename on mini files changes",
-})

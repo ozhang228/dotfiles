@@ -19,6 +19,18 @@ return {
     desc = "Grep Word",
   },
   {
+    "<leader>ft",
+    function()
+      Snacks.picker.grep({
+        title = "Code TODOs",
+        search = [[(#|//|--|/\*+|^\s*\*|<!--)\s*(TODO|FIXME)\b]],
+        live = false,
+        args = { "--ignore-case" },
+      })
+    end,
+    desc = "TODO / FIXME Comments",
+  },
+  {
     "<leader>fb",
     function()
       Snacks.picker.buffers({
