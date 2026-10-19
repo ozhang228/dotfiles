@@ -25,3 +25,8 @@ Dotfiles with setup script
 
 - ubuntu
   - setup monitors in arandr then save in autorandr
+
+- manjaro laptop power (needs sudo, not managed by `symlinks.json`; battery service assumes `BAT0` with charge thresholds, e.g. ThinkPad)
+  - `sudo install -Dm644 ~/dotfiles/src/linux/manjaro/system/logind-lid.conf /etc/systemd/logind.conf.d/lid.conf` (lid close ignored on AC or docked; applies after reboot)
+  - `sudo install -Dm644 ~/dotfiles/src/linux/manjaro/system/battery-charge-limit.service /etc/systemd/system/battery-charge-limit.service`
+  - `sudo systemctl enable --now battery-charge-limit.service` (charge between 75% and 80%)
