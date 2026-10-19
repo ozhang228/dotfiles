@@ -94,6 +94,10 @@ Avoid shotgun parsing: finish parsing before acting on input, and push the burde
 
 ## Git & PR Workflow
 
+### Worktree names
+
+Prefix every AI-created worktree directory name with `ai-` (for example, `ai-fix-login`) unless Oscar explicitly requested that worktree and supplied its name. When both conditions are met, use Oscar's requested name.
+
 ### Protected default branches
 
 Never push directly to `main` or `master`, including fast-forwards, merge commits, and emergency reverts. 
