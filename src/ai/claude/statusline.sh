@@ -27,7 +27,7 @@ if [ "$max_k" -eq 0 ]; then
 fi
 
 # Active skills (up to 10)
-skills=$(ls ~/.claude/skills/ 2>/dev/null | head -10 | paste -sd ',' | sed 's/,/, /g')
+skills=$(find -L ~/.claude/skills -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' 2>/dev/null | xargs -rn1 basename | sort | head -10 | paste -sd ',' | sed 's/,/, /g')
 
 # Catppuccin Macchiato — same progression as starship: red peach yellow green teal blue
 c_red=$'\033[38;2;238;153;160m'      # model      #ee99a0
