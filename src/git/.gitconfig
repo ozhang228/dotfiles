@@ -16,7 +16,7 @@
     # use n and N to move between diff sections
     navigate = true
     dark = true
-    syntax-theme = Catppuccin Macchiato
+    syntax-theme = ansi
     plus-style = "syntax #2d3440"
     plus-emph-style = "syntax #364047"
     minus-style = "syntax #322e40"
