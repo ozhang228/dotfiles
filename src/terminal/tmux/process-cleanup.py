@@ -17,7 +17,9 @@ def pane_scope(pid: int):
         cgroup = Path(f"/proc/{pid}/cgroup").read_text()
     except FileNotFoundError:
         return None
-    return next(iter(re.findall(r"(?<=/)tmux-spawn-[0-9a-f-]{36}\.scope\b", cgroup)), None)
+    return next(
+        iter(re.findall(r"(?<=/)tmux-spawn-[0-9a-f-]{36}\.scope\b", cgroup)), None
+    )
 
 
 def stop_scopes(scopes: set[str]):
@@ -25,18 +27,25 @@ def stop_scopes(scopes: set[str]):
         # A pane can exit before its session, in which case systemd removes its scope.
         loaded = subprocess.run(
             ["systemctl", "--user", "show", "--property=LoadState", "--value", scope],
-            check=True, capture_output=True, text=True,
+            check=True,
+            capture_output=True,
+            text=True,
         ).stdout.strip()
         if loaded == "not-found":
             continue
         print(f"Stopping {scope}", flush=True)
         try:
-            subprocess.run(["systemctl", "--user", "stop", scope], check=True, timeout=3)
+            subprocess.run(
+                ["systemctl", "--user", "stop", scope], check=True, timeout=3
+            )
         except subprocess.TimeoutExpired:
             subprocess.run(
-                ["systemctl", "--user", "kill", "--signal=SIGKILL", scope], check=True,
+                ["systemctl", "--user", "kill", "--signal=SIGKILL", scope],
+                check=True,
             )
-            subprocess.run(["systemctl", "--user", "stop", scope], check=True, timeout=5)
+            subprocess.run(
+                ["systemctl", "--user", "stop", scope], check=True, timeout=5
+            )
 
 
 def sync_sessions(*, socket: str, server: int):
@@ -56,36 +65,70 @@ def sync_sessions(*, socket: str, server: int):
                 owners[scope] = set(sessions)
 
         sessions_result = subprocess.run(
-            ["tmux", "-S", socket, "list-sessions", "-F", "#{session_id}"],
-            capture_output=True, text=True,
+            ["tmux", "-S", socket, "list-sessions", "-F", "#{pid} #{session_id}"],
+            capture_output=True,
+            text=True,
         )
         if sessions_result.returncode:
             error = sessions_result.stderr
-            if not any(message in error for message in ("no server running", "no sessions", "No such file or directory")):
+            if not any(
+                message in error
+                for message in (
+                    "no server running",
+                    "no sessions",
+                    "No such file or directory",
+                )
+            ):
                 raise RuntimeError(error)
             sessions = set()
         else:
-            sessions = set(sessions_result.stdout.splitlines())
+            sessions = {
+                session
+                for pid, session in (
+                    line.split() for line in sessions_result.stdout.splitlines()
+                )
+                if int(pid) == server
+            }
+        if sessions:
             panes = subprocess.run(
-                ["tmux", "-S", socket, "list-panes", "-a", "-F", "#{session_id} #{pane_pid}"],
-                check=True, capture_output=True, text=True,
+                [
+                    "tmux",
+                    "-S",
+                    socket,
+                    "list-panes",
+                    "-a",
+                    "-F",
+                    "#{pid} #{session_id} #{pane_pid}",
+                ],
+                check=True,
+                capture_output=True,
+                text=True,
             ).stdout
             current = {}
             for line in panes.splitlines():
-                session, pid = line.split()
+                server_pid, session, pid = line.split()
+                if int(server_pid) != server:
+                    continue
+                # A session can be created between the two tmux queries.
+                sessions.add(session)
                 scope = pane_scope(int(pid))
                 if scope:
                     current.setdefault(scope, set()).add(session)
             # Live panes may have moved or been linked to another session.
             owners.update(current)
 
-        expired = {scope for scope, members in owners.items() if members.isdisjoint(sessions)}
+        expired = {
+            scope for scope, members in owners.items() if members.isdisjoint(sessions)
+        }
         stop_scopes(expired)
         temporary = state.with_suffix(".tmp")
-        temporary.write_text("".join(
-            "\t".join([scope, *sorted(members & sessions)]) + "\n"
-            for scope, members in sorted(owners.items()) if scope not in expired
-        ))
+        temporary.write_text(
+            "".join(
+                "\t".join([scope, *sorted(members & sessions)]) + "\n"
+                for scope, members in sorted(owners.items())
+                if scope not in expired
+            )
+        )
         temporary.replace(state)
 
 
@@ -93,7 +136,9 @@ def stop_worktree(path: Path):
     root = path.resolve(strict=True)
     git_root = subprocess.run(
         ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
-        check=True, capture_output=True, text=True,
+        check=True,
+        capture_output=True,
+        text=True,
     ).stdout.strip()
     if root == Path.home() or root == Path("/") or root != Path(git_root).resolve():
         raise ValueError(f"Refusing non-worktree path: {root}")
@@ -129,12 +174,17 @@ def stop_worktree(path: Path):
             ancestor = parents.get(ancestor, 0)
         selected -= protected
         while True:
-            children = {pid for pid, parent in parents.items() if parent in selected} - protected
+            children = {
+                pid for pid, parent in parents.items() if parent in selected
+            } - protected
             if children <= selected:
                 break
             selected |= children
 
         pending = {handles[pid] for pid in selected}
+        poller = select.poll()
+        for handle in pending:
+            poller.register(handle, select.POLLIN)
         for signum in (signal.SIGTERM, signal.SIGKILL):
             for handle in pending:
                 try:
@@ -144,12 +194,17 @@ def stop_worktree(path: Path):
             # pidfds remain tied to these processes even if a PID is reused.
             deadline = time.monotonic() + 3
             while pending and time.monotonic() < deadline:
-                finished, _, _ = select.select(list(pending), [], [], max(0, deadline - time.monotonic()))
-                pending -= set(finished)
+                for handle, _ in poller.poll(
+                    max(0, int((deadline - time.monotonic()) * 1000))
+                ):
+                    pending.remove(handle)
+                    poller.unregister(handle)
             if not pending:
                 break
         if pending:
-            raise RuntimeError(f"{len(pending)} processes did not stop; keeping worktree")
+            raise RuntimeError(
+                f"{len(pending)} processes did not stop; keeping worktree"
+            )
         if selected:
             print(f"Stopped {len(selected)} processes in {root}")
     finally:
