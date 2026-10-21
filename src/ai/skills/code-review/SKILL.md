@@ -107,6 +107,8 @@ When the work is the reverse — you're the author addressing comments on your o
 
 Use a self-contained local visual recap as the primary review surface. Read `references/visual-recap.md` in full. It owns the self-contained contract, causal explanation, final understanding quiz, structured-blocks component library, canonical shape/budgets, and validation and serving steps.
 
+Every HTML review must include a Mermaid diagram rendered with `mmdc` that explains how the relevant files fit together. Embed the rendered SVG in the HTML and retain the editable `.mmd` source. Follow the file-map guidance in `references/visual-recap.md`.
+
 ## Output Format
 
 - Write the full review to `./tmp/review-<branch-name>.md`.

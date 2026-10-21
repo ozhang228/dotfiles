@@ -24,6 +24,23 @@ review.
 - Feedback comes through chat or file edits. When the user references a recap
   item, update code and local review files directly.
 
+## Required file map
+
+Every HTML review includes a Mermaid diagram rendered locally with `mmdc`.
+Place it near the opening explanation so the reader can orient themselves
+before reading individual files. Label nodes with real file paths and the
+important symbol or responsibility; label arrows to distinguish calls, data
+flow, and schema dependencies. Use subgraphs to show ownership or process
+boundaries. Ground every relationship in the current source.
+
+Keep the editable `.mmd` source beside the recap and embed the generated SVG
+inline in `index.html`, so the HTML works without Mermaid JavaScript or a
+network connection. Include the Mermaid source in the Markdown fallback.
+When there is a reading tour, number its stops and diagram nodes consistently
+and link nodes to the corresponding in-page explanations. Explain how to use
+the diagram and tour. Check label legibility, links, and narrow-screen behavior
+in a browser. If `mmdc` is unavailable, report the rendering blocker explicitly.
+
 ## Structured blocks, not text-on-a-page
 
 `index.html` is not prose poured into HTML — it's built from the component
@@ -55,8 +72,8 @@ the short version:
   one-sided diff.
 - **Structured before/after** (schema/contract shape) → `columns`, not two
   stacked cards.
-- **Architecture or data-flow shift** → two-panel/swimlane `diagram`. Never
-  reduce a structural change to one left-to-right arrow chain.
+- **Architecture or data-flow shift** → the required `mmdc` file map, with
+  subgraphs for ownership/process boundaries or before/after states.
 - **Different failure handling scopes** → `boundary-matrix`, with one row per
   failure naming the handling scope and why partial recovery is safe.
 - **Final understanding check** → `quiz`, with 3–5 scored questions and answer
@@ -166,6 +183,8 @@ answer, and targeted feedback for every choice.
 Before handoff:
 
 - Confirm `index.html` and `review.md` exist.
+- Confirm the required diagram was rendered with `mmdc`, its SVG is embedded
+  in the HTML, and its `.mmd` source and relationships match the current code.
 - Read the generated files enough to catch placeholders, stale claims,
   contradictions, broken anchors, or missing expected sections.
 - Open `index.html` mentally against `references/structured-blocks.md`'s
