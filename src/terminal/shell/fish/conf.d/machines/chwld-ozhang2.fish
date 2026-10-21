@@ -14,6 +14,10 @@ test -f ~/.local/share/claude_credentials.fish && source ~/.local/share/claude_c
 
 # pnpm
 fish_add_path $HOME/.local/share/pnpm/bin $HOME/.local/share/pnpm
+set -gx npm_config_registry https://npm.drwholdings.com/repository/npm/
+set -gx pnpm_config_registry https://npm.drwholdings.com/repository/npm/
+# keep mirror URLs out of pnpm-lock.yaml so lockfiles also install against registry.npmjs.org
+set -gx pnpm_config_lockfile_include_tarball_url false
 
 # >>> conda initialize >>>
 if status is-interactive; and test -f /home/ozhang/miniconda3/bin/conda
