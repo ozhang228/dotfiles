@@ -111,6 +111,10 @@ session_root=${XDG_DATA_HOME:-"$HOME/.local/share"}/nvim/sessions
 current_session_name=$(percent_encode_session_name "$worktree")
 legacy_session_name=${worktree//\//%}
 
+if [[ $(uname -s) == Linux ]]; then
+  python3 "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/../../terminal/tmux/process-cleanup.py" worktree "$worktree"
+fi
+
 git -C "$main_worktree" worktree remove "${remove_args[@]}" "$worktree"
 git -C "$main_worktree" branch -D "$branch"
 
