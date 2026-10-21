@@ -17,20 +17,17 @@ def pane_scope(pid: int):
         cgroup = Path(f"/proc/{pid}/cgroup").read_text()
     except FileNotFoundError:
         return None
-    return next(
-        iter(re.findall(r"(?<=/)tmux-spawn-[0-9a-f-]{36}\.scope\b", cgroup)), None
-    )
+    match = re.search(r"(?<=/)tmux-spawn-[0-9a-f-]{36}\.scope\b", cgroup)
+    return match.group() if match else None
 
 
 def stop_scopes(scopes: set[str]):
     for scope in sorted(scopes):
         # A pane can exit before its session, in which case systemd removes its scope.
-        loaded = subprocess.run(
+        loaded = subprocess.check_output(
             ["systemctl", "--user", "show", "--property=LoadState", "--value", scope],
-            check=True,
-            capture_output=True,
             text=True,
-        ).stdout.strip()
+        ).strip()
         if loaded == "not-found":
             continue
         print(f"Stopping {scope}", flush=True)
@@ -59,11 +56,12 @@ def sync_sessions(*, socket: str, server: int):
         owners = {}
         if state.exists():
             for line in state.read_text().splitlines():
-                scope, *sessions = line.split("\t")
+                scope, *saved_sessions = line.split("\t")
                 if not re.fullmatch(r"tmux-spawn-[0-9a-f-]{36}\.scope", scope):
                     raise ValueError(f"Invalid scope in {state}")
-                owners[scope] = set(sessions)
+                owners[scope] = set(saved_sessions)
 
+        sessions = set()
         sessions_result = subprocess.run(
             ["tmux", "-S", socket, "list-sessions", "-F", "#{pid} #{session_id}"],
             capture_output=True,
@@ -80,17 +78,13 @@ def sync_sessions(*, socket: str, server: int):
                 )
             ):
                 raise RuntimeError(error)
-            sessions = set()
         else:
-            sessions = {
-                session
-                for pid, session in (
-                    line.split() for line in sessions_result.stdout.splitlines()
-                )
-                if int(pid) == server
-            }
+            for line in sessions_result.stdout.splitlines():
+                server_pid, session = line.split()
+                if int(server_pid) == server:
+                    sessions.add(session)
         if sessions:
-            panes = subprocess.run(
+            panes = subprocess.check_output(
                 [
                     "tmux",
                     "-S",
@@ -100,10 +94,8 @@ def sync_sessions(*, socket: str, server: int):
                     "-F",
                     "#{pid} #{session_id} #{pane_pid}",
                 ],
-                check=True,
-                capture_output=True,
                 text=True,
-            ).stdout
+            )
             current = {}
             for line in panes.splitlines():
                 server_pid, session, pid = line.split()
@@ -112,7 +104,7 @@ def sync_sessions(*, socket: str, server: int):
                 # A session can be created between the two tmux queries.
                 sessions.add(session)
                 scope = pane_scope(int(pid))
-                if scope:
+                if scope is not None:
                     current.setdefault(scope, set()).add(session)
             # Live panes may have moved or been linked to another session.
             owners.update(current)
@@ -122,24 +114,19 @@ def sync_sessions(*, socket: str, server: int):
         }
         stop_scopes(expired)
         temporary = state.with_suffix(".tmp")
-        temporary.write_text(
-            "".join(
-                "\t".join([scope, *sorted(members & sessions)]) + "\n"
-                for scope, members in sorted(owners.items())
-                if scope not in expired
-            )
-        )
+        with temporary.open("w") as output:
+            for scope, members in sorted(owners.items()):
+                if scope not in expired:
+                    print(scope, *sorted(members & sessions), sep="\t", file=output)
         temporary.replace(state)
 
 
 def stop_worktree(path: Path):
     root = path.resolve(strict=True)
-    git_root = subprocess.run(
+    git_root = subprocess.check_output(
         ["git", "-C", str(root), "rev-parse", "--show-toplevel"],
-        check=True,
-        capture_output=True,
         text=True,
-    ).stdout.strip()
+    ).strip()
     if root == Path.home() or root == Path("/") or root != Path(git_root).resolve():
         raise ValueError(f"Refusing non-worktree path: {root}")
 
@@ -193,10 +180,11 @@ def stop_worktree(path: Path):
                     pass
             # pidfds remain tied to these processes even if a PID is reused.
             deadline = time.monotonic() + 3
-            while pending and time.monotonic() < deadline:
-                for handle, _ in poller.poll(
-                    max(0, int((deadline - time.monotonic()) * 1000))
-                ):
+            while pending:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                for handle, _ in poller.poll(max(1, int(remaining * 1000))):
                     pending.remove(handle)
                     poller.unregister(handle)
             if not pending:
