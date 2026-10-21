@@ -1,14 +1,15 @@
 ---
 name: brainstorm
-description: 'Use before creative implementation with real design space: features, components, scripts/tools, system designs, or proposal planning. Also trigger on "grill me", "stress-test this", and "interview me". Challenge the premise, ask one question at a time without proposing an answer, define expected behaviors, and get approval before coding. Skip direct concrete edits, mechanical type/build/lint fixes, throwaway experiments, and handoff summaries.'
+description: 'Use before creative implementation with real design space: features, components, scripts/tools, system designs, or proposal planning. Also trigger on "grill me", "stress-test this", and "interview me". Challenge the premise, ask one question at a time without proposing an answer, define expected behaviors, and get approval before coding. Skip purely mechanical changes with no design decisions, throwaway experiments, and handoff summaries.'
 ---
 
 # Brainstorming
 
 - Help turn ideas into fully formed specs through collaborative dialogue.
 - Understand the current project context, then ask questions one at a time to refine the idea. Afterwards, present the design and get user approval.
-- Skip the brainstorm workflow when the task is purely "fix build issue" **no behavior change and no design choice** 
+- Skip purely mechanical changes with no design decisions.
 - Skip when the user just wants to *try something out* — a throwaway probe, a `tmp/` experiment, a "let me see if this works" spike with no intent to ship. 
+- A specific request or existing example doesn't necessarily mean the approach is settled. When unsure, briefly raise the approach with Oscar before making changes.
 
 ## Challenge the premise first
 
