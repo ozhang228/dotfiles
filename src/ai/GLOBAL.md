@@ -94,9 +94,10 @@ Avoid shotgun parsing: finish parsing before acting on input, and push the burde
 
 ## Git & PR Workflow
 
-### Worktree names
+### Branch and worktree names
 
-Prefix every AI-created worktree directory name with `ai-` (for example, `ai-fix-login`) unless Oscar explicitly requested that worktree and supplied its name. When both conditions are met, use Oscar's requested name.
+- Prefix AI-created Git branch names with `ai-` (for example, `ai-risk-attribution`) unless Oscar supplies a branch name or a task-specific branch naming rule applies.
+- Do not add `ai-` to worktree directory names. Use `<repository>-<task>` (for example, `desk-tools-risk-attribution`). If Oscar supplies a worktree directory name, use it exactly. Branch names and worktree directory names are independent.
 
 ### Protected default branches
 
