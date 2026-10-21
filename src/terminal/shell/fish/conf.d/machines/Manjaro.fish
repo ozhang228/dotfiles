@@ -6,6 +6,5 @@ end
 # pnpm end
 
 set -gx AI_CLI_CMD "claude-branch-resume --dangerously-skip-permissions || claude --dangerously-skip-permissions"
-set -gx ANTHROPIC_MODEL sonnet
 
 tmux_autostart
