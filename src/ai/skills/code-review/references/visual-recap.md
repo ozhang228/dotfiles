@@ -5,9 +5,10 @@ review.
 
 ## Self-Contained Contract
 
-- Use the canonical light high-contrast token system from
-  `references/structured-blocks.md`. Do not add dark-mode overrides or a
-  separate decorative palette.
+- Use the shared Catppuccin Macchiato tokens and components from
+  `references/structured-blocks.md`, including matching colors for Mermaid
+  diagrams. Keep palette changes in the shared tokens rather than inventing
+  a theme in each artifact, unless the user requests a different appearance.
 
 - Keep recap content local. Read diff, stat, and source context from local
   files and shell commands only.

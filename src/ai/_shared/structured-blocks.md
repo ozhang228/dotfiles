@@ -51,8 +51,9 @@ per-skill checklist.
 .badge.renamed { color: var(--warn); background: var(--warn-bg); }
 ```
 
-This light high-contrast palette is the canonical visual language for local AI
-artifacts. Never hard-code a hex color inside a block's own markup; reference
+Catppuccin Macchiato is the default palette for local AI artifacts. Copy these
+shared tokens unchanged unless the user requests a different theme. Never
+hard-code a hex color inside a block's own markup; reference
 the token. Reserve green and red for semantic added/success and
 removed/failure states.
 
