@@ -19,8 +19,12 @@ import subprocess
 
 d = pathlib.Path.home() / ".i3/i3-resurrect"
 saved, failed = [], []
+workspaces = json.loads(os.environ["WS_JSON"])
+workspace_names = {ws["name"] for ws in workspaces}
+if not workspace_names:
+    raise RuntimeError("i3 returned no workspaces; keeping existing snapshots")
 
-for ws in json.loads(os.environ["WS_JSON"]):
+for ws in workspaces:
     name = ws["name"]
     result = subprocess.run(
         ["i3-resurrect", "save", "-w", name, "--swallow=class,instance"],
@@ -32,6 +36,12 @@ for ws in json.loads(os.environ["WS_JSON"]):
         failed.append(name)
         for f in (d / f"workspace_{name}_layout.json", d / f"workspace_{name}_programs.json"):
             f.unlink(missing_ok=True)
+
+for kind in ("layout", "programs"):
+    for snapshot in d.glob(f"workspace_*_{kind}.json"):
+        name = snapshot.name.removeprefix("workspace_").removesuffix(f"_{kind}.json")
+        if name not in workspace_names:
+            snapshot.unlink()
 
 summary = f"i3-resurrect save: {len(saved)} saved, {len(failed)} failed"
 if failed:
