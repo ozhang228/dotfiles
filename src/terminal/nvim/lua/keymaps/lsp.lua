@@ -39,5 +39,10 @@ return {
       function() vim.lsp.buf.rename() end,
       desc = "Rename",
     },
+    {
+      "<leader>lR",
+      "<cmd>lsp restart<cr>",
+      desc = "Restart LSP",
+    },
   },
 }
