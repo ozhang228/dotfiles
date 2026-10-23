@@ -13,6 +13,8 @@ in tests; include test-directory type checks when the build recipe requires them
 
 For most features, a test suite's secondary job is documentation: someone unfamiliar with the code should be able to learn what a function does and doesn't guarantee by reading test names and bodies alone, without opening the implementation. That means naming and structuring each test around one specific, observable behavior, and writing the assertion so the expected outcome is legible on its own (a pinned literal, not an expression the reader has to evaluate). If you can't tell what behavior broke from a failing test's name and body without reading the code under test, the test isn't pinning down behavior, it's just exercising code, rewrite it.
 
+A test must make sense read top to bottom: every input that determines the asserted value (props, builder overrides, the current time, fixture fields) is set in the test body. Render-helper defaults, builder defaults, and `beforeEach` setup may only supply inputs the assertion doesn't depend on. If the expected literal mentions a value, the reader should see where that value came from without leaving the test.
+
 Prefer realistic user interactions and their observable consequences. For UI behavior, use the testing library's user interaction helpers and assert the visible or behavioral side effect, rather than dispatching a synthetic event and inspecting an implementation detail such as `defaultPrevented`. Dispatch events directly only when the event itself is the public behavior and no user-visible consequence can express the contract.
 
 ## Recurring bad-test patterns
