@@ -1,5 +1,6 @@
 focus-follows-mouse.enabled = true
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
+on-focus-changed = ['layout --root tiles', 'layout tiles']
 
 start-at-login = true
 
@@ -33,6 +34,9 @@ alt-shift-k = 'move up'
 alt-shift-l = 'move right'
 
 alt-shift-f = 'fullscreen'
+alt-esc = ['macos-native-fullscreen off', 'fullscreen off']
+ctrl-cmd-f = 'macos-native-fullscreen off'
+alt-comma = ['flatten-workspace-tree', 'layout tiles']
 
 alt-shift-q = 'close'
 alt-enter = 'exec-and-forget open -a kitty'
