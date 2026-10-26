@@ -370,21 +370,5 @@
       "ubuntu": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh",
       "mac": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh"
     }
-  },
-  "claude_skills_dir_not_symlinked": {
-    "check": "test ! -L ~/.claude/skills",
-    "install": {
-      "manjaro": "rm ~/.claude/skills 2>/dev/null; mkdir -p ~/.claude/skills",
-      "ubuntu": "rm ~/.claude/skills 2>/dev/null; mkdir -p ~/.claude/skills",
-      "mac": "rm ~/.claude/skills 2>/dev/null; mkdir -p ~/.claude/skills"
-    }
-  },
-  "agents_skills_dir_not_symlinked": {
-    "check": "test ! -L ~/.agents/skills",
-    "install": {
-      "manjaro": "rm ~/.agents/skills 2>/dev/null; mkdir -p ~/.agents/skills",
-      "ubuntu": "rm ~/.agents/skills 2>/dev/null; mkdir -p ~/.agents/skills",
-      "mac": "rm ~/.agents/skills 2>/dev/null; mkdir -p ~/.agents/skills"
-    }
   }
 }
