@@ -23,7 +23,7 @@ return {
     function()
       Snacks.picker.grep({
         title = "Code TODOs",
-        search = [[(#|//|--|/\*+|^\s*\*|<!--)\s*(TODO|FIXME)\b]],
+        search = [[(#|//|--|/\*+|^\s*\*|<!--)\s*(TODO|FIXME)(\([^()\r\n]+\))?\s*:]],
         live = false,
         args = { "--ignore-case" },
       })
