@@ -268,7 +268,7 @@
     }
   },
   "clang-tidy": {
-    "check": "command -v clang-tidy",
+    "check": "command -v clang-tidy || test -x /opt/homebrew/opt/llvm/bin/clang-tidy || test -x /usr/local/opt/llvm/bin/clang-tidy",
     "install": {
       "ubuntu": "sudo apt install clang-tools",
       "manjaro": "sudo pacman -S clang",
