@@ -46,6 +46,7 @@ Read and apply only files whose declared scope matches the current task. Do not 
 - Explicitness: prefer explicit behavior and data flow
 - Simplicity: see the ladder below
 - Fail fast: shut down with an error over silently failing
+- Make matches and switches over closed variants exhaustive in any language. Handle every variant and use the language's `never`/`assert_never` check where available. Use a broad fallback only for an intentionally open boundary, and handle unknown values explicitly.
 
 ### Simplicity ladder
 
@@ -96,6 +97,7 @@ Avoid shotgun parsing: finish parsing before acting on input, and push the burde
 
 ### Branch and worktree names
 
+- Reuse the current checkout or worktree when it already fits the task. Create another worktree only when the work needs isolation or a different branch/base that cannot be handled safely in the current one.
 - Prefix AI-created Git branch names with `ai-` (for example, `ai-risk-attribution`) unless Oscar supplies a branch name or a task-specific branch naming rule applies.
 - Do not add `ai-` to worktree directory names. Use `<repository>-<task>` (for example, `desk-tools-risk-attribution`). If Oscar supplies a worktree directory name, use it exactly. Branch names and worktree directory names are independent.
 

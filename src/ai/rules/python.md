@@ -28,7 +28,7 @@ skip_if: Working in TypeScript, C++, or any non-Python language
 - When re-raising exceptions, use `raise e1 from e2` to preserve the original cause.
 - In projects that use UV, run `uv lock` after adding, removing, or changing a dependency and include the regenerated `uv.lock` in the same change.
 - Branch on enum values with `match`, not ternary expressions or `if`/`elif` chains, and handle every enum member explicitly.
-- Every `match` statement must end with `case _ as unreachable: assert_never(unreachable)` on the matched value. This adds exhaustive matching
+- For closed unions and enums, end each `match` with `case _ as unreachable: assert_never(unreachable)`. An open base class or external value may instead need an explicit unsupported-value case.
 - Keep internal-package `__init__.py` files empty. Re-export names from `__init__.py` only when the package intentionally defines a public-facing library API.
 - For Linux subprocess memory replays, read `VmRSS` and `VmHWM` from `/proc/self/status` inside the child. `resource.getrusage(RUSAGE_SELF).ru_maxrss` can carry a parent's earlier high-water mark across `fork`/`exec`; report the greater of `VmHWM` and sampled `VmRSS` as the observed peak, since the high-water reading can lag a sample.
 - When splitting a Dash Plotly chart into independently updated graphs, measure serialized payload as well as redraw work: each `go.Figure` repeats its default template. Set `template="none"` only after making the template properties in use explicit and checking rendered output.
