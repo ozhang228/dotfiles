@@ -46,6 +46,7 @@ Read and apply only files whose declared scope matches the current task. Do not 
 - Explicitness: prefer explicit behavior and data flow
 - Simplicity: see the ladder below
 - Fail fast: shut down with an error over silently failing
+- Contain a recoverable failure to the smallest trustworthy unit, such as one item or metric. Keep unrelated results available and report the affected failure; escalate when identity or shared state is no longer reliable.
 - Make matches and switches over closed variants exhaustive in any language. Handle every variant and use the language's `never`/`assert_never` check where available. Use a broad fallback only for an intentionally open boundary, and handle unknown values explicitly.
 
 ### Simplicity ladder
