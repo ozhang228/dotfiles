@@ -20,9 +20,12 @@ def test_install_package_reports_installed_on_success() -> None:
     assert result == Ok("installed")
 
 
-def test_install_package_captures_stderr_on_failure() -> None:
-    package = Package(check="false", install={Distro.MANJARO: "echo 'boom' >&2; exit 1"})
+def test_install_package_shows_output_and_reports_failure(capfd) -> None:
+    package = Package(check="false", install={Distro.MANJARO: "echo 'progress'; echo 'boom' >&2; exit 1"})
 
     result = install_package(package, package.install[Distro.MANJARO])
 
-    assert result == Err("boom")
+    output = capfd.readouterr()
+    assert "progress\n" in output.out
+    assert output.err == "boom\n"
+    assert result == Err("Installer exited with status 1; see output above")

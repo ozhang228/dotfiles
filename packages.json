@@ -30,7 +30,7 @@
     }
   },
   "vivaldi": {
-    "check": "command -v vivaldi",
+    "check": "command -v vivaldi || test -d /Applications/Vivaldi.app || test -d \"$HOME/Applications/Vivaldi.app\"",
     "install": {
       "manjaro": "sudo pacman -S vivaldi",
       "ubuntu": "echo 'install vivaldi manually or just use chrome'",

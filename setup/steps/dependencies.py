@@ -20,8 +20,8 @@ def install_package(package: Package, install_cmd: InstallCommand) -> Result[Ins
     if package.check and _already_installed(package.check):
         return Ok("already_present")
 
-    result = subprocess.run(install_cmd, shell=True, capture_output=True, text=True)
+    print("  Installing...", flush=True)
+    result = subprocess.run(install_cmd, shell=True)
     if result.returncode != 0:
-        detail = (result.stderr or result.stdout or f"exited {result.returncode}").strip()
-        return Err(detail)
+        return Err(f"Installer exited with status {result.returncode}; see output above")
     return Ok("installed")

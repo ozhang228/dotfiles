@@ -37,6 +37,7 @@ def run_packages(distro: Distro, file: Path | None) -> None:
             console.print(f"  [dim]- {package_id} (not available on {distro})[/dim]")
             continue
 
+        console.print(f"  Checking {package_id}...")
         result = install_package(package, install_cmd)
         match result:
             case Ok("already_present"):
