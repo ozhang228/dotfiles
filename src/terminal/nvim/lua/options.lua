@@ -1,7 +1,8 @@
 vim.o.mouse = "a"
 vim.o.background = "dark"
 vim.cmd.colorscheme("catppuccin")
-vim.o.shell = "/bin/fish"
+local fish = vim.fn.exepath("fish")
+if fish ~= "" then vim.o.shell = fish end
 
 vim.g.have_nerd_font = true
 
