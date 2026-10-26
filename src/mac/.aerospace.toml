@@ -39,8 +39,8 @@ ctrl-cmd-f = 'macos-native-fullscreen off'
 alt-comma = ['flatten-workspace-tree', 'layout tiles']
 
 alt-shift-q = 'close'
-alt-enter = 'exec-and-forget open -a kitty'
-alt-shift-enter = 'exec-and-forget open -a "Google Chrome" --args --profile-directory="Profile 1" --restore-last-session'
+alt-enter = 'exec-and-forget open -na kitty'
+alt-shift-enter = 'exec-and-forget open -na "Google Chrome" --args --profile-directory="Profile 1" --restore-last-session --new-window'
 alt-shift-s = 'exec-and-forget open "shottr://grab/area?then=edit"'
 
 alt-1 = 'workspace 1'
