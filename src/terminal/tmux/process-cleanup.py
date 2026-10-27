@@ -30,7 +30,6 @@ def stop_scopes(scopes: set[str]):
         ).strip()
         if loaded == "not-found":
             continue
-        print(f"Stopping {scope}", flush=True)
         try:
             subprocess.run(
                 ["systemctl", "--user", "stop", scope], check=True, timeout=3
