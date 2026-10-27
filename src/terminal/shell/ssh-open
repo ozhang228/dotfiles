@@ -7,6 +7,18 @@ if [ -z "$target" ]; then
     exit 2
 fi
 
+open_locally() {
+    if command -v systemctl >/dev/null; then
+        while IFS='=' read -r name value; do
+            case "$name" in
+                DISPLAY) export DISPLAY="$value" ;;
+                XAUTHORITY) export XAUTHORITY="$value" ;;
+            esac
+        done < <(systemctl --user show-environment 2>/dev/null)
+    fi
+    exec env -u BROWSER xdg-open "$target"
+}
+
 # A long-running tmux pane can keep BROWSER=ssh-open after a desktop client attaches.
 if [ -n "${TMUX:-}" ]; then
     client_pid=$(tmux display-message -p '#{client_pid}' 2>/dev/null || true)
@@ -14,11 +26,11 @@ if [ -n "${TMUX:-}" ]; then
         parent_pid=$(ps -o ppid= -p "$client_pid" 2>/dev/null || true)
         parent_command=$(ps -o comm= -p "$parent_pid" 2>/dev/null || true)
         if [ -n "$parent_command" ] && [[ "$parent_command" != sshd* ]]; then
-            exec env -u BROWSER xdg-open "$target"
+            open_locally
         fi
     fi
 elif [ -z "${SSH_TTY:-}" ]; then
-    exec env -u BROWSER xdg-open "$target"
+    open_locally
 fi
 
 encoded=$(printf '%s' "$target" | base64 | tr -d '\n')
