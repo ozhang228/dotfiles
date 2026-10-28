@@ -3,13 +3,13 @@ import argparse
 import fcntl
 import hashlib
 import os
-from pathlib import Path
 import re
 import select
 import signal
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 
 def pane_scope(pid: int):
@@ -44,27 +44,56 @@ def stop_scopes(scopes: set[str]):
             )
 
 
+def read_owners(state: Path):
+    owners = {}
+    if state.exists():
+        for line in state.read_text().splitlines():
+            scope, *saved_sessions = line.split("\t")
+            if not re.fullmatch(r"tmux-spawn-[0-9a-f-]{36}\.scope", scope):
+                raise ValueError(f"Invalid scope in {state}")
+            owners[scope] = set(saved_sessions)
+    return owners
+
+
+def is_tmux_server(pid: int):
+    try:
+        return Path(f"/proc/{pid}/comm").read_text().strip() == "tmux: server"
+    except FileNotFoundError:
+        return False
+
+
+def stop_dead_servers(state_root: Path):
+    # kill-server and crashes exit without running session-closed hooks.
+    for state in state_root.iterdir():
+        match = re.fullmatch(r"(\d+)-[0-9a-f]{16}", state.name)
+        if match is None or is_tmux_server(int(match[1])):
+            continue
+        lock_path = state.with_suffix(".lock")
+        with lock_path.open("a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            if not state.exists():
+                continue
+            stop_scopes(set(read_owners(state)))
+            state.unlink()
+            lock_path.unlink()
+
+
 def sync_sessions(*, socket: str, server: int):
     state_root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local/state"))
     state_root = state_root / "tmux/processes"
     state_root.mkdir(parents=True, exist_ok=True, mode=0o700)
-    key = hashlib.sha256(f"{socket}:{server}".encode()).hexdigest()
+    key = f"{server}-{hashlib.sha256(socket.encode()).hexdigest()[:16]}"
     state = state_root / key
     with (state_root / f"{key}.lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
-        owners = {}
-        if state.exists():
-            for line in state.read_text().splitlines():
-                scope, *saved_sessions = line.split("\t")
-                if not re.fullmatch(r"tmux-spawn-[0-9a-f-]{36}\.scope", scope):
-                    raise ValueError(f"Invalid scope in {state}")
-                owners[scope] = set(saved_sessions)
+        owners = read_owners(state)
 
         sessions = set()
         sessions_result = subprocess.run(
             ["tmux", "-S", socket, "list-sessions", "-F", "#{pid} #{session_id}"],
             capture_output=True,
             text=True,
+            check=False,
         )
         if sessions_result.returncode:
             error = sessions_result.stderr
@@ -118,6 +147,7 @@ def sync_sessions(*, socket: str, server: int):
                 if scope not in expired:
                     print(scope, *sorted(members & sessions), sep="\t", file=output)
         temporary.replace(state)
+    stop_dead_servers(state_root)
 
 
 def stop_worktree(path: Path):
@@ -153,7 +183,10 @@ def stop_worktree(path: Path):
             if Path(cwd).is_relative_to(root):
                 selected.add(pid)
 
-        protected = set()
+        # The tmux server keeps the cwd it was started from; stopping it would
+        # close every session, not just the ones in this worktree.
+        protected = {pid for pid in selected if is_tmux_server(pid)}
+
         ancestor = os.getpid()
         while ancestor and ancestor not in protected:
             protected.add(ancestor)

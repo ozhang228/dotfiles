@@ -36,8 +36,6 @@ load_session_activity() {
         session_activity["$name"]="$timestamp"
         session_paths["$name"]="$path"
     done < <(tmux list-sessions -F '#{session_name}|#{session_activity}|#{session_path}' 2>/dev/null || true)
-
-    load_ai_statuses
 }
 
 path_basename() {
@@ -79,48 +77,6 @@ git_common_dir_from_marker() {
 git_common_dir_for() {
     git_common_dir_from_marker "$1" || \
         git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null
-}
-
-load_ai_statuses() {
-    local pane_dir="$HOME/.cache/tmux-ai-status/panes"
-    declare -gA session_ai_statuses
-    session_ai_statuses=()
-    [ -d "$pane_dir" ] || return 0
-
-    declare -A active_panes=()
-    local session pane key f filename stem pane_id status icon
-    while IFS='|' read -r session pane; do
-        [ -n "$session" ] || continue
-        key="$session|$pane"
-        active_panes["$key"]=1
-    done < <(tmux list-panes -a -F '#{session_name}|#{pane_id}' 2>/dev/null || true)
-
-    for f in "$pane_dir"/*.status; do
-        [ -f "$f" ] || continue
-        filename="${f##*/}"
-        stem="${filename%.status}"
-        pane_id="${stem##*_}"
-        session="${stem%_$pane_id}"
-        key="$session|$pane_id"
-        [ -n "${active_panes[$key]+x}" ] || continue
-        IFS= read -r status < "$f" || status=""
-        case "$status" in
-            working) icon="⚡" ;;
-            done)    icon="✅" ;;
-            wait)    icon="⏸" ;;
-            *)       icon="" ;;
-        esac
-        [ -n "$icon" ] || continue
-        if [ -n "${session_ai_statuses[$session]+x}" ]; then
-            session_ai_statuses["$session"]+=" $icon"
-        else
-            session_ai_statuses["$session"]="$icon"
-        fi
-    done
-}
-
-ai_status_icons() {
-    REPLY="${session_ai_statuses[$1]:-}"
 }
 
 session_indicator() {
@@ -244,17 +200,6 @@ worktree_label() {
     REPLY="$label"
 }
 
-label_session() {
-    local label="$1" session="$2" ai_status indicator
-    session_indicator "$session"
-    indicator="$REPLY"
-    label="$label $indicator"
-    ai_status_icons "$session"
-    ai_status="$REPLY"
-    [ -n "$ai_status" ] && label="$label $ai_status"
-    REPLY="$label"
-}
-
 list_entries() {
     load_session_activity
     build_worktree_index
@@ -285,8 +230,9 @@ list_entries() {
             label="$name"
             project="-"
         fi
-        label_session "$label" "$name"
-        label="$REPLY"
+        session_indicator "$name"
+        indicator="$REPLY"
+        label="$label $indicator"
         timestamp="${session_activity[$name]:-0}"
         if [ "$timestamp" -gt "${project_recent[$project]:-0}" ]; then
             project_recent["$project"]="$timestamp"

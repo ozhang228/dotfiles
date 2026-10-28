@@ -12,14 +12,6 @@
     "dst": "~/.agents/skills/brainstorm"
   },
   {
-    "src": "~/dotfiles/src/ai/skills/code-respond",
-    "dst": "~/.claude/skills/code-respond"
-  },
-  {
-    "src": "~/dotfiles/src/ai/skills/code-respond",
-    "dst": "~/.agents/skills/code-respond"
-  },
-  {
     "src": "~/dotfiles/src/ai/skills/code-review",
     "dst": "~/.claude/skills/code-review"
   },
@@ -126,14 +118,6 @@
   {
     "src": "~/dotfiles/src/terminal/tmux/tmux.conf",
     "dst": "~/.config/tmux/tmux.conf"
-  },
-  {
-    "src": "~/dotfiles/src/terminal/tmux/sessionizer.sh",
-    "dst": "~/.config/tmux/sessionizer.sh"
-  },
-  {
-    "src": "~/dotfiles/src/terminal/tmux/theme.conf",
-    "dst": "~/.config/tmux/theme.conf"
   },
   {
     "src": "~/anvil/skills/interview",

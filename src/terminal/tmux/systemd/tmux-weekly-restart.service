@@ -1,0 +1,8 @@
+[Unit]
+Description=Restart the tmux server so it runs the installed tmux and current config
+
+[Service]
+Type=oneshot
+ExecStart=%h/dotfiles/src/terminal/tmux/weekly_restart.sh
+# The script waits through a 5-minute warning before restarting.
+TimeoutStartSec=15min

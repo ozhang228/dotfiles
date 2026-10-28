@@ -370,5 +370,12 @@
       "ubuntu": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh",
       "mac": "bash ~/dotfiles/setup/scripts/tmux-tpm.sh"
     }
+  },
+  "tmux-weekly-restart": {
+    "check": "systemctl --user is-enabled --quiet tmux-weekly-restart.timer",
+    "install": {
+      "manjaro": "bash ~/dotfiles/setup/scripts/tmux-weekly-restart.sh",
+      "ubuntu": "bash ~/dotfiles/setup/scripts/tmux-weekly-restart.sh"
+    }
   }
 }

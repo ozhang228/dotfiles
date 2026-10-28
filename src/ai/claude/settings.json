@@ -14,7 +14,6 @@
       "Bash(tail *)",
       "Bash(grep *)",
       "Bash(rg *)",
-      "Bash(find *)",
       "Bash(fd *)",
       "Bash(tree *)",
       "Bash(wc *)",
@@ -35,8 +34,43 @@
       "Bash(printf *)",
       "Bash(jq *)",
       "Bash(bc *)",
-      "Bash(git *)",
-      "Bash(gh *)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log)",
+      "Bash(git log *)",
+      "Bash(git show)",
+      "Bash(git show *)",
+      "Bash(git branch)",
+      "Bash(git branch --show-current)",
+      "Bash(git branch -a)",
+      "Bash(git branch -vv)",
+      "Bash(git branch --list *)",
+      "Bash(git rev-parse *)",
+      "Bash(git merge-base *)",
+      "Bash(git rev-list *)",
+      "Bash(git ls-files *)",
+      "Bash(git blame *)",
+      "Bash(git grep *)",
+      "Bash(git describe *)",
+      "Bash(git shortlog *)",
+      "Bash(git reflog)",
+      "Bash(git worktree list)",
+      "Bash(git worktree list *)",
+      "Bash(git remote -v)",
+      "Bash(git config --get *)",
+      "Bash(git stash list)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr diff *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr status)",
+      "Bash(gh issue view *)",
+      "Bash(gh issue list *)",
+      "Bash(gh run view *)",
+      "Bash(gh run list *)",
+      "Bash(gh repo view *)",
       "Bash(make)",
       "Bash(make *)",
       "Bash(pytest)",
@@ -45,7 +79,6 @@
       "Bash(pnpm test *)",
       "Bash(uv run pytest *)",
       "Bash(uv run pytest)",
-      "Bash(sed *)",
       "Bash(pr-languages *)",
       "Bash(pacman -Q *)",
       "Bash(pacman -Ss *)",
@@ -67,40 +100,12 @@
     ]
   },
   "hooks": {
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh UserPromptSubmit"
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh PreToolUse"
-          }
-        ]
-      }
-    ],
     "Notification": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "/home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh notification"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh Notification"
           }
         ]
       }
@@ -111,14 +116,6 @@
           {
             "type": "command",
             "command": "env AI_BRANCH_SESSION_DIR=/home/ozhang/.claude/branch-sessions /home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh stop"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/tmux_ai_status.sh Stop"
           }
         ]
       }
