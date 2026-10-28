@@ -3,6 +3,11 @@ gui:
   mouseEvents: true
   sidePanelWidth: 0.2
   expandFocusedSidePanel: true
+  shrinkSidePanelsToContent: true
+  sidePanels:
+    - [files, submodules]
+    - [branches, worktrees, remotes, tags]
+    - [commits, reflog, stash]
   theme:
     activeBorderColor:
       - "#8aadf4"
