@@ -3,31 +3,43 @@
 set -euo pipefail
 
 input=$(cat)
-cwd=$(echo "$input"      | jq -r '.workspace.current_dir')
-model=$(echo "$input"    | jq -r '.model.display_name')
-model_id=$(echo "$input" | jq -r '.model.id // empty')
-used=$(echo "$input"     | jq -r '.context_window.used_percentage // 0')
-in_tok=$(echo "$input"   | jq -r '.context_window.total_input_tokens // 0')
-out_tok=$(echo "$input"  | jq -r '.context_window.total_output_tokens // 0')
-max_tokens=$(echo "$input" | jq -r '.context_window.max_tokens // 0')
-
-branch=$(git -C "$cwd" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null || echo '')
-cost=$(printf '%.2f' "$(echo "scale=4; ($in_tok * 15 + $out_tok * 75) / 1000000" | bc 2>/dev/null || echo '0')")
-dir=$(basename "$cwd")
-# Derive max context window: prefer JSON field, then parse model ID/name for e.g. [1m] or (200k)
-max_k=$(( max_tokens / 1000 ))
-if [ "$max_k" -eq 0 ]; then
-    for src in "$model_id" "$model"; do
-        if [[ "$src" =~ ([0-9]+)([km]) ]]; then
-            val="${BASH_REMATCH[1]}"; unit="${BASH_REMATCH[2]}"
-            [ "$unit" = "m" ] && max_k=$(( val * 1000 )) || max_k=$val
-            break
-        fi
-    done
+mapfile -d '' -t fields < <(jq -jr '
+  [
+    .workspace.current_dir // "",
+    .model.display_name // "",
+    .context_window.used_percentage // 0,
+    (.cost.total_cost_usd // (((.context_window.total_input_tokens // 0) * 15 + (.context_window.total_output_tokens // 0) * 75) / 1000000))
+  ] | map(tostring + "\u0000") | join("")
+' <<< "$input")
+if [ "${#fields[@]}" -ne 4 ]; then
+    echo "Invalid Claude status input" >&2
+    exit 1
 fi
+cwd=${fields[0]}
+model=${fields[1]}
+used=${fields[2]}
+printf -v cost '%.2f' "${fields[3]}"
 
-# Active skills (up to 10)
-skills=$(find -L ~/.claude/skills -mindepth 2 -maxdepth 2 -name SKILL.md -printf '%h\n' 2>/dev/null | xargs -rn1 basename | sort | head -10 | paste -sd ',' | sed 's/,/, /g')
+branch=''
+if [ -d "$cwd" ]; then
+    branch=$(git -C "$cwd" --no-optional-locks rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+fi
+dir=${cwd##*/}
+
+skills=''
+skill_count=0
+for skill_file in "$HOME"/.claude/skills/*/SKILL.md; do
+    [ -f "$skill_file" ] || continue
+    skill_name=${skill_file%/SKILL.md}
+    skill_name=${skill_name##*/}
+    if [ -n "$skills" ]; then
+        skills+=", $skill_name"
+    else
+        skills=$skill_name
+    fi
+    skill_count=$((skill_count + 1))
+    if [ "$skill_count" -ge 10 ]; then break; fi
+done
 
 # Catppuccin Macchiato — same progression as starship: red peach yellow green teal blue
 c_red=$'\033[38;2;238;153;160m'      # model      #ee99a0

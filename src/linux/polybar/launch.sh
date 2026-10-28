@@ -1,7 +1,14 @@
 #!/bin/bash
 
 killall -q polybar
-while pgrep -u $UID -x polybar >/dev/null; do sleep 1; done
+deadline=$((SECONDS + 5))
+while pgrep -u "$UID" -x polybar >/dev/null; do
+    if (( SECONDS >= deadline )); then
+        echo "polybar did not stop within 5 seconds" >&2
+        exit 1
+    fi
+    sleep 0.1
+done
 
 > /tmp/polybar.log
 

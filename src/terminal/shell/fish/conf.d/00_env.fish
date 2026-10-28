@@ -1,5 +1,5 @@
 fish_add_path "$HOME/.local/bin"
-fish_add_path /home/ozhang/.opencode/bin
+fish_add_path "$HOME/.opencode/bin"
 fish_add_path "$HOME/go/bin"
 
 # Color tools treat the presence of NO_COLOR as disabled colors, regardless of its value.

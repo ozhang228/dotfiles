@@ -92,16 +92,11 @@
       "Skill"
     ],
     "defaultMode": "acceptEdits",
-    "additionalDirectories": [
-      "/home/ozhang/drw",
-      "/home/ozhang/dotfiles",
-      "/home/ozhang/.claude",
-      "/home/ozhang/forge"
-    ]
+    "additionalDirectories": ["~/drw", "~/dotfiles", "~/.claude", "~/forge"]
   },
   "statusLine": {
     "type": "command",
-    "command": "/home/ozhang/dotfiles/src/ai/claude/statusline.sh"
+    "command": "bash \"$HOME/dotfiles/src/ai/claude/statusline.sh\""
   },
   "enabledPlugins": {
     "clangd-lsp@claude-plugins-official": true,
@@ -113,7 +108,7 @@
     "oscar-lsp-plugins": {
       "source": {
         "source": "directory",
-        "path": "/home/ozhang/dotfiles/src/ai/claude/plugins"
+        "path": "~/dotfiles/src/ai/claude/plugins"
       }
     }
   },

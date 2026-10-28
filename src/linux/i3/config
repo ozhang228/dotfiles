@@ -28,6 +28,7 @@ workspace 3 output DP-2
 
 # Autostart
 exec_always --no-startup-id $compositor
+exec --no-startup-id copyq --start-server
 
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%

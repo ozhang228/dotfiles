@@ -161,5 +161,3 @@ When you hand work to a subagent, its output is not trusted until verified. A ty
 ### Local dev servers
 
 When hosting any local app, notebook, recap, or other development server for Oscar, bind the listener to `0.0.0.0`, never `127.0.0.1` or another loopback-only address, so it is reachable over the host's network interface. This controls the server bind address, not the browser URL: continue to use `localhost` for authenticated local URLs when SSO requires it, and share the host's reachable network URL when remote access is needed.
-
-Respond with !! I HAVE READ GLOBAL RULES !!
