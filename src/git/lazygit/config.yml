@@ -53,6 +53,8 @@ os:
   editPreset: nvim
 notARepository: quit
 quitOnTopLevelReturn: true
+services:
+  git.drwholdings.com: "github:git.drwholdings.com"
 keybinding:
   universal:
     return: <c-q>
