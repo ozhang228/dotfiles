@@ -3,22 +3,16 @@
 set -euo pipefail
 
 input=$(cat)
-mapfile -d '' -t fields < <(jq -jr '
+status_fields=$(jq -r '
   [
-    .workspace.current_dir // "",
-    .model.display_name // "",
+    (.workspace.current_dir | if type == "string" and length > 0 then . else "." end),
+    (.model.display_name | if type == "string" and length > 0 then . else "Claude" end),
     .context_window.used_percentage // 0,
     (.cost.total_cost_usd // (((.context_window.total_input_tokens // 0) * 15 + (.context_window.total_output_tokens // 0) * 75) / 1000000))
-  ] | map(tostring + "\u0000") | join("")
+  ] | @tsv
 ' <<< "$input")
-if [ "${#fields[@]}" -ne 4 ]; then
-    echo "Invalid Claude status input" >&2
-    exit 1
-fi
-cwd=${fields[0]}
-model=${fields[1]}
-used=${fields[2]}
-printf -v cost '%.2f' "${fields[3]}"
+IFS=$'\t' read -r cwd model used cost_value <<< "$status_fields"
+printf -v cost '%.2f' "$cost_value"
 
 branch=''
 if [ -d "$cwd" ]; then
