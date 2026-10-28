@@ -6,8 +6,8 @@ return {
     input = {
       enabled = true,
       win = {
-        relative = "cursor",
-        row = -3,
+        relative = "editor",
+        row = function() return math.floor((vim.o.lines - 3) / 2) end,
         width = 40,
         border = "rounded",
       },
