@@ -5,9 +5,8 @@ gui:
   expandFocusedSidePanel: true
   shrinkSidePanelsToContent: true
   sidePanels:
-    - [files, submodules]
-    - [branches, worktrees, remotes, tags]
-    - [commits, reflog, stash]
+    - [files, commits, reflog, stash]
+    - [branches, remotes, worktrees, submodules, tags]
   theme:
     activeBorderColor:
       - "#8aadf4"

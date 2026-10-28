@@ -32,8 +32,8 @@ exec_always --no-startup-id $compositor
 # hack: PipeWire on Ubuntu resets mic volume on login
 exec --no-startup-id pactl set-source-volume @DEFAULT_SOURCE@ 26%
 
-exec --no-startup-id "PYTHONWARNINGS=ignore autorandr --change; \
-    bash $HOME/dotfiles/src/linux/i3/wallpaper.sh; \
+exec --no-startup-id "PYTHONWARNINGS=ignore timeout 15s autorandr --change; \
+    timeout 10s bash $HOME/dotfiles/src/linux/i3/wallpaper.sh; \
     bash $HOME/dotfiles/src/linux/polybar/launch.sh; \
     $HOME/dotfiles/src/linux/i3/resurrect-restore-all.sh && \
     $browser"

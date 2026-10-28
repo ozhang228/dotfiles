@@ -9,12 +9,23 @@ function codex-worktree-resume --description "Continue the latest Codex session 
 
     set -l has_session 0
     if test $fresh -eq 0
-        for session_file in ~/.codex/sessions/**.jsonl
-            if head -n1 $session_file | jq -e --arg root "$root" '.type == "session_meta" and .payload.cwd == $root' >/dev/null 2>&1
-                set has_session 1
-                break
-            end
-        end
+        set has_session (python3 -c '
+import json
+import pathlib
+import sys
+
+for path in (pathlib.Path.home() / ".codex/sessions").rglob("*.jsonl"):
+    try:
+        with path.open() as session_file:
+            metadata = json.loads(session_file.readline())
+        if metadata.get("type") == "session_meta" and metadata.get("payload", {}).get("cwd") == sys.argv[1]:
+            print(1)
+            break
+    except (OSError, ValueError):
+        continue
+else:
+    print(0)
+' $root); or return $status
     end
 
     pushd $root
