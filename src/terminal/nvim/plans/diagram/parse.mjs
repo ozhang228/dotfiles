@@ -42,13 +42,11 @@ export function diagramsFromMarkdown(markdown) {
     while (parents.length && parents.at(-1).indent >= indent) parents.pop();
     const name = `task${index++}`;
     const status = task[2] === " " ? "pending" : task[2] === "-" ? "progress" : "done";
-    const label = wrapWords(`${status === "done" ? "✓ " : ""}${task[3].trim()}`)
-      .map(escapeLabel)
-      .join("<br/>");
+    const label = wrapWords(task[3].trim()).map(escapeLabel).join("<br/>");
     const node = `${name}["${label}"]:::${status}`;
     if (parents.length) {
       const parent = parents.at(-1);
-      parent.tree.push(node, `${parent.name} --> ${name}`);
+      parent.tree.push(node, `${parent.name} --- ${name}`);
       parents.push({ indent, name, tree: parent.tree });
     } else {
       const tree = [...HEADER, node];

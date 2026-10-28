@@ -1,0 +1,22 @@
+# Dev Dashboard
+
+- [ ] Improve the PR workflow
+  - [ ] 1. Make the PR list useful day to day
+    - [ ] Add a repository filter, defaulting to all repositories
+    - [ ] Add an All option to the author filter
+    - [ ] Let `r` refresh the PR list immediately
+    - [ ] Make individual CI checks inspectable from each PR row
+  - [ ] 2. Make the PR list keyboard navigable
+    - [ ] Select PRs across repository groups with `j`/`k`, arrows, and count prefixes; keep selection visible and stable across refreshes
+      - [ ] Show a focus ring on the selected row
+    - [ ] Open the selected PR on GitHub with `Shift+Enter`
+    - [ ] Add status and author filter shortcuts, including shortcut hints
+    - [ ] Show a shortcut cheat sheet with `?`
+  - [ ] 3. Build the in-app PR review page
+    - [ ] Implement the PR detail route
+    - [ ] Open the selected PR there with `Enter`
+    - [ ] Add a changed-file tree and diff navigation
+    - [ ] Add private review comments that can be exported to AI
+  - [ ] 4. Add PR actions
+    - [ ] Close and draft or undraft PRs with confirmation
+    - [ ] Approve PRs authored by someone else
