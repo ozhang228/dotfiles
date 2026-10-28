@@ -1,5 +1,5 @@
-# set -gx AI_CLI_CMD "claude-branch-resume --dangerously-skip-permissions || claude --dangerously-skip-permissions"
-set -gx AI_CLI_CMD "codex-branch-resume --no-daemon || codex --no-daemon"
+# set -gx AI_CLI_CMD "claude-worktree-resume --dangerously-skip-permissions"
+set -gx AI_CLI_CMD "codex-worktree-resume --no-daemon"
 
 if set -q SSH_CONNECTION
     set -e DISPLAY

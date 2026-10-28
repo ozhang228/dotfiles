@@ -99,28 +99,6 @@
       "/home/ozhang/forge"
     ]
   },
-  "hooks": {
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh notification"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "env AI_BRANCH_SESSION_DIR=/home/ozhang/.claude/branch-sessions /home/ozhang/dotfiles/src/ai/hooks/ai_desktop_notification.sh stop"
-          }
-        ]
-      }
-    ]
-  },
   "statusLine": {
     "type": "command",
     "command": "/home/ozhang/dotfiles/src/ai/claude/statusline.sh"

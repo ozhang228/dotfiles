@@ -2,7 +2,6 @@
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.opencode/AGENTS.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.claude/CLAUDE.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.codex/AGENTS.md" },
-  { "src": "~/dotfiles/src/ai/codex/hooks.json", "dst": "~/.codex/hooks.json" },
   {
     "src": "~/dotfiles/src/ai/skills/brainstorm",
     "dst": "~/.claude/skills/brainstorm"

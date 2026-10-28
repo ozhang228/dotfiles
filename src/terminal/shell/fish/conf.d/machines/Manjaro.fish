@@ -5,6 +5,6 @@ if not string match -q -- $PNPM_HOME $PATH
 end
 # pnpm end
 
-set -gx AI_CLI_CMD "claude-branch-resume --dangerously-skip-permissions || claude --dangerously-skip-permissions"
+set -gx AI_CLI_CMD "claude-worktree-resume --dangerously-skip-permissions"
 
 tmux_autostart
