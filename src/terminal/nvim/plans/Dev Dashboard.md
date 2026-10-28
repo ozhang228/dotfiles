@@ -1,32 +1,37 @@
 # Dev Dashboard
 
-- [ ] 1. Make the PR list useful day to day
-  - [ ] Add a repository filter, defaulting to all repositories
-  - [ ] Add an All option to the author filter
+- [ ] Make the PR list useful day to day
+  - [ ] Add PR filters
+    - [ ] Add a repository filter, defaulting to all repositories
+    - [ ] Add an All option to the author filter
   - [ ] Let `r` refresh the PR list immediately
   - [ ] Load GHE author avatars through the authenticated backend
   - [ ] Make individual CI checks inspectable from each PR row
-- [ ] 2. Speed up PR filtering where measurements justify it
-  - [ ] Measure PR query latency, response size, and GitHub API usage
+- [ ] Speed up PR filtering where measurements justify it
   - [ ] Compare the current filtered requests with a broader batched PR query and client-side filtering
+    - [ ] Measure PR query latency, response size, and GitHub API usage
   - [ ] Prefetch likely next filter views if the measurements show a benefit
-- [ ] 3. Make the PR list keyboard navigable
-  - [ ] Select PRs across repository groups with `j`/`k`, arrows, and count prefixes; keep selection visible and stable across refreshes
-    - [ ] Show a focus ring on the selected row
-  - [ ] Open the selected PR on GitHub with `Shift+Enter`
-  - [ ] Add sequence support for status (`s` then `o`/`d`/`m`/`c`) and author (`a` then `m`/`r`/`s`) filters
+- [ ] Make the PR list keyboard navigable
+  - [ ] Select and open PRs from the keyboard
+    - [ ] Select PRs across repository groups with `j`/`k`, arrows, and count prefixes; keep selection visible and stable across refreshes
+      - [ ] Show a focus ring on the selected row
+    - [ ] Open the selected PR on GitHub with `Shift+Enter`
+  - [ ] Filter PRs from the keyboard
+    - [ ] Add sequence support for status (`s` then `o`/`d`/`m`/`c`) and author (`a` then `m`/`r`/`s`) filters
     - [ ] Focus the specific-author input after `a` then `s`
     - [ ] Show the shortcuts beside filter labels
   - [ ] Show a shortcut cheat sheet with `?`
-- [ ] 4. Build the in-app PR review page
-  - [ ] Implement the PR detail route
-  - [ ] Open the selected PR there with `Enter`
-  - [ ] Add a backend interface for changed files
-  - [ ] Render changed files with `@pierre/diffs` and a file tree
-  - [ ] Add file-tree navigation and foldable functions
+- [ ] Build the in-app PR review page
+  - [ ] Open selected PRs in-app
+    - [ ] Implement the PR detail route
+    - [ ] Open the selected PR there with `Enter`
+  - [ ] Show and navigate changed files
+    - [ ] Add a backend interface for changed files
+    - [ ] Render changed files with `@pierre/diffs` and a file tree
+    - [ ] Add file-tree navigation and foldable functions
   - [ ] Add private review comments that can be exported to AI
   - [ ] Explore an import-dependency diagram for changed files
-- [ ] 5. Add PR actions
+- [ ] Add PR actions
   - [ ] Close and draft or undraft PRs with confirmation
   - [ ] Approve PRs authored by someone else
-- [ ] 6. Implement the launcher page
+- [ ] Implement the launcher page
