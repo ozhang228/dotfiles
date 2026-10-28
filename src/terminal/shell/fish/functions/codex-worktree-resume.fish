@@ -1,4 +1,4 @@
-function codex-worktree-resume --description "Choose a Codex session for the current git worktree (or directory outside git), or start one. --fresh starts a new session."
+function codex-worktree-resume --description "Continue the latest Codex session for the current git worktree (or directory outside git), or start one. --fresh starts a new session."
     set -l fresh 0
     if set -l idx (contains -i -- --fresh $argv)
         set fresh 1
@@ -7,31 +7,41 @@ function codex-worktree-resume --description "Choose a Codex session for the cur
 
     set -l root (git rev-parse --show-toplevel 2>/dev/null; or pwd)
 
-    set -l has_session 0
+    set -l session_id ""
     if test $fresh -eq 0
-        set has_session (python3 -c '
+        set session_id (python3 -c '
 import json
 import pathlib
 import sys
 
+latest_session = None
 for path in (pathlib.Path.home() / ".codex/sessions").rglob("*.jsonl"):
     try:
         with path.open() as session_file:
             metadata = json.loads(session_file.readline())
-        if metadata.get("type") == "session_meta" and metadata.get("payload", {}).get("cwd") == sys.argv[1]:
-            print(1)
-            break
+        if not isinstance(metadata, dict):
+            continue
+        payload = metadata.get("payload")
+        if (
+            metadata.get("type") == "session_meta"
+            and isinstance(payload, dict)
+            and payload.get("cwd") == sys.argv[1]
+        ):
+            session_id = payload.get("id")
+            if isinstance(session_id, str) and session_id:
+                session = (path.stat().st_mtime_ns, session_id)
+                if latest_session is None or session[0] > latest_session[0]:
+                    latest_session = session
     except (OSError, ValueError):
         continue
-else:
-    print(0)
+print(latest_session[1] if latest_session else "")
 ' $root); or return $status
     end
 
     pushd $root
-    # The resume picker filters to sessions whose cwd is this directory.
-    if test $has_session -eq 1
-        codex resume $argv
+    # Resolve the latest session by its recorded cwd so resume is explicitly worktree-scoped.
+    if test -n "$session_id"
+        codex resume $session_id $argv
     else
         codex $argv
     end
