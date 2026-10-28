@@ -1,4 +1,4 @@
-function codex-worktree-resume --description "Continue the latest Codex session for the current git worktree (or directory outside git), or start one. --fresh starts a new session."
+function codex-worktree-resume --description "Choose a Codex session for the current git worktree (or directory outside git), or start one. --fresh starts a new session."
     set -l fresh 0
     if set -l idx (contains -i -- --fresh $argv)
         set fresh 1
@@ -29,9 +29,9 @@ else:
     end
 
     pushd $root
-    # `codex resume --last` picks the most recent session whose cwd is this directory.
+    # The resume picker filters to sessions whose cwd is this directory.
     if test $has_session -eq 1
-        codex resume --last $argv
+        codex resume $argv
     else
         codex $argv
     end
