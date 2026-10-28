@@ -32,6 +32,44 @@ local function create_plan()
   end)
 end
 
+local function toggle_task()
+  local line = vim.api.nvim_get_current_line()
+  local before, state, after = line:match("^(%s*[-*+] %[)(.)(%] .+)$")
+  local next_state = { [" "] = "-", ["-"] = "x", x = " " }
+  if before and next_state[state] then
+    vim.api.nvim_set_current_line(before .. next_state[state] .. after)
+  else
+    vim.cmd("normal! +")
+  end
+end
+
+function M.setup()
+  vim.api.nvim_create_autocmd({ "BufEnter", "BufFilePost" }, {
+    group = vim.api.nvim_create_augroup("plan_keymaps", { clear = true }),
+    callback = function(args)
+      if not M.current_path() then
+        if vim.b[args.buf].plan_keymaps then
+          for _, key in ipairs({ "<CR>", "<leader>dm", "<leader>dM" }) do
+            vim.keymap.del("n", key, { buffer = args.buf })
+          end
+          vim.b[args.buf].plan_keymaps = nil
+        end
+        return
+      end
+      vim.b[args.buf].plan_keymaps = true
+      vim.keymap.set("n", "<CR>", toggle_task, { buffer = args.buf, desc = "Cycle plan task state" })
+      vim.keymap.set("n", "<leader>dm", function() require("plan_diagram").open() end, {
+        buffer = args.buf,
+        desc = "Plan Mermaid diagram",
+      })
+      vim.keymap.set("n", "<leader>dM", function() require("plan_diagram").stop() end, {
+        buffer = args.buf,
+        desc = "Stop plan diagram",
+      })
+    end,
+  })
+end
+
 function M.pick()
   local items = { { text = "+ New plan", create = true } }
   for _, path in ipairs(vim.fn.globpath(directory(), "*.md", false, true)) do
@@ -45,7 +83,7 @@ function M.pick()
       picker:close()
       if not item then return end
       if item.create then
-        create_plan()
+        vim.schedule(create_plan)
       else
         vim.cmd.edit(vim.fn.fnameescape(item.file))
       end

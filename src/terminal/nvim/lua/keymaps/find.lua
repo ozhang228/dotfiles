@@ -1,5 +1,6 @@
 return {
   { "<leader>f", "<nop>", desc = "Find" },
+  { "<leader>fp", function() require("plans").pick() end, desc = "Plans" },
   {
     "<leader>ff",
     function()
