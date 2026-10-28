@@ -109,3 +109,11 @@ case "$mode" in
     fi
     ;;
 esac
+
+# A new worktree only has tracked files, so bring over the small ignored local config.
+git -C "$main_worktree" ls-files -z --others --ignored --exclude-standard -- \
+  ':(glob)**/.env' ':(glob)**/.env.*' ':(glob)**/.envrc' ':(glob).claude/settings.local.json' |
+  while IFS= read -r -d '' file; do
+    mkdir -p "$(dirname "$target/$file")"
+    cp -p "$main_worktree/$file" "$target/$file"
+  done
