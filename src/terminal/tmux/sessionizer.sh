@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
-# Fuzzy-pick a project, worktree, or existing tmux session.
+# Session picker for prefix f.
 #
-# - Worktrees are labeled by their filesystem directory name in one flat list.
-# - Existing sessions, including standalone sessions such as "default", remain visible.
-# - Stale worktrees sort first and ctrl-x only removes the highlighted stale registration.
-# - All entries are ordered by stale status, then most-recently-active session.
+# - Live sessions by last attach (the current one last), then root worktrees
+#   without a session, then stale worktree registrations.
+# - Sessions are only created from the fixed roots, or by name with ctrl-n in
+#   $TMUX_NEW_SESSION_DIR (default ~).
 set -euo pipefail
 
 SCRIPT=$(realpath "$0")
 printf -v SCRIPT_Q '%q' "$SCRIPT"
 REPLY=""
+
+LOG_FILE="${XDG_STATE_HOME:-$HOME/.local/state}/tmux/sessionizer.log"
+PROMPT='  '
+CONFIRM_PREFIX='  kill '
+
+# Catppuccin Macchiato.
+GREEN=$'\e[38;2;166;218;149m' RED=$'\e[38;2;237;135;150m'
+OVERLAY=$'\e[38;2;110;115;141m' BLUE=$'\e[38;2;138;173;244m' SUBTEXT=$'\e[38;2;165;173;203m' RESET=$'\e[0m'
 
 collect_candidates() {
     candidates=()
@@ -24,18 +32,6 @@ collect_candidates() {
             [ -d "$dir" ] && candidates+=("${dir%/}")
         done
     fi
-}
-
-load_session_activity() {
-    declare -gA session_activity session_paths
-    session_activity=()
-    session_paths=()
-
-    while IFS='|' read -r name timestamp path; do
-        [ -n "$name" ] || continue
-        session_activity["$name"]="$timestamp"
-        session_paths["$name"]="$path"
-    done < <(tmux list-sessions -F '#{session_name}|#{session_activity}|#{session_path}' 2>/dev/null || true)
 }
 
 path_basename() {
@@ -77,15 +73,6 @@ git_common_dir_from_marker() {
 git_common_dir_for() {
     git_common_dir_from_marker "$1" || \
         git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null
-}
-
-session_indicator() {
-    local session="$1"
-    if [ -n "${session_activity[$session]+x}" ]; then
-        REPLY=$'\033[92m•\033[0m'
-    else
-        REPLY=$'\033[90m○\033[0m'
-    fi
 }
 
 # Emit: worktree path, branch/detached label, stale flag.
@@ -191,115 +178,6 @@ build_worktree_index() {
     done
 }
 
-worktree_label() {
-    local path="$1" stale="$2" label
-    path_basename "$path"
-    label="$REPLY"
-
-    [ "$stale" -eq 1 ] && label="🗑 stale  $label"
-    REPLY="$label"
-}
-
-list_entries() {
-    load_session_activity
-    build_worktree_index
-
-    local -a entries=()
-    declare -A project_recent=()
-    local name path project branch stale session timestamp label git_dir kind indicator
-    local group_timestamp index
-
-    # Keep every existing tmux session, even when it is not a discovered project.
-    for name in "${!session_activity[@]}"; do
-        path="${session_paths[$name]}"
-        project="${worktree_projects[$path]:-}"
-        branch="${worktree_branches[$path]:-}"
-
-        if [ -z "$project" ] && [ -d "$path" ] && git_dir=$(git_common_dir_for "$path"); then
-            if [[ "$git_dir" == */.git ]]; then
-                project="${git_dir%/.git}"
-                branch=$(git -C "$path" branch --show-current 2>/dev/null || true)
-                [ -n "$branch" ] || branch="(detached)"
-            fi
-        fi
-
-        if [ -n "$project" ] && [ -n "$branch" ]; then
-            worktree_label "$path" 0
-            label="$REPLY"
-        else
-            label="$name"
-            project="-"
-        fi
-        session_indicator "$name"
-        indicator="$REPLY"
-        label="$label $indicator"
-        timestamp="${session_activity[$name]:-0}"
-        if [ "$timestamp" -gt "${project_recent[$project]:-0}" ]; then
-            project_recent["$project"]="$timestamp"
-        fi
-        entries+=("0"$'\t'"$timestamp"$'\t'session$'\t'"$name"$'\t'"$label"$'\t'"$project")
-    done
-
-    # Add every discovered worktree that does not already have a live session.
-    for path in "${!worktree_projects[@]}"; do
-        project="${worktree_projects[$path]}"
-        branch="${worktree_branches[$path]}"
-        stale="${worktree_stale[$path]}"
-        session_name_for_path "$path"
-        session="$REPLY"
-        if [ "$stale" -eq 0 ] && [ -n "${session_activity[$session]+x}" ]; then
-            continue
-        fi
-
-        timestamp="${session_activity[$session]:-0}"
-        worktree_label "$path" "$stale"
-        label="$REPLY"
-        session_indicator "$session"
-        indicator="$REPLY"
-        label="$label $indicator"
-        if [ "$branch" = "directory" ]; then
-            kind=directory
-        else
-            kind=worktree
-        fi
-        if [ "$timestamp" -gt "${project_recent[$project]:-0}" ]; then
-            project_recent["$project"]="$timestamp"
-        fi
-        entries+=("$stale"$'\t'"$timestamp"$'\t'"$kind"$'\t'"$path"$'\t'"$label"$'\t'"$project")
-    done
-
-    # Keep the most recently used project groups first, then sort each group
-    # by its stable filesystem name so the project root precedes its worktrees.
-    for index in "${!entries[@]}"; do
-        IFS=$'\t' read -r stale timestamp kind path label project <<<"${entries[$index]}"
-        group_timestamp="${project_recent[$project]:-0}"
-        entries[$index]="$stale"$'\t'"$group_timestamp"$'\t'"$timestamp"$'\t'"$kind"$'\t'"$path"$'\t'"$label"$'\t'"$project"
-    done
-
-    printf '%s\n' "${entries[@]}" \
-        | sort -t $'\t' -k1,1rn -k2,2rn -k6,6 -k3,3rn \
-        | cut -f1,3-7
-}
-
-preview_entry() {
-    local kind="$1" key="$2"
-    if [ "$kind" = "session" ]; then
-        tmux capture-pane -e -p -t "$key" 2>/dev/null || true
-        return 0
-    fi
-
-    if [ ! -d "$key" ]; then
-        printf '🗑 stale worktree: %s\n' "$key"
-        return 0
-    fi
-
-    ls -la --color=always -- "$key" 2>/dev/null || true
-    if git -C "$key" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        echo
-        git -C "$key" log --oneline --color=always -10 2>/dev/null || true
-    fi
-}
-
 prune_stale_worktree() {
     local project="$1" selected_path="$2" git_dir path branch stale
     local found=0 selected_stale=0
@@ -333,120 +211,262 @@ open_session() {
     fi
 }
 
-open_worktree() {
-    local path="$1" session
-    session_name_for_path "$path"
-    session="$REPLY"
-    if ! tmux has-session -t "=$session" 2>/dev/null; then
-        tmux new-session -d -s "$session" -c "$path"
+current_session() {
+    if [ -n "${TMUX_SESSIONIZER_CLIENT:-}" ]; then
+        tmux display-message -p -c "$TMUX_SESSIONIZER_CLIENT" '#{client_session}' 2>/dev/null || true
+    else
+        tmux display-message -p '#{client_session}' 2>/dev/null || true
     fi
-    open_session "$session"
 }
 
-client_size() {
-    tmux display-message -p -t "$1" '#{client_width}x#{client_height}' 2>/dev/null
+# Live sessions as "name<TAB>path<TAB>last attached", most recent first, current last.
+live_sessions() {
+    local current
+    current=$(current_session)
+    tmux list-sessions -F '#{session_last_attached}	#{session_name}	#{session_path}' 2>/dev/null \
+        | sort -t $'\t' -k1,1rn \
+        | awk -F '\t' -v current="$current" -v OFS='\t' '
+            $2 == current { last = $2 OFS $3 OFS $1; next }
+            { print $2, $3, $1 }
+            END { if (last != "") print last }'
 }
 
+relative_age() {
+    local attached="${1:-0}" seconds
+    [ -n "$attached" ] || attached=0
+    seconds=$(( $(date +%s) - attached ))
+    if [ "$attached" -eq 0 ]; then REPLY=""
+    elif [ "$seconds" -lt 60 ]; then REPLY="now"
+    elif [ "$seconds" -lt 3600 ]; then REPLY="$((seconds / 60))m"
+    elif [ "$seconds" -lt 86400 ]; then REPLY="$((seconds / 3600))h"
+    else REPLY="$((seconds / 86400))d"
+    fi
+}
+
+short_path() {
+    REPLY="${1/#$HOME/\~}"
+}
+
+# Emit one row: kind, session name, path, project, then the displayed label.
+# The label puts the path and age flush right, sized to fzf's width.
+emit_row() {
+    local kind="$1" name="$2" path="$3" project="$4" age="$5" icon left right gap
+    case "$kind" in
+        session) icon="${GREEN}●${RESET}" ;;
+        start) icon="${OVERLAY}○${RESET}" ;;
+        stale) icon="${RED}✗${RESET}" ;;
+    esac
+    short_path "$path"
+
+    left="● $name"
+    printf -v right '%s  %3s' "$REPLY" "$age"
+    # fzf reports 0 columns during its start event, so fall back to the popup width.
+    local width=${FZF_COLUMNS:-0}
+    [ "$width" -gt 0 ] || width=${SESSIONIZER_WIDTH:-100}
+    gap=$(( width - 6 - ${#left} - ${#right} ))
+    if [ "$gap" -lt 2 ]; then
+        REPLY="…${REPLY:$(( 2 - gap + 1 ))}"
+        printf -v right '%s  %3s' "$REPLY" "$age"
+        gap=2
+    fi
+    printf '%s\t%s\t%s\t%s\t%s %s%*s%s%s%s  %s%3s%s\n' \
+        "$kind" "$name" "$path" "$project" \
+        "$icon" "$name" "$gap" "" \
+        "$OVERLAY" "$REPLY" "$RESET" "$SUBTEXT" "$age" "$RESET"
+}
+
+list_sessions() {
+    local name path last_attached project branch stale
+    declare -A live_paths=() live_names=()
+
+    while IFS=$'\t' read -r name path last_attached; do
+        live_names["$name"]=1
+        live_paths["$path"]=1
+        relative_age "$last_attached"
+        emit_row session "$name" "$path" - "$REPLY"
+    done < <(live_sessions)
+
+    build_worktree_index
+    local -a startable=() stale_rows=()
+    for path in "${!worktree_projects[@]}"; do
+        if [ "${worktree_stale[$path]}" -eq 1 ]; then
+            stale_rows+=("$path")
+            continue
+        fi
+        session_name_for_path "$path"
+        [ -n "${live_paths[$path]+x}" ] || [ -n "${live_names[$REPLY]+x}" ] || startable+=("$path")
+    done
+
+    [ "${#startable[@]}" -eq 0 ] || while IFS= read -r path; do
+        session_name_for_path "$path"
+        emit_row start "$REPLY" "$path" "${worktree_projects[$path]}" ""
+    done < <(printf '%s\n' "${startable[@]}" | awk -F / '{ print $NF "\t" $0 }' | sort | cut -f2-)
+
+    for path in "${stale_rows[@]}"; do
+        path_basename "$path"
+        emit_row stale "$REPLY" "$path" "${worktree_projects[$path]}" ""
+    done
+}
+
+open_entry() {
+    local kind="$1" name="$2" path="$3"
+    case "$kind" in
+        session) open_session "$name" ;;
+        start)
+            tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$path"
+            open_session "$name"
+            ;;
+        stale|"") ;;
+    esac
+}
+
+new_session() {
+    local name="$1" dir="${TMUX_NEW_SESSION_DIR:-$HOME}"
+    [ -n "$name" ] || return 0
+    session_name_for_path "$name"
+    name="$REPLY"
+    tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$dir"
+    open_session "$name"
+}
+
+rename_session() {
+    local kind="$1" name="$2" new_name="$3"
+    [ "$kind" = session ] && [ -n "$new_name" ] || return 0
+    session_name_for_path "$new_name"
+    new_name="$REPLY"
+    tmux has-session -t "=$new_name" 2>/dev/null && return 0
+    tmux rename-session -t "=$name" "$new_name"
+}
+
+kill_entry() {
+    local kind="$1" name="$2" path="$3" project="$4" fallback
+    case "$kind" in
+        session)
+            if [ "$name" = "$(current_session)" ]; then
+                fallback=$(live_sessions | cut -f1 | grep -Fvx -- "$name" | head -n1 || true)
+                [ -z "$fallback" ] || open_session "$fallback"
+            fi
+            tmux kill-session -t "=$name"
+            ;;
+        stale) prune_stale_worktree "$project" "$path" ;;
+        start|"") ;;
+    esac
+}
+
+kill_all_stale() {
+    local path
+    build_worktree_index
+    for path in "${!worktree_projects[@]}"; do
+        [ "${worktree_stale[$path]}" -eq 1 ] && prune_stale_worktree "${worktree_projects[$path]}" "$path"
+    done
+    return 0
+}
+
+# Answer a y/n key: act on a pending kill confirmation, otherwise type the key.
+answer_key() {
+    local key="$1"
+    case "${FZF_PROMPT:-}" in
+        "$CONFIRM_PREFIX"*)
+            if [ "$key" = y ]; then
+                if [ "$FZF_PROMPT" = "${CONFIRM_PREFIX}all stale worktrees? y/n  " ]; then
+                    printf 'execute-silent(%s --kill-all-stale)+' "$SCRIPT_Q"
+                else
+                    printf 'execute-silent(%s --kill {1} {2} {3} {4})+' "$SCRIPT_Q"
+                fi
+                printf 'reload(%s --list)+' "$SCRIPT_Q"
+            fi
+            printf 'change-prompt:%s' "$PROMPT"
+            ;;
+        *) [ "$key" = esc ] && printf 'abort' || printf 'put(%s)' "$key" ;;
+    esac
+}
+
+confirm_kill() {
+    case "$1" in
+        session|stale) printf 'change-prompt:%s%s? y/n  ' "$CONFIRM_PREFIX" "$2" ;;
+        *) ;;
+    esac
+}
+
+# Size the popup to the list so short lists leave no empty space.
 open_popup() {
-    local client="$1"
-    tmux display-popup \
-        -c "$client" \
-        -w 100% \
-        -h 100% \
-        -e "TMUX_SESSIONIZER_CLIENT=$client" \
+    local client="$1" rows client_height client_width height width
+    client_width=$(tmux display-message -p -c "$client" '#{client_width}')
+    # 60% of the screen, but wide enough for the key hints in the footer.
+    width=$(( client_width * 6 / 10 ))
+    [ "$width" -ge 110 ] || width=110
+    [ "$width" -le "$client_width" ] || width=$client_width
+    rows=$("$SCRIPT" --list sessions 2>/dev/null | wc -l)
+    client_height=$(tmux display-message -p -c "$client" '#{client_height}')
+    # 8 rows of input, list, and footer borders.
+    height=$(( rows + 8 ))
+    [ "$height" -le $(( client_height * 8 / 10 )) ] || height=$(( client_height * 8 / 10 ))
+    tmux display-popup -B -w "$width" -h "$height" -c "$client" \
+        -e "TMUX_SESSIONIZER_CLIENT=$client" -e "SESSIONIZER_WIDTH=$width" \
         -E "$SCRIPT_Q"
 }
 
-run_resizing_popup() {
-    local client="$1" popup_pid size new_size pending_size pending_checks
-
-    open_popup "$client" &
-    popup_pid=$!
-    size=$(client_size "$client") || size=""
-    pending_size=""
-    pending_checks=0
-
-    while kill -0 "$popup_pid" 2>/dev/null; do
-        sleep 0.1
-        new_size=$(client_size "$client") || break
-        if [ -z "$new_size" ] || [ "$new_size" = "$size" ]; then
-            pending_size=""
-            pending_checks=0
-            continue
-        fi
-
-        if [ "$new_size" != "$pending_size" ]; then
-            pending_size="$new_size"
-            pending_checks=1
-            continue
-        fi
-
-        pending_checks=$((pending_checks + 1))
-        if [ "$pending_checks" -ge 2 ]; then
-            tmux display-popup -C -c "$client" 2>/dev/null || true
-            wait "$popup_pid" 2>/dev/null || true
-            open_popup "$client" &
-            popup_pid=$!
-            size="$new_size"
-            pending_size=""
-            pending_checks=0
-        fi
+# Format "key ➜ description" pairs like which-key.
+key_hints() {
+    local separator="$1" hint=""
+    shift
+    while [ "$#" -ge 2 ]; do
+        hint+="${BLUE}$1${RESET} ${OVERLAY}➜${RESET} $2$separator"
+        shift 2
     done
+    REPLY="${hint%"$separator"}"
+}
 
-    wait "$popup_pid" 2>/dev/null || true
+run_picker() {
+    local footer
+
+    key_hints '   ' '<CR>' open '<C-n>' 'new from query' '<C-r>' 'rename to query' '<C-x>' kill '<C-d>' 'kill all stale'
+    footer=$REPLY
+
+    # Ignore the shell's fzf defaults; their --height=90% draws inline and can cut off the top.
+    FZF_DEFAULT_OPTS='' FZF_DEFAULT_OPTS_FILE='' fzf \
+        --ansi --layout=reverse --style=full --border=none --gutter=' ' \
+        --input-border=rounded --list-border=rounded --footer-border=rounded \
+        --delimiter $'\t' --with-nth=5 --tiebreak=index \
+        --input-label=' 󰆍 Sessions ' \
+        --prompt="$PROMPT" --pointer='▌' \
+        --info=inline-right --no-scrollbar \
+        --footer="$footer" \
+        --color='bg:#24273a,bg+:#363a4f,fg:#cad3f5,fg+:#cad3f5,hl:#ed8796,hl+:#ed8796' \
+        --color='border:#b7bdf8,label:#cad3f5,prompt:#c6a0f6,pointer:#f4dbd6,info:#6e738d' \
+        --color='header:#a5adcb,footer:#6e738d,query:#cad3f5,spinner:#f4dbd6,marker:#b7bdf8' \
+        --bind "start:reload($SCRIPT_Q --list sessions)" \
+        --bind "enter:become($SCRIPT_Q --open {1} {2} {3})" \
+        --bind "ctrl-n:become($SCRIPT_Q --new {q})" \
+        --bind "ctrl-r:execute-silent($SCRIPT_Q --rename {1} {2} {q})+clear-query+reload($SCRIPT_Q --list sessions)" \
+        --bind "ctrl-x:transform($SCRIPT_Q --confirm-kill {1} {2})" \
+        --bind "ctrl-d:change-prompt:${CONFIRM_PREFIX}all stale worktrees? y/n  " \
+        --bind "y:transform($SCRIPT_Q --answer y),n:transform($SCRIPT_Q --answer n),esc:transform($SCRIPT_Q --answer esc)" \
+        </dev/null || true
 }
 
 case "${1:-}" in
     --list)
-        list_entries
-        exit 0
+        case "${2:-}" in
+            sessions|"") list_sessions ;;
+            *) printf 'unknown list: %s\n' "$2" >&2; exit 2 ;;
+        esac
         ;;
-    --preview)
-        [ "$#" -ge 3 ] && preview_entry "$2" "$3"
-        exit 0
-        ;;
-    --prune-worktree)
-        [ "$#" -ge 3 ] && prune_stale_worktree "$2" "$3"
-        exit 0
-        ;;
+    --open) open_entry "${2:-}" "${3:-}" "${4:-}" ;;
+    --new) new_session "${2:-}" ;;
+    --rename) rename_session "${2:-}" "${3:-}" "${4:-}" ;;
+    --confirm-kill) confirm_kill "${2:-}" "${3:-}" ;;
+    --answer) answer_key "$2" ;;
+    --kill) kill_entry "${2:-}" "${3:-}" "${4:-}" "${5:-}" ;;
+    --kill-all-stale) kill_all_stale ;;
     --popup)
         [ "$#" -ge 2 ] || exit 2
-        run_resizing_popup "$2"
-        exit 0
+        open_popup "$2"
         ;;
+    "")
+        mkdir -p "$(dirname "$LOG_FILE")"
+        # Stray stderr scrolls the popup and cuts off fzf's top border.
+        run_picker 2>>"$LOG_FILE"
+        ;;
+    *) printf 'unknown option: %s\n' "$1" >&2; exit 2 ;;
 esac
-
-fzf_status=0
-selected=""
-while true; do
-    selected=$(list_entries | fzf \
-        --border=none \
-        --ansi \
-        --delimiter $'\t' --with-nth=5 \
-        --tiebreak=index \
-        --header='Enter: switch/create live  |  ctrl-x: remove stale  |  Esc: exit' \
-        --bind "ctrl-x:execute-silent($SCRIPT_Q --prune-worktree {6} {4})+reload($SCRIPT_Q --list)" \
-        --info=hidden \
-        --preview "$SCRIPT_Q --preview {3} {4} {6}" \
-        --preview-window right:60%,nowrap,noinfo,border-left) || fzf_status=$?
-
-    case "$fzf_status" in
-        0) ;;
-        1|130) exit 0 ;;
-        *) exit "$fzf_status" ;;
-    esac
-
-    [ -n "$selected" ] || exit 0
-    stale=$(printf '%s' "$selected" | cut -f1)
-    kind=$(printf '%s' "$selected" | cut -f3)
-    key=$(printf '%s' "$selected" | cut -f4)
-
-    # Selecting a stale row does not attempt to create a session.
-    [ "$stale" -eq 0 ] || continue
-    if [ "$kind" = "session" ]; then
-        open_session "$key"
-    else
-        [ -d "$key" ] && open_worktree "$key"
-    fi
-    exit 0
-done
