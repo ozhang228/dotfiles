@@ -1,21 +1,4 @@
 # Dotfiles
 
-- [ ] Rebuild the `prefix f` session picker
-  - [x] Order entries by recency
-    - [x] List live sessions by last attached, with the current session last
-    - [x] List startable root worktrees alphabetically below live sessions
-    - [x] List stale worktrees at the bottom
-  - [x] Restyle the picker like the snacks picker
-    - [x] Show a centered popup at about 60% of the screen with rounded Catppuccin Macchiato borders
-    - [x] Remove the preview pane
-    - [x] Show key hints in the footer and a full key list on `?`
-  - [ ] Manage sessions from the picker
-    - [x] Create a session named from the query with `ctrl-n` in `TMUX_NEW_SESSION_DIR`, set per machine and defaulting to `~`
-      - [x] Set `TMUX_NEW_SESSION_DIR` to `~/drw` on the work machine
-    - [x] Rename the highlighted session from the query with `ctrl-r`
-    - [x] Kill the highlighted session with `ctrl-x` after a `y/n` confirmation, switching away first when it is the current session
-    - [x] Kill all stale worktrees at once
-      - [ ] Treat worktrees whose remote branch is gone as stale, reusing `cleanup-worktree.sh` safety checks
-        - [ ] Decide how bulk cleanup handles dirty worktrees and squash-merged branches that look unmerged
 - [ ] Investigate workmux-style tooling to make AI sessions easier
-- [ ] Add icons to the plans picker
+  - [ ] Add icons to the plans picker

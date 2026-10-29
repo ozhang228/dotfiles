@@ -254,7 +254,10 @@ function M.pick()
     title = "Plans · ? help",
     items = items,
     toggles = no_toggles,
-    format = function(item) return { { item.text } } end,
+    format = function(item)
+      local icon, hl = require("mini.icons").get(item.create and "lsp" or "file", item.create and "constructor" or item.file)
+      return { { icon .. " ", hl }, { item.text } }
+    end,
     actions = {
       plan_new = function(picker)
         picker:close()
