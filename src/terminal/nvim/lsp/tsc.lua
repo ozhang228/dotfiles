@@ -8,6 +8,7 @@ local root_markers = {
 ---@type vim.lsp.Config
 return {
   cmd = { "tsc", "--lsp", "--stdio" },
+  capabilities = { experimental = { hoverVerbosityLevel = true } },
   filetypes = {
     "javascript",
     "javascriptreact",
