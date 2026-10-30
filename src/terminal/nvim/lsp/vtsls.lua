@@ -17,10 +17,17 @@ return {
   },
 
   on_attach = function(client)
-    local keep = { "semanticTokensProvider" }
-    for key, _ in pairs(client.server_capabilities) do
-      if not vim.tbl_contains(keep, key) then client.server_capabilities[key] = nil end
+    local keep = { "textDocumentSync", "codeActionProvider", "executeCommandProvider" }
+    for capability in pairs(client.server_capabilities) do
+      if not vim.tbl_contains(keep, capability) then client.server_capabilities[capability] = nil end
     end
+
+    vim.diagnostic.config({
+      virtual_text = false,
+      virtual_lines = false,
+      signs = false,
+      underline = false,
+    }, vim.lsp.diagnostic.get_namespace(client.id))
   end,
 
   root_dir = function(bufnr, on_dir)
