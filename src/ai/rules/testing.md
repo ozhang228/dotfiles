@@ -17,6 +17,8 @@ A test must make sense read top to bottom: every input that determines the asser
 
 Prefer realistic user interactions and their observable consequences. For UI behavior, use the testing library's user interaction helpers and assert the visible or behavioral side effect, rather than dispatching a synthetic event and inspecting an implementation detail such as `defaultPrevented`. Dispatch events directly only when the event itself is the public behavior and no user-visible consequence can express the contract.
 
+Test the behavior a user experiences directly. Prefer accessible names, visible content, resulting actions, and rendered layout or styles over class names, DOM structure, component internals, or implementation markers. For visual-only behavior, use browser assertions when that infrastructure is warranted; otherwise leave it untested rather than infer it from markup. Keep unavoidable selectors inside the page object, and make them describe the user-facing element as closely as possible.
+
 ## Recurring bad-test patterns
 
 These apply in any language. The failure is in the test's logic, not a language-specific idiom.
