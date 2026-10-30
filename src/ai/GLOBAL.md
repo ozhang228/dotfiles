@@ -98,7 +98,7 @@ Avoid shotgun parsing: finish parsing before acting on input, and push the burde
 
 ### Branch and worktree names
 
-- Reuse the current checkout or worktree when it already fits the task. Create another worktree only when the work needs isolation or a different branch/base that cannot be handled safely in the current one.
+- Reuse the current checkout or worktree when it already fits the task. Ask Oscar before creating another worktree unless he explicitly requested one for this task, even when isolation or a different branch/base would be useful.
 - Prefix AI-created Git branch names with `ai-` (for example, `ai-risk-attribution`) unless Oscar supplies a branch name or a task-specific branch naming rule applies.
 - Do not add `ai-` to worktree directory names. Use `<repository>-<task>` (for example, `desk-tools-risk-attribution`). If Oscar supplies a worktree directory name, use it exactly. Branch names and worktree directory names are independent.
 

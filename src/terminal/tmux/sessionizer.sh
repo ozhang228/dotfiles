@@ -53,7 +53,7 @@ git_common_dir_from_marker() {
     local path="$1" marker="$1/.git" git_dir
 
     if [ -d "$marker" ]; then
-        printf '%s' "$marker"
+        REPLY="$marker"
         return 0
     fi
 
@@ -62,7 +62,7 @@ git_common_dir_from_marker() {
     case "$git_dir" in
         "gitdir: "/*/.git/worktrees/*)
             git_dir="${git_dir#gitdir: }"
-            printf '%s' "${git_dir%%/worktrees/*}"
+            REPLY="${git_dir%%/worktrees/*}"
             ;;
         *)
             return 1
@@ -91,7 +91,8 @@ collect_projects() {
 
     local dir git_dir project
     for dir in "${candidates[@]}"; do
-        if git_dir=$(git_common_dir_from_marker "$dir"); then
+        if git_common_dir_from_marker "$dir"; then
+            git_dir="$REPLY"
             if [[ "$git_dir" == */.git ]]; then
                 project="${git_dir%/.git}"
             else
@@ -298,20 +299,23 @@ confirm_kill() {
 
 # Size the popup to the list so short lists leave no empty space.
 open_popup() {
-    local client="$1" rows client_height client_width height width
+    local client="$1" rows client_height client_width height width list_file
     client_width=$(tmux display-message -p -c "$client" '#{client_width}')
     # Just wide enough for the key hints, plus the footer's border and padding.
     footer_hints
     REPLY=$(printf '%s' "$REPLY" | sed 's/\x1b\[[0-9;]*m//g')
     width=$(( ${#REPLY} + 8 ))
     [ "$width" -le "$client_width" ] || width=$client_width
-    rows=$("$SCRIPT" --list sessions 2>/dev/null | wc -l)
+    list_file=$(mktemp "${TMPDIR:-/tmp}/tmux-sessionizer.XXXXXXXX")
+    SESSIONIZER_WIDTH="$width" "$SCRIPT" --list sessions > "$list_file" 2>/dev/null
+    rows=$(wc -l < "$list_file")
     client_height=$(tmux display-message -p -c "$client" '#{client_height}')
     # 8 rows of input, list, and footer borders.
     height=$(( rows + 8 ))
     [ "$height" -le $(( client_height * 8 / 10 )) ] || height=$(( client_height * 8 / 10 ))
     tmux display-popup -B -w "$width" -h "$height" -c "$client" \
         -e "TMUX_SESSIONIZER_CLIENT=$client" -e "SESSIONIZER_WIDTH=$width" \
+        -e "SESSIONIZER_LIST_FILE=$list_file" \
         -E "$SCRIPT_Q"
 }
 
@@ -329,6 +333,10 @@ footer_hints() {
 run_picker() {
     local footer
 
+    if [ -n "${SESSIONIZER_LIST_FILE:-}" ]; then
+        trap 'rm -f "$SESSIONIZER_LIST_FILE"' EXIT
+    fi
+
     footer_hints
     footer=$REPLY
 
@@ -344,13 +352,16 @@ run_picker() {
         --color='bg:#24273a,bg+:#363a4f,fg:#cad3f5,fg+:#cad3f5,hl:#ed8796,hl+:#ed8796' \
         --color='border:#b7bdf8,label:#cad3f5,prompt:#c6a0f6,pointer:#f4dbd6,info:#6e738d' \
         --color='header:#a5adcb,footer:#6e738d,query:#cad3f5,spinner:#f4dbd6,marker:#b7bdf8' \
-        --bind "start:reload($SCRIPT_Q --list sessions)" \
         --bind "enter:become($SCRIPT_Q --open {1} {2} {3})" \
         --bind "ctrl-n:become($SCRIPT_Q --new {q})" \
         --bind "ctrl-r:execute-silent($SCRIPT_Q --rename {1} {2} {q})+clear-query+reload($SCRIPT_Q --list sessions)" \
         --bind "ctrl-x:transform($SCRIPT_Q --confirm-kill {1} {2})" \
         --bind "y:transform($SCRIPT_Q --answer y),n:transform($SCRIPT_Q --answer n),esc:transform($SCRIPT_Q --answer esc)" \
-        </dev/null || true
+        < <(if [ -n "${SESSIONIZER_LIST_FILE:-}" ]; then
+            cat -- "$SESSIONIZER_LIST_FILE"
+        else
+            "$SCRIPT" --list sessions
+        fi) || true
 }
 
 case "${1:-}" in

@@ -2,8 +2,8 @@
 
 - [ ] Make the PR list useful day to day
   - [ ] Add PR filters
-    - [ ] Add a repository filter, defaulting to all repositories
-    - [ ] Add an All option to the author filter
+    - [-] Add a repository filter, defaulting to all repositories
+    - [x] Add an All option to the author filter
   - [ ] Let `r` refresh the PR list immediately
   - [ ] Load GHE author avatars through the authenticated backend
   - [ ] Make individual CI checks inspectable from each PR row
