@@ -8,7 +8,7 @@ return {
     opts = {
       auto_update = true,
       ensure_installed = {
-        "tsgo",
+        "tsc",
         "vtsls",
         "eslint_d",
         "oxlint",
