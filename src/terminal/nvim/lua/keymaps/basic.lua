@@ -86,7 +86,6 @@ return {
     { "N", "Nzz", desc = "Previous search result with cursor centered" },
     { "<C-D>", "<C-D>zz", desc = "Scroll down with cursor centered" },
     { "<C-U>", "<C-U>zz", desc = "Scroll up with cursor centered" },
-    { "K", function() vim.lsp.buf.hover() end, desc = "Hover" },
     {
       "<leader>|",
       function() vim.cmd("vsplit " .. vim.api.nvim_buf_get_name(0)) end,

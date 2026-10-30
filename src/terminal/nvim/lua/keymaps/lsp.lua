@@ -2,6 +2,22 @@ return {
   {
     mode = "n",
     {
+      "K",
+      function()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local client = vim.lsp.get_clients({ bufnr = bufnr, name = "tsc" })[1]
+        if not client then return vim.lsp.buf.hover() end
+
+        local params = vim.lsp.util.make_position_params(0, client.offset_encoding)
+        params.verbosityLevel = 2
+        client:request("textDocument/hover", params, function(err, result)
+          if vim.api.nvim_get_current_buf() ~= bufnr then return end
+          require("noice.lsp.hover").on_hover(err, result, { bufnr = bufnr })
+        end, bufnr)
+      end,
+      desc = "Hover",
+    },
+    {
       "<leader>l",
       "nop",
       desc = "LSP",
