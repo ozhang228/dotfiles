@@ -32,3 +32,24 @@ vim.lsp.handlers["textDocument/inlayHint"] = function(err, result, ctx, config)
   end
   orig_handler(err, result, ctx, config)
 end
+
+local function renamed_file_uris(workspace_edit)
+  local uris = vim.tbl_keys(workspace_edit.changes or {})
+  for _, change in ipairs(workspace_edit.documentChanges or {}) do
+    if change.textDocument then table.insert(uris, change.textDocument.uri) end
+  end
+  return uris
+end
+
+local function save_other_renamed_files(workspace_edit, current_bufnr)
+  for _, uri in ipairs(renamed_file_uris(workspace_edit)) do
+    local bufnr = vim.uri_to_bufnr(uri)
+    if bufnr ~= current_bufnr and vim.bo[bufnr].modified then vim.api.nvim_buf_call(bufnr, function() vim.cmd("silent write") end) end
+  end
+end
+
+local apply_rename = vim.lsp.handlers["textDocument/rename"]
+vim.lsp.handlers["textDocument/rename"] = function(err, result, ctx, config)
+  apply_rename(err, result, ctx, config)
+  if not err and result then save_other_renamed_files(result, ctx.bufnr) end
+end
