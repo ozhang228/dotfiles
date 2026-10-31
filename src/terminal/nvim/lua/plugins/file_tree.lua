@@ -1,6 +1,4 @@
-local function is_test(name)
-  return name:match("%.test%.") ~= nil or name:match("%.spec%.") ~= nil or name:match("%.browser%.") ~= nil
-end
+local function is_test(name) return name:match("%.test%.") ~= nil or name:match("%.spec%.") ~= nil or name:match("%.browser%.") ~= nil end
 
 return {
   "nvim-mini/mini.files",
