@@ -1,3 +1,7 @@
+local function is_test(name)
+  return name:match("%.test%.") ~= nil or name:match("%.spec%.") ~= nil or name:match("%.browser%.") ~= nil
+end
+
 return {
   "nvim-mini/mini.files",
   version = false,
@@ -14,13 +18,17 @@ return {
           if a_hidden ~= b_hidden then return not a_hidden end
           -- Rule 2: directories before files
           if a_dir ~= b_dir then return a_dir end
-          -- Rule 3: group by extension (directories have no extension)
+          -- Rule 3: source files before test files
+          local a_test = is_test(a.name)
+          local b_test = is_test(b.name)
+          if a_test ~= b_test then return b_test end
+          -- Rule 4: group by extension (directories have no extension)
           if not a_dir and not b_dir then
             local a_ext = a.name:match("%.([^%.]+)$") or ""
             local b_ext = b.name:match("%.([^%.]+)$") or ""
             if a_ext ~= b_ext then return a_ext < b_ext end
           end
-          -- Rule 4: case-insensitive alphabetical
+          -- Rule 5: case-insensitive alphabetical
           return a.name:lower() < b.name:lower()
         end)
         return entries
