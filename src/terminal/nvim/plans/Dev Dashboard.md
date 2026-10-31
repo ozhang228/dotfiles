@@ -38,3 +38,4 @@
   - [ ] Approve PRs authored by someone else
 - [ ] Implement the launcher page
 - [ ] implement TODO list widget, integrated with local, shared with life dashboard
+- [ ] Email / better reminders widget
