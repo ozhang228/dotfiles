@@ -8,8 +8,8 @@
     - [x] have to have some sort of ui for it
   - [x] Load GHE author avatars through the authenticated backend
   - [-] Make individual CI checks inspectable from each PR row
-    - [ ] xx/xx successful
-    - [ ] Popover for status checks
+    - [-] xx/xx successful
+    - [-] Popover for status checks
 - [ ] Help Page (lib-ui) 
 - [ ] Speed up PR filtering where measurements justify it
   - [ ] Compare the current filtered requests with a broader batched PR query and client-side filtering
