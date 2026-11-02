@@ -9,6 +9,8 @@
   - [x] Load GHE author avatars through the authenticated backend
   - [-] Make individual CI checks inspectable from each PR row
     - [-] xx/xx successful
+      - [x] backend modeling / data
+      - [-] FE display (don't display when No, otherwise display xx/xx and the same sign)
     - [-] Popover for status checks
 - [ ] Help Page (lib-ui) 
 - [ ] Speed up PR filtering where measurements justify it
