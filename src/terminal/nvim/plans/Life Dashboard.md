@@ -9,3 +9,4 @@
 - [ ] Financial modeling with monte carlo
 - [ ] Wanderlog replacement, integrated with google lists? can calculate optimal paths / integrate with insta
 - [ ] Fundamentals Trading / Crypto trading apps
+- [ ] open whisper

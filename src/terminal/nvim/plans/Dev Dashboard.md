@@ -6,9 +6,11 @@
     - [x] Add an All option to the author filter
   - [x] Let `r` refresh the PR list immediately
     - [x] have to have some sort of ui for it
-  - [-] Load GHE author avatars through the authenticated backend
-  - [ ] Make individual CI checks inspectable from each PR row
-- [ ] Help Page (lib-ui) that gathers 
+  - [x] Load GHE author avatars through the authenticated backend
+  - [-] Make individual CI checks inspectable from each PR row
+    - [ ] xx/xx successful
+    - [ ] Popover for status checks
+- [ ] Help Page (lib-ui) 
 - [ ] Speed up PR filtering where measurements justify it
   - [ ] Compare the current filtered requests with a broader batched PR query and client-side filtering
     - [ ] Measure PR query latency, response size, and GitHub API usage
@@ -18,6 +20,7 @@
     - [ ] Select PRs across repository groups with `j`/`k`, arrows, and count prefixes; keep selection visible and stable across refreshes
       - [ ] Show a focus ring on the selected row
     - [ ] Open the selected PR on GitHub with `Shift+Enter`
+    - [ ] open status checks
   - [ ] Filter PRs from the keyboard
     - [ ] Add sequence support for status (`s` then `o`/`d`/`m`/`c`) and author (`a` then `m`/`r`/`s`) filters
     - [ ] Focus the specific-author input after `a` then `s`
