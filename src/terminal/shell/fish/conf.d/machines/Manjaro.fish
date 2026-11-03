@@ -1,8 +1,6 @@
 # pnpm
 set -gx PNPM_HOME "/home/ozhang/.local/share/pnpm"
-if not string match -q -- $PNPM_HOME $PATH
-  set -gx PATH "$PNPM_HOME" $PATH
-end
+fish_add_path $PNPM_HOME/bin $PNPM_HOME
 # pnpm end
 
 set -gx AI_CLI_CMD "claude-worktree-resume --dangerously-skip-permissions"

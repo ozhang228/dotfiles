@@ -12,6 +12,7 @@
       - [x] backend modeling / data
       - [-] FE display (don't display when No, otherwise display xx/xx and the same sign)
     - [-] Popover for status checks
+- [ ] Setup backend proxy
 - [ ] Help Page (lib-ui) 
 - [ ] Speed up PR filtering where measurements justify it
   - [ ] Compare the current filtered requests with a broader batched PR query and client-side filtering
