@@ -91,8 +91,13 @@
       "Bash(hyprctl hyprpaper listactive)",
       "Skill"
     ],
-    "defaultMode": "acceptEdits",
-    "additionalDirectories": ["~/drw", "~/dotfiles", "~/.claude", "~/forge"]
+    "defaultMode": "auto",
+    "additionalDirectories": [
+      "~/drw",
+      "~/dotfiles",
+      "~/.claude",
+      "~/forge"
+    ]
   },
   "statusLine": {
     "type": "command",
@@ -113,13 +118,14 @@
     }
   },
   "effortLevel": "medium",
-  "skipDangerousModePermissionPrompt": true,
-  "skipWorkflowUsageWarning": true,
-  "theme": "custom:catppuccin-macchiato",
-  "agentPushNotifEnabled": true,
   "modelSettings": {
     "claude-opus-5-5": {
       "autoCompactWindow": 400000
     }
-  }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "theme": "custom:catppuccin-macchiato",
+  "agentPushNotifEnabled": true,
+  "tui": "fullscreen"
 }
