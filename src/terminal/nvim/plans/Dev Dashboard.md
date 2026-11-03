@@ -38,6 +38,8 @@
     - [ ] Render changed files with `@pierre/diffs` and a file tree
     - [ ] Add file-tree navigation and foldable functions
   - [ ] Add private review comments that can be exported to AI
+  # can think of review as two separate stages right, looking at diff, and looking at the file
+  - [ ] File Drilldown (lsp enabled
   - [ ] Explore an import-dependency diagram for changed files
 - [ ] Add PR actions
   - [ ] Close and draft or undraft PRs with confirmation
