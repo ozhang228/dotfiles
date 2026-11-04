@@ -1,6 +1,7 @@
 # Dev Dashboard
 
 - [ ] Make the PR list useful day to day
+  - [ ] Paginate PR results and lazy-load additional pages as needed
   - [ ] Add PR filters
     - [-] Add a repository filter, defaulting to all repositories
     - [x] Add an All option to the author filter
