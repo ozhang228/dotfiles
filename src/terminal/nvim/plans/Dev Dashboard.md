@@ -17,7 +17,6 @@
 - [ ] Help Page (lib-ui) 
 - [ ] Optimize PR GraphQL query patterns where measurements justify it
   - [ ] Compare the current filtered query with a broader batched query and client-side filtering at a 10-PR page size; measure latency, response size, filter correctness, and GraphQL cost
-    - [ ] Check whether list queries need diff stats and mergeability or can leave those fields for the PR detail query
     - [ ] Evaluate splitting essential row data from additional data such as status checks into parallel requests; compare time to first render and total latency with one request
   - [ ] Prefetch likely next filter views if the measurements show a benefit
 - [ ] Make the PR list keyboard navigable
