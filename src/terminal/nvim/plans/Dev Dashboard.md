@@ -38,7 +38,7 @@
     - [ ] Add a backend interface for changed files
     - [ ] Render changed files with `@pierre/diffs` and a file tree
     - [ ] Add file-tree navigation and foldable functions
-  - [ ] Add private review comments that can be exported to AI
+  - [ ] Add private review comments that can be exported to AI and we should be able to export comments with line numbers to ai easily
   # can think of review as two separate stages right, looking at diff, and looking at the file
   - [ ] File Drilldown (lsp enabled
   - [ ] Explore an import-dependency diagram for changed files
