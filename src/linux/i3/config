@@ -80,6 +80,9 @@ bindsym $mod+$key_down        focus down
 bindsym $mod+$key_up          focus up
 bindsym $mod+$key_right       focus right
 
+bindsym $mod+b split h
+bindsym $mod+v split v
+
 # Move focused window
 bindsym $mod+$smod+$key_left  move left
 bindsym $mod+$smod+$key_down  move down
