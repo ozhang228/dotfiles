@@ -13,7 +13,7 @@
       - [x] backend modeling / data
       - [x] FE display (don't display when No, otherwise display xx/xx and the same sign)
     - [-] Popover for status checks
-- [ ] Setup backend proxy
+- [x] Setup backend proxy
 - [ ] Help Page (lib-ui) 
 - [ ] Optimize PR GraphQL query patterns where measurements justify it
   - [ ] Compare the current filtered query with a broader batched query and client-side filtering at a 10-PR page size; measure latency, response size, filter correctness, and GraphQL cost
