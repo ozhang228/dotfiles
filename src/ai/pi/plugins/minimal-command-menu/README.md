@@ -1,15 +1,6 @@
 # Minimal command menu
 
-Filters slash-command autocomplete using `allowed-commands.json`. Command names
-omit the leading `/`; `skill:*` includes every loaded skill automatically.
-Unlisted commands remain callable when typed in full. Argument suggestions,
-file completion, and keyboard shortcuts are preserved.
+Filters slash-command suggestions using `allowed-commands.json`. Names omit `/`;
+`skill:*` includes all loaded skills. Unlisted commands still work when typed fully.
 
-Edit the whitelist and run `/reload` in Pi. The extension is enabled in
-`src/ai/pi/settings.json`; no package installation is needed.
-
-Run the tests against the installed Pi modules:
-
-```sh
-NODE_PATH=/usr/lib/pi/lib/node_modules /usr/lib/drw-nodejs-pi/bin/node --test src/ai/pi/plugins/minimal-command-menu/index.test.mjs
-```
+Edit the whitelist, then run `/reload`.

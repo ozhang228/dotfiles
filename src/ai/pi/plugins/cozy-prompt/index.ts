@@ -4,7 +4,13 @@ import {
   type ExtensionAPI,
   type KeybindingsManager,
 } from "@earendil-works/pi-coding-agent";
-import { truncateToWidth, visibleWidth, type EditorTheme, type TUI } from "@earendil-works/pi-tui";
+import {
+  matchesKey,
+  truncateToWidth,
+  visibleWidth,
+  type EditorTheme,
+  type TUI,
+} from "@earendil-works/pi-tui";
 
 const panelBackground = "\x1b[48;2;30;32;48m";
 const panelBorder = "\x1b[38;2;183;189;248m";
@@ -85,9 +91,16 @@ export default function cozyPrompt(pi: ExtensionAPI) {
 
     ctx.ui.setFooter((tui, _theme, footerData) => {
       const unsubscribe = footerData.onBranchChange(() => tui.requestRender());
+      const unsubscribeInput = ctx.ui.onTerminalInput((data) => {
+        if (matchesKey(data, "ctrl+c") && !ctx.isIdle()) return { data: "\x1b" };
+        return undefined;
+      });
       ctx.ui.setWidget("cozy-prompt-toolbar", undefined);
       return {
-        dispose: unsubscribe,
+        dispose() {
+          unsubscribeInput();
+          unsubscribe();
+        },
         invalidate() {},
         render(width) {
           const theme = ctx.ui.theme;
