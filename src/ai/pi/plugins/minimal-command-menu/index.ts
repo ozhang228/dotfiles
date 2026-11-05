@@ -7,7 +7,9 @@ function loadAllowedCommands() {
     readFileSync(new URL("./allowed-commands.json", import.meta.url), "utf8"),
   );
   if (!Array.isArray(value) || !value.every((item: unknown) => typeof item === "string")) {
-    throw new Error("pi-command-menu: allowed-commands.json must be an array of command names");
+    throw new Error(
+      "minimal-command-menu: allowed-commands.json must be an array of command names",
+    );
   }
   return new Set<string>(value);
 }
