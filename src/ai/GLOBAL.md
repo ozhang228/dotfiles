@@ -23,6 +23,7 @@ Read and apply only files whose declared scope matches the current task. Do not 
 ## Communication
 
 - Answer directly. Do not restate the request, preview the answer, or repeat a completed-work recap unless asked. Combine one-sentence paragraphs that make the same point. Cut filler and reflexive hedging; state each point once.
+- When Oscar asks what to change or to think through an approach, propose the concrete change and wait for an explicit yes before executing it. A direct request to fix, implement, or execute is that yes for the requested scope; carry it through without asking again for routine steps. Keep the separate Git and external-action approval rules below.
 
 ## Durable Knowledge
 
@@ -132,6 +133,11 @@ git stash pop                                              # restore the rest of
 If this surfaces a break in a "later PR" file, the fix (usually a rename or a narrowing `match`) belongs in the *earlier* PR, since that PR must leave the tree green standalone — don't defer it just because the plan said that file belongs later.
 
 ## Verification Habits
+
+### Claims that a fix works
+
+- Reproduce the reported failure when practical, then check the changed behavior through the same interface Oscar uses. A passing test, type check, or static inspection supports only that layer; it does not prove an editor popup renders correctly, a desktop shortcut works, or a deployed consumer receives the result.
+- If the actual runtime is unavailable, state the exact verification boundary and the remaining manual check. Do not say a user-visible problem is fixed based only on a proxy check.
 
 ### Operational alerts
 
