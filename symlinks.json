@@ -3,6 +3,10 @@
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.claude/CLAUDE.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.codex/AGENTS.md" },
   { "src": "~/dotfiles/src/ai/pi/settings.json", "dst": "~/.pi/agent/settings.json" },
+  {
+    "src": "~/dotfiles/src/ai/pi/plugins/pi-command-menu",
+    "dst": "~/.pi/agent/extensions/pi-command-menu"
+  },
   { "src": "~/dotfiles/src/ai/pi/themes", "dst": "~/.pi/agent/themes" },
   {
     "src": "~/dotfiles/src/ai/skills/brainstorm",

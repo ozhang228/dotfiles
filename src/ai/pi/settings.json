@@ -12,6 +12,7 @@
     "+builtin:mcp",
     "+builtin:codemode",
     "+builtin:tool-search",
+    "+extensions/pi-command-menu/index.ts",
     "+extensions/portkey-provider.ts"
   ],
   "themes": ["!**", "+themes/catppuccin-macchiato.json"],
