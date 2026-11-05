@@ -14,6 +14,7 @@
     "+builtin:tool-search",
     "+extensions/minimal-command-menu/index.ts",
     "+extensions/cozy-prompt/index.ts",
+    "+extensions/compact-tools/index.ts",
     "+extensions/portkey-provider.ts"
   ],
   "themes": ["!**", "+themes/catppuccin-macchiato.json"],

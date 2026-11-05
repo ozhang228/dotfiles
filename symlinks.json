@@ -13,6 +13,10 @@
     "src": "~/dotfiles/src/ai/pi/plugins/cozy-prompt",
     "dst": "~/.pi/agent/extensions/cozy-prompt"
   },
+  {
+    "src": "~/dotfiles/src/ai/pi/plugins/compact-tools",
+    "dst": "~/.pi/agent/extensions/compact-tools"
+  },
   { "src": "~/dotfiles/src/ai/pi/themes", "dst": "~/.pi/agent/themes" },
   {
     "src": "~/dotfiles/src/ai/skills/brainstorm",

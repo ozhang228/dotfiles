@@ -4,23 +4,13 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Required before switching
 
-- [ ] Start with the smallest possible Pi setup and add one capability at a time
-  - [x] Start from minimal settings, then customize ordinary `pi`: exclude discovered resources by default; whitelist DRW, bundled MCP/codemode/tool search, the dotfiles skills directory, and Catppuccin Macchiato; enable read-only tools and compaction, keep llama.cpp disabled, and set project trust to ask
-  - [x] Keep only the existing DRW model provider enabled and preserve the previous default model
-  - [ ] Verify plain chat through DRW; normal `pi` retains native session saving and context discovery because those have no equivalent disabling settings
-  - [ ] Add and verify the full-process sandbox and protected recovery before enabling execution or write tools
-  - [x] Enable read, grep, find, and ls as the default workspace tools
-  - [ ] Enable controlled execution/editing after sandbox and recovery verification, then one reviewed plugin at a time
-  - [ ] Add canonical rules/skills, sessions, MCP services, memory, jobs, and subagents individually; keep everything unused disabled
-  - [ ] Verify each addition against the existing acceptance checks before enabling the next
+- [ ] Add remaining capabilities one at a time, verifying each before enabling the next
+  - [ ] Enable controlled execution/editing only after sandbox and recovery verification
 - [ ] Establish the Pi baseline
   - [ ] Pin a supported Pi release and extension versions; this audit checked v1.5.0, which already includes MCP and codemode
-  - [ ] Keep reusable configuration and extensions in dotfiles; keep credentials, sessions, and machine-specific endpoints outside Git
-  - [ ] Make installation and symlinks work on the machines where I use the harness
-- [ ] Connect the existing model gateway
-  - [ ] Configure the DRW Portkey endpoint, Responses API, required provider/metadata headers, and environment-based credentials
+  - [ ] Verify installation and symlinks on other machines before switching them to Pi
+- [ ] Verify the existing model gateway
   - [ ] Verify real streamed responses, tool calls, reasoning levels, cancellation, usage reporting, and provider errors through the gateway
-  - [ ] Carry over model selection and compaction settings using verified model context limits; do not assume gateway compatibility from its name
   - [ ] Support switching between the Claude and OpenAI models I use without losing the active conversation
 - [ ] Enforce sandbox boundaries
   - [ ] Choose and verify an OS sandbox, container, or VM boundary for the entire agent process, including extensions, subagents, shell commands, and language servers
@@ -43,9 +33,7 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Expose read-only MCP tools by default and place independent enforcement on writable external tools and credentials
   - [ ] Keep approval decisions bound to the concrete action; do not let skills, repository content, or tool results supply authority
   - [ ] Distinguish enforced controls from instructions; project trust and prompt rules do not constitute a sandbox
-- [x] Add cozy-prompt with a Catppuccin toolbar and inset prompt panel; keep regular terminal mode for Neovim scrollback
 - [ ] Add focus mode
-  - [x] Add src/ai/pi/plugins/minimal-command-menu with an editable slash-command whitelist; preserve skill, argument, and file completion
   - [ ] Add a command and shortcut to toggle focus mode and remember the preference
   - [ ] Hide tool call headers, arguments, streaming output, results, images produced by tools, and subagent tool chatter from the visible transcript
   - [ ] Keep user messages, assistant progress/answers, a compact running/waiting indicator, and required approval requests visible
@@ -55,24 +43,20 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Try Pi's global tool-renderer extension API first; verify whether it can remove outer spacing and all tool images, and make a narrow TUI change only if needed
   - [ ] Verify in the actual Neovim Snacks terminal and tmux, including streaming, failures, approval prompts, cancellation, and resumed sessions
 - [ ] Preserve worktree and editor integration
-  - [x] Add ai-resume --agent pi using the Git root or current directory, native pi --continue, --fresh, and correct exit-status propagation
   - [ ] Switch AI_CLI_CMD to ai-resume --agent pi when ready; keep the existing Snacks terminal toggle on ai-resume --agent codex --no-daemon for now
   - [ ] Verify the current @file:line and @file:start-end mappings; translate references if Pi does not resolve their existing syntax correctly
-  - [x] Verify native Pi resume/restart, fresh sessions, subdirectory launch, separate project directories, missing session directories, exit status, and shell directory restoration; verify the actual Neovim toggle opens, hides, and reopens the same terminal without losing the draft
   - [ ] Verify linked-worktree separation and moved session directories
 - [ ] Reuse existing instructions and skills
-  - [x] Symlink GLOBAL.md into ~/.pi/agent/AGENTS.md and verify Pi loads its contents
   - [ ] Verify ancestor/project AGENTS.md and CLAUDE.md discovery
-  - [x] Load every skill under ~/dotfiles/src/ai/skills through an explicit directory whitelist and enable skill commands; exclude Pi's default skill discovery directories with !skills/** so new dotfiles skills are included without per-skill entries
   - [ ] Verify skill workflows through Pi, including brainstorm, code-review, debug, postmortem, and applauncher-use
   - [ ] Audit skill assumptions about tool names, delegation, model routing, questions, and local artifacts; adapt only incompatible harness contracts
   - [ ] Keep familiar /brainstorm and /code-review entry points through aliases/templates if desired; Pi's native commands use /skill:name
-  - [ ] Verify rule loading stays scoped and debug/postmortem still produce the existing Marimo and anvil artifacts
+  - [ ] Verify rule loading stays scoped; adapt debug/postmortem to the investigation workflow chosen below
 - [ ] Configure the MCP tools I use
   - [ ] Migrate developer, Slack read-only, Polaris, Grafana, Splunk, and OpenAI documentation servers to Pi's native MCP configuration
   - [ ] Preserve per-tool exposure restrictions, authentication, timeouts, and useful server descriptions
   - [ ] Verify a real read-only call against each required service through the sandbox
-  - [ ] Enable native codemode/tool search for bounded output and parallel independent calls; retain ordered errors and results
+  - [ ] Verify native codemode/tool search with the required services: bounded output, parallel independent calls, and ordered errors/results
   - [ ] Add the historical TAPS position-query server only if still needed and accessible
 - [ ] Preserve long-running command control
   - [ ] Add or select managed background jobs with stable IDs, bounded incremental output, status, exit codes, cancellation, and process-tree cleanup
@@ -80,17 +64,34 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Support interactive stdin or PTY sessions where required; verify whether existing Pi facilities cover each case before adding a tool
   - [ ] Bind local development servers to 0.0.0.0 and preserve the existing tmux process-cleanup behavior
   - [ ] Keep jobs and their writable paths inside the sandbox; define what survives harness exit and what must stop
-- [ ] Preserve subagent workflows
+- [ ] Add subagent support
   - [ ] Start from Pi's bundled subagent example or an existing package; add only the coordination behavior used by the existing skills
   - [ ] Support spawn, task delivery, results, status, follow-up work, wait, interruption, and messages between parent and workers
   - [ ] Preserve explicit model/effort selection where skills require it and inherit the parent's sandbox and authorization limits
   - [ ] Make shared-workspace edit ownership explicit and verify actual tests after delegated edits
   - [ ] Surface concise worker status in focus mode and preserve full worker logs for inspection
-- [ ] Preserve cross-session memory
+- [ ] Rethink the memory and debugging system beyond Anvil
+  - [ ] Define what is missing from keeping notebooks and postmortems in one place: finding previous work, resuming investigations, rerunning evidence, or recalling useful findings
+  - [ ] Decide where investigations, reproducible notebooks, postmortems, reusable helpers, and durable knowledge belong and how they connect
+  - [ ] Design how I and the agent find relevant previous work, with source links and clear handling of stale findings
+  - [ ] Simplify investigation capture and closeout; decide when a notebook or postmortem is useful instead of requiring one for every task
+  - [ ] Keep wiki maintenance out of active debugging; capture only the evidence needed to investigate and resume
+  - [ ] Make /postmortem proactively write the incident record and promote verified, reusable findings into the relevant wiki pages, linking to evidence and updating existing pages rather than appending duplicate recaps
+  - [ ] Keep wiki pages and investigation records together in one knowledge repository; use focused topic/system pages and a small navigation index
+  - [ ] Give each wiki page a clear scope, supporting sources, and last-verified date; label historical observations with their environment and date
+  - [ ] Give Pi bounded search/read access to the wiki and postmortems; load a small navigation guide instead of the whole archive
+  - [ ] Add knowledge_search returning short excerpts, source links, and verification dates; start with full-text search and add semantic search only if wording differences cause useful results to be missed
+  - [ ] Make relevant knowledge lookup part of system-specific work; /debug also searches previous investigations before starting new probes
+  - [ ] Decide whether automatic lookup runs for every work task or only investigations and unfamiliar systems; evaluate a Pi extension that retrieves initial context
+  - [ ] Make /postmortem search existing pages before editing, resolve or mark superseded claims, and record unresolved contradictions; collect conflicts found during debugging for closeout
+  - [ ] Report pages updated, contradictions resolved, and unresolved questions after /postmortem so maintenance is reviewable
+  - [ ] Verify wiki retrieval and maintenance through real investigations, including finding an existing answer and correcting an outdated page
+  - [ ] Try the proposed workflow on a real investigation before migrating existing Anvil artifacts; preserve the originals
+- [ ] Implement cross-session memory after agreeing on that design
   - [ ] Reuse canonical rules and durable knowledge instead of copying incident recaps into new files
   - [ ] Provide searchable previous-conversation and memory files with source/session references
   - [ ] Add task-relevant memory lookup/injection at session start or before work; keep it bounded and distinguish historical facts from current verification
-  - [ ] Preserve explicit-user-request-only memory updates and the existing distinction between shared durable knowledge and local transcript history
+  - [ ] Treat invoking /postmortem as authorization for relevant wiki updates; keep other durable writes explicitly requested and distinguish reusable knowledge from investigation history
   - [ ] Keep old Claude/Codex logs available for read-only search; evaluate Pi import separately rather than assuming lossless conversion
 - [ ] Verify native conversation behavior
   - [ ] Exercise queued steering and follow-up messages during active tools; preserve task direction and cancellation
@@ -99,9 +100,7 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Follow-up work
 
-- [ ] Match terminal preferences
-  - [ ] Configure fullscreen mode, Catppuccin Macchiato, useful footer fields, and Escape behavior
-  - [ ] Add completion/waiting notifications only if wanted; verify actual hooks instead of copying stale hook trust entries
+- [ ] Add completion/waiting notifications only if wanted; verify actual hooks instead of copying stale hook trust entries
 - [ ] Improve questions during ongoing work
   - [ ] Evaluate an asynchronous question UI that leaves independent work running; current history uses nonblocking question tools
 - [ ] Evaluate agent-side LSP
@@ -114,6 +113,29 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 ## Plugin shortlist to review
 
 These are candidates, not an approved install set. Reviewed repository READMEs, package manifests, and selected implementation paths on 2026-11-05. Versions below are from repository manifests, not independently verified npm releases. Nothing was installed or executed. Prefer one package per responsibility and load selected resources from bundles rather than enabling everything.
+
+- [ ] Check additional packages (not yet reviewed; exploration only, most may be skipped; verify overlap with existing candidates)
+  - [ ] [@dietrichgebert/ponytail](https://pi.dev/packages/@dietrichgebert/ponytail)
+  - [ ] [billion-context](https://pi.dev/packages/billion-context)
+  - [ ] [pi-web-access](https://pi.dev/packages/pi-web-access)
+  - [ ] [@postman/postman-plugin](https://pi.dev/packages/@postman/postman-plugin)
+  - [ ] [pi-subagents](https://pi.dev/packages/pi-subagents)
+  - [ ] [@juicesharp/rpiv-ask-user-question](https://pi.dev/packages/@juicesharp/rpiv-ask-user-question)
+  - [ ] [@onkernel/browser-loop](https://pi.dev/packages/@onkernel/browser-loop)
+  - [ ] [context-mode](https://pi.dev/packages/context-mode)
+  - [ ] [@plannotator/pi-extension](https://pi.dev/packages/@plannotator/pi-extension)
+  - [ ] [pi-memory](https://pi.dev/packages/pi-memory)
+  - [ ] [pi-tidy-memory](https://github.com/mikeyobrien/pi-tidy-tools/tree/main/packages/pi-tidy-memory)
+  - [ ] `pi-fff` — fast fuzzy search (`ffgrep` / `fffind`)
+  - [ ] `rpiv-todo` — todo tool
+  - [ ] `pi-computer-use` — desktop/GUI automation
+  - [ ] `pi-session-recall` — search and query past sessions
+  - [ ] `npm:pi-sandbox`
+  - [ ] `npm:@narumitw/pi-btw`
+  - [ ] `npm:pi-observational-memory`
+  - [ ] `pi-lens`
+  - [ ] `@feniix/pi-devtools`
+  - [ ] `@gwynnnplaine/pi-github`
 
 - [ ] Review the core plugin candidates
   - [ ] Review [pi-subagents](https://github.com/nicobailon/pi-subagents) for delegation
