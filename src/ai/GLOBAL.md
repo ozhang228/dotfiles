@@ -20,6 +20,10 @@ Language and task conventions live in these canonical files:
 
 Read and apply only files whose declared scope matches the current task. Do not read all rule files by default. Tell the user which rule files you read.
 
+## Communication
+
+- Answer directly. Do not restate the request, preview the answer, or repeat a completed-work recap unless asked. Combine one-sentence paragraphs that make the same point. Cut filler and reflexive hedging; state each point once.
+
 ## Durable Knowledge
 
 - Before documenting a finding, ask: would this help with a different future task without needing this task's history? If not, leave it out. A completed task does not require a knowledge entry.
