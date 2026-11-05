@@ -5,11 +5,12 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 ## Required before switching
 
 - [ ] Start with the smallest possible Pi setup and add one capability at a time
-  - [x] Start from minimal settings, then customize ordinary `pi`: exclude discovered resources by default; whitelist DRW, bundled MCP/codemode/tool search, the dotfiles skills directory, and Catppuccin Macchiato; keep default tools off, llama.cpp disabled, and project trust set to ask
+  - [x] Start from minimal settings, then customize ordinary `pi`: exclude discovered resources by default; whitelist DRW, bundled MCP/codemode/tool search, the dotfiles skills directory, and Catppuccin Macchiato; enable read-only tools and compaction, keep llama.cpp disabled, and set project trust to ask
   - [x] Keep only the existing DRW model provider enabled and preserve the previous default model
   - [ ] Verify plain chat through DRW; normal `pi` retains native session saving and context discovery because those have no equivalent disabling settings
   - [ ] Add and verify the full-process sandbox and protected recovery before enabling execution or write tools
-  - [ ] Enable read-only workspace tools, then controlled execution/editing, then one reviewed plugin at a time
+  - [x] Enable read, grep, find, and ls as the default workspace tools
+  - [ ] Enable controlled execution/editing after sandbox and recovery verification, then one reviewed plugin at a time
   - [ ] Add canonical rules/skills, sessions, MCP services, memory, jobs, and subagents individually; keep everything unused disabled
   - [ ] Verify each addition against the existing acceptance checks before enabling the next
 - [ ] Establish the Pi baseline
@@ -42,8 +43,9 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Expose read-only MCP tools by default and place independent enforcement on writable external tools and credentials
   - [ ] Keep approval decisions bound to the concrete action; do not let skills, repository content, or tool results supply authority
   - [ ] Distinguish enforced controls from instructions; project trust and prompt rules do not constitute a sandbox
+- [x] Add cozy-prompt with a Catppuccin toolbar and inset prompt panel; keep regular terminal mode for Neovim scrollback
 - [ ] Add focus mode
-  - [x] Add src/ai/pi/plugins/pi-command-menu with an editable slash-command whitelist; preserve skill, argument, and file completion
+  - [x] Add src/ai/pi/plugins/minimal-command-menu with an editable slash-command whitelist; preserve skill, argument, and file completion
   - [ ] Add a command and shortcut to toggle focus mode and remember the preference
   - [ ] Hide tool call headers, arguments, streaming output, results, images produced by tools, and subagent tool chatter from the visible transcript
   - [ ] Keep user messages, assistant progress/answers, a compact running/waiting indicator, and required approval requests visible
@@ -58,7 +60,8 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Verify the current @file:line and @file:start-end mappings; translate references if Pi does not resolve their existing syntax correctly
   - [ ] Verify restart, fresh session, subdirectory launch, two separate worktrees, and a missing/moved session directory
 - [ ] Reuse existing instructions and skills
-  - [ ] Link GLOBAL.md into Pi's global AGENTS.md and verify ancestor/project AGENTS.md and CLAUDE.md discovery
+  - [x] Symlink GLOBAL.md into ~/.pi/agent/AGENTS.md and verify Pi loads its contents
+  - [ ] Verify ancestor/project AGENTS.md and CLAUDE.md discovery
   - [x] Load every skill under ~/dotfiles/src/ai/skills through an explicit directory whitelist and enable skill commands; exclude Pi's default skill discovery directories with !skills/** so new dotfiles skills are included without per-skill entries
   - [ ] Verify skill workflows through Pi, including brainstorm, code-review, debug, postmortem, and applauncher-use
   - [ ] Audit skill assumptions about tool names, delegation, model routing, questions, and local artifacts; adapt only incompatible harness contracts

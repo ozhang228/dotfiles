@@ -9,7 +9,7 @@ information. The native working indicator stays embedded in the rounded prompt
 border, including compaction and retry progress. Context is shown as unknown
 until Pi has a usage estimate. Other extensions' footer statuses remain visible.
 
-The dark composer and lavender frame match the Macchiato theme. Rows are not
+The dark composer, lavender frame and `❯` prompt marker match the Macchiato theme. Rows are not
 added inside the editor, so native mouse selection remains aligned. Narrow
 terminals retain the native border. This is an appearance extension; transcript
 tool calls remain visible. In Neovim terminal normal mode you can scroll and

@@ -4,6 +4,7 @@
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.codex/AGENTS.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.pi/agent/AGENTS.md" },
   { "src": "~/dotfiles/src/ai/pi/settings.json", "dst": "~/.pi/agent/settings.json" },
+  { "src": "~/dotfiles/src/ai/pi/keybindings.json", "dst": "~/.pi/agent/keybindings.json" },
   {
     "src": "~/dotfiles/src/ai/pi/plugins/minimal-command-menu",
     "dst": "~/.pi/agent/extensions/minimal-command-menu"

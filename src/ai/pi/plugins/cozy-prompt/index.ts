@@ -73,7 +73,7 @@ export class CozyEditor extends CustomEditor {
     // Keep native rows and columns so mouse placement, autocomplete and cursor markers stay aligned.
     return lines.map((line, index) =>
       index > 0 && index < bottomIndex
-        ? border("│") + shade(line.slice(1, -1)) + border("│")
+        ? border("│") + shade((index === 1 ? border("❯") : " ") + line.slice(2, -1)) + border("│")
         : line,
     );
   }
