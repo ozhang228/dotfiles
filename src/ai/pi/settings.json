@@ -3,7 +3,7 @@
   "defaultProvider": "drw",
   "defaultModel": "@azure/gpt-5.6-sol",
   "defaultThinkingLevel": "medium",
-  "defaultTools": [],
+  "defaultTools": ["read", "grep", "find", "ls"],
   "skills": ["!skills/**", "~/dotfiles/src/ai/skills"],
   "prompts": ["!**"],
   "packages": [],
@@ -26,26 +26,25 @@
     "mermaid": "streaming"
   },
   "terminal": {
-    "showImages": false,
-    "images": false,
+    "showImages": true,
+    "images": "auto",
     "showTerminalProgress": false,
-    "hyperlinks": false
+    "hyperlinks": "auto"
   },
   "images": {
-    "blockImages": true
+    "blockImages": false
   },
-  "fullscreenCopyOnSelect": false,
   "showCacheMissNotices": false,
   "compaction": {
-    "enabled": false
+    "enabled": true
   },
   "branchSummary": {
     "skipPrompt": true
   },
   "cacheWarming": "off",
   "retry": {
-    "enabled": false,
-    "maxRetries": 0,
+    "enabled": true,
+    "maxRetries": 3,
     "provider": {
       "maxRetries": 0
     }
