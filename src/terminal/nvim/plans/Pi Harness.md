@@ -55,10 +55,11 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Try Pi's global tool-renderer extension API first; verify whether it can remove outer spacing and all tool images, and make a narrow TUI change only if needed
   - [ ] Verify in the actual Neovim Snacks terminal and tmux, including streaming, failures, approval prompts, cancellation, and resumed sessions
 - [ ] Preserve worktree and editor integration
-  - [ ] Add pi-worktree-resume using the Git root or current directory, native pi --continue, --fresh, and correct exit-status propagation
-  - [ ] Point AI_CLI_CMD at the Pi launcher and preserve the existing Snacks terminal toggle
+  - [x] Add ai-resume --agent pi using the Git root or current directory, native pi --continue, --fresh, and correct exit-status propagation
+  - [ ] Switch AI_CLI_CMD to ai-resume --agent pi when ready; keep the existing Snacks terminal toggle on ai-resume --agent codex --no-daemon for now
   - [ ] Verify the current @file:line and @file:start-end mappings; translate references if Pi does not resolve their existing syntax correctly
-  - [ ] Verify restart, fresh session, subdirectory launch, two separate worktrees, and a missing/moved session directory
+  - [x] Verify native Pi resume/restart, fresh sessions, subdirectory launch, separate project directories, missing session directories, exit status, and shell directory restoration; verify the actual Neovim toggle opens, hides, and reopens the same terminal without losing the draft
+  - [ ] Verify linked-worktree separation and moved session directories
 - [ ] Reuse existing instructions and skills
   - [x] Symlink GLOBAL.md into ~/.pi/agent/AGENTS.md and verify Pi loads its contents
   - [ ] Verify ancestor/project AGENTS.md and CLAUDE.md discovery

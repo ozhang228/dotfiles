@@ -1,5 +1,4 @@
-# set -gx AI_CLI_CMD "claude-worktree-resume --dangerously-skip-permissions"
-set -gx AI_CLI_CMD "codex-worktree-resume --no-daemon"
+set -gx AI_CLI_CMD "ai-resume --agent codex --no-daemon"
 set -gx TMUX_NEW_SESSION_DIR $HOME/drw
 
 if set -q SSH_CONNECTION
