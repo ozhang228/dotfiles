@@ -13,6 +13,8 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
+exec.env-vars.PATH = '${HOME}/.local/bin:/opt/homebrew/bin:/usr/local/bin:${PATH}'
+
 [workspace-to-monitor-force-assignment]
 1 = 'AW3425DWM'
 2 = 'AW3425DWM'
@@ -40,6 +42,7 @@ alt-shift-f = 'fullscreen'
 alt-esc = ['macos-native-fullscreen off', 'fullscreen off']
 ctrl-cmd-f = 'macos-native-fullscreen off'
 alt-comma = ['flatten-workspace-tree', 'layout tiles']
+alt-g = 'exec-and-forget uv run --no-project --script "$HOME/dotfiles/src/mac/aerospace-grid.py"'
 
 alt-shift-q = 'close'
 alt-enter = 'exec-and-forget open -na kitty'
