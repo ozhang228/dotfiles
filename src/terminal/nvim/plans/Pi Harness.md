@@ -4,57 +4,32 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Required before switching
 
-- [ ] Add remaining capabilities one at a time, verifying each before enabling the next
-  - [ ] Enable controlled execution/editing only after sandbox and recovery verification
 - [ ] Establish the Pi baseline
   - [ ] Pin a supported Pi release and extension versions; this audit checked v1.5.0, which already includes MCP and codemode
   - [ ] Verify installation and symlinks on other machines before switching them to Pi
 - [ ] Verify the existing model gateway
   - [ ] Verify real streamed responses, tool calls, reasoning levels, cancellation, usage reporting, and provider errors through the gateway
   - [ ] Support switching between the Claude and OpenAI models I use without losing the active conversation
-- [ ] Sandbox step 1: verify the native isolation boundary
-  - [ ] Use [Claude Code](https://code.claude.com/docs/en/sandboxing), [Codex](https://learn.chatgpt.com/docs/sandboxing), and [carderne/pi-sandbox](https://github.com/carderne/pi-sandbox) as references; keep OS isolation, action approvals, and recovery separate
-  - [ ] Start with Linux Bubblewrap; investigate the namespace failures seen in this execution environment and verify it from the actual host terminal
-  - [ ] Add Bubblewrap to setup for both distros: Ubuntu uses `sudo apt install bubblewrap`; Manjaro uses `sudo pacman -S bubblewrap`
-  - [ ] Verify namespace isolation on each machine before enabling writes; investigate Ubuntu AppArmor or kernel restrictions where startup fails
-  - [ ] If Bubblewrap cannot provide the required boundary, evaluate a container or VM without weakening the requirements
-  - [ ] Fail closed on unavailable dependencies or initialization failure; never silently retry on the unrestricted host
-  - [ ] Treat pi-sandbox as a reference, not the sole safety layer: its inspected source permits unsandboxed Bash after initialization failure and omits grep/find/ls file checks
-- [ ] Sandbox step 2: launch the entire Pi process inside the boundary
-  - [ ] Include extensions, all file tools, codemode execution, subagents, shell commands, and language servers; child processes inherit the restrictions
-  - [ ] Keep Neovim outside and reuse ai-resume and the Snacks terminal; preserve resume, Ctrl+C, double Escape, and scrollback
-  - [ ] Mount only required configuration, skills, tools, and original project data read-only; use private writable session/cache/temp storage
-  - [ ] Protect unrelated repositories, home directories, SSH material, reusable credentials, host processes, and privileged sockets
-  - [ ] Keep sandbox policy outside the agent's writable boundary; project configuration and agent commands cannot disable or broaden it
-- [ ] Sandbox step 3: add the isolated working copy
-  - [ ] Keep original host data read-only and let Pi edit a separate working copy; changes reach the current checkout only through an explicit apply step
-  - [ ] Preserve tracked, untracked, ignored, and already-uncommitted content without sharing writable inodes or writable Git metadata with the original
-  - [ ] Preserve project identity for resume, relative file references, linked worktrees, and tests; show clearly which workspace contains pending edits
-  - [ ] Decide how generated files become persistent and receive protected checkpoints; disposable storage alone does not preserve intermediate work
-- [ ] Sandbox step 4: implement protected recovery and apply
-  - [ ] Store recovery records outside Pi's writable boundary; retain original paths and metadata, with user-controlled retention and cleanup
-  - [ ] Compare host files against the working copy's starting state and refuse conflicting changes rather than overwriting concurrent Neovim edits
-  - [ ] Require a verified checkpoint before applying deletion, overwrite, truncation, rename-overwrite, or destructive Git operations to persistent data
-  - [ ] Preserve files changed since the previous checkpoint; a startup backup or Git stash alone is insufficient
-  - [ ] Make partial apply and crash recovery explicit; stop on uncertain state and retain enough information to inspect, resume, or restore safely
-  - [ ] Provide inspect and restore actions; Pi cannot permanently purge recovery data
-  - [ ] Cover Python/Node, shell redirection, find -delete, and git clean/reset as well as rm; tool-name filters do not guarantee recovery
-- [ ] Sandbox step 5: restrict network, credentials, and external actions
-  - [ ] Route model and MCP access through scoped credentials or a host-side broker; arbitrary subprocesses cannot read reusable secrets
-  - [ ] Allow only required network services; allowing a hostname does not authorize writes or production operations
-  - [ ] Expose read-only MCP operations initially and enforce writable external operations independently of prompt instructions
-  - [ ] Preserve explicit push/deploy/restart approval, protected default branches, draft PRs, and no GitHub review-conversation mutations
+- [ ] Verify sandboxed Pi on each Ubuntu and Manjaro machine
+  - [ ] Run the native isolation/recovery smoke test; check AppArmor or namespace restrictions when startup fails
+  - [ ] Check actual Neovim/tmux startup, resume, Ctrl+C, resize, scrollback, and immediate LazyGit changes
+  - [ ] Exercise real builds, tests, formatters, and larger repositories; check checkpoint cost and recovery limits
+  - [ ] Extend crash/recovery checks to interrupted exports, concurrent host edits, multiple repos sharing the storage limit, and future subagents
+- [ ] Add explicitly scoped worker network and external capabilities
+  - [ ] Allow required documentation/search, package registries, APIs, databases, and MCP services; verify DNS, TLS, proxies, timeouts, and errors
+  - [ ] Install project dependencies in isolated virtual environments, node_modules, and private caches; lifecycle scripts inherit the sandbox
+  - [ ] Use host brokers or scoped credential injection; reusable credentials and privileged host sockets stay inaccessible
+  - [ ] Expose only needed host diagnostics through a scoped read-only interface
+  - [ ] Enforce writable external operations independently of prompt instructions; preserve explicit push/deploy/restart approval, protected default branches, draft PRs, and no GitHub review-conversation mutations
   - [ ] Bind approval to the concrete action; skills, repository content, and tool results cannot supply authority
-- [ ] Sandbox step 6: prove the boundary and recovery
-  - [ ] Verify blocked access through symlinks, child processes, alternate interpreters, extension code, codemode, and subagents
-  - [ ] Verify blocked filesystem/network access, secret and socket access, policy modification, and sandbox-disable attempts
-  - [ ] Restore a deleted untracked file, overwritten uncommitted content, and a file modified after an earlier checkpoint after both successful runs and crashes
-  - [ ] Verify conflicting host edits and interrupted apply cannot silently lose data
-  - [ ] Test actual Neovim/tmux startup, resume, cancellation, process cleanup, and read-only model/MCP calls
-- [ ] Sandbox step 7: enable capabilities gradually
-  - [ ] Enable Bash, Edit, and Write only after the boundary and recovery checks pass; keep current read-only tools until then
-  - [ ] Add managed jobs, subagents, and required MCP services one at a time and verify each inherits the intended restrictions
-  - [ ] Keep immediate writes to the original checkout out of the first version; revisit only with a verified live recovery mechanism
+- [ ] Extend local Git support without weakening the sandbox
+  - [ ] Support read-only Git inspection in linked worktrees whose metadata is outside the launch repo
+  - [ ] Add explicitly requested local commits later; keep Git metadata read-only until then
+  - [ ] Add push and draft PR creation only with explicit approval and scoped authentication
+- [ ] Add sandboxed dev servers and watchers after the foreground-command version
+  - [ ] Extend the host controller with supervised jobs, scoped ports, cancellation, and verified process-tree cleanup
+  - [ ] Define recovery for writes made after a launch command returns; do not silently bypass the checkpoint guarantee
+  - [ ] Reuse the same controller boundary for statically configured extra repos, with separate scope and recovery accounting
 - [ ] Add focus mode
   - [ ] Add a command and shortcut to toggle focus mode and remember the preference
   - [ ] Hide tool call headers, arguments, streaming output, results, images produced by tools, and subagent tool chatter from the visible transcript

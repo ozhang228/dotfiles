@@ -5,9 +5,11 @@
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
+import tomllib
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
@@ -27,12 +29,29 @@ class ResumeRequest:
     arguments: tuple[str, ...]
 
 
+@dataclass(frozen=True)
+class CodexSession:
+    id: str
+    provider: str | None
+
+
 def main():
     request = parse_arguments()
     root = worktree_root()
     command = resume_command(request, root=root)
     try:
         status = subprocess.run(command, cwd=root, check=False).returncode
+        if (
+            request.agent == Agent.CODEX
+            and len(command) > 1
+            and command[1] in {"resume", "fork"}
+            and status > 0
+            and status not in {130, 143}
+        ):
+            print("Codex resume failed; starting a fresh session.", file=sys.stderr)
+            status = subprocess.run(
+                ["codex", *request.arguments], cwd=root, check=False
+            ).returncode
     except FileNotFoundError:
         print(f"Agent command not found: {request.agent}", file=sys.stderr)
         return 127
@@ -91,17 +110,45 @@ def resume_command(request: ResumeRequest, *, root: Path):
             if request.fresh:
                 return [request.agent.value, *request.arguments]
             # Resolve the latest session by its recorded cwd so resume is explicitly worktree-scoped.
-            session_id = find_latest_codex_session(root)
-            resume_arguments = ["resume", session_id] if session_id else []
+            home = Path(os.environ.get("CODEX_HOME", str(Path.home() / ".codex")))
+            session = find_latest_codex_session(root, home=home)
+            resume_arguments = []
+            if session:
+                config_path = home / "config.toml"
+                config = (
+                    tomllib.loads(config_path.read_text())
+                    if config_path.exists()
+                    else {}
+                )
+                providers = {
+                    "openai",
+                    "ollama",
+                    "lmstudio",
+                    *config.get("model_providers", {}),
+                }
+                if session.provider and session.provider not in providers:
+                    provider = config.get("model_provider", "openai")
+                    print(
+                        f"Saved provider {session.provider!r} is unavailable; forking history with {provider!r}.",
+                        file=sys.stderr,
+                    )
+                    resume_arguments = [
+                        "fork",
+                        session.id,
+                        "-c",
+                        f"model_provider={json.dumps(provider)}",
+                    ]
+                else:
+                    resume_arguments = ["resume", session.id]
         case _ as unreachable:
             assert_never(unreachable)
 
     return [request.agent.value, *resume_arguments, *request.arguments]
 
 
-def find_latest_codex_session(root: Path) -> str | None:
+def find_latest_codex_session(root: Path, *, home: Path) -> CodexSession | None:
     latest_session = None
-    for path in (Path.home() / ".codex/sessions").rglob("*.jsonl"):
+    for path in (home / "sessions").rglob("*.jsonl"):
         try:
             with path.open() as session_file:
                 metadata = json.loads(session_file.readline())
@@ -117,7 +164,10 @@ def find_latest_codex_session(root: Path) -> str | None:
             session_id = payload.get("id")
             if not isinstance(session_id, str) or not session_id:
                 continue
-            session = (path.stat().st_mtime_ns, session_id)
+            provider = payload.get("model_provider")
+            if provider is not None and not isinstance(provider, str):
+                continue
+            session = (path.stat().st_mtime_ns, CodexSession(session_id, provider))
             if latest_session is None or session[0] > latest_session[0]:
                 latest_session = session
         except (OSError, ValueError):
