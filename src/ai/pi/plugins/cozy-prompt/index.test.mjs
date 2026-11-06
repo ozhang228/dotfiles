@@ -5,7 +5,9 @@ import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import test from "node:test";
 
-const piCli = realpathSync(execFileSync("sh", ["-c", "command -v pi"], { encoding: "utf8" }).trim());
+const piCli = realpathSync(
+  execFileSync("sh", ["-c", "command -v pi"], { encoding: "utf8" }).trim(),
+);
 let piAgent = dirname(piCli);
 while (!existsSync(`${piAgent}/package.json`)) piAgent = dirname(piAgent);
 const piAgentRequire = createRequire(`${piAgent}/package.json`);

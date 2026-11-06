@@ -12,16 +12,10 @@ import {
   type TUI,
 } from "@earendil-works/pi-tui";
 
-const panelBorder = "\x1b[38;2;183;189;248m";
-const reset = "\x1b[0m";
 const compactTokens = new Intl.NumberFormat("en", {
   notation: "compact",
   maximumFractionDigits: 1,
 });
-
-function border(text: string) {
-  return panelBorder + text + reset;
-}
 
 function toolbarLine({ left, right, width }: { left: string; right: string; width: number }) {
   const innerWidth = Math.max(0, width - 4);
@@ -42,8 +36,6 @@ export class CozyEditor extends CustomEditor {
 
   constructor(tui: TUI, theme: EditorTheme, keybindings: KeybindingsManager) {
     super(tui, theme, keybindings, { paddingX: 3, embedWorkingStatus: true });
-    // Pi recolors the editor border for thinking level and bash mode; keep the frame lavender.
-    Object.defineProperty(this, "borderColor", { get: () => border, set: () => {} });
   }
 
   setPaddingX(padding: number) {
@@ -53,13 +45,19 @@ export class CozyEditor extends CustomEditor {
 
   protected renderTopBorder(width: number, hiddenLineCount: number) {
     if (width < 8) return super.renderTopBorder(width, hiddenLineCount);
-    return border("╭") + super.renderTopBorder(width - 2, hiddenLineCount) + border("╮");
+    return (
+      this.borderColor("╭") +
+      super.renderTopBorder(width - 2, hiddenLineCount) +
+      this.borderColor("╮")
+    );
   }
 
   protected renderBottomBorder(width: number, hiddenLineCount: number) {
     if (width < 8) return super.renderBottomBorder(width, hiddenLineCount);
     this.bottomBorder =
-      border("╰") + super.renderBottomBorder(width - 2, hiddenLineCount) + border("╯");
+      this.borderColor("╰") +
+      super.renderBottomBorder(width - 2, hiddenLineCount) +
+      this.borderColor("╯");
     return this.bottomBorder;
   }
 
@@ -70,7 +68,10 @@ export class CozyEditor extends CustomEditor {
     // Keep native rows and columns so mouse placement, autocomplete and cursor markers stay aligned.
     return lines.map((line, index) =>
       index > 0 && index < bottomIndex
-        ? border("│") + (index === 1 ? border("❯") : " ") + line.slice(2, -1) + border("│")
+        ? this.borderColor("│") +
+          (index === 1 ? this.borderColor("❯") : " ") +
+          line.slice(2, -1) +
+          this.borderColor("│")
         : line,
     );
   }
