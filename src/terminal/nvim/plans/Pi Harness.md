@@ -13,11 +13,13 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 - [ ] Verify sandboxed Pi on each Ubuntu and Manjaro machine
   - [ ] Run the native isolation/recovery smoke test; check AppArmor or namespace restrictions when startup fails
   - [ ] Check actual Neovim/tmux startup, resume, Ctrl+C, resize, scrollback, and immediate LazyGit changes
-  - [ ] Exercise real builds, tests, formatters, and larger repositories; check checkpoint cost and recovery limits
-  - [ ] Extend crash/recovery checks to interrupted exports, concurrent host edits, multiple repos sharing the storage limit, and future subagents
+  - [ ] Exercise real builds and formatters in larger repositories; measure checkpoint cost beyond dotfiles
+  - [ ] Extend recovery tests to interrupted exports, edits made concurrently by host programs, and host-controller death while a worker still holds the repo operation lock
 - [ ] Add explicitly scoped worker network and external capabilities
-  - [ ] Allow required documentation/search, package registries, APIs, databases, and MCP services; verify DNS, TLS, proxies, timeouts, and errors
-  - [ ] Install project dependencies in isolated virtual environments, node_modules, and private caches; lifecycle scripts inherit the sandbox
+  - [ ] Start with an explicit domain allowlist for documentation and project package registries; keep other destinations blocked
+  - [ ] Give workers private dependency caches and repo-local virtual environments/node_modules; keep shared host caches protected
+  - [ ] Verify a real dependency install and test run, blocked destinations, and sandboxed lifecycle scripts before expanding access
+  - [ ] Verify DNS, TLS, proxies, timeouts, and errors; then add explicitly scoped APIs, databases, and MCP services
   - [ ] Use host brokers or scoped credential injection; reusable credentials and privileged host sockets stay inaccessible
   - [ ] Expose only needed host diagnostics through a scoped read-only interface
   - [ ] Enforce writable external operations independently of prompt instructions; preserve explicit push/deploy/restart approval, protected default branches, draft PRs, and no GitHub review-conversation mutations
@@ -30,6 +32,7 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Extend the host controller with supervised jobs, scoped ports, cancellation, and verified process-tree cleanup
   - [ ] Define recovery for writes made after a launch command returns; do not silently bypass the checkpoint guarantee
   - [ ] Reuse the same controller boundary for statically configured extra repos, with separate scope and recovery accounting
+  - [ ] Verify recovery and process cleanup for background jobs and future subagents
 - [ ] Add focus mode
   - [ ] Add a command and shortcut to toggle focus mode and remember the preference
   - [ ] Hide tool call headers, arguments, streaming output, results, images produced by tools, and subagent tool chatter from the visible transcript
@@ -116,12 +119,10 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
   - [ ] [billion-context](https://pi.dev/packages/billion-context)
   - [ ] [pi-web-access](https://pi.dev/packages/pi-web-access)
   - [ ] [@postman/postman-plugin](https://pi.dev/packages/@postman/postman-plugin)
-  - [ ] [pi-subagents](https://pi.dev/packages/pi-subagents)
   - [ ] [@juicesharp/rpiv-ask-user-question](https://pi.dev/packages/@juicesharp/rpiv-ask-user-question)
   - [ ] [@onkernel/browser-loop](https://pi.dev/packages/@onkernel/browser-loop)
   - [ ] [context-mode](https://pi.dev/packages/context-mode)
   - [ ] [@plannotator/pi-extension](https://pi.dev/packages/@plannotator/pi-extension)
-  - [ ] [pi-memory](https://pi.dev/packages/pi-memory)
   - [ ] [pi-tidy-memory](https://github.com/mikeyobrien/pi-tidy-tools/tree/main/packages/pi-tidy-memory)
   - [ ] `pi-fff` — fast fuzzy search (`ffgrep` / `fffind`)
   - [ ] `rpiv-todo` — todo tool
@@ -196,9 +197,6 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
   - [ ] Review Pi's [git-checkpoint example](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/examples/extensions/git-checkpoint.ts) only as an illustration
     - [ ] It uses git stash create, keeps refs in an in-memory map, clears them after a run, and applies a stash when asked; it is not persistent recovery and does not capture untracked/ignored files
     - [ ] Do not use it to satisfy the no-unrecoverable-deletion requirement
-  - [ ] Keep complete focus mode as an unresolved plugin search/customization task
-    - [ ] No reviewed candidate was verified to hide all tool headers/results/images while preserving logs, reveal-on-demand, approvals, and status; collapse shortcuts and hidden-tool declarations are different behaviors
-    - [ ] Prototype the global renderer API against the acceptance checks above before choosing a fork or larger UI package
   - [ ] Avoid [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) and [pi-mcp-extension](https://github.com/irahardianto/pi-mcp-extension) unless a concrete unsupported transport requires one
     - [ ] Native Pi 1.5.0 already handles the HTTP MCP services I use; additional clients duplicate tool discovery and authentication
 
@@ -207,9 +205,9 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
   - [ ] Run each candidate's actual relevant tests against the pinned tree in isolation; README and manifest compatibility do not prove runtime compatibility
   - [ ] Verify the combined load order and tool replacements, especially bash, edit/write, permission hooks, codemode, detached jobs, and subagents
   - [ ] Reject a required safety component if installation/loading fails or the sandbox is unavailable; Pi's ordinary package-loading behavior can warn and continue without a failed package
-  - [ ] Prove sandbox failure blocks execution, cross-boundary reads/writes fail, untracked deletions and overwritten uncommitted work restore, and recovery storage cannot be destroyed by the agent
+  - [ ] Recheck isolation and recovery with selected plugins loaded; verify they cannot bypass the controller or access recovery storage
   - [ ] Exercise gateway/MCP reads, delegated edits, long tests, interactive shells, cancellation, compaction/resume, and focus-mode approvals through the actual editor workflow
-  - [ ] Record passed checks and remaining gaps in this plan before making the Pi launcher the default
+  - [ ] Resolve remaining integration gaps before making Pi the editor default
 
 Discovery sources: [Pi package gallery](https://pi.dev/packages) and each repository linked above. Repository inspection identified specific limits; no plugin has been certified safe or compatible end to end. General npm search was unavailable during discovery, so exact publication/install verification remains a checklist item.
 
@@ -221,6 +219,6 @@ Claude history contains 70 /code-review, 31 /brainstorm, 113 /model, 162 /clear,
 
 Current Codex configuration uses Portkey with the Responses API, enabled memory, disabled web search, and unrestricted local permissions. Those unrestricted permissions describe the current setup; the requested Pi sandbox is a stronger requirement. Old hook trust records exist, but the referenced global hooks file was absent during this audit.
 
-Pi behavior was checked against source/docs for released v1.5.0 and current documentation. Pi already supports MCP, skills, context files, sessions, steering, compaction, model settings, and codemode. Its security documentation explicitly says project trust does not sandbox tools. Focus mode and end-to-end gateway/sandbox compatibility remain implementation and runtime checks.
+Pi behavior was checked against source/docs for released v1.5.0 and current documentation. Pi already supports MCP, skills, context files, sessions, steering, compaction, model settings, and codemode. Its security documentation explicitly says project trust does not sandbox tools. Focus mode, gateway/MCP integration, and sandbox verification on other machines remain pending.
 
 Sources: [Pi v1.5.0](https://github.com/earendil-works/pi/releases/tag/v1.5.0), [security](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/security.md), [MCP](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/mcp.md), [extensions](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md), [skills](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md), and [official OpenAI documentation](https://learn.chatgpt.com/docs/developer-commands).
