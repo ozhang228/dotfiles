@@ -1,0 +1,3 @@
+#!/bin/sh
+# SRT isolates user/mount/PID/network; retain our IPC and hostname isolation too.
+exec /usr/bin/bwrap --unshare-ipc --unshare-uts "$@"

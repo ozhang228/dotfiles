@@ -19,6 +19,11 @@
   },
   { "src": "~/dotfiles/src/ai/pi/themes", "dst": "~/.pi/agent/themes" },
   {
+    "src": "~/dotfiles/src/ai/pi/sandbox/bin",
+    "dst": "~/.local/share/pi-sandbox/bin",
+    "distros": ["ubuntu", "manjaro"]
+  },
+  {
     "src": "~/dotfiles/src/ai/skills/brainstorm",
     "dst": "~/.claude/skills/brainstorm"
   },

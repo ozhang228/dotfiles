@@ -70,13 +70,17 @@ def worktree_root():
 
 
 def resume_command(request: ResumeRequest, *, root: Path):
-    if request.fresh:
-        return [request.agent.value, *request.arguments]
-
     match request.agent:
         case Agent.PI:
-            resume_arguments = ["--continue"]
+            launcher = Path(__file__).resolve().parents[3] / "ai/pi/sandbox/bin/pi"
+            return [
+                str(launcher),
+                *([] if request.fresh else ["--continue"]),
+                *request.arguments,
+            ]
         case Agent.CLAUDE:
+            if request.fresh:
+                return [request.agent.value, *request.arguments]
             # Claude Code keeps each directory's sessions under its path with every non-alphanumeric character replaced by "-".
             project_name = re.sub(r"[^a-zA-Z0-9]", "-", str(root))
             project_dir = Path.home() / ".claude/projects" / project_name
@@ -84,6 +88,8 @@ def resume_command(request: ResumeRequest, *, root: Path):
                 ["--continue"] if any(project_dir.glob("*.jsonl")) else []
             )
         case Agent.CODEX:
+            if request.fresh:
+                return [request.agent.value, *request.arguments]
             # Resolve the latest session by its recorded cwd so resume is explicitly worktree-scoped.
             session_id = find_latest_codex_session(root)
             resume_arguments = ["resume", session_id] if session_id else []

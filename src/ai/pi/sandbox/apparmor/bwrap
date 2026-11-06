@@ -1,0 +1,7 @@
+abi <abi/4.0>,
+include <tunables/global>
+
+# Allow Bubblewrap to establish its own namespaces on Ubuntu 24.04+.
+profile pi-bubblewrap /usr/bin/bwrap flags=(unconfined) {
+  userns,
+}
