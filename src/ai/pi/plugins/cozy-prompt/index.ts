@@ -12,7 +12,6 @@ import {
   type TUI,
 } from "@earendil-works/pi-tui";
 
-const panelBackground = "\x1b[48;2;30;32;48m";
 const panelBorder = "\x1b[38;2;183;189;248m";
 const reset = "\x1b[0m";
 const compactTokens = new Intl.NumberFormat("en", {
@@ -22,16 +21,6 @@ const compactTokens = new Intl.NumberFormat("en", {
 
 function border(text: string) {
   return panelBorder + text + reset;
-}
-
-function shade(text: string) {
-  return (
-    panelBackground +
-    text
-      .replaceAll(reset, reset + panelBackground)
-      .replaceAll("\x1b[49m", "\x1b[49m" + panelBackground) +
-    reset
-  );
 }
 
 function toolbarLine({ left, right, width }: { left: string; right: string; width: number }) {
@@ -53,6 +42,8 @@ export class CozyEditor extends CustomEditor {
 
   constructor(tui: TUI, theme: EditorTheme, keybindings: KeybindingsManager) {
     super(tui, theme, keybindings, { paddingX: 3, embedWorkingStatus: true });
+    // Pi recolors the editor border for thinking level and bash mode; keep the frame lavender.
+    Object.defineProperty(this, "borderColor", { get: () => border, set: () => {} });
   }
 
   setPaddingX(padding: number) {
@@ -79,7 +70,7 @@ export class CozyEditor extends CustomEditor {
     // Keep native rows and columns so mouse placement, autocomplete and cursor markers stay aligned.
     return lines.map((line, index) =>
       index > 0 && index < bottomIndex
-        ? border("│") + shade((index === 1 ? border("❯") : " ") + line.slice(2, -1)) + border("│")
+        ? border("│") + (index === 1 ? border("❯") : " ") + line.slice(2, -1) + border("│")
         : line,
     );
   }
