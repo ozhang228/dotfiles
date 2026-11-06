@@ -82,6 +82,18 @@ export default function cozyPrompt(pi: ExtensionAPI) {
     if (!ctx.hasUI) return;
 
     ctx.ui.setFooter((tui, _theme, footerData) => {
+      // Bubblewrap starts a separate session, so terminal SIGWINCH does not reach Pi.
+      const resizeWatcher =
+        process.platform === "linux" && process.stdout.isTTY
+          ? setInterval(() => {
+              try {
+                process.kill(process.pid, "SIGWINCH");
+              } catch {
+                clearInterval(resizeWatcher);
+              }
+            }, 250)
+          : undefined;
+      resizeWatcher?.unref();
       const unsubscribe = footerData.onBranchChange(() => tui.requestRender());
       const unsubscribeInput = ctx.ui.onTerminalInput((data) => {
         if (matchesKey(data, "ctrl+c") && !ctx.isIdle()) return { data: "\x1b" };
@@ -90,6 +102,7 @@ export default function cozyPrompt(pi: ExtensionAPI) {
       ctx.ui.setWidget("cozy-prompt-toolbar", undefined);
       return {
         dispose() {
+          clearInterval(resizeWatcher);
           unsubscribeInput();
           unsubscribe();
         },
