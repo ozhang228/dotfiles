@@ -1,25 +1,25 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { realpathSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import test from "node:test";
 
 const piCli = realpathSync(execFileSync("sh", ["-c", "command -v pi"], { encoding: "utf8" }).trim());
-const piRequire = createRequire(piCli);
-const piAgent = dirname(piRequire.resolve("@earendil-works/pi-coding-agent/package.json"));
+let piAgent = dirname(piCli);
+while (!existsSync(`${piAgent}/package.json`)) piAgent = dirname(piAgent);
 const piAgentRequire = createRequire(`${piAgent}/package.json`);
-const piTui = dirname(piAgentRequire.resolve("@earendil-works/pi-tui/package.json"));
+const piTuiEntry = piAgentRequire.resolve("@earendil-works/pi-tui");
 const { createJiti } = piAgentRequire("jiti");
 const jiti = createJiti(import.meta.url, {
   alias: {
     "@earendil-works/pi-coding-agent": `${piAgent}/dist/index.js`,
-    "@earendil-works/pi-tui": `${piTui}/dist/index.js`,
+    "@earendil-works/pi-tui": piTuiEntry,
   },
 });
 const { CozyEditor } = await jiti.import("./index.ts");
 const { KeybindingsManager } = await jiti.import(`${piAgent}/dist/core/keybindings.js`);
-const { CombinedAutocompleteProvider, visibleWidth } = await jiti.import(`${piTui}/dist/index.js`);
+const { CombinedAutocompleteProvider, visibleWidth } = await jiti.import(piTuiEntry);
 
 function makeEditor() {
   const terminal = { columns: 80, rows: 24 };
