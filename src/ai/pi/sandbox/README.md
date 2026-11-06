@@ -35,17 +35,31 @@ Node. Only their required runtime roots are mounted read-only; unsupported
 layouts fail closed. The provider source comes from the host agent extension
 or distribution. No host credential/config directory is mounted.
 
-SRT isolates the complete Pi tree with read-only project/skills, a disposable
-writable config copy for Pi's locks and runtime updates, private temp, and
-process/network/Unix-socket restrictions. Original configuration stays protected.
-`/etc/hosts` is readable so the local sandbox proxy can resolve `localhost`.
-A small Bubblewrap shim adds
-IPC and hostname isolation. Nested `.pi`/dotenv entries are masked; other secrets
-embedded in project files remain readable. SRT's proxy routes only the internal
-gateway hostname to the host broker. The broker holds the real DRW key, permits
-only fixed catalog/inference/metadata routes, and refuses redirects.
-Private sessions/cache use `~/.local/state/pi-sandbox/<project-hash>/`, separate
-from normal Pi. Protected editing/checkpoints/apply remain for a later step.
-Startup runs dependency and native isolation checks before loading credentials;
-missing/degraded isolation never falls back to ordinary Pi. After native smoke
-passes, check startup, Ctrl-C, resume, and scrollback in the host terminal.
+Pi and extensions stay read-only. At a Git repository root, Edit/Write/Bash
+request a protected checkpoint before a separate worker edits the actual checkout;
+Neovim and LazyGit see changes immediately. Git metadata, dotenv files, private
+Pi state, and the controller's source remain protected. Subdirectory/non-Git
+launches remain read-only. Linked worktree Git metadata outside the launch root
+is unavailable. Workers have no network access; documentation/registry access
+and supervised servers/watchers are later stages.
+
+`recovery_list` lists checkpoints or their saved files. `recovery_restore` restores
+missing selected files and exports existing ones to `.recovered-*` siblings,
+so newer Neovim edits are never overwritten. Pre-command tracked, untracked,
+ignored, and uncommitted bytes are saved; intermediate changes within a command
+are not guaranteed. Checkpoints are per-file captures, not atomic tree snapshots
+while another editor is saving. Cancelled commands lose their entire worker tree. Large shell output is truncated;
+full-output artifacts are not retained.
+
+Recovery lives outside both sandboxes, under `~/.local/state/pi-sandbox/recovery`.
+Content is deduplicated and streamed. Defaults in `recovery.py` are 2 GiB per repo
+and 5 GiB total: oldest completed checkpoints are pruned automatically; active
+and newest checkpoints remain protected until replacement is durable. Oversized
+checkpoints or disk/I/O failures stop new writes. Retention limits cannot repair
+an exhausted underlying filesystem.
+
+The gateway holds the host DRW key and exposes only fixed model routes and the
+scoped controller. Network/Unix-socket restrictions, private namespaces, and
+fail-closed preflight remain mandatory. Sessions/cache are separate per project;
+original configuration stays protected. After smoke passes, check startup,
+Ctrl-C, resume, resizing, and scrollback in the host terminal.

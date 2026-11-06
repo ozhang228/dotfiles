@@ -9,6 +9,12 @@ You own the review: explain the PR to the user in reading order, not just a bug 
 
 When explaining a function in a reading tour or recap, show a concise signature with named inputs and output first, then one sentence describing what the function does and any relevant side effects. Reflect the actual code; do not invent types or signatures. Keep findings centered on the specific behavior and change requested.
 
+## Explain the context before the diff
+
+- Assume Oscar has no prior knowledge of the repository, domain, or earlier discussion. Define the concepts needed to understand the change; do not assume a file list or identifier explains its role.
+- Establish the current behavior, its consumers, and a concrete trigger and consequence for the problem or unmet need. Then distinguish what already existed from what the PR changes and trace the resulting behavior through the system.
+- Use rendered Mermaid diagrams wherever they clarify the mechanism: ownership, before/after flow, caller-to-internal translations, dependencies, state transitions, and failure paths. The required file map is orientation, not a substitute for explaining behavior. Prefer several focused diagrams over a crowded map, and explain each diagram's takeaway. Skip extra diagrams when they add no understanding.
+
 **No diff to review?** Same skill, pointed at an existing system/feature/concept instead of a PR ("explain how X works", "walk me through the auth flow"). Skip merge-base resolution, the architecture gate, focused review passes, and the Bugs/Testing/Performance/Simplification sections. Identify prerequisites (invariants, vocabulary, abstractions the code assumes), write `## Prerequisites` then `## Reading Tour` with ordered `file:line` stops, each explaining what to look for, with opinions inline (confusing naming, whether files live under their conceptual owner, a better structure, why it's built this way). End by inviting the user to read and come back with questions. Push toward a verdict ("does this design make sense to you?", "what would you do differently?"), not just comprehension. Length follows the concept: 3 stops or 12. Give `file:line` anchors, not large pasted snippets.
 
 ## Reference Guide

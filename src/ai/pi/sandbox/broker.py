@@ -1,4 +1,5 @@
 import http.client
+import json
 import re
 import select
 import socket
@@ -7,6 +8,7 @@ import threading
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlsplit
+from controller import Controller, parse_request
 
 MAX_BODY_BYTES = 8 * 1024 * 1024
 IDLE_TIMEOUT = 60
@@ -34,7 +36,15 @@ def destination(*, method: str, path: str):
 class Broker(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
     daemon_threads = True
 
-    def __init__(self, path: Path, *, key: str, connect=None):
+    def __init__(
+        self,
+        path: Path,
+        *,
+        key: str,
+        connect=None,
+        controller: Controller | None = None,
+    ):
+        self.controller = controller
         self.key = key
         self.connect = connect or (
             lambda host: http.client.HTTPSConnection(host, timeout=IDLE_TIMEOUT)
@@ -42,17 +52,23 @@ class Broker(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
         super().__init__(str(path), GatewayHandler)
         path.chmod(0o600)
 
-    def handle_error(self, *_):
+    def handle_error(self, request, client_address):
         # HTTP failures must never log credentials, prompts, or upstream payloads.
         pass
 
 
 class GatewayHandler(BaseHTTPRequestHandler):
+    @property
+    def gateway(self):
+        if not isinstance(self.server, Broker):
+            raise RuntimeError("Unexpected gateway server")
+        return self.server
+
     def setup(self):
         super().setup()
         self.connection.settimeout(IDLE_TIMEOUT)
 
-    def log_message(self, *_):
+    def log_message(self, format, *args):
         pass
 
     def send_error(self, code, message=None, explain=None):
@@ -81,7 +97,85 @@ class GatewayHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.close_connection = False
 
+    def control(self):
+
+        controller = self.gateway.controller
+        if controller is None:
+            self.reply(403, b"Controller unavailable\n")
+            return
+        lengths = self.headers.get_all("Content-Length", [])
+        if (
+            self.headers.get("Transfer-Encoding")
+            or self.headers.get("Content-Encoding")
+            or len(lengths) != 1
+            or not re.fullmatch(r"[0-9]+", lengths[0])
+        ):
+            self.reply(403, b"Controller request denied\n")
+            return
+        length = int(lengths[0])
+        if length > MAX_BODY_BYTES:
+            self.reply(413, b"Controller request too large\n")
+            return
+        stopped = threading.Event()
+
+        def cancel_on_disconnect():
+            while not stopped.wait(0.1):
+                try:
+                    readable, _, _ = select.select([self.connection], [], [], 0)
+                    if readable and not self.connection.recv(1, socket.MSG_PEEK):
+                        stopped.set()
+                        return
+                except OSError:
+                    stopped.set()
+                    return
+
+        watcher = None
+        try:
+            body = self.rfile.read(length)
+            if len(body) != length:
+                return
+            request = parse_request(json.loads(body))
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-ndjson")
+            self.send_header("Connection", "close")
+            self.end_headers()
+            self.close_connection = True
+            watcher = threading.Thread(target=cancel_on_disconnect, daemon=True)
+            watcher.start()
+            for message in controller.execute(request, stopped):
+                self.wfile.write(json.dumps(message).encode() + b"\n")
+                self.wfile.flush()
+        except (OSError, ValueError, RuntimeError) as error:
+            try:
+                if watcher is None:
+                    self.reply(400, b"Invalid controller request\n")
+                else:
+                    self.wfile.write(
+                        json.dumps(
+                            {"type": "error", "error": str(error)[:2000]}
+                        ).encode()
+                        + b"\n"
+                    )
+                    self.wfile.flush()
+            except OSError:
+                pass
+        finally:
+            stopped.set()
+            if watcher is not None:
+                watcher.join(timeout=1)
+
     def forward(self):
+        parsed = urlsplit(self.path)
+        if (
+            self.command == "POST"
+            and parsed.path == "/control"
+            and not parsed.query
+            and not parsed.fragment
+            and parsed.netloc in {"", "pi-gateway.invalid"}
+            and self.gateway.controller is not None
+        ):
+            self.control()
+            return
         target = destination(method=self.command, path=self.path)
         if target is None:
             self.reply(403, b"Gateway request denied\n")
@@ -108,14 +202,14 @@ class GatewayHandler(BaseHTTPRequestHandler):
         if host == "ai.drwcloud.com":
             headers.update(
                 {
-                    "x-portkey-api-key": self.server.key,
+                    "x-portkey-api-key": self.gateway.key,
                     "x-portkey-metadata": '{"service":"pi"}',
                 }
             )
             strict = self.headers.get("x-portkey-strict-open-ai-compliance")
             if strict in {"true", "false"}:
                 headers["x-portkey-strict-open-ai-compliance"] = strict
-        upstream = self.server.connect(host)
+        upstream = self.gateway.connect(host)
         response_started = False
         stopped = threading.Event()
         watcher = None

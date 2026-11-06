@@ -15,6 +15,8 @@ import threading
 from pathlib import Path
 
 from broker import Broker
+from controller import Controller, Worker
+from recovery import Recovery
 from runtime import agent_dir, find_runtime, provider_source, runtime_roots
 
 RUNTIME_VERSION = "0.0.81"
@@ -86,6 +88,8 @@ def snapshot_config(config: Path, *, assets: Path, cli: Path):
     extensions.mkdir()
     for name in PLUGINS:
         shutil.copytree(assets / "pi/plugins" / name, extensions / name)
+    (config / "sandbox").mkdir()
+    shutil.copyfile(assets / "pi/sandbox/tools.ts", config / "sandbox/tools.ts")
     (extensions / "portkey-provider.ts").write_text(
         adapt_provider(provider_source(cli))
     )
@@ -178,7 +182,15 @@ def credential_paths(project: Path):
 
 
 def sandbox_prefix(
-    *, node: Path, cli: Path, project: Path, state: Path, temporary: Path, assets: Path
+    *,
+    node: Path,
+    cli: Path,
+    project: Path,
+    state: Path,
+    temporary: Path,
+    assets: Path,
+    writable=False,
+    protected=(),
 ):
     modules, package = sandbox_runtime()
     sources = (
@@ -190,11 +202,11 @@ def sandbox_prefix(
         temporary / "scratch",
         *[assets / name for name in ("rules", "skills", "_shared")],
     )
-    protected = (agent_dir(), state)
+    host_protected = (agent_dir(), state)
     for source in sources[:3]:
         if Path.home().resolve().is_relative_to(source) or any(
             path.is_relative_to(source) or source.is_relative_to(state)
-            for path in protected
+            for path in host_protected
         ):
             raise RuntimeError(
                 "Pi runtime overlaps host credentials or private sandbox state"
@@ -235,12 +247,37 @@ def sandbox_prefix(
                     ),
                 )
             ),
-            "denyWrite": [literal(project)],
+            "denyWrite": list(map(literal, protected if writable else (project,))),
         },
         "enableWeakerNestedSandbox": False,
         "allowNestedUserNamespaces": False,
         "bwrapPath": str(Path(__file__).with_name("bwrap").resolve()),
     }
+    if writable:
+        policy["network"] = {
+            "allowedDomains": [],
+            "deniedDomains": ["*"],
+            "allowAllUnixSockets": False,
+        }
+        policy["filesystem"]["allowWrite"] = list(
+            map(literal, (project, temporary / "scratch"))
+        )
+        policy["filesystem"]["allowRead"] = [
+            literal(Path(path).resolve())
+            for path in ("/usr", "/lib", "/lib64", "/etc/hosts")
+            if Path(path).exists()
+        ] + list(
+            map(
+                literal,
+                (
+                    *runtime_roots(node=node, cli=cli),
+                    modules,
+                    project,
+                    temporary / "config",
+                    temporary / "scratch",
+                ),
+            )
+        )
     settings = temporary / "sandbox.json"
     settings.write_text(json.dumps(policy))
     return [
@@ -269,6 +306,91 @@ def sandbox_environment(*, node: Path, temporary: Path):
         if name in os.environ:
             environment[name] = os.environ[name]
     return environment
+
+
+def protected_git_paths(project: Path):
+    for directory, directories, files in os.walk(project, followlinks=False):
+        if ".git" in (*directories, *files):
+            path = Path(directory) / ".git"
+            if path.is_symlink():
+                raise RuntimeError(
+                    "Git metadata symlinks are not supported for writable projects"
+                )
+            yield path
+            if ".git" in directories:
+                directories.remove(".git")
+
+
+def editing_controller(
+    *, node: Path, cli: Path, project: Path, state: Path, assets: Path
+):
+    result = subprocess.run(
+        ["/usr/bin/git", "-C", str(project), "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={"PATH": "/usr/bin:/bin", "HOME": "/nonexistent"},
+        timeout=10,
+    )
+    if result.returncode or Path(result.stdout.strip()).resolve() != project:
+        return None
+    protected = [*protected_git_paths(project), *credential_paths(project)]
+    if assets.is_relative_to(project):
+        protected.append(assets)
+    recovery = Recovery(state.parent / "recovery", repo=project, protected=protected)
+
+    def run(request, stop, lock_fd):
+        with tempfile.TemporaryDirectory(prefix="pi-worker-") as directory:
+            temporary = Path(directory)
+            (temporary / "config").mkdir()
+            (temporary / "home").mkdir()
+            (temporary / "scratch").mkdir()
+            (temporary / "cache").symlink_to(
+                temporary / "scratch", target_is_directory=True
+            )
+            helper = temporary / "config/worker.mjs"
+            shutil.copyfile(Path(__file__).with_name("worker.mjs"), helper)
+            sandbox_prefix(
+                node=node,
+                cli=cli,
+                project=project,
+                state=state,
+                temporary=temporary,
+                assets=assets,
+                writable=True,
+                protected=[
+                    *protected_git_paths(project),
+                    *credential_paths(project),
+                    *([assets] if assets.is_relative_to(project) else []),
+                ],
+            )
+            environment = sandbox_environment(node=node, temporary=temporary)
+            environment.pop("PORTKEY_API_KEY")
+            from runtime import module_root
+
+            native = (
+                module_root(cli)
+                / "@earendil-works/pi-coding-agent/dist/core/tools/index.js"
+            )
+            _, package = sandbox_runtime()
+
+            def command(lifeline):
+                return [
+                    str(node),
+                    str(helper),
+                    "supervise",
+                    str(package / "dist/index.js"),
+                    str(temporary / "sandbox.json"),
+                    str(lifeline),
+                    str(native),
+                    str(lock_fd),
+                ]
+
+            yield from Worker(command=command, environment=environment, repo=project)(
+                request, stop, lock_fd
+            )
+
+    return Controller(recovery, run=run)
 
 
 def main():
@@ -333,7 +455,28 @@ def main():
             assets=assets,
         )
         check_boundary([*command, "/usr/bin/true"], environment=environment)
-        with Broker(temporary / "gateway.sock", key=credential()) as broker:
+        controller = editing_controller(
+            node=node, cli=cli, project=project, state=state, assets=assets
+        )
+        if controller is not None:
+            environment["PI_SANDBOX_CONTROL"] = "1"
+            settings_path = temporary / "config/settings.json"
+            settings = json.loads(settings_path.read_text())
+            settings["defaultTools"] = [
+                "read",
+                "grep",
+                "find",
+                "ls",
+                "edit",
+                "write",
+                "bash",
+                "recovery_list",
+                "recovery_restore",
+            ]
+            settings_path.write_text(json.dumps(settings))
+        with Broker(
+            temporary / "gateway.sock", key=credential(), controller=controller
+        ) as broker:
             thread = threading.Thread(target=broker.serve_forever, daemon=True)
             thread.start()
             try:
@@ -352,6 +495,8 @@ def main():
                     env=environment,
                 ).returncode
             finally:
+                if controller is not None:
+                    controller.close()
                 broker.shutdown()
                 thread.join()
     return status if status >= 0 else 128 - status

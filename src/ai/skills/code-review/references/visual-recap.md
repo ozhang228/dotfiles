@@ -42,6 +42,20 @@ and link nodes to the corresponding in-page explanations. Explain how to use
 the diagram and tour. Check label legibility, links, and narrow-screen behavior
 in a browser. If `mmdc` is unavailable, report the rendering blocker explicitly.
 
+## Explain behavior with diagrams
+
+Assume the reader has no prior repository or domain context. Explain the
+existing system and the concrete problem before the new mechanism. Mark
+existing behavior, changed behavior, and proposed behavior distinctly.
+
+Use Mermaid beyond the file map whenever a visual makes the explanation
+clearer: before/after paths, caller-to-internal translations, required inputs,
+dependent calculations, state transitions, or success and failure paths.
+Place each diagram beside the explanation it supports and give its takeaway
+in a sentence. Split crowded diagrams by concept rather than forcing every
+relationship into one map. Follow the shared Mermaid rendering and validation
+guidance in `references/structured-blocks.md`.
+
 ## Structured blocks, not text-on-a-page
 
 `index.html` is not prose poured into HTML — it's built from the component
@@ -106,10 +120,11 @@ failure paths to an observable result? Four parts, top to bottom:
    Build the reader's intuition in causal order:
    - Open with a one-minute summary of before, after, scope, and the essential
      behavior. The essential behavior must connect mechanism to outcome.
-   - Introduce only the background concepts and system boundaries needed to
-     understand the diff.
-   - Walk through the smallest concrete failure scenario under the old
-     behavior.
+   - Introduce the background concepts, consumers, and system boundaries
+     needed to understand the diff without assuming prior project knowledge.
+   - Walk through the smallest concrete scenario showing the old failure or
+     unmet need and why it matters. Distinguish existing interfaces from the
+     PR's additions before explaining how they connect.
    - State the core intuition in one memorable idea, then trace a representative
      input through the end-to-end flow to its observable result.
    - Walk through the implementation by behavioral stage and ownership. When a

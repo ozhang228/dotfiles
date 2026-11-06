@@ -16,11 +16,12 @@ Build `plan.html` from the component library in `references/structured-blocks.md
 in full before authoring `plan.html`; never hand-roll a block from memory.
 
 Brainstorm reaches for: `summary-card`, `callout`, `options-compare`,
-`assumption-list`, `api-endpoint`, `columns`, and `boundary-matrix`. Copy only
+`assumption-list`, `api-endpoint`, `columns`, `boundary-matrix`, and rendered
+Mermaid diagrams. Copy only
 the CSS for the blocks actually used into `plan.html`'s own `<style>` tag. End
 every plan with the shared `quiz` block.
-Skip `section-nav` — a plan is short enough to read linearly; don't add a
-navigation strip.
+Use a compact `section-nav` when a substantial plan has more than five
+sections; include the Quiz anchor. Short plans read linearly.
 
 ## Idea → Block Mapping
 
@@ -40,11 +41,11 @@ navigation strip.
   failure naming the handling scope and why partial recovery is safe.
 - **Final understanding check** → `quiz`, with 3–5 scored questions and answer
   rationales.
-- **Before/after architecture or data-flow shift** → describe it in prose,
-  scoped to the mechanism (durable unit of work, success, failure/retry,
-  ordering); this library has no diagram block for brainstorm. If a genuine
-  architecture sketch is needed, use `columns` for the before/after states
-  instead of a boxes-and-arrows diagram.
+- **Architecture, ownership, data flow, dependency, or state transition** →
+  rendered Mermaid diagram plus a short explanation. Show current and proposed
+  behavior separately when their difference motivates the design. Use the
+  shared Mermaid guidance in `references/structured-blocks.md`; `columns`
+  still fit comparisons of static contract shapes.
 - **A proposed code change to an existing or new file** → describe it in
   prose with the file path and the concrete before/after behavior; this
   library has no diff/code block for brainstorm. If the plan needs to show
@@ -70,10 +71,12 @@ summary of benefits.
    behavior, scope, and essential design claim. Make the essential claim a
    causal sentence: because the design does X, the user or system can now
    observe Y. Do not turn this into a generic benefits list.
-3. **Background and failure mode.** Introduce only the concepts and system
-   boundaries needed to understand the proposal, then walk through the
-   smallest concrete scenario that fails today. Skip this beat when the
-   current behavior is already obvious.
+3. **Background and problem.** Assume no prior repository or domain knowledge.
+   Explain the current system, its users, the terms needed for this decision,
+   and the smallest concrete scenario showing the failure or unmet need.
+   Explain its consequence before proposing a fix. Use a current-system
+   diagram when relationships matter; do not treat familiar identifiers as
+   self-explanatory or invent a failure for a new capability.
 4. **Core intuition and end-to-end flow.** Explain the recommendation in one
    memorable idea, then trace a representative input through each meaningful
    stage to its observable result. Name the durable unit of work, success,
@@ -141,6 +144,10 @@ The implementation plan in `tmp/PLAN.md` does not need to repeat the quiz.
 Before handoff:
 
 - Confirm `plan.html` and `plan.md` exist.
+- For each diagram, retain its `.mmd` source, embed the locally rendered SVG,
+  include the source in `plan.md`, and validate it using the shared Mermaid
+  guidance. If rendering is unavailable, keep the plan useful and report the
+  specific limitation rather than silently omitting the diagrams.
 - Read the generated files enough to catch placeholders, stale claims,
   contradictions, broken anchors, or missing expected sections.
 - Open `plan.html` mentally against `references/structured-blocks.md`'s

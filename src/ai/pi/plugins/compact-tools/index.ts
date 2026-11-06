@@ -1,4 +1,10 @@
 import {
+  sandboxBash,
+  sandboxEdit,
+  sandboxWrite,
+  registerRecovery,
+} from "../../sandbox/tools.ts";
+import {
   createBashToolDefinition,
   defineTool,
   createEditToolDefinition,
@@ -298,11 +304,13 @@ export default function compactTools(pi: ExtensionAPI) {
       },
     }),
   );
-  const bash = createBashToolDefinition(process.cwd());
+  const sandboxed = process.env.PI_SANDBOX_CONTROL === "1";
+  const bash = sandboxed ? sandboxBash(process.cwd()) : createBashToolDefinition(process.cwd());
   pi.registerTool(
     withSummary({
       ...bash,
       execute(id, args, signal, update, ctx) {
+        if (sandboxed) return sandboxBash(ctx.cwd).execute(id, args, signal, update, ctx);
         const settings = pi.getSettings();
         return createBashToolDefinition(ctx.cwd, {
           commandPrefix: settings.shellCommandPrefix,
@@ -314,8 +322,13 @@ export default function compactTools(pi: ExtensionAPI) {
   pi.registerTool(withSummary(createGrepToolDefinition(process.cwd())));
   pi.registerTool(withSummary(createFindToolDefinition(process.cwd())));
   pi.registerTool(withSummary(createLsToolDefinition(process.cwd())));
-  pi.registerTool(withSummary(createEditToolDefinition(process.cwd())));
-  pi.registerTool(withSummary(createWriteToolDefinition(process.cwd())));
+  pi.registerTool(
+    withSummary(sandboxed ? sandboxEdit(process.cwd()) : createEditToolDefinition(process.cwd())),
+  );
+  pi.registerTool(
+    withSummary(sandboxed ? sandboxWrite(process.cwd()) : createWriteToolDefinition(process.cwd())),
+  );
+  if (sandboxed) registerRecovery(pi);
   pi.registerToolRenderer(function resolveRenderer(name, next) {
     return isToolName(name) ? compactRenderers(name, next()) : next();
   });

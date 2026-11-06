@@ -6,10 +6,13 @@
 import errno
 import os
 import shutil
+import signal
 import socket
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 from pathlib import Path
 
 NAMESPACES = ("user", "mnt", "pid", "net", "ipc", "uts")
@@ -195,6 +198,201 @@ def smoke_test():
     print("      namespaces, network/Unix socket restrictions, and child inheritance")
 
 
+def editing_smoke():
+    from controller import parse_request
+    from launcher import editing_controller
+    from runtime import find_runtime
+
+    node, cli = find_runtime()
+    with tempfile.TemporaryDirectory(prefix="pi-edit-smoke-") as directory:
+        root = Path(directory)
+        project = root / "repo"
+        project.mkdir()
+        subprocess.run(["/usr/bin/git", "init", "-q", str(project)], check=True)
+        state = root / "private/project"
+        state.mkdir(parents=True)
+        outside = root / "outside"
+        outside.write_text("outside sentinel")
+        (project / "escape").symlink_to(outside)
+        (project / "original").write_text("uncommitted original")
+        (project / ".env").write_text("protected dotenv")
+        assets = project / "protected-ai"
+        for name in ("rules", "skills", "_shared"):
+            (assets / name).mkdir(parents=True)
+        (assets / "controller.py").write_text("protected controller")
+        controller = editing_controller(
+            node=node, cli=cli, project=project, state=state, assets=assets
+        )
+        require(controller is not None, "No editable controller")
+
+        def execute(tool, args):
+            return list(
+                controller.execute(
+                    parse_request({"tool": tool, "args": args}), threading.Event()
+                )
+            )
+
+        execute("write", {"path": "created", "content": "visible checkout change"})
+        require(
+            (project / "created").read_text() == "visible checkout change",
+            "Native write failed",
+        )
+        execute(
+            "edit",
+            {
+                "path": "created",
+                "edits": [{"oldText": "visible", "newText": "immediate"}],
+            },
+        )
+        require(
+            (project / "created").read_text() == "immediate checkout change",
+            "Native edit failed",
+        )
+        execute("bash", {"command": "printf damaged > original; rm created"})
+        require((project / "original").read_text() == "damaged", "Native bash failed")
+        checkpoint = controller.recovery.list()[0]["checkpoint"]
+        paths = controller.recovery.restore(checkpoint, ["original", "created"])
+        require(
+            (project / paths[0]).read_text() == "uncommitted original",
+            "Original recovery failed",
+        )
+        require(
+            (project / "created").read_text() == "immediate checkout change",
+            "Deleted file recovery failed",
+        )
+        command = f"printf bad > {outside}; printf bad > escape; printf bad > .git/config; printf bad > .git/new; printf bad > protected-ai/controller.py; printf bad > .env; printf bad > {state.parent / 'recovery/lock'}; true"
+        git_config = (project / ".git/config").read_bytes()
+        execute("bash", {"command": command})
+        require(outside.read_text() == "outside sentinel", "Outside scope changed")
+        require((project / ".env").read_text() == "protected dotenv", "Dotenv changed")
+        require(
+            (project / ".git/config").read_bytes() == git_config, "Git metadata changed"
+        )
+        require(not (project / ".git/new").exists(), "Git metadata creation allowed")
+        require(
+            (assets / "controller.py").read_text() == "protected controller",
+            "Controller assets changed",
+        )
+        large_output = execute(
+            "bash", {"command": "head -c 100000 /dev/zero | tr '\\0' x"}
+        )[-1]["result"]
+        require(
+            "fullOutputPath" not in large_output.get("details", {}),
+            "Unavailable output path advertised",
+        )
+        require(
+            "full_output_path" not in large_output.get("structuredContent", {}),
+            "Unavailable structured output path advertised",
+        )
+        require(
+            "full output is not retained" in large_output["content"][0]["text"],
+            "Truncated output limitation missing",
+        )
+        for interruption in ("cancel", "supervisor-crash"):
+            (project / "ticks").unlink(missing_ok=True)
+            stop = threading.Event()
+            errors = []
+            original_before = (project / "original").read_bytes()
+
+            def detached_operation():
+                try:
+                    list(
+                        controller.execute(
+                            parse_request(
+                                {
+                                    "tool": "bash",
+                                    "args": {
+                                        "command": 'setsid sh -c "while :; do echo tick >> ticks; sleep 0.05; done" & wait',
+                                        "timeout": 30,
+                                    },
+                                }
+                            ),
+                            stop,
+                        )
+                    )
+                except RuntimeError as error:
+                    errors.append(error)
+
+            thread = threading.Thread(target=detached_operation)
+            thread.start()
+            try:
+                deadline = time.monotonic() + 15
+                while not (project / "ticks").exists() and time.monotonic() < deadline:
+                    time.sleep(0.05)
+                require((project / "ticks").exists(), "Detached worker never started")
+                match interruption:
+                    case "cancel":
+                        stop.set()
+                    case "supervisor-crash":
+                        children = Path(f"/proc/self/task/{thread.native_id}/children")
+                        supervisor = next(
+                            int(pid)
+                            for pid in children.read_text().split()
+                            if b"supervise"
+                            in Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
+                        )
+                        os.kill(supervisor, signal.SIGKILL)
+                    case _:
+                        raise RuntimeError("Unknown interruption")
+                thread.join(timeout=10)
+                require(
+                    not thread.is_alive() and bool(errors),
+                    f"Worker did not exit after {interruption}",
+                )
+                size = (project / "ticks").stat().st_size
+                time.sleep(0.3)
+                require(
+                    (project / "ticks").stat().st_size == size,
+                    f"Write-capable child survived {interruption}",
+                )
+                checkpoint = controller.recovery.list()[0]
+                require(checkpoint["status"] == "interrupted", "Checkpoint lost")
+                resumed = threading.Event()
+                deadline = threading.Timer(10, resumed.set)
+                deadline.start()
+                try:
+                    restored = list(
+                        controller.execute(
+                            parse_request(
+                                {
+                                    "tool": "recovery_restore",
+                                    "args": {
+                                        "checkpoint": checkpoint["checkpoint"],
+                                        "paths": ["original"],
+                                    },
+                                }
+                            ),
+                            resumed,
+                        )
+                    )[0]["result"]["paths"]
+                finally:
+                    deadline.cancel()
+                require(
+                    (project / restored[0]).read_bytes() == original_before,
+                    "Interrupted checkpoint recovery failed",
+                )
+            finally:
+                stop.set()
+                thread.join(timeout=10)
+
+        execute("write", {"path": "recover-me", "content": "precious bytes"})
+        execute("bash", {"command": "rm recover-me; mkfifo pipe"})
+        checkpoint = controller.recovery.list()[0]["checkpoint"]
+        restored = execute(
+            "recovery_restore",
+            {"checkpoint": checkpoint, "paths": ["recover-me"]},
+        )[0]["result"]["paths"]
+        require(
+            (project / restored[0]).read_text() == "precious bytes",
+            "Special file blocked recovery",
+        )
+        require((project / "pipe").exists(), "Recovery changed unrelated special file")
+        controller.close()
+    print(
+        "PASS: native Edit/Write/Bash, protected Git/credentials/outside paths, special-file recovery, and worker cancellation/crash recovery"
+    )
+
+
 def main():
     try:
         if sys.argv[1:] and sys.argv[1] in {"--probe", "--child-probe"}:
@@ -202,6 +400,7 @@ def main():
         else:
             require(len(sys.argv) == 1, "Usage: python3 tests/smoke.py")
             smoke_test()
+            editing_smoke()
     except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as error:
         print(f"FAIL: {error}", file=sys.stderr)
         return 1

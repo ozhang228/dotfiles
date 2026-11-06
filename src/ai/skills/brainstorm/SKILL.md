@@ -11,6 +11,13 @@ description: 'Use before creative implementation with real design space: feature
 - Skip when the user just wants to *try something out* — a throwaway probe, a `tmp/` experiment, a "let me see if this works" spike with no intent to ship. 
 - A specific request or existing example doesn't necessarily mean the approach is settled. When unsure, briefly raise the approach with Oscar before making changes.
 
+## Explain the context before designing
+
+- Assume Oscar has no prior knowledge of this repository, domain, or earlier discussion. Define the concepts and vocabulary needed for this decision without turning the explanation into a general tutorial.
+- Explain what exists today, who uses it, and the smallest concrete scenario that exposes the problem or unmet need. State why it matters before discussing a fix or asking a design question; do not ask Oscar to reconstruct context you can establish from the code.
+- Distinguish existing behavior and interfaces from proposed additions. Trace an example through inputs, important functions, dependencies, and outputs so the proposed change has a clear place in the system.
+- Prefer rendered Mermaid diagrams when they clarify ownership, before/after behavior, data flow, dependencies, state transitions, or failure paths. Use several focused diagrams when one would become crowded, with a short explanation of what each shows. Follow the shared rendering guidance in `references/structured-blocks.md`; skip diagrams that add no understanding.
+
 ## Challenge the premise first
 
 Before design, sanity-check the work itself. The user often has a thread to pull but hasn't decided whether the work is worth doing, surface that 
@@ -55,7 +62,7 @@ Follow these phases in order:
 - Make the mechanism concrete before presenting files. Name the durable unit of work, success, failure/retry, and ordering. For stateful, concurrent, or partial-failure designs, walk through the smallest example that distinguishes the proposed behavior from the current behavior.
 - Map failure boundaries when errors can be handled at different scopes. Use a `boundary-matrix` block to show the failure, handling scope, and why that scope is safe. Do not imply partial recovery when identity or ordering is no longer trustworthy.
 - Define the behavior contract and verification - focus on **core behaviors only**: what must be true for the feature to be correct? Aim for 3–5 entries for genuinely complex work; use fewer when that is all the design needs. Classify each entry as a new `test`, an `invariant` that should shape the design without another test, or a `manual check`. For every manual artifact, state what visible fact distinguishes success from the old behavior; a screenshot or benchmark with no discriminating observation proves nothing. Use `references/testing.md` for the format and selection rules. **Do not turn every desired behavior into a test.** Existing framework validation, types, stronger tests, and runtime measurements often make another test redundant. Get user approval before proceeding
-- Write local visual plan - read `references/visual-plan.md` in full. Create `tmp/plan.html` per that reference, including its causal explanation and final understanding quiz. Include the approved approach, tradeoffs, expected behaviors, performance boundaries, file map, and open questions.
+- Write local visual plan - read `references/visual-plan.md` in full. Create `tmp/plan.html` per that reference, including the current-system context, useful rendered Mermaid diagrams, causal explanation, and final understanding quiz. Include the approved approach, tradeoffs, expected behaviors, performance boundaries, file map, and open questions.
 - Spec self-review - inspect `plan.html` and `plan.md` for placeholders, contradictions, ambiguity, scope drift, broken anchors, and missing sections.
 - User reviews visual plan - report the served URL then ask the user to review the visual plan before proceeding.
 - Transition to implementation with a Markdown plan - follow the format in `references/writing-plans.md` to produce a step-by-step plan for the agent.

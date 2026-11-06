@@ -270,6 +270,33 @@ why the remaining identity/order/transaction state is still trustworthy.
 Use real failure modes and observed/designed handling. Do not infer that
 partial recovery is safe merely because the implementation attempts it.
 
+## Rendered Mermaid diagrams (brainstorm and code-review)
+
+Prefer Mermaid when the reader needs to understand relationships, ordering,
+ownership, dependencies, or state. Use flowcharts for data/call paths, sequence
+diagrams for interactions over time, and state diagrams for lifecycle changes.
+Static comparisons still fit `columns` or tables. Add diagrams for distinct
+questions, not to meet a count; split an unreadable overview into focused views.
+
+- Ground nodes and edges in source or the explicitly labeled proposed design.
+  Define unfamiliar terms first, label arrows with their meaning, distinguish
+  current from proposed behavior, and state each diagram's takeaway in prose.
+- Render locally with installed `mmdc`, keep editable `.mmd` sources beside the
+  artifact, and embed the SVG inline. Include the Mermaid source in the Markdown
+  fallback. Match the shared palette; do not use a CDN or runtime Mermaid script.
+- If `mmdc` is unavailable, keep the source and a readable text explanation,
+  report the rendering limitation, and continue the authorized work without
+  installing or fetching tools merely to render it.
+- When embedding multiple SVGs, give each diagram's IDs a unique prefix and
+  update their CSS selectors, marker references, and internal links together.
+  Preserve links to document sections. Check for duplicate IDs and broken links.
+- Inspect rendered labels, arrow meaning, contrast, and narrow-screen behavior
+  in a browser. Use scrolling or focused diagrams to keep labels readable rather
+  than shrinking a dense graph into illegible text.
+- Use a small interactive mode/scenario explorer when it makes alternatives or
+  dependencies easier to understand. Label simulated behavior as illustrative;
+  it is an explanation, not runtime verification.
+
 ## Block: diagram (two-panel / swimlane)
 
 Architecture or data-flow shifts. Plain flex boxes — no diagram library, no
@@ -580,7 +607,7 @@ block: a reader who trusts it may skip the exact thing it got wrong.
 | API / action / route change or proposal | `api-endpoint` with request/response examples |
 | Structured before/after (schema/contract shape) | `columns`, not stacked cards |
 | Different failure handling scopes | `boundary-matrix` with failure, scope, and safety rationale |
-| Architecture or data-flow shift | two-panel/swimlane `diagram`, never a single arrow chain |
+| Architecture, data flow, dependency, interaction, or state transition | rendered Mermaid with meaningful edges; two-panel/swimlane `diagram` for simple comparisons |
 | First-viewport ask/outcome summary | `summary-card` |
 | Non-negotiable constraint or unresolved risk | `callout` |
 | 3+ real alternatives before committing to an approach | `options-compare` |

@@ -1,0 +1,364 @@
+import sys
+import tempfile
+import threading
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from controller import Controller, parse_request
+from recovery import Recovery
+
+
+def test_checkpoint_failure_prevents_worker_and_foreign_paths_are_rejected():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "file").write_text("protected content")
+        calls = []
+
+        def run(request, stop, lock_fd):
+            calls.append(request)
+            (repo / "file").write_text("damaged")
+            yield {"type": "result", "result": {"content": []}}
+
+        controller = Controller(
+            Recovery(root / "private", repo=repo, repo_limit=10, total_limit=10),
+            run=run,
+        )
+        with pytest.raises(RuntimeError, match="limit"):
+            list(
+                controller.execute(
+                    parse_request({"tool": "bash", "args": {"command": "rm file"}}),
+                    threading.Event(),
+                )
+            )
+        assert calls == []
+        assert (repo / "file").read_text() == "protected content"
+        with pytest.raises(ValueError, match="relative"):
+            parse_request(
+                {"tool": "write", "args": {"path": "../outside", "content": "bad"}}
+            )
+
+
+def test_failed_worker_retains_checkpoint_and_recovery_exports_host_conflict():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "file").write_text("original")
+
+        def run(request, stop, lock_fd):
+            (repo / "file").write_text("partial damage")
+            raise RuntimeError("worker interrupted")
+            yield
+
+        controller = Controller(Recovery(root / "private", repo=repo), run=run)
+        with pytest.raises(RuntimeError, match="interrupted"):
+            list(
+                controller.execute(
+                    parse_request({"tool": "bash", "args": {"command": "false"}}),
+                    threading.Event(),
+                )
+            )
+        checkpoint = controller.recovery.list()[0]
+        assert checkpoint["status"] == "interrupted"
+        (repo / "file").write_text("new Neovim edit")
+        result = list(
+            controller.execute(
+                parse_request(
+                    {
+                        "tool": "recovery_restore",
+                        "args": {
+                            "checkpoint": checkpoint["checkpoint"],
+                            "paths": ["file"],
+                        },
+                    }
+                ),
+                threading.Event(),
+            )
+        )[0]
+        recovered = result["result"]["paths"][0]
+        assert (repo / recovered).read_text() == "original"
+        assert (repo / "file").read_text() == "new Neovim edit"
+
+
+def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
+    import contextlib
+    import http.client
+    import json
+    import subprocess
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+    from broker import Broker
+    from launcher import (
+        assets_root,
+        editing_controller,
+        sandbox_environment,
+        sandbox_prefix,
+        snapshot_config,
+    )
+    from runtime import find_runtime
+
+    calls = []
+    native_calls = [
+        (
+            "write",
+            {
+                "path": "visible.txt",
+                "content": "before",
+                "summary": "create visible file",
+            },
+        ),
+        (
+            "codemode",
+            {
+                "code": 'text(await tools.edit({path:"visible.txt",edits:[{oldText:"before",newText:"after"}],summary:"update visible file"})); text(await tools.bash({command:"printf shell > shell.txt",summary:"create shell file"})); text(await tools.recovery_list({}));'
+            },
+        ),
+    ]
+
+    class Model(BaseHTTPRequestHandler):
+        def do_GET(self):
+            payload = (
+                {"data": [{"id": "@azure/gpt-5.6-sol"}]}
+                if self.path == "/v1/models"
+                else {}
+            )
+            body = json.dumps(payload).encode()
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_POST(self):
+            calls.append(
+                json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+            )
+            index = len(calls) - 1
+            if index < len(native_calls):
+                name, args = native_calls[index]
+                item = {
+                    "id": f"fc_{index}",
+                    "type": "function_call",
+                    "call_id": f"call_{index}",
+                    "name": name,
+                    "arguments": json.dumps(args),
+                    "status": "completed",
+                }
+                added = {**item, "arguments": "", "status": "in_progress"}
+                delta = {
+                    "type": "response.function_call_arguments.delta",
+                    "output_index": 0,
+                    "delta": item["arguments"],
+                }
+            else:
+                item = {
+                    "id": "msg_done",
+                    "type": "message",
+                    "role": "assistant",
+                    "status": "completed",
+                    "content": [
+                        {
+                            "type": "output_text",
+                            "text": "editing complete",
+                            "annotations": [],
+                        }
+                    ],
+                }
+                added = {**item, "content": [], "status": "in_progress"}
+                delta = {
+                    "type": "response.output_text.delta",
+                    "output_index": 0,
+                    "content_index": 0,
+                    "delta": "editing complete",
+                }
+            response = {
+                "id": f"resp_{index}",
+                "object": "response",
+                "created_at": 1,
+                "model": "gpt-5.6-sol",
+                "status": "completed",
+                "output": [item],
+                "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
+            }
+            events: list[dict[str, object]] = [
+                {
+                    "type": "response.created",
+                    "response": {**response, "status": "in_progress", "output": []},
+                },
+                {
+                    "type": "response.output_item.added",
+                    "output_index": 0,
+                    "item": added,
+                },
+            ]
+            if item["type"] == "message":
+                events.append(
+                    {
+                        "type": "response.content_part.added",
+                        "output_index": 0,
+                        "content_index": 0,
+                        "part": {"type": "output_text", "text": "", "annotations": []},
+                    }
+                )
+            events += [
+                delta,
+                {"type": "response.output_item.done", "output_index": 0, "item": item},
+                {"type": "response.completed", "response": response},
+            ]
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.end_headers()
+            for event in events:
+                self.wfile.write(f"data: {json.dumps(event)}\n\n".encode())
+                self.wfile.flush()
+
+        def log_message(self, format, *args):
+            pass
+
+    @contextlib.contextmanager
+    def serve(server):
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            yield server
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join()
+
+    node, cli = find_runtime()
+    with (
+        tempfile.TemporaryDirectory(prefix="pi-native-tools-") as directory,
+        serve(ThreadingHTTPServer(("0.0.0.0", 0), Model)) as model,
+    ):
+        root = Path(directory)
+        project = root / "repo"
+        project.mkdir()
+        subprocess.run(["/usr/bin/git", "init", "-q", str(project)], check=True)
+        state = root / "private/project"
+        for name in ("sessions", "cache"):
+            (state / name).mkdir(parents=True)
+        temporary = root / "temporary"
+        for name in ("home", "scratch"):
+            (temporary / name).mkdir(parents=True)
+        (temporary / "cache").symlink_to(state / "cache", target_is_directory=True)
+        snapshot_config(temporary / "config", assets=assets_root(), cli=cli)
+        settings = json.loads((temporary / "config/settings.json").read_text())
+        settings["defaultTools"] = [
+            "read",
+            "write",
+            "edit",
+            "bash",
+            "recovery_list",
+            "recovery_restore",
+            "codemode",
+        ]
+        (temporary / "config/settings.json").write_text(json.dumps(settings))
+        environment = sandbox_environment(node=node, temporary=temporary)
+        environment["PI_SANDBOX_CONTROL"] = "1"
+        controller = editing_controller(
+            node=node, cli=cli, project=project, state=state, assets=assets_root()
+        )
+        command = sandbox_prefix(
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            temporary=temporary,
+            assets=assets_root(),
+        )
+
+        def connect(_host):
+            return http.client.HTTPConnection(
+                "localhost", model.server_port, timeout=10
+            )
+
+        with serve(
+            Broker(
+                temporary / "gateway.sock",
+                key="host-only-test-secret",
+                connect=connect,
+                controller=controller,
+            )
+        ):
+            try:
+                result = subprocess.run(
+                    [
+                        *command,
+                        str(node),
+                        str(cli),
+                        "-p",
+                        "--no-session",
+                        "--no-mcp",
+                        "--no-approve",
+                        "--thinking",
+                        "off",
+                        "Edit the fixture",
+                    ],
+                    cwd=project,
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                    timeout=45,
+                    check=False,
+                )
+                abort_source = r"""
+                    import { existsSync } from 'node:fs';
+                    const controller = new AbortController();
+                    const deadline = setTimeout(() => controller.abort(), 10000);
+                    const watcher = setInterval(() => {
+                        if (existsSync('bridge-ticks')) controller.abort();
+                    }, 50);
+                    try {
+                        const response = await fetch('http://pi-gateway.invalid/control', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ tool: 'bash', args: {
+                                command: 'setsid sh -c "while :; do echo tick >> bridge-ticks; sleep 0.05; done" & wait',
+                                timeout: 30,
+                            }}), signal: controller.signal,
+                        });
+                        for await (const chunk of response.body) {}
+                    } catch (error) {
+                        console.log(error.name);
+                    } finally {
+                        clearInterval(watcher);
+                        clearTimeout(deadline);
+                    }
+                """
+                aborted = subprocess.run(
+                    [
+                        *command,
+                        str(node),
+                        "--input-type=module",
+                        "--eval",
+                        abort_source,
+                    ],
+                    cwd=project,
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                    check=False,
+                )
+                assert aborted.stdout.strip() == "AbortError", aborted.stderr
+                import time
+
+                time.sleep(0.5)
+                size = (project / "bridge-ticks").stat().st_size
+                time.sleep(0.3)
+                assert (project / "bridge-ticks").stat().st_size == size
+            finally:
+                controller.close()
+        assert result.returncode == 0, result.stderr
+        assert result.stdout.strip() == "editing complete"
+        assert (project / "visible.txt").read_text() == "after"
+        assert (project / "shell.txt").read_text() == "shell"
+        assert [entry["label"] for entry in controller.recovery.list()] == [
+            "bash",
+            "bash",
+            "edit",
+            "write",
+        ]
+        assert len(calls) == 3
