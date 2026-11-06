@@ -399,3 +399,40 @@ def test_real_pi_streams_through_authenticated_srt_proxy_without_host_auth():
         assert completion.stdout.strip() == "sandbox reply"
         assert inference_keys == ["host-only-secret"]
         assert json.loads((config / "auth.json").read_text()) == {}
+
+
+def test_broker_validation_errors_explain_invalid_paths_and_json():
+    broker = load_module("broker")
+    from controller import Controller
+    from recovery import Recovery
+
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+
+        def run(request, stop, lock_fd):
+            raise AssertionError("Invalid requests must not start a worker")
+            yield
+
+        controller = Controller(Recovery(root / "private", repo=repo), run=run)
+        with serve(
+            broker.Broker(root / "gateway.sock", key="unused", controller=controller)
+        ):
+            for body, explanation in (
+                (
+                    b'{"tool":"write","args":{"path":"../outside","content":"bad"}}',
+                    "inside the launch repository",
+                ),
+                (b"{", "Expecting property name"),
+            ):
+                connection = UnixHTTPConnection(str(root / "gateway.sock"), timeout=10)
+                connection.request(
+                    "POST", "http://pi-gateway.invalid/control", body=body
+                )
+                response = connection.getresponse()
+                assert response.status == 400
+                assert explanation in response.read().decode()
+                connection.close()
+        controller.close()
+        assert not (root / "outside").exists()

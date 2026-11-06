@@ -59,7 +59,7 @@ def test_storage_prunes_oldest_completed_but_oversized_checkpoint_never_mutates(
         assert (repo / "file").read_bytes() == b"x" * 100000
 
 
-def test_snapshot_rejects_hardlinks_and_restore_rejects_external_symlink():
+def test_snapshot_saves_hardlinks_and_restore_rejects_external_symlink():
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
         repo = root / "repo"
@@ -72,8 +72,11 @@ def test_snapshot_rejects_hardlinks_and_restore_rejects_external_symlink():
         store = Recovery(root / "private", repo=repo)
         checkpoint = store.checkpoint("write")
         (root / "hardlink").hardlink_to(repo / "file")
-        with pytest.raises(RuntimeError, match="hardlink"):
-            store.checkpoint("bash")
+        shared = store.checkpoint("bash")
+        recovered = store.restore(shared, ["file"])
+        assert (repo / recovered[0]).read_text() == "safe"
+        assert (root / "hardlink").read_text() == "safe"
+        assert (repo / "file").stat().st_nlink == 2
         (root / "hardlink").unlink()
         (repo / "dir/file").unlink()
         (repo / "dir").rmdir()
@@ -297,3 +300,45 @@ def test_abrupt_prune_crash_in_another_repo_does_not_strand_global_quota():
         (repo_a / "file").unlink()
         assert store_a.restore(latest, ["file"]) == ["file"]
         assert (repo_a / "file").read_bytes() == b"latest" * 13000
+
+
+def test_global_pruning_retains_cross_repo_shared_blobs_without_duplicate_charges():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo_a = root / "a"
+        repo_b = root / "b"
+        repo_a.mkdir()
+        repo_b.mkdir()
+        store_a = Recovery(root / "private", repo=repo_a, total_limit=420000)
+        (repo_a / "file").write_bytes(b"old" * 26000)
+        (repo_a / "shared").write_bytes(b"shared" * 3000)
+        oldest = store_a.checkpoint("bash")
+        store_a.complete(oldest)
+        (repo_a / "file").write_bytes(b"latest" * 13000)
+        (repo_a / "shared").unlink()
+        latest_a = store_a.checkpoint("bash")
+        store_a.complete(latest_a)
+        store_b = Recovery(
+            root / "private", repo=repo_b, repo_limit=126000, total_limit=420000
+        )
+        (repo_b / "shared").write_bytes(b"shared" * 3000)
+        first_b = store_b.checkpoint("bash")
+        store_b.complete(first_b)
+        (repo_b / "duplicate").write_bytes(b"shared" * 3000)
+        (repo_b / "new").write_bytes(b"other" * 16000)
+        latest_b = store_b.checkpoint("bash")
+        store_b.complete(latest_b)
+        assert [entry["checkpoint"] for entry in store_a.list()] == [latest_a]
+        assert [entry["checkpoint"] for entry in store_b.list()] == [latest_b, first_b]
+        (repo_b / "shared").unlink()
+        (repo_b / "new").unlink()
+        assert store_b.restore(latest_b, ["shared", "new"]) == ["shared", "new"]
+        assert (repo_b / "shared").read_bytes() == b"shared" * 3000
+        assert (repo_b / "new").read_bytes() == b"other" * 16000
+        (repo_a / "file").unlink()
+        assert store_a.restore(latest_a, ["file"]) == ["file"]
+        assert (repo_a / "file").read_bytes() == b"latest" * 13000
+        allocated = (root / "private").stat().st_blocks * 512 + sum(
+            path.stat().st_blocks * 512 for path in (root / "private").rglob("*")
+        )
+        assert allocated <= 420000

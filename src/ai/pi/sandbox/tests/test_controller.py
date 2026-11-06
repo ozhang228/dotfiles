@@ -65,7 +65,7 @@ def test_failed_worker_retains_checkpoint_and_recovery_exports_host_conflict():
         checkpoint = controller.recovery.list()[0]
         assert checkpoint["status"] == "interrupted"
         (repo / "file").write_text("new Neovim edit")
-        result = list(
+        results = list(
             controller.execute(
                 parse_request(
                     {
@@ -78,7 +78,8 @@ def test_failed_worker_retains_checkpoint_and_recovery_exports_host_conflict():
                 ),
                 threading.Event(),
             )
-        )[0]
+        )
+        result = results[0]
         recovered = result["result"]["paths"][0]
         assert (repo / recovered).read_text() == "original"
         assert (repo / "file").read_text() == "new Neovim edit"
@@ -90,6 +91,7 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
     import json
     import subprocess
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
     from broker import Broker
     from launcher import (
         assets_root,
@@ -101,22 +103,7 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
     from runtime import find_runtime
 
     calls = []
-    native_calls = [
-        (
-            "write",
-            {
-                "path": "visible.txt",
-                "content": "before",
-                "summary": "create visible file",
-            },
-        ),
-        (
-            "codemode",
-            {
-                "code": 'text(await tools.edit({path:"visible.txt",edits:[{oldText:"before",newText:"after"}],summary:"update visible file"})); text(await tools.bash({command:"printf shell > shell.txt",summary:"create shell file"})); text(await tools.recovery_list({}));'
-            },
-        ),
-    ]
+    native_calls = []
 
     class Model(BaseHTTPRequestHandler):
         def do_GET(self):
@@ -236,7 +223,41 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
         root = Path(directory)
         project = root / "repo"
         project.mkdir()
+        (project / ".zprofile").touch()
+        zprofile_inode = (project / ".zprofile").stat().st_ino
+        (project / ".claude").mkdir()
+        (project / ".claude/settings.local.json").write_bytes(b'{"allowed":true}')
+        native_calls = [
+            (
+                "write",
+                {
+                    "path": str(project / "visible.txt"),
+                    "content": "before",
+                    "summary": "create visible file",
+                },
+            ),
+            (
+                "codemode",
+                {
+                    "code": "text(await tools.edit({path:"
+                    + json.dumps(str(project / "visible.txt"))
+                    + ',edits:[{oldText:"before",newText:"after"}],summary:"update visible file"})); text(await tools.bash({command:"printf shell > shell.txt",summary:"create shell file"})); text(await tools.recovery_list({}));'
+                },
+            ),
+            (
+                "write",
+                {
+                    "path": str(root / "outside.txt"),
+                    "content": "denied",
+                    "summary": "outside scope",
+                },
+            ),
+        ]
         subprocess.run(["/usr/bin/git", "init", "-q", str(project)], check=True)
+        cached = root / "cached-package"
+        cached.write_text("package")
+        (project / ".venv").mkdir()
+        (project / ".venv/package.py").hardlink_to(cached)
         state = root / "private/project"
         for name in ("sessions", "cache"):
             (state / name).mkdir(parents=True)
@@ -355,10 +376,101 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
         assert result.stdout.strip() == "editing complete"
         assert (project / "visible.txt").read_text() == "after"
         assert (project / "shell.txt").read_text() == "shell"
+        assert (project / ".zprofile").read_bytes() == b""
+        assert (project / ".zprofile").stat().st_ino == zprofile_inode
+        assert (
+            project / ".claude/settings.local.json"
+        ).read_bytes() == b'{"allowed":true}'
+        for path in (".bashrc", ".gitconfig", ".claude/agents", ".claude/commands"):
+            assert not (project / path).exists(), path
         assert [entry["label"] for entry in controller.recovery.list()] == [
             "bash",
             "bash",
             "edit",
             "write",
         ]
-        assert len(calls) == 3
+        assert len(calls) == 4
+        assert not (root / "outside.txt").exists()
+        assert "Sandbox controller 400" in json.dumps(calls[-1])
+        assert "inside the launch repository" in json.dumps(calls[-1])
+
+
+def test_native_worker_protects_shared_aliases_and_leaves_source_writable():
+    import subprocess
+
+    from launcher import assets_root, editing_controller
+    from runtime import find_runtime
+
+    node, cli = find_runtime()
+    with tempfile.TemporaryDirectory(prefix="pi-shared-files-") as directory:
+        root = Path(directory)
+        project = root / "repo"
+        project.mkdir()
+        subprocess.run(["/usr/bin/git", "init", "-q", str(project)], check=True)
+        sentinel = root / "cache"
+        sentinel.write_text("cached package")
+        sentinel.chmod(0o644)
+        dependencies = project / "setup/.venv/lib"
+        dependencies.mkdir(parents=True)
+        (dependencies / "package.py").hardlink_to(sentinel)
+        (dependencies / "second.py").hardlink_to(sentinel)
+        (project / "shared.py").hardlink_to(sentinel)
+        (project / "alias.py").symlink_to("shared.py")
+        state = root / "private/project"
+        for name in ("sessions", "cache"):
+            (state / name).mkdir(parents=True)
+        controller = editing_controller(
+            node=node, cli=cli, project=project, state=state, assets=assets_root()
+        )
+        try:
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "write",
+                            "args": {"path": "source.py", "content": "first"},
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+            (project / "late.py").hardlink_to(sentinel)
+            messages = list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "bash",
+                            "args": {
+                                "command": """
+                    set -eu
+                    printf fresh > source.py
+                    for path in setup/.venv/lib/package.py setup/.venv/lib/second.py shared.py late.py; do
+                        if { printf damaged >> "$path"; } 2>/dev/null; then exit 10; fi
+                        if chmod 600 "$path" 2>/dev/null; then exit 11; fi
+                        if ln "$path" bypass.py 2>/dev/null; then exit 12; fi
+                        if mv "$path" moved.py 2>/dev/null; then exit 13; fi
+                    done
+                    if { printf damaged >> alias.py; } 2>/dev/null; then exit 14; fi
+                    if chmod 600 alias.py 2>/dev/null; then exit 15; fi
+                    if ln -L alias.py bypass.py 2>/dev/null; then exit 16; fi
+                    printf protected
+                """
+                            },
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+            assert messages[-1]["result"]["content"] == [
+                {"type": "text", "text": "protected"}
+            ]
+            assert (project / "source.py").read_text() == "fresh"
+            assert sentinel.read_text() == "cached package"
+            assert sentinel.stat().st_mode & 0o777 == 0o644
+            assert (dependencies / "package.py").stat().st_nlink == 5
+            checkpoint = controller.recovery.list()[0]["checkpoint"]
+            restored = controller.recovery.restore(checkpoint, ["shared.py"])
+            assert (project / restored[0]).read_text() == "cached package"
+            assert sentinel.read_text() == "cached package"
+        finally:
+            controller.close()

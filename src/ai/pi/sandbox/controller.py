@@ -304,6 +304,12 @@ class Worker:
             if reader >= 0:
                 os.close(reader)
             if process is not None:
+                # Let the supervisor stop bwrap and clean its tracked mount placeholders.
+                try:
+                    process.send_signal(signal.SIGTERM)
+                    process.wait(timeout=1)
+                except (ProcessLookupError, subprocess.TimeoutExpired):
+                    pass
                 # Kill SRT's intermediate shell too; bwrap then kills its PID namespace.
                 try:
                     os.killpg(process.pid, signal.SIGKILL)

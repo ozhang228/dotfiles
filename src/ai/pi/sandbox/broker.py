@@ -8,6 +8,7 @@ import threading
 from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlsplit
+
 from controller import Controller, parse_request
 
 MAX_BODY_BYTES = 8 * 1024 * 1024
@@ -61,7 +62,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
     @property
     def gateway(self):
         if not isinstance(self.server, Broker):
-            raise RuntimeError("Unexpected gateway server")
+            raise TypeError("Unexpected gateway server")
         return self.server
 
     def setup(self):
@@ -148,7 +149,10 @@ class GatewayHandler(BaseHTTPRequestHandler):
         except (OSError, ValueError, RuntimeError) as error:
             try:
                 if watcher is None:
-                    self.reply(400, b"Invalid controller request\n")
+                    self.reply(
+                        400,
+                        f"Invalid controller request: {str(error)[:2000]}\n".encode(),
+                    )
                 else:
                     self.wfile.write(
                         json.dumps(

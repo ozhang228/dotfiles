@@ -10,6 +10,7 @@ import stat
 import time
 import uuid
 from collections.abc import Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
 BUFFER = 1024 * 1024
@@ -25,7 +26,9 @@ def relative_path(value: str):
         or path.is_absolute()
         or any(part in {".", ".."} for part in value.split("/"))
     ):
-        raise ValueError("Paths must be relative, without traversal")
+        raise ValueError(
+            "Paths must stay inside the launch repository, relative and without traversal"
+        )
     return path
 
 
@@ -35,6 +38,12 @@ def sync_directory(path: Path):
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
+
+
+@dataclass(frozen=True)
+class CheckpointUsage:
+    _repo_bytes: int
+    _blob_bytes: int
 
 
 class Recovery:
@@ -118,7 +127,7 @@ class Recovery:
             if mount != self.repo and mount.is_relative_to(self.repo):
                 raise RuntimeError(f"Nested mount refused: {mount}")
 
-    def files(self):
+    def files(self, *, include_excluded=False):
         self.validate_mounts()
         descriptor = os.open(self.repo, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         device = os.fstat(descriptor).st_dev
@@ -127,7 +136,7 @@ class Recovery:
             with os.scandir(parent) as items:
                 for item in items:
                     path = prefix / item.name
-                    if self.excluded(path):
+                    if self.excluded(path) and not include_excluded:
                         continue
                     info = os.stat(item.name, dir_fd=parent, follow_symlinks=False)
                     if info.st_dev != device:
@@ -165,14 +174,15 @@ class Recovery:
                             0,
                         )
                     elif stat.S_ISREG(info.st_mode):
-                        if info.st_nlink != 1:
-                            raise RuntimeError(f"Writable hardlink refused: {path}")
                         file = os.open(
                             item.name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=parent
                         )
                         try:
                             before = os.fstat(file)
-                            if before.st_ino != info.st_ino or before.st_nlink != 1:
+                            if (
+                                before.st_ino != info.st_ino
+                                or before.st_nlink != info.st_nlink
+                            ):
                                 raise RuntimeError(
                                     "Repository changed during checkpoint"
                                 )
@@ -194,22 +204,40 @@ class Recovery:
         finally:
             os.close(descriptor)
 
+    def shared_paths(self):
+        protected = set()
+        for path, kind, _mode, file, _target, _size in self.files(
+            include_excluded=True
+        ):
+            if kind != "file" or os.fstat(file).st_nlink < 2:
+                continue
+            relative = Path(path)
+            for index, part in enumerate(relative.parts[:-1]):
+                if part in {".venv", "venv", "node_modules"}:
+                    relative = Path(*relative.parts[: index + 1])
+                    break
+            protected.add(self.repo / relative)
+        return tuple(sorted(protected))
+
+    def overhead(self, database):
+        # Reserve a complete rollback journal and VACUUM copy alongside the database.
+        pages = database.execute("PRAGMA page_count").fetchone()[0]
+        page_size = database.execute("PRAGMA page_size").fetchone()[0]
+        database_bytes = max(
+            pages * page_size,
+            (self.root / "recovery.sqlite").stat().st_blocks * 512,
+        )
+        directories = sum(
+            path.stat().st_blocks * 512 for path in (self.root, self.root / "blobs")
+        )
+        return database_bytes * 3 + directories
+
     def usage(self, database, repo=None):
         if repo is None:
-            # Reserve a complete rollback journal and VACUUM copy alongside the database.
-            pages = database.execute("PRAGMA page_count").fetchone()[0]
-            page_size = database.execute("PRAGMA page_size").fetchone()[0]
             blobs = database.execute(
                 "SELECT coalesce(sum(bytes),0) FROM blobs"
             ).fetchone()[0]
-            database_bytes = max(
-                pages * page_size,
-                (self.root / "recovery.sqlite").stat().st_blocks * 512,
-            )
-            directories = sum(
-                path.stat().st_blocks * 512 for path in (self.root, self.root / "blobs")
-            )
-            return database_bytes * 3 + blobs + directories
+            return self.overhead(database) + blobs
         metadata = database.execute(
             "SELECT coalesce(sum(512 + length(CAST(path AS BLOB)) + length(CAST(target AS BLOB))),0) FROM entries WHERE checkpoint IN (SELECT id FROM checkpoints WHERE repo=?)",
             (repo,),
@@ -226,6 +254,14 @@ class Recovery:
             (repo,),
         ).fetchone()[0]
         return metadata + blobs + exports + records * RECORD_BYTES
+
+    def checkpoint_usage(self, database):
+        return CheckpointUsage(
+            _repo_bytes=self.usage(database, self.repo_id),
+            _blob_bytes=database.execute(
+                "SELECT coalesce(sum(bytes),0) FROM blobs"
+            ).fetchone()[0],
+        )
 
     def collect(self, database, *, pinned_digest="", staging=""):
         for (digest,) in database.execute(
@@ -252,7 +288,10 @@ class Recovery:
         digest="",
         size=0,
         staging="",
+        accounted: CheckpointUsage | None = None,
     ):
+        if accounted is None:
+            accounted = self.checkpoint_usage(database)
         while True:
             repo_blob = (
                 size
@@ -271,15 +310,13 @@ class Recovery:
                 ).fetchone()
                 else 0
             )
-            repo_full = (
-                self.usage(database, self.repo_id) + repo_bytes + repo_blob
-                > self.repo_limit
-            )
+            repo_full = accounted._repo_bytes + repo_bytes + repo_blob > self.repo_limit
+            total_usage = accounted._blob_bytes + self.overhead(database)
             if (
                 not repo_full
-                and self.usage(database) + total_bytes + total_blob <= self.total_limit
+                and total_usage + total_bytes + total_blob <= self.total_limit
             ):
-                return
+                return accounted
             row = database.execute(
                 """SELECT id FROM checkpoints c WHERE status IN ('completed','interrupted')
                 AND id NOT IN (SELECT id FROM checkpoints n WHERE n.repo=c.repo AND n.status != 'staging' ORDER BY created DESC LIMIT 1)
@@ -299,6 +336,7 @@ class Recovery:
             self.collect(database, pinned_digest=digest, staging=staging)
             database.commit()
             database.execute("VACUUM")
+            accounted = self.checkpoint_usage(database)
 
     def checkpoint(self, label: str):
         identifier = uuid.uuid4().hex
@@ -313,12 +351,18 @@ class Recovery:
             self.collect(database)
             database.commit()
             try:
-                self.make_room(
-                    database, repo_bytes=RECORD_BYTES, total_bytes=RECORD_BYTES
+                accounted = self.make_room(
+                    database,
+                    repo_bytes=RECORD_BYTES,
+                    total_bytes=RECORD_BYTES,
                 )
                 database.execute(
                     "INSERT INTO checkpoints VALUES(?,?,?,?,?)",
                     (identifier, self.repo_id, time.time_ns(), label[:120], "staging"),
+                )
+                accounted = CheckpointUsage(
+                    _repo_bytes=accounted._repo_bytes + RECORD_BYTES,
+                    _blob_bytes=accounted._blob_bytes,
                 )
                 fragment = os.statvfs(self.root / "blobs").f_frsize
                 for path, kind, mode, file, target, size in self.files():
@@ -365,12 +409,13 @@ class Recovery:
                         raise RuntimeError(
                             "Required checkpoint exceeds recovery storage limit"
                         )
-                    self.make_room(
+                    accounted = self.make_room(
                         database,
                         repo_bytes=cost,
                         total_bytes=max(cost * 2, 65536),
                         digest=digest,
                         size=allocation,
+                        accounted=accounted,
                     )
                     if new_blob:
                         staging = self.root / "blobs" / f".{identifier}"
@@ -388,23 +433,25 @@ class Recovery:
                                 allocated = os.fstat(output.fileno()).st_blocks * 512
                                 if allocated > allocation:
                                     allocation = allocated
-                                    self.make_room(
+                                    accounted = self.make_room(
                                         database,
                                         repo_bytes=cost,
                                         total_bytes=max(cost * 2, 65536),
                                         digest=digest,
                                         size=allocation,
                                         staging=staging.name,
+                                        accounted=accounted,
                                     )
                             os.fsync(output.fileno())
                             allocation = os.fstat(output.fileno()).st_blocks * 512
-                            self.make_room(
+                            accounted = self.make_room(
                                 database,
                                 repo_bytes=cost,
                                 total_bytes=max(cost * 2, 65536),
                                 digest=digest,
                                 size=allocation,
                                 staging=staging.name,
+                                accounted=accounted,
                             )
                         if hasher.hexdigest() != digest or copied != size:
                             raise RuntimeError("File changed during checkpoint")
@@ -413,9 +460,23 @@ class Recovery:
                         database.execute(
                             "INSERT INTO blobs VALUES(?,?)", (digest, allocation)
                         )
+                    repo_blob = (
+                        allocation
+                        if digest
+                        and not database.execute(
+                            "SELECT 1 FROM entries e JOIN checkpoints c ON c.id=e.checkpoint WHERE c.repo=? AND e.digest=? LIMIT 1",
+                            (self.repo_id, digest),
+                        ).fetchone()
+                        else 0
+                    )
                     database.execute(
                         "INSERT INTO entries VALUES(?,?,?,?,?,?,?)",
                         (identifier, path, kind, mode, digest, target, size),
+                    )
+                    accounted = CheckpointUsage(
+                        _repo_bytes=accounted._repo_bytes + cost + repo_blob,
+                        _blob_bytes=accounted._blob_bytes
+                        + (allocation if new_blob else 0),
                     )
                 database.execute(
                     'UPDATE checkpoints SET status="active" WHERE id=?', (identifier,)

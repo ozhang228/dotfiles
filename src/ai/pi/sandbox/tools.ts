@@ -4,6 +4,7 @@ import {
   createWriteToolDefinition,
   type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent";
+import { isAbsolute, relative } from "node:path";
 import { Type, type TSchema } from "typebox";
 import { Value } from "typebox/value";
 
@@ -72,7 +73,29 @@ async function request<T extends TSchema>(
     body: JSON.stringify({ tool, args }),
     signal,
   });
-  if (!response.ok || !response.body) throw new Error("Sandbox controller unavailable");
+  if (!response.ok) {
+    let explanation = "";
+    const reader = response.body?.getReader();
+    if (reader) {
+      const decoder = new TextDecoder();
+      let remaining = 2000;
+      try {
+        while (remaining > 0) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          explanation += decoder.decode(value.subarray(0, remaining), { stream: true });
+          remaining -= value.length;
+        }
+        explanation += decoder.decode();
+      } finally {
+        await reader.cancel();
+      }
+    }
+    throw new Error(
+      `Sandbox controller ${response.status}: ${explanation.trim() || response.statusText}`,
+    );
+  }
+  if (!response.body) throw new Error("Sandbox controller returned no response body");
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let pending = "";
@@ -100,12 +123,24 @@ async function request<T extends TSchema>(
   }
 }
 
+function relativeToolPath(cwd: string, path: string) {
+  if (!isAbsolute(path) || path.split("/").some((part) => part === "." || part === "..")) {
+    return path;
+  }
+  return relative(cwd, path);
+}
+
 export function sandboxWrite(cwd: string) {
   const native = createWriteToolDefinition(cwd);
   return {
     ...native,
     execute: async function execute(_id, args, signal, _update, _ctx) {
-      const result = await request("write", args, writeResult, signal);
+      const result = await request(
+        "write",
+        { ...args, path: relativeToolPath(cwd, args.path) },
+        writeResult,
+        signal,
+      );
       return { ...result, details: undefined };
     },
   } satisfies typeof native;
@@ -116,7 +151,12 @@ export function sandboxEdit(cwd: string) {
   return {
     ...native,
     execute: async function execute(_id, args, signal, _update, _ctx) {
-      const result = await request("edit", args, editResult, signal);
+      const result = await request(
+        "edit",
+        { ...args, path: relativeToolPath(cwd, args.path) },
+        editResult,
+        signal,
+      );
       return { ...result, details: result.details };
     },
   } satisfies typeof native;

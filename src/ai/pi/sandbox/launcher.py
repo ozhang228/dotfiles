@@ -361,6 +361,7 @@ def editing_controller(
                 protected=[
                     *protected_git_paths(project),
                     *credential_paths(project),
+                    *recovery.shared_paths(),
                     *([assets] if assets.is_relative_to(project) else []),
                 ],
             )
