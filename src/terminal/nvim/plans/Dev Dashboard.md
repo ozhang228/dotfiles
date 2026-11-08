@@ -14,7 +14,10 @@
       - [x] FE display (don't display when No, otherwise display xx/xx and the same sign)
     - [-] Popover for status checks
 - [x] Setup backend proxy
-- [ ] Help Page (lib-ui), zustand store that regsiters all keybindings, then help page which reads off of it
+- [-] Help Page (lib-ui), zustand store that regsiters all keybindings, then help page which reads off of it
+- [ ] Polish the NavBar (lib-ui)
+  - [ ] Underline or otherwise indicate the active page
+  - [ ] Add a mobile layout
 - [ ] Optimize PR GraphQL query patterns where measurements justify it
   - [ ] Compare the current filtered query with a broader batched query and client-side filtering at a 10-PR page size; measure latency, response size, filter correctness, and GraphQL cost
     - [ ] Evaluate splitting essential row data from additional data such as status checks into parallel requests; compare time to first render and total latency with one request

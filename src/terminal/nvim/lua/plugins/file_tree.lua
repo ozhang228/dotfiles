@@ -1,4 +1,9 @@
-local function is_test(name) return name:match("%.test%.") ~= nil or name:match("%.spec%.") ~= nil or name:match("%.browser%.") ~= nil end
+local function is_test_or_story(name)
+  return name:match("%.test%.") ~= nil
+    or name:match("%.spec%.") ~= nil
+    or name:match("%.browser%.") ~= nil
+    or name:match("%.stories%.") ~= nil
+end
 
 return {
   "nvim-mini/mini.files",
@@ -16,9 +21,9 @@ return {
           if a_hidden ~= b_hidden then return not a_hidden end
           -- Rule 2: directories before files
           if a_dir ~= b_dir then return a_dir end
-          -- Rule 3: source files before test files
-          local a_test = is_test(a.name)
-          local b_test = is_test(b.name)
+          -- Rule 3: source files before test and story files
+          local a_test = is_test_or_story(a.name)
+          local b_test = is_test_or_story(b.name)
           if a_test ~= b_test then return b_test end
           -- Rule 4: group by extension (directories have no extension)
           if not a_dir and not b_dir then
