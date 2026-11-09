@@ -51,7 +51,7 @@ return {
           },
           buffer = {
             score_offset = 0,
-            min_keyword_length = 4,
+            min_keyword_length = 3,
             max_items = 10,
           },
         },
@@ -101,7 +101,10 @@ return {
         },
       },
       signature = { enabled = true, window = { border = "rounded" } },
-      fuzzy = { implementation = "prefer_rust" },
+      fuzzy = {
+        implementation = "prefer_rust",
+        sorts = { "sort_text", "score" },
+      },
     },
   },
 }
