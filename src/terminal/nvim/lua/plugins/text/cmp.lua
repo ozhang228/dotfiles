@@ -1,3 +1,5 @@
+local source_priority = { lazydev = 0, lsp = 1, path = 2, snippets = 3, buffer = 4, ripgrep = 5 }
+
 return {
   {
     "Saghen/blink.cmp",
@@ -103,7 +105,16 @@ return {
       signature = { enabled = true, window = { border = "rounded" } },
       fuzzy = {
         implementation = "prefer_rust",
-        sorts = { "sort_text", "score" },
+        sorts = {
+          "exact",
+          function(a, b)
+            local a_priority = source_priority[a.source_id] or 6
+            local b_priority = source_priority[b.source_id] or 6
+            if a_priority ~= b_priority then return a_priority < b_priority end
+          end,
+          "sort_text",
+          "score",
+        },
       },
     },
   },
