@@ -5,14 +5,17 @@
 # inside an nvim floating terminal (nvim sets $NVIM for its jobs).
 function tmux_autostart
     if status is-interactive
+        and isatty stdin
+        and isatty stdout
         and not set -q TMUX
         and not set -q NVIM
         and type -q tmux
 
         if tmux has-session -t default 2>/dev/null
-            exec tmux attach-session -t default
+            command tmux attach-session -t default
         else
-            exec tmux new-session -s default -c ~
+            command tmux new-session -s default -c ~
         end
+        and exit
     end
 end
