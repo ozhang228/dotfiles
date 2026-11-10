@@ -4,16 +4,12 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Required before switching
 
-- [ ] Establish the Pi baseline
-  - [ ] Pin a supported Pi release and extension versions; this audit checked v1.5.0, which already includes MCP and codemode
-  - [ ] Verify installation and symlinks on other machines before switching them to Pi
 - [ ] Verify the existing model gateway
-  - [ ] Verify real streamed responses, tool calls, reasoning levels, cancellation, usage reporting, and provider errors through the gateway
+  - [ ] Verify reasoning levels, usage reporting, and provider errors through the gateway
   - [ ] Support switching between the Claude and OpenAI models I use without losing the active conversation
-- [ ] Verify sandboxed Pi on remaining Ubuntu and Manjaro machines, including native isolation/recovery smoke tests
-  - [ ] Check actual Neovim/tmux startup, resume, Ctrl+C, resize, scrollback, and immediate LazyGit changes
-  - [ ] Exercise real builds and formatters in larger repositories; measure checkpoint cost beyond dotfiles
-  - [ ] Extend recovery tests to interrupted exports, edits made concurrently by host programs, and host-controller death while a worker still holds the repo operation lock
+- [ ] Verify installation, symlinks, and native isolation/recovery smoke tests on remaining Ubuntu and Manjaro machines
+- [ ] Exercise real builds and formatters in larger repositories; measure checkpoint cost beyond dotfiles
+- [ ] Extend recovery tests to interrupted exports, host edits during checkpoint capture, and host-controller death while a worker holds the repo operation lock
 - [ ] Add explicitly scoped worker network and external capabilities
   - [ ] Start with an explicit domain allowlist for documentation and project package registries; keep other destinations blocked
   - [ ] Give workers private dependency caches and repo-local virtual environments/node_modules; keep shared host caches protected
@@ -21,26 +17,20 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Verify DNS, TLS, proxies, timeouts, and errors; then add explicitly scoped APIs, databases, and MCP services
   - [ ] Use host brokers or scoped credential injection; reusable credentials and privileged host sockets stay inaccessible
   - [ ] Expose only needed host diagnostics through a scoped read-only interface
-  - [ ] Enforce writable external operations independently of prompt instructions; preserve explicit push/deploy/restart approval, protected default branches, draft PRs, and no GitHub review-conversation mutations
-  - [ ] Bind approval to the concrete action; skills, repository content, and tool results cannot supply authority
+  - [ ] Scope external writes independently of model instructions; retain protected default branches and existing Git/external-action rules
 - [ ] Extend local Git support without weakening the sandbox
   - [ ] Support read-only Git inspection in linked worktrees whose metadata is outside the launch repo
   - [ ] Add explicitly requested local commits later; keep Git metadata read-only until then
   - [ ] Add push and draft PR creation only with explicit approval and scoped authentication
-- [ ] Add sandboxed dev servers and watchers after the foreground-command version
-  - [ ] Extend the host controller with supervised jobs, scoped ports, cancellation, and verified process-tree cleanup
-  - [ ] Define recovery for writes made after a launch command returns; do not silently bypass the checkpoint guarantee
-  - [ ] Reuse the same controller boundary for statically configured extra repos, with separate scope and recovery accounting
-  - [ ] Verify recovery and process cleanup for background jobs and future subagents
 - [ ] Preserve worktree and editor integration
   - [ ] Switch AI_CLI_CMD to ai-resume --agent pi when ready; keep the existing Snacks terminal toggle on ai-resume --agent codex --no-daemon for now
-  - [ ] Verify the current @file:line and @file:start-end mappings; translate references if Pi does not resolve their existing syntax correctly
+  - [ ] Check Neovim/tmux startup, resume, Ctrl+C, resize, scrollback, and immediate LazyGit changes
+  - [ ] Verify @file:line and @file:start-end references through Pi
   - [ ] Verify linked-worktree separation and moved session directories
-- [ ] Reuse existing instructions and skills
+- [ ] Verify remaining instruction and skill integration
   - [ ] Verify ancestor/project AGENTS.md and CLAUDE.md discovery
-  - [ ] Verify skill workflows through Pi, including brainstorm, code-review, debug, postmortem, and applauncher-use
+  - [ ] Verify brainstorm, debug, postmortem, and applauncher-use through Pi
   - [ ] Audit skill assumptions about tool names, delegation, model routing, questions, and local artifacts; adapt only incompatible harness contracts
-  - [ ] Keep familiar /brainstorm and /code-review entry points through aliases/templates if desired; Pi's native commands use /skill:name
   - [ ] Verify rule loading stays scoped; adapt debug/postmortem to the investigation workflow chosen below
 - [ ] Configure the MCP tools I use
   - [ ] Migrate developer, Slack read-only, Polaris, Grafana, Splunk, and OpenAI documentation servers to Pi's native MCP configuration
@@ -48,12 +38,12 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Verify a real read-only call against each required service through the sandbox
   - [ ] Verify native codemode/tool search with the required services: bounded output, parallel independent calls, and ordered errors/results
   - [ ] Add the historical TAPS position-query server only if still needed and accessible
-- [ ] Preserve long-running command control
+- [ ] Add managed long-running jobs, dev servers, and watchers
   - [ ] Add or select managed background jobs with stable IDs, bounded incremental output, status, exit codes, cancellation, and process-tree cleanup
   - [ ] Support long tests, benchmarks, local servers, and notebooks while continuing the conversation
   - [ ] Support interactive stdin or PTY sessions where required; verify whether existing Pi facilities cover each case before adding a tool
-  - [ ] Bind local development servers to 0.0.0.0 and preserve the existing tmux process-cleanup behavior
-  - [ ] Keep jobs and their writable paths inside the sandbox; define what survives harness exit and what must stop
+  - [ ] Scope server ports, bind to 0.0.0.0, and verify process-tree cleanup after cancellation and harness exit
+  - [ ] Define recovery for writes made after a launch command returns; keep jobs and writable paths inside the sandbox
 - [ ] Rethink the memory and debugging system beyond Anvil
   - [ ] Define what is missing from keeping notebooks and postmortems in one place: finding previous work, resuming investigations, rerunning evidence, or recalling useful findings
   - [ ] Decide where investigations, reproducible notebooks, postmortems, reusable helpers, and durable knowledge belong and how they connect
@@ -80,7 +70,7 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 - [ ] Verify native conversation behavior
   - [ ] Exercise queued steering and follow-up messages during active tools; preserve task direction and cancellation
   - [ ] Exercise automatic/manual compaction and resume with important constraints retained
-  - [ ] Verify model/thinking selectors, file/image input, context/usage display, and clipboard behavior
+  - [ ] Verify file/image input and clipboard behavior
 
 ## Follow-up work
 
@@ -96,9 +86,9 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Plugin shortlist to review
 
-These are candidates, not an approved install set. Reviewed repository READMEs, package manifests, and selected implementation paths on 2026-11-05. Versions below are from repository manifests, not independently verified npm releases. Nothing was installed or executed. Prefer one package per responsibility and load selected resources from bundles rather than enabling everything.
+Candidates for exploration; most will be skipped. Prefer one package per responsibility. Source versions below do not establish runtime compatibility.
 
-- [ ] Check additional packages (not yet reviewed; exploration only, most may be skipped; verify overlap with existing candidates)
+- [ ] Review additional packages for useful features and overlap
   - [ ] [@dietrichgebert/ponytail](https://pi.dev/packages/@dietrichgebert/ponytail)
   - [ ] [billion-context](https://pi.dev/packages/billion-context)
   - [ ] [pi-web-access](https://pi.dev/packages/pi-web-access)
@@ -112,34 +102,16 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
   - [ ] `rpiv-todo` — todo tool
   - [ ] `pi-computer-use` — desktop/GUI automation
   - [ ] `pi-session-recall` — search and query past sessions
-  - [ ] `npm:pi-sandbox`
   - [ ] `npm:@narumitw/pi-btw`
   - [ ] `npm:pi-observational-memory`
-  - [ ] `pi-lens`
   - [ ] `@feniix/pi-devtools`
   - [ ] `@gwynnnplaine/pi-github`
 
 - [ ] Review the core plugin candidates
-  - [ ] Review [pi-subagents](https://github.com/nicobailon/pi-subagents) for delegation
-    - [ ] Source version 0.85.0 requires Pi 1.2.0 or newer; compare foreground/background children, fleet inspection, steering, stop, result delivery, and model selection with my existing skill contracts
-    - [ ] Verify in-process and detached children inherit the full-process sandbox and chosen permission layer; do not assume integration with a different author's permission plugin
   - [ ] Review [pi-interactive-shell](https://github.com/nicobailon/pi-interactive-shell) for managed jobs and PTYs
     - [ ] Source version 0.18.0 provides stable session IDs, input, status, background dispatch, and user takeover; verify build/test/server workflows inside the sandbox
     - [ ] Disable automatic quiet-close for servers; its kill result can mean supervision ended without confirmed process exit, so verify actual process-tree termination
     - [ ] Review its default 24-hour saved-log cleanup and overlay behavior against recoverability and the compact tool display
-  - [ ] Review [@gotgenes/pi-permission-system](https://github.com/gotgenes/pi-packages/tree/main/packages/pi-permission-system) for action approvals
-    - [ ] Source version 42.0.0 declares Pi >=1.0.0; review allow/ask/deny policies, canonical paths, fail-closed gate errors, unknown shell commands, and MCP access
-    - [ ] Use the current monorepo; the old standalone repository is archived because it moved
-    - [ ] Verify indirect codemode calls and all child execution paths; its documented automatic integration is with @gotgenes/pi-subagents, not necessarily nicobailon's package
-    - [ ] Keep automated authorizer/model-judge extensions off initially; explicit push/deploy approval must remain mine
-  - [ ] Review [cc-safety-net](https://github.com/kenryu42/cc-safety-net) for destructive-command checks
-    - [ ] Source version 2.7.3 includes a Pi extension and semantic command checks; compare its destructive Git, filesystem, and secret-access coverage with my rules
-    - [ ] Treat it as an additional guard: its documentation explicitly says it is not a sandbox and it provides no general filesystem recovery
-    - [ ] Inspect configuration-error fallback to defaults and any override controls; ensure they cannot weaken mandatory action policies
-  - [ ] Review [agents-sandbox](https://github.com/inoio/agents-sandbox) for whole-agent isolation
-    - [ ] This is a launcher, not a Pi extension; evaluate its per-project microVM, scoped network, host-side secret injection, Linux/KVM, and macOS requirements
-    - [ ] Its default workspace sharing is read/write; choose a protected copy/overlay and independently recoverable apply boundary before accepting it
-    - [ ] Verify Neovim/tmux attachment, Portkey/MCP connectivity, local server access, subagents, and recovery after crashes
   - [ ] Review [pi-memory](https://github.com/jayzeng/pi-memory) for portable Markdown memory
     - [ ] Source version 0.4.2 declares Pi >=0.81.1; review bounded injection, plain files, optional qmd search, and memory_forget/memory_restore recovery records
     - [ ] Disable default exit-summary generation with PI_MEMORY_EXIT_SUMMARY=0 and enforce explicit authorization for durable writes; its memory recovery does not protect arbitrary workspace files
@@ -164,45 +136,12 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
     - [ ] Inspect dependency/lifecycle-script requirements and output volume; choose it only if the extra checks are useful
   - [ ] Review [pi-notify](https://github.com/ferologics/pi-notify) for completion notifications
     - [ ] Source version 1.4.0 uses terminal OSC protocols and tmux passthrough; my tmux config already enables passthrough, but verify delivery through the actual Snacks/Kitty/tmux setup
-    - [ ] Check whether waiting-for-approval notifications need a separate event handler; the documented main trigger is agent completion
   - [ ] Review selected [mitsupi / agent-stuff](https://github.com/mitsuhiko/agent-stuff) utilities
     - [ ] Source version 1.6.0 includes session control, goal tracking, question answering, review, usage breakdown, notifications, and other extensions
     - [ ] Select only needed files; do not enable its separate todos store, automatic GitHub trust, uv restrictions, or alternate review workflow by default
-    - [ ] Consider answer/control/goal/session-breakdown individually; the bundled subagent extension is serial and may not cover my parallel review workflow
+    - [ ] Consider answer/control/goal/session-breakdown individually
 
-- [ ] Keep these candidates on hold until their gaps are resolved
-  - [ ] Review [carderne/pi-sandbox](https://github.com/carderne/pi-sandbox) only with an independent fail-closed launcher
-    - [ ] Source version 0.8.0 declares a ^0.80.0 Pi peer range, which excludes 1.5.0; resolve compatibility before installation
-    - [ ] Its initialization failure clears sandboxEnabled and its bash wrapper uses ordinary operations when disabled; fix or contain this fallback before use
-    - [ ] It gates built-in file tools and sandboxes bash, not the entire agent/extension process; documented Linux write globs are ignored by the OS backend and the browser sample opens security loopholes
-  - [ ] Review [@oddsjam/pi-sandbox](https://github.com/oddsjam/pi-sandbox) only with an independent fail-closed launcher
-    - [ ] Source version 0.1.0 gates built-in tools but explicitly leaves Pi itself unsandboxed; its bash wrapper calls localBash when initialization/enabling is false
-    - [ ] A startup failure therefore does not satisfy my mandatory sandbox boundary; also inspect weaker network isolation defaults, child tools, and rollback coverage
-  - [ ] Review Pi's [git-checkpoint example](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/examples/extensions/git-checkpoint.ts) only as an illustration
-    - [ ] It uses git stash create, keeps refs in an in-memory map, clears them after a run, and applies a stash when asked; it is not persistent recovery and does not capture untracked/ignored files
-    - [ ] Do not use it to satisfy the no-unrecoverable-deletion requirement
-  - [ ] Avoid [pi-mcp-adapter](https://github.com/nicobailon/pi-mcp-adapter) and [pi-mcp-extension](https://github.com/irahardianto/pi-mcp-extension) unless a concrete unsupported transport requires one
-    - [ ] Native Pi 1.5.0 already handles the HTTP MCP services I use; additional clients duplicate tool discovery and authentication
-
-- [ ] Approve a concrete plugin combination after verification
-  - [ ] Verify published versions, supported Pi/Node versions, licenses, active repository ownership, dependency trees, and lifecycle scripts; pin exact versions or commits
-  - [ ] Run each candidate's actual relevant tests against the pinned tree in isolation; README and manifest compatibility do not prove runtime compatibility
-  - [ ] Verify the combined load order and tool replacements, especially bash, edit/write, permission hooks, codemode, detached jobs, and subagents
-  - [ ] Reject a required safety component if installation/loading fails or the sandbox is unavailable; Pi's ordinary package-loading behavior can warn and continue without a failed package
-  - [ ] Recheck isolation and recovery with selected plugins loaded; verify they cannot bypass the controller or access recovery storage
-  - [ ] Exercise gateway/MCP reads, delegated edits, long tests, interactive shells, cancellation, compaction/resume, and approval prompts through the actual editor workflow
-  - [ ] Resolve remaining integration gaps before making Pi the editor default
-
-Discovery sources: [Pi package gallery](https://pi.dev/packages) and each repository linked above. Repository inspection identified specific limits; no plugin has been certified safe or compatible end to end. General npm search was unavailable during discovery, so exact publication/install verification remains a checklist item.
-
-## Evidence and verification limits
-
-Audited the current dotfiles, local Claude/Codex history indexes, all 1,193 retained Codex JSONL files, and all three retained Claude project transcripts. Retained logs include imported conversations and worker sessions, so counts below are recorded occurrences rather than unique tasks. Local history indexes contain 18,338 Codex entries and 12,116 Claude entries; some historical features have since changed.
-
-Claude history contains 70 /code-review, 31 /brainstorm, 113 /model, 162 /clear, and 30 /compact entries. Local Claude metadata records 1,436 prompt-queue uses. Codex logs contain 764 spawn_agent calls across 153 files, 36,467 nested write_stdin calls across 510 files, and 584 nonblocking question calls across 108 files. MCP use is substantial: 2,953 Splunk queries, 694 Slack searches, 410 Prometheus queries, and 165 Polaris calls. Image inspection and compaction also appear repeatedly. These demonstrate workflow dependencies; configured Claude LSP plugins alone do not prove agent-side LSP use.
-
-Current Codex configuration uses Portkey with the Responses API, enabled memory, disabled web search, and unrestricted local permissions. Those unrestricted permissions describe the current setup; the requested Pi sandbox is a stronger requirement. Old hook trust records exist, but the referenced global hooks file was absent during this audit.
-
-Pi behavior was checked against source/docs for released v1.5.0 and current documentation. Pi already supports MCP, skills, context files, sessions, steering, compaction, model settings, and codemode. Its security documentation explicitly says project trust does not sandbox tools. Gateway/MCP integration and sandbox verification on other machines remain pending.
-
-Sources: [Pi v1.5.0](https://github.com/earendil-works/pi/releases/tag/v1.5.0), [security](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/security.md), [MCP](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/mcp.md), [extensions](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md), [skills](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md), and [official OpenAI documentation](https://learn.chatgpt.com/docs/developer-commands).
+- [ ] Test selected plugins inside the existing sandbox
+  - [ ] Verify Pi/Node compatibility, licenses, ownership, dependencies, and lifecycle scripts; run each package's relevant tests in isolation
+  - [ ] Verify combined load order, tool replacements, codemode, MCP, and managed jobs through the actual editor workflow
+  - [ ] Recheck isolation, recovery, cancellation, and process cleanup with selected plugins loaded
