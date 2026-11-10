@@ -10,8 +10,7 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 - [ ] Verify the existing model gateway
   - [ ] Verify real streamed responses, tool calls, reasoning levels, cancellation, usage reporting, and provider errors through the gateway
   - [ ] Support switching between the Claude and OpenAI models I use without losing the active conversation
-- [ ] Verify sandboxed Pi on each Ubuntu and Manjaro machine
-  - [ ] Run the native isolation/recovery smoke test; check AppArmor or namespace restrictions when startup fails
+- [ ] Verify sandboxed Pi on remaining Ubuntu and Manjaro machines, including native isolation/recovery smoke tests
   - [ ] Check actual Neovim/tmux startup, resume, Ctrl+C, resize, scrollback, and immediate LazyGit changes
   - [ ] Exercise real builds and formatters in larger repositories; measure checkpoint cost beyond dotfiles
   - [ ] Extend recovery tests to interrupted exports, edits made concurrently by host programs, and host-controller death while a worker still holds the repo operation lock
