@@ -4,7 +4,6 @@ import {
   createWriteToolDefinition,
   type ExtensionAPI,
 } from "@earendil-works/pi-coding-agent";
-import { isAbsolute, relative } from "node:path";
 import { Type, type TSchema } from "typebox";
 import { Value } from "typebox/value";
 
@@ -123,24 +122,12 @@ async function request<T extends TSchema>(
   }
 }
 
-function relativeToolPath(cwd: string, path: string) {
-  if (!isAbsolute(path) || path.split("/").some((part) => part === "." || part === "..")) {
-    return path;
-  }
-  return relative(cwd, path);
-}
-
 export function sandboxWrite(cwd: string) {
   const native = createWriteToolDefinition(cwd);
   return {
     ...native,
     execute: async function execute(_id, args, signal, _update, _ctx) {
-      const result = await request(
-        "write",
-        { ...args, path: relativeToolPath(cwd, args.path) },
-        writeResult,
-        signal,
-      );
+      const result = await request("write", args, writeResult, signal);
       return { ...result, details: undefined };
     },
   } satisfies typeof native;
@@ -151,12 +138,7 @@ export function sandboxEdit(cwd: string) {
   return {
     ...native,
     execute: async function execute(_id, args, signal, _update, _ctx) {
-      const result = await request(
-        "edit",
-        { ...args, path: relativeToolPath(cwd, args.path) },
-        editResult,
-        signal,
-      );
+      const result = await request("edit", args, editResult, signal);
       return { ...result, details: result.details };
     },
   } satisfies typeof native;
@@ -164,8 +146,20 @@ export function sandboxEdit(cwd: string) {
 
 export function sandboxBash(cwd: string) {
   const native = createBashToolDefinition(cwd);
+  const parameters = Type.Object({
+    ...native.parameters.properties,
+    writablePaths: Type.Optional(
+      Type.Array(Type.String(), {
+        minItems: 1,
+        maxItems: 50,
+        description:
+          "Existing directories this command may change (absolute, ~/ or relative). All approved repositories remain readable. Defaults to the working directory. Choose the smallest directories needed so recovery stays fast and bounded; other directories stay read-only for this command.",
+      }),
+    ),
+  });
   return {
     ...native,
+    parameters,
     execute: async function execute(_id, args, signal, update, _ctx) {
       const result = await request("bash", args, bashResult, signal, (partial) =>
         update?.({ ...partial, details: partial.details }),

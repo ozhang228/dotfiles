@@ -22,6 +22,7 @@ def load_module(name):
         (Path(__file__).parent if name == "smoke" else Path(__file__).parents[1])
         / f"{name}.py",
     )
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -83,7 +84,7 @@ def test_broker_preserves_stream_and_blocks_routing_and_redirects():
             self.send_header("Location", "https://unapproved.invalid/secret")
             self.end_headers()
 
-        def log_message(self, *_):
+        def log_message(self, format, *args):
             pass
 
     with (
@@ -308,7 +309,7 @@ def test_real_pi_streams_through_authenticated_srt_proxy_without_host_auth():
             self.end_headers()
             self.wfile.write(data)
 
-        def log_message(self, *_):
+        def log_message(self, format, *args):
             pass
 
     with (
@@ -347,8 +348,14 @@ def test_real_pi_streams_through_authenticated_srt_proxy_without_host_auth():
                 env={"PATH": "/usr/bin:/bin"},
             )
             try:
+                assert proxy.stdout is not None
                 port = int(proxy.stdout.readline())
-                launcher.snapshot_config(config, assets=launcher.assets_root(), cli=cli)
+                launcher.snapshot_config(
+                    config,
+                    assets=launcher.assets_root(),
+                    cli=cli,
+                    roots=launcher.approved_repositories(Path(directory)),
+                )
                 environment = {
                     "HOME": directory,
                     "PATH": "/usr/bin",
@@ -422,7 +429,7 @@ def test_broker_validation_errors_explain_invalid_paths_and_json():
             for body, explanation in (
                 (
                     b'{"tool":"write","args":{"path":"../outside","content":"bad"}}',
-                    "inside the launch repository",
+                    "without traversal",
                 ),
                 (b"{", "Expecting property name"),
             ):

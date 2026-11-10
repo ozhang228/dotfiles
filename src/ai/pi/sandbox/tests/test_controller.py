@@ -1,6 +1,7 @@
 import sys
 import tempfile
 import threading
+from collections.abc import Mapping
 from pathlib import Path
 
 import pytest
@@ -85,6 +86,159 @@ def test_failed_worker_retains_checkpoint_and_recovery_exports_host_conflict():
         assert (repo / "file").read_text() == "new Neovim edit"
 
 
+def test_shared_repositories_support_absolute_paths_and_recovery_without_escape():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        launch = root / "launch"
+        launch.mkdir()
+        repos = tuple(root / name for name in ("dotfiles", "anvil", "forge"))
+        for repo in repos:
+            repo.mkdir()
+            (repo / "file").write_text(repo.name)
+        stores = tuple(Recovery(root / "private", repo=repo) for repo in repos)
+        (repos[1] / "large-cache").write_bytes(b"cache" * 10000)
+
+        def run(request, stop, lock_fd):
+            if hasattr(request, "path"):
+                Path(request.path).write_text(request.content)
+            else:
+                for repo in repos:
+                    (repo / "file").unlink()
+            yield {"type": "result", "result": {"content": []}}
+
+        controller = Controller(stores[0], run=run, recoveries=stores, cwd=launch)
+        (repos[0] / "knowledge").symlink_to(repos[1] / "file")
+        list(
+            controller.execute(
+                parse_request(
+                    {
+                        "tool": "write",
+                        "args": {
+                            "path": str(repos[0] / "knowledge"),
+                            "content": "updated knowledge",
+                        },
+                    }
+                ),
+                threading.Event(),
+            )
+        )
+        assert (repos[1] / "file").read_text() == "updated knowledge"
+        assert stores[0].list() == []
+        assert len(stores[1].list()) == 1
+        assert [
+            entry["path"]
+            for entry in stores[1].paths(stores[1].list()[0]["checkpoint"])
+        ] == ["file"]
+
+        (repos[0] / "escape").symlink_to(launch / "outside")
+        for target in (
+            launch / "outside",
+            repos[0] / "escape",
+            repos[2] / ".git/config",
+        ):
+            with pytest.raises(ValueError, match="approved|protected"):
+                list(
+                    controller.execute(
+                        parse_request(
+                            {
+                                "tool": "write",
+                                "args": {
+                                    "path": str(target),
+                                    "content": "bad",
+                                },
+                            }
+                        ),
+                        threading.Event(),
+                    )
+                )
+        assert not (launch / "outside").exists()
+
+        list(
+            controller.execute(
+                parse_request(
+                    {
+                        "tool": "bash",
+                        "args": {
+                            "command": "delete files in all approved repositories",
+                            "writablePaths": [str(repo) for repo in repos],
+                        },
+                    }
+                ),
+                threading.Event(),
+            )
+        )
+        history = list(
+            controller.execute(
+                parse_request({"tool": "recovery_list", "args": {}}), threading.Event()
+            )
+        )[0]["result"]["entries"]
+        assert {entry["repo"] for entry in history} == {str(repo) for repo in repos}
+        for repo in repos:
+            checkpoint = next(
+                entry["checkpoint"] for entry in history if entry["repo"] == str(repo)
+            )
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "recovery_restore",
+                            "args": {
+                                "checkpoint": checkpoint,
+                                "paths": ["file"],
+                            },
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+        assert [(repo / "file").read_text() for repo in repos] == [
+            "dotfiles",
+            "updated knowledge",
+            "forge",
+        ]
+
+
+def test_failed_shared_checkpoint_blocks_bash_before_any_repository_changes():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repos = (root / "first", root / "second")
+        for repo in repos:
+            repo.mkdir()
+            (repo / "file").write_text("original")
+        stores = (
+            Recovery(root / "private", repo=repos[0]),
+            Recovery(root / "private", repo=repos[1], repo_limit=10),
+        )
+        calls = []
+
+        def run(request, stop, lock_fd):
+            calls.append(request)
+            yield {"type": "result", "result": {"content": []}}
+
+        controller = Controller(stores[0], run=run, recoveries=stores)
+        with pytest.raises(RuntimeError, match="limit"):
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "bash",
+                            "args": {
+                                "command": "rm file",
+                                "writablePaths": [str(repo) for repo in repos],
+                            },
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+        assert calls == []
+        assert stores[0].list()[0]["status"] == "interrupted"
+        assert [(repo / "file").read_text() for repo in repos] == [
+            "original",
+            "original",
+        ]
+
+
 def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
     import contextlib
     import http.client
@@ -94,6 +248,7 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
 
     from broker import Broker
     from launcher import (
+        approved_repositories,
         assets_root,
         editing_controller,
         sandbox_environment,
@@ -169,7 +324,7 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
                 "output": [item],
                 "usage": {"input_tokens": 1, "output_tokens": 1, "total_tokens": 2},
             }
-            events: list[dict[str, object]] = [
+            events: list[Mapping[str, object]] = [
                 {
                     "type": "response.created",
                     "response": {**response, "status": "in_progress", "output": []},
@@ -189,11 +344,17 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
                         "part": {"type": "output_text", "text": "", "annotations": []},
                     }
                 )
-            events += [
-                delta,
-                {"type": "response.output_item.done", "output_index": 0, "item": item},
-                {"type": "response.completed", "response": response},
-            ]
+            events.extend(
+                [
+                    delta,
+                    {
+                        "type": "response.output_item.done",
+                        "output_index": 0,
+                        "item": item,
+                    },
+                    {"type": "response.completed", "response": response},
+                ]
+            )
             self.send_response(200)
             self.send_header("Content-Type", "text/event-stream")
             self.end_headers()
@@ -227,7 +388,31 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
         zprofile_inode = (project / ".zprofile").stat().st_ino
         (project / ".claude").mkdir()
         (project / ".claude/settings.local.json").write_bytes(b'{"allowed":true}')
+        shared = tuple(root / name for name in ("dotfiles", "anvil", "forge"))
+        for repo in shared:
+            repo.mkdir()
+            (repo / "file").write_text(repo.name)
+        (shared[0] / "knowledge").symlink_to(shared[1] / "file")
+        roots = (project, *shared)
         native_calls = [
+            (
+                "codemode",
+                {
+                    "code": "text(await tools.write({path:"
+                    + json.dumps(str(shared[0] / "knowledge"))
+                    + ',content:"private knowledge",summary:"write shared knowledge"})); text(await tools.edit({path:'
+                    + json.dumps(str(shared[2] / "file"))
+                    + ',edits:[{oldText:"forge",newText:"edited forge"}],summary:"edit shared source"})); text(await tools.read({path:'
+                    + json.dumps(str(shared[1] / "file"))
+                    + ',summary:"read shared knowledge"})); text(await tools.bash({command:'
+                    + json.dumps(
+                        f"printf denied > {project / 'uncheckpointed'}; printf shared > {shared[0] / 'file'}; rm {shared[2] / 'file'}"
+                    )
+                    + ",writablePaths:"
+                    + json.dumps([str(repo) for repo in shared])
+                    + ',summary:"change shared repositories"}));'
+                },
+            ),
             (
                 "write",
                 {
@@ -265,7 +450,12 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
         for name in ("home", "scratch"):
             (temporary / name).mkdir(parents=True)
         (temporary / "cache").symlink_to(state / "cache", target_is_directory=True)
-        snapshot_config(temporary / "config", assets=assets_root(), cli=cli)
+        snapshot_config(
+            temporary / "config",
+            assets=assets_root(),
+            cli=cli,
+            roots=approved_repositories(project),
+        )
         settings = json.loads((temporary / "config/settings.json").read_text())
         settings["defaultTools"] = [
             "read",
@@ -280,7 +470,12 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
         environment = sandbox_environment(node=node, temporary=temporary)
         environment["PI_SANDBOX_CONTROL"] = "1"
         controller = editing_controller(
-            node=node, cli=cli, project=project, state=state, assets=assets_root()
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            assets=assets_root(),
+            roots=roots,
         )
         command = sandbox_prefix(
             node=node,
@@ -289,6 +484,7 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
             state=state,
             temporary=temporary,
             assets=assets_root(),
+            roots=roots,
         )
 
         def connect(_host):
@@ -370,12 +566,35 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
                 size = (project / "bridge-ticks").stat().st_size
                 time.sleep(0.3)
                 assert (project / "bridge-ticks").stat().st_size == size
+                shared_history = controller.history(0)
+                checkpoint = next(
+                    entry["checkpoint"]
+                    for entry in reversed(shared_history)
+                    if entry["repo"] == str(shared[2])
+                    and entry["label"] == "bash"
+                    and entry["status"] == "completed"
+                )
+                restored = list(
+                    controller.execute(
+                        parse_request(
+                            {
+                                "tool": "recovery_restore",
+                                "args": {"checkpoint": checkpoint, "paths": ["file"]},
+                            }
+                        ),
+                        threading.Event(),
+                    )
+                )[0]["result"]["paths"]
             finally:
                 controller.close()
         assert result.returncode == 0, result.stderr
         assert result.stdout.strip() == "editing complete"
         assert (project / "visible.txt").read_text() == "after"
         assert (project / "shell.txt").read_text() == "shell"
+        assert not (project / "uncheckpointed").exists()
+        assert (shared[0] / "file").read_text() == "shared"
+        assert (shared[1] / "file").read_text() == "private knowledge"
+        assert Path(restored[0]).read_text() == "edited forge"
         assert (project / ".zprofile").read_bytes() == b""
         assert (project / ".zprofile").stat().st_ino == zprofile_inode
         assert (
@@ -389,10 +608,9 @@ def test_native_pi_direct_and_codemode_tools_edit_existing_checkout():
             "edit",
             "write",
         ]
-        assert len(calls) == 4
+        assert len(calls) == 5
         assert not (root / "outside.txt").exists()
-        assert "Sandbox controller 400" in json.dumps(calls[-1])
-        assert "inside the launch repository" in json.dumps(calls[-1])
+        assert "approved repositories" in json.dumps(calls[-1])
 
 
 def test_native_worker_protects_shared_aliases_and_leaves_source_writable():

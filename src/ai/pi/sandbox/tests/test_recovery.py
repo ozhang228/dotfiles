@@ -260,11 +260,11 @@ def test_abrupt_prune_crash_in_another_repo_does_not_strand_global_quota():
             sqlite3.connect = lambda *args, **kwargs: connect(*args, **kwargs, factory=CrashAfterPrune)
             store = Recovery(Path(sys.argv[2]), repo=Path(sys.argv[3]), total_limit=500000)
             files = store.files
-            def ordered_files():
-                for entry in files():
+            def ordered_files(**kwargs):
+                for entry in files(**kwargs):
                     if entry[0] == 'file':
                         yield entry
-                for entry in files():
+                for entry in files(**kwargs):
                     if entry[0] != 'file':
                         yield entry
             store.files = ordered_files

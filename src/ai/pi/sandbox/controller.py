@@ -8,7 +8,7 @@ import signal
 import subprocess
 import threading
 import time
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import assert_never
@@ -41,6 +41,7 @@ class Edit:
 class Bash:
     command: str
     timeout: float = 300
+    writablePaths: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -70,15 +71,20 @@ def text(value: object):
     return value
 
 
+def tool_path(value: object):
+    value = text(value)
+    if not value or any(part in {".", ".."} for part in value.split("/")):
+        raise ValueError("Use absolute or relative paths without traversal")
+    return value
+
+
 def parse_request(value: object) -> Request:
     request = object_value(value)
     args = object_value(request.get("args"))
     tool = text(request.get("tool"))
     match tool:
         case "write":
-            return Write(
-                str(relative_path(text(args.get("path")))), text(args.get("content"))
-            )
+            return Write(tool_path(args.get("path")), text(args.get("content")))
         case "edit":
             edits = args.get("edits")
             if not isinstance(edits, list) or not 1 <= len(edits) <= 1000:
@@ -89,8 +95,11 @@ def parse_request(value: object) -> Request:
                 replacements.append(
                     Replacement(text(edit.get("oldText")), text(edit.get("newText")))
                 )
-            return Edit(str(relative_path(text(args.get("path")))), tuple(replacements))
+            return Edit(tool_path(args.get("path")), tuple(replacements))
         case "bash":
+            paths = args.get("writablePaths", [])
+            if not isinstance(paths, list) or len(paths) > 50:
+                raise ValueError("Expected at most 50 writable directories")
             timeout = args.get("timeout", 300)
             if (
                 isinstance(timeout, bool)
@@ -98,7 +107,11 @@ def parse_request(value: object) -> Request:
                 or not 0 < timeout <= 3600
             ):
                 raise ValueError("Timeout must be 0 to 3600 seconds")
-            return Bash(text(args.get("command")), timeout)
+            return Bash(
+                text(args.get("command")),
+                timeout,
+                tuple(tool_path(path) for path in paths),
+            )
         case "recovery_list":
             offset = args.get("offset", 0)
             if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
@@ -137,8 +150,14 @@ class Controller:
         run: Callable[
             [Write | Edit | Bash, threading.Event, int], Iterator[Mapping[str, object]]
         ],
+        recoveries: Sequence[Recovery] = (),
+        cwd: Path | None = None,
     ):
         self.recovery = recovery
+        self.recoveries = tuple(recoveries) or (recovery,)
+        if any(store.root != recovery.root for store in self.recoveries):
+            raise ValueError("Repositories must share the recovery store")
+        self.cwd = cwd or recovery.repo
         self.run = run
         self._active = set()
         self._guard = threading.Condition()
@@ -158,7 +177,8 @@ class Controller:
             if self._closed:
                 raise RuntimeError("Sandbox controller stopped")
             self._active.add(stop)
-        lock_path = self.recovery.root / f"{self.recovery.repo_id}.operation.lock"
+        # Every session can edit shared repos. The worker retains this global lock.
+        lock_path = self.recovery.root / "operation.lock"
         try:
             with lock_path.open("a+b") as lock:
                 while True:
@@ -170,10 +190,9 @@ class Controller:
                     except BlockingIOError:
                         stop.wait(0.1)
                 with self.recovery.locked() as database:
-                    # This repo lock establishes that no previous worker is live.
+                    # This lock establishes that no previous worker is live.
                     database.execute(
-                        'UPDATE checkpoints SET status="interrupted" WHERE repo=? AND status IN ("active","recovering")',
-                        (self.recovery.repo_id,),
+                        'UPDATE checkpoints SET status="interrupted" WHERE status IN ("active","recovering")',
                     )
                 yield lock.fileno()
         finally:
@@ -181,16 +200,61 @@ class Controller:
                 self._active.discard(stop)
                 self._guard.notify_all()
 
+    def target(self, path: str):
+        candidate = Path(path).expanduser()
+        if not candidate.is_absolute():
+            candidate = self.cwd / candidate
+        if not any(candidate.is_relative_to(store.repo) for store in self.recoveries):
+            raise ValueError("Target must stay within approved repositories")
+        resolved = candidate.resolve()
+        for store in self.recoveries:
+            if resolved.is_relative_to(store.repo):
+                if store.excluded(resolved.relative_to(store.repo)):
+                    raise ValueError("Target is protected by the sandbox")
+                return store, resolved
+        raise ValueError("Symlink target must stay within approved repositories")
+
+    def checkpoint_store(self, checkpoint: str):
+        with self.recovery.locked() as database:
+            row = database.execute(
+                "SELECT repo FROM checkpoints WHERE id=?", (checkpoint,)
+            ).fetchone()
+        for store in self.recoveries:
+            if row and store.repo_id == row[0]:
+                return store
+        raise ValueError("Unknown checkpoint")
+
+    def history(self, offset: int):
+        stores = {store.repo_id: store for store in self.recoveries}
+        placeholders = ",".join("?" for _ in stores)
+        with self.recovery.locked() as database:
+            return [
+                {
+                    **dict(
+                        zip(
+                            ("checkpoint", "label", "status", "files", "last_recovery"),
+                            row[:5],
+                            strict=True,
+                        )
+                    ),
+                    "repo": str(stores[row[5]].repo),
+                }
+                for row in database.execute(
+                    f"""SELECT id,label,status,(SELECT count(*) FROM entries WHERE checkpoint=c.id), (SELECT status FROM exports WHERE checkpoint=c.id ORDER BY created DESC LIMIT 1),repo FROM checkpoints c WHERE repo IN ({placeholders}) AND status != 'staging' ORDER BY created DESC LIMIT 20 OFFSET ?""",
+                    (*stores, offset),
+                )
+            ]
+
     def execute(self, request: Request, stop: threading.Event):
         with self.operation(stop) as lock_fd:
             match request:
                 case ListRecovery():
                     if request.checkpoint:
-                        result = self.recovery.paths(
+                        result = self.checkpoint_store(request.checkpoint).paths(
                             request.checkpoint, offset=request.offset
                         )
                     else:
-                        result = self.recovery.list(offset=request.offset)
+                        result = self.history(request.offset)
                     yield {
                         "type": "result",
                         "result": {
@@ -199,24 +263,57 @@ class Controller:
                         },
                     }
                 case Restore():
-                    paths = self.recovery.restore(request.checkpoint, request.paths)
+                    store = self.checkpoint_store(request.checkpoint)
+                    paths = store.restore(request.checkpoint, request.paths)
+                    if store.repo != self.cwd:
+                        paths = [str(store.repo / path) for path in paths]
                     yield {"type": "result", "result": {"paths": paths}}
                 case Write() | Edit() | Bash():
-                    if isinstance(request, (Write, Edit)) and self.recovery.excluded(
-                        Path(request.path)
-                    ):
-                        raise ValueError("Target is protected by the sandbox")
-                    checkpoint = self.recovery.checkpoint(
-                        type(request).__name__.lower()
-                    )
+                    selections = {}
+                    if isinstance(request, (Write, Edit)):
+                        store, target = self.target(request.path)
+                        request = dataclasses.replace(request, path=str(target))
+                        selections[store] = [target.relative_to(store.repo)]
+                    else:
+                        values = request.writablePaths
+                        if not values and any(
+                            self.cwd.is_relative_to(store.repo)
+                            for store in self.recoveries
+                        ):
+                            values = (str(self.cwd),)
+                        directories = []
+                        for value in values:
+                            store, directory = self.target(value)
+                            if not directory.is_dir():
+                                raise ValueError(
+                                    "Bash writablePaths must be existing directories"
+                                )
+                            selections.setdefault(store, []).append(
+                                directory.relative_to(store.repo)
+                            )
+                            directories.append(str(directory))
+                        request = dataclasses.replace(
+                            request, writablePaths=tuple(directories)
+                        )
+                    checkpoints = []
                     completed = False
                     try:
+                        for store, paths in selections.items():
+                            checkpoints.append(
+                                (
+                                    store,
+                                    store.checkpoint(
+                                        type(request).__name__.lower(), paths=paths
+                                    ),
+                                )
+                            )
                         if stop.is_set():
                             raise RuntimeError("Operation cancelled")
                         yield from self.run(request, stop, lock_fd)
                         completed = True
                     finally:
-                        self.recovery.complete(checkpoint, interrupted=not completed)
+                        for store, checkpoint in checkpoints:
+                            store.complete(checkpoint, interrupted=not completed)
                 case _ as unreachable:
                     assert_never(unreachable)
 

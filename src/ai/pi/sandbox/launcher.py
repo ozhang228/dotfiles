@@ -15,7 +15,7 @@ import threading
 from pathlib import Path
 
 from broker import Broker
-from controller import Controller, Worker
+from controller import Controller, Edit, Worker, Write
 from recovery import Recovery
 from runtime import agent_dir, find_runtime, provider_source, runtime_roots
 
@@ -43,7 +43,7 @@ def adapt_provider(path: Path):
     return source
 
 
-def snapshot_config(config: Path, *, assets: Path, cli: Path):
+def snapshot_config(config: Path, *, assets: Path, cli: Path, roots=()):
     for source in (
         assets / "pi",
         assets / "rules",
@@ -52,7 +52,9 @@ def snapshot_config(config: Path, *, assets: Path, cli: Path):
         assets / "GLOBAL.md",
     ):
         for path in (source, *source.rglob("*")):
-            if path.is_symlink() and not path.resolve().is_relative_to(assets):
+            if path.is_symlink() and not any(
+                path.resolve().is_relative_to(root) for root in (assets, *roots)
+            ):
                 raise RuntimeError(
                     "Sandbox config symlinks must stay within approved assets"
                 )
@@ -181,6 +183,47 @@ def credential_paths(project: Path):
                     directories.remove(name)
 
 
+def approved_repositories(project: Path):
+    settings = json.loads(Path(__file__).with_name("settings.json").read_text())
+    if not isinstance(settings, dict) or not isinstance(
+        settings.get("writableRoots"), list
+    ):
+        raise ValueError("Sandbox writableRoots must be a list of absolute paths")
+    roots = []
+    for value in settings["writableRoots"]:
+        if not isinstance(value, str) or not value or "\x00" in value:
+            raise ValueError("Invalid sandbox repository path")
+        path = Path(value).expanduser()
+        if not path.is_absolute():
+            raise ValueError(
+                "Sandbox repository paths must be absolute or start with ~/"
+            )
+        if path.exists():
+            if not path.is_dir():
+                raise ValueError("Sandbox repository paths must be directories")
+            roots.append(path.resolve())
+    if is_repository_root(project):
+        roots.append(project)
+    unique = tuple(dict.fromkeys(roots))
+    return tuple(
+        root
+        for root in unique
+        if not any(root != other and root.is_relative_to(other) for other in unique)
+    )
+
+
+def is_repository_root(project: Path):
+    result = subprocess.run(
+        ["/usr/bin/git", "-C", str(project), "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        check=False,
+        env={"PATH": "/usr/bin:/bin", "HOME": "/nonexistent"},
+        timeout=10,
+    )
+    return result.returncode == 0 and Path(result.stdout.strip()).resolve() == project
+
+
 def sandbox_prefix(
     *,
     node: Path,
@@ -189,21 +232,26 @@ def sandbox_prefix(
     state: Path,
     temporary: Path,
     assets: Path,
+    roots=(),
+    write_paths=None,
     writable=False,
     protected=(),
 ):
+    roots = tuple(roots) or (project,)
+    write_paths = roots if write_paths is None else tuple(write_paths)
     modules, package = sandbox_runtime()
     sources = (
         *runtime_roots(node=node, cli=cli),
         modules,
         project,
+        *roots,
         temporary / "config",
         temporary / "home",
         temporary / "scratch",
         *[assets / name for name in ("rules", "skills", "_shared")],
     )
     host_protected = (agent_dir(), state)
-    for source in sources[:3]:
+    for source in (*sources[:3], project, *roots):
         if Path.home().resolve().is_relative_to(source) or any(
             path.is_relative_to(source) or source.is_relative_to(state)
             for path in host_protected
@@ -227,7 +275,11 @@ def sandbox_prefix(
             },
         },
         "filesystem": {
-            "denyRead": ["/", "/sys", *map(literal, credential_paths(project))],
+            "denyRead": [
+                "/",
+                "/sys",
+                *[literal(path) for root in roots for path in credential_paths(root)],
+            ],
             "allowRead": [
                 *[
                     literal(Path(path).resolve())
@@ -247,7 +299,9 @@ def sandbox_prefix(
                     ),
                 )
             ),
-            "denyWrite": list(map(literal, protected if writable else (project,))),
+            "denyWrite": list(
+                map(literal, protected if writable else (project, *roots))
+            ),
         },
         "enableWeakerNestedSandbox": False,
         "allowNestedUserNamespaces": False,
@@ -260,7 +314,7 @@ def sandbox_prefix(
             "allowAllUnixSockets": False,
         }
         policy["filesystem"]["allowWrite"] = list(
-            map(literal, (project, temporary / "scratch"))
+            map(literal, (*write_paths, temporary / "scratch"))
         )
         policy["filesystem"]["allowRead"] = [
             literal(Path(path).resolve())
@@ -273,7 +327,9 @@ def sandbox_prefix(
                     *runtime_roots(node=node, cli=cli),
                     modules,
                     project,
+                    *roots,
                     temporary / "config",
+                    temporary / "home",
                     temporary / "scratch",
                 ),
             )
@@ -322,34 +378,58 @@ def protected_git_paths(project: Path):
 
 
 def editing_controller(
-    *, node: Path, cli: Path, project: Path, state: Path, assets: Path
+    *, node: Path, cli: Path, project: Path, state: Path, assets: Path, roots=()
 ):
-    result = subprocess.run(
-        ["/usr/bin/git", "-C", str(project), "rev-parse", "--show-toplevel"],
-        capture_output=True,
-        text=True,
-        check=False,
-        env={"PATH": "/usr/bin:/bin", "HOME": "/nonexistent"},
-        timeout=10,
-    )
-    if result.returncode or Path(result.stdout.strip()).resolve() != project:
+    if not roots and not is_repository_root(project):
         return None
-    protected = [*protected_git_paths(project), *credential_paths(project)]
-    if assets.is_relative_to(project):
-        protected.append(assets)
-    recovery = Recovery(state.parent / "recovery", repo=project, protected=protected)
+    roots = tuple(roots) or (project,)
+    controller_sources = (Path(__file__).resolve().parent, assets / "pi/sandbox")
+    recoveries = tuple(
+        Recovery(
+            state.parent / "recovery",
+            repo=root,
+            protected=[
+                *protected_git_paths(root),
+                *credential_paths(root),
+                *controller_sources,
+            ],
+        )
+        for root in roots
+    )
 
     def run(request, stop, lock_fd):
         with tempfile.TemporaryDirectory(prefix="pi-worker-") as directory:
             temporary = Path(directory)
             (temporary / "config").mkdir()
             (temporary / "home").mkdir()
+            for root in roots:
+                if root.parent == Path.home():
+                    (temporary / "home" / root.name).symlink_to(
+                        root, target_is_directory=True
+                    )
             (temporary / "scratch").mkdir()
             (temporary / "cache").symlink_to(
                 temporary / "scratch", target_is_directory=True
             )
             helper = temporary / "config/worker.mjs"
             shutil.copyfile(Path(__file__).with_name("worker.mjs"), helper)
+            selections = {}
+            targets = (
+                (request.path,)
+                if isinstance(request, (Write, Edit))
+                else request.writablePaths
+            )
+            for value in targets:
+                target = Path(value)
+                root = next(root for root in roots if target.is_relative_to(root))
+                selections.setdefault(root, []).append(target.relative_to(root))
+            if isinstance(request, (Write, Edit)):
+                writable = Path(request.path).parent
+                while not writable.exists():
+                    writable = writable.parent
+                write_paths = (writable,)
+            else:
+                write_paths = tuple(Path(path) for path in request.writablePaths)
             sandbox_prefix(
                 node=node,
                 cli=cli,
@@ -357,12 +437,20 @@ def editing_controller(
                 state=state,
                 temporary=temporary,
                 assets=assets,
+                roots=roots,
+                write_paths=write_paths,
                 writable=True,
                 protected=[
-                    *protected_git_paths(project),
-                    *credential_paths(project),
-                    *recovery.shared_paths(),
-                    *([assets] if assets.is_relative_to(project) else []),
+                    *controller_sources,
+                    *[
+                        path
+                        for store in recoveries
+                        for path in (
+                            *protected_git_paths(store.repo),
+                            *credential_paths(store.repo),
+                            *store.shared_paths(paths=selections.get(store.repo, [])),
+                        )
+                    ],
                 ],
             )
             environment = sandbox_environment(node=node, temporary=temporary)
@@ -391,7 +479,7 @@ def editing_controller(
                 request, stop, lock_fd
             )
 
-    return Controller(recovery, run=run)
+    return Controller(recoveries[0], run=run, recoveries=recoveries, cwd=project)
 
 
 def main():
@@ -402,10 +490,14 @@ def main():
         raise RuntimeError("Install Bubblewrap before launching sandboxed Pi")
     project = Path.cwd().resolve()
     home = Path.home().resolve()
+    roots = approved_repositories(project)
     protected = (agent_dir(), home / ".pi", home / ".local/state/pi-sandbox")
-    if home.is_relative_to(project) or any(
-        project.is_relative_to(path) or path.is_relative_to(project)
-        for path in protected
+    if any(
+        home.is_relative_to(root)
+        or any(
+            root.is_relative_to(path) or path.is_relative_to(root) for path in protected
+        )
+        for root in (project, *roots)
     ):
         raise RuntimeError(
             "Sandbox project must not expose the host home or private Pi state"
@@ -421,12 +513,14 @@ def main():
                 "Sandbox project overlaps private gateway or state storage"
             )
         (temporary / "scratch").mkdir()
-        (temporary / "home/dotfiles/src").mkdir(parents=True)
-        (temporary / "home/dotfiles/src/ai").symlink_to(
-            assets, target_is_directory=True
-        )
+        (temporary / "home").mkdir()
+        for root in roots:
+            if root.parent == home:
+                (temporary / "home" / root.name).symlink_to(
+                    root, target_is_directory=True
+                )
         (temporary / "cache").symlink_to(state / "cache", target_is_directory=True)
-        snapshot_config(temporary / "config", assets=assets, cli=cli)
+        snapshot_config(temporary / "config", assets=assets, cli=cli, roots=roots)
         environment = sandbox_environment(node=node, temporary=temporary)
         # Refuse unsupported proxy support or degraded isolation before loading credentials.
         dependency_check = (
@@ -454,10 +548,11 @@ def main():
             state=state,
             temporary=temporary,
             assets=assets,
+            roots=roots,
         )
         check_boundary([*command, "/usr/bin/true"], environment=environment)
         controller = editing_controller(
-            node=node, cli=cli, project=project, state=state, assets=assets
+            node=node, cli=cli, project=project, state=state, assets=assets, roots=roots
         )
         if controller is not None:
             environment["PI_SANDBOX_CONTROL"] = "1"

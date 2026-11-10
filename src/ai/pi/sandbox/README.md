@@ -35,18 +35,21 @@ Node. Only their required runtime roots are mounted read-only; unsupported
 layouts fail closed. The provider source comes from the host agent extension
 or distribution. No host credential/config directory is mounted.
 
-Pi and extensions stay read-only. At a Git repository root, Edit/Write/Bash
-request a protected checkpoint before a separate worker edits the actual checkout;
-Neovim and LazyGit see changes immediately. Git metadata, dotenv files, private
-Pi state, and the controller's source remain protected. Subdirectory/non-Git
-launches remain read-only. Linked worktree Git metadata outside the launch root
-is unavailable. Workers have no network access; documentation/registry access
-and supervised servers/watchers are later stages.
+`settings.json` grants every session access to `~/dotfiles`, `~/anvil`, and
+`~/forge`, plus the launch directory when it is a Git repository root. Missing
+configured directories are skipped. Edit/Write checkpoint the target file before
+a separate worker changes the actual checkout; Neovim and LazyGit see changes
+immediately. Bash checkpoints its `writablePaths` directories (default: working
+directory); other approved paths remain readable. Use small directory scopes for
+large repositories. No approval prompt is required. Git metadata, dotenv files,
+private Pi state, shared hardlinks, and sandbox/controller code stay protected.
+Pi itself remains read-only. Workers have no network access; supervised servers
+and watchers are later stages.
 
 `recovery_list` lists checkpoints or their saved files. `recovery_restore` restores
 missing selected files and exports existing ones to `.recovered-*` siblings,
 so newer Neovim edits are never overwritten. Pre-command tracked, untracked,
-ignored, and uncommitted bytes are saved; intermediate changes within a command
+ignored, and uncommitted bytes within the writable scope are saved; intermediate changes within a command
 are not guaranteed. Checkpoints are per-file captures, not atomic tree snapshots
 while another editor is saving. Cancelled commands lose their entire worker tree. Large shell output is truncated;
 full-output artifacts are not retained.

@@ -219,7 +219,8 @@ def editing_smoke():
         assets = project / "protected-ai"
         for name in ("rules", "skills", "_shared"):
             (assets / name).mkdir(parents=True)
-        (assets / "controller.py").write_text("protected controller")
+        (assets / "pi/sandbox").mkdir(parents=True)
+        (assets / "pi/sandbox/controller.py").write_text("protected controller")
         controller = editing_controller(
             node=node, cli=cli, project=project, state=state, assets=assets
         )
@@ -260,7 +261,7 @@ def editing_smoke():
             (project / "created").read_text() == "immediate checkout change",
             "Deleted file recovery failed",
         )
-        command = f"printf bad > {outside}; printf bad > escape; printf bad > .git/config; printf bad > .git/new; printf bad > protected-ai/controller.py; printf bad > .env; printf bad > {state.parent / 'recovery/lock'}; true"
+        command = f"printf bad > {outside}; printf bad > escape; printf bad > .git/config; printf bad > .git/new; printf bad > protected-ai/pi/sandbox/controller.py; printf bad > .env; printf bad > {state.parent / 'recovery/lock'}; true"
         git_config = (project / ".git/config").read_bytes()
         execute("bash", {"command": command})
         require(outside.read_text() == "outside sentinel", "Outside scope changed")
@@ -270,7 +271,7 @@ def editing_smoke():
         )
         require(not (project / ".git/new").exists(), "Git metadata creation allowed")
         require(
-            (assets / "controller.py").read_text() == "protected controller",
+            (assets / "pi/sandbox/controller.py").read_text() == "protected controller",
             "Controller assets changed",
         )
         large_output = execute(

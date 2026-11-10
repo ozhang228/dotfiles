@@ -127,7 +127,7 @@ class Recovery:
             if mount != self.repo and mount.is_relative_to(self.repo):
                 raise RuntimeError(f"Nested mount refused: {mount}")
 
-    def files(self, *, include_excluded=False):
+    def files(self, *, include_excluded=False, paths: Sequence[Path] | None = None):
         self.validate_mounts()
         descriptor = os.open(self.repo, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
         device = os.fstat(descriptor).st_dev
@@ -136,6 +136,13 @@ class Recovery:
             with os.scandir(parent) as items:
                 for item in items:
                     path = prefix / item.name
+                    if paths is not None and not any(
+                        path == selected
+                        or path.is_relative_to(selected)
+                        or selected.is_relative_to(path)
+                        for selected in paths
+                    ):
+                        continue
                     if self.excluded(path) and not include_excluded:
                         continue
                     info = os.stat(item.name, dir_fd=parent, follow_symlinks=False)
@@ -204,10 +211,10 @@ class Recovery:
         finally:
             os.close(descriptor)
 
-    def shared_paths(self):
+    def shared_paths(self, paths: Sequence[Path] | None = None):
         protected = set()
         for path, kind, _mode, file, _target, _size in self.files(
-            include_excluded=True
+            include_excluded=True, paths=paths
         ):
             if kind != "file" or os.fstat(file).st_nlink < 2:
                 continue
@@ -338,7 +345,7 @@ class Recovery:
             database.execute("VACUUM")
             accounted = self.checkpoint_usage(database)
 
-    def checkpoint(self, label: str):
+    def checkpoint(self, label: str, *, paths: Sequence[Path] | None = None):
         identifier = uuid.uuid4().hex
         with self.locked() as database:
             # A creator holds this global lock until staging becomes active.
@@ -365,7 +372,7 @@ class Recovery:
                     _blob_bytes=accounted._blob_bytes,
                 )
                 fragment = os.statvfs(self.root / "blobs").f_frsize
-                for path, kind, mode, file, target, size in self.files():
+                for path, kind, mode, file, target, size in self.files(paths=paths):
                     cost = 512 + len(path.encode()) + len(target.encode())
                     digest = ""
                     new_blob = False
