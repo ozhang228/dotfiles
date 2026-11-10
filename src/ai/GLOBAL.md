@@ -64,6 +64,7 @@ Before writing new code, walk this and stop at the first rung that holds:
 4. **An already-installed dependency solves it?** Use it. Don't add a new dep for what a few lines do.
 
 - Prefer inline code until a second caller exists.
+- Prefer defining functions above their callers so files read top to bottom. Where recursion or language constraints prevent this, keep the clearest natural order without adding indirection solely to enforce it.
 - Deletion over addition. The shortest working diff wins.
 - When a request has an obviously simpler path, name it.
 - A rewrite is reasonable when strong tests or differential checks pin existing behavior and the result is materially simpler.

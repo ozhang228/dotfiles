@@ -59,6 +59,15 @@ keybinding:
   universal:
     return: <c-q>
 customCommands:
+  - key: "M"
+    context: "localBranches"
+    description: "Merge into current branch"
+    prompts:
+      - type: "confirm"
+        title: "Confirm merge"
+        body: "Merge {{if .SelectedLocalBranch.Head}}latest master/main{{else}}{{.SelectedLocalBranch.Name}}{{end}} into {{.CheckedOutBranch.Name}}?"
+    command: "bash ~/.config/lazygit/merge-branch.sh {{.SelectedLocalBranch.Name | quote}} {{.CheckedOutBranch.Name | quote}}"
+    loadingText: "Fetching and merging branch..."
   - key: "W"
     context: "localBranches"
     command: "~/.config/lazygit/create-worktree.sh existing {{.SelectedLocalBranch.Name | quote}}"
