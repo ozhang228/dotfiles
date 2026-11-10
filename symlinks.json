@@ -1,4 +1,5 @@
 [
+  { "src": "~/anvil/ai/work-knowledge.md", "dst": "~/dotfiles/src/ai/rules/work-knowledge.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.opencode/AGENTS.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.claude/CLAUDE.md" },
   { "src": "~/dotfiles/src/ai/GLOBAL.md", "dst": "~/.codex/AGENTS.md" },
