@@ -25,7 +25,7 @@ Run the bundled `scripts/pr-languages` first to identify which languages are in 
 | ----------------- | --------------------------------- | ------------------------------------- |
 | Python            | `references/python.md`            | Any `.py` files in the diff           |
 | TypeScript/TSX    | `references/typescript.md`        | Any `.ts` or `.tsx` files in the diff |
-| Feedback Examples | `references/feedback-examples.md` | Writing good feedback                 |
+| Feedback Rules    | `references/feedback.md`          | Writing good feedback                 |
 | Local Recaps      | `references/visual-recap.md`      | Authoring self-contained local recaps |
 | Structured Blocks | `references/structured-blocks.md` | Diff, API, boundary, and navigation components (shared with `brainstorm` - see that file's header) |
 
