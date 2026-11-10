@@ -7,6 +7,11 @@
 - Retain knowledge in the dotfiles repository only when it meets the Durable Knowledge rules below.
 - Complete every requested step before yielding. Stop early only when blocked by missing authority, required user input, or an external state that cannot be changed safely
 
+## Filesystem Scope
+
+- Prefer the task's working repository for file changes and artifacts. Keep writes within approved repositories and request only the smallest directories needed. Do not request broad write access to `/tmp`, the host home, host caches (`~/.cache`), or tool installation directories.
+- Use provided scratch and cache locations for disposable scripts, reports, and tool caches, such as `$TMPDIR`, `$XDG_CACHE_HOME`, and `$UV_CACHE_DIR`. Treat installed tools as read-only; do not change `HOME` or request host cache access to make them work. Report unavailable tools or blocked network access rather than weakening isolation.
+
 ## Language & Task Rules
 
 Language and task conventions live in these canonical files:
@@ -23,6 +28,7 @@ Read and apply only files whose declared scope matches the current task. Do not 
 ## Communication
 
 - Answer directly. Do not restate the request, preview the answer, or repeat a completed-work recap unless asked. Combine one-sentence paragraphs that make the same point. Cut filler and reflexive hedging; state each point once.
+- Make longer replies easy to scan: use short Markdown headings for distinct topics, short paragraphs, and bullets for parallel items. Lead each finding with its consequence, then explain it briefly. Put paths and commands in links or inline code, and keep long code or logs in linked artifacts. Separate paragraphs and lists with blank lines; avoid packing several findings into one long bullet.
 - When Oscar asks what to change or to think through an approach, propose the concrete change and wait for an explicit yes before executing it. A direct request to fix, implement, or execute is that yes for the requested scope; carry it through without asking again for routine steps. Keep the separate Git and external-action approval rules below.
 
 ## Durable Knowledge

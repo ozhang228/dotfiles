@@ -31,8 +31,10 @@ pytest -q ~/dotfiles/src/ai/pi/sandbox
 
 Runtime discovery skips the sandbox wrapper and supports DRW prefix installs,
 npm package-bin symlinks, and official `releases-v1` managed installs/standalone
-Node. Only their required runtime roots are mounted read-only; unsupported
-layouts fail closed. The provider source comes from the host agent extension
+Node. Runtime roots and installed tools in `~/.local/bin`, Mason, UV/Pipx/Poetry
+environments, Cargo/Rustup, and Bun are mounted read-only when present; tool paths
+also work under the disposable sandbox home. Other layouts remain inaccessible.
+The provider source comes from the host agent extension
 or distribution. No host credential/config directory is mounted.
 
 `settings.json` grants every session access to `~/dotfiles`, `~/anvil`, and
@@ -45,6 +47,11 @@ large repositories. No approval prompt is required. Git metadata, dotenv files,
 private Pi state, shared hardlinks, and sandbox/controller code stay protected.
 Pi itself remains read-only. Workers have no network access; supervised servers
 and watchers are later stages.
+
+Never request `/tmp`, host home/cache, or tool installations in `writablePaths`.
+Use `$TMPDIR` for scripts/reports; UV, npm, and Python bytecode caches point into
+disposable scratch. Network-dependent installs and nested sandbox tests remain
+blocked; run isolation tests from the host.
 
 `recovery_list` lists checkpoints or their saved files. `recovery_restore` restores
 missing selected files and exports existing ones to `.recovered-*` siblings,
@@ -64,5 +71,12 @@ an exhausted underlying filesystem.
 The gateway holds the host DRW key and exposes only fixed model routes and the
 scoped controller. Network/Unix-socket restrictions, private namespaces, and
 fail-closed preflight remain mandatory. Sessions/cache are separate per project;
-original configuration stays protected. After smoke passes, check startup,
+only saved model/provider/thinking defaults are merged into the original settings;
+sandbox policy overrides stay temporary. Conflicting manual default edits are preserved.
+Startup and each command share one fresh credential/Git scan per approved repo.
+The host gateway caches successful model catalogues and metadata in
+`~/.local/state/pi-sandbox/catalog`, separated by credential, with a 64 MiB limit.
+Later launches use the saved catalogue while refreshing in the background;
+the first successful fetch needs network access. Inference is never cached.
+After smoke passes, check startup,
 Ctrl-C, resume, resizing, and scrollback in the host terminal.

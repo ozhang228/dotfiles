@@ -3,6 +3,7 @@ import dataclasses
 import fcntl
 import json
 import os
+import re
 import selectors
 import signal
 import subprocess
@@ -11,9 +12,11 @@ import time
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import assert_never
+from typing import NewType, assert_never
 
 from recovery import Recovery, relative_path
+
+RunId = NewType("RunId", str)
 
 MAX_MESSAGE = 8 * 1024 * 1024
 MAX_OUTPUT = 256 * 1024
@@ -45,6 +48,18 @@ class Bash:
 
 
 @dataclass(frozen=True)
+class ReadonlyBash:
+    command: str
+    runId: RunId
+    timeout: float = 300
+
+
+@dataclass(frozen=True)
+class CancelReadonly:
+    runId: RunId
+
+
+@dataclass(frozen=True)
 class ListRecovery:
     offset: int = 0
     checkpoint: str = ""
@@ -56,7 +71,15 @@ class Restore:
     paths: tuple[str, ...]
 
 
-Request = Write | Edit | Bash | ListRecovery | Restore
+Command = Write | Edit | Bash | ReadonlyBash
+Request = Command | ListRecovery | Restore | CancelReadonly
+
+
+def run_id(value: object):
+    value = text(value)
+    if not re.fullmatch(r"[A-Za-z0-9-]{1,80}", value):
+        raise ValueError("Invalid read-only run ID")
+    return RunId(value)
 
 
 def object_value(value: object):
@@ -73,9 +96,9 @@ def text(value: object):
 
 def tool_path(value: object):
     value = text(value)
-    if not value or any(part in {".", ".."} for part in value.split("/")):
+    if not value or ".." in value.split("/"):
         raise ValueError("Use absolute or relative paths without traversal")
-    return value
+    return str(Path(value))
 
 
 def parse_request(value: object) -> Request:
@@ -96,7 +119,9 @@ def parse_request(value: object) -> Request:
                     Replacement(text(edit.get("oldText")), text(edit.get("newText")))
                 )
             return Edit(tool_path(args.get("path")), tuple(replacements))
-        case "bash":
+        case "bash" | "readonly_bash":
+            if tool == "readonly_bash" and "writablePaths" in args:
+                raise ValueError("Read-only commands cannot request writablePaths")
             paths = args.get("writablePaths", [])
             if not isinstance(paths, list) or len(paths) > 50:
                 raise ValueError("Expected at most 50 writable directories")
@@ -107,11 +132,19 @@ def parse_request(value: object) -> Request:
                 or not 0 < timeout <= 3600
             ):
                 raise ValueError("Timeout must be 0 to 3600 seconds")
+            if tool == "readonly_bash":
+                return ReadonlyBash(
+                    command=text(args.get("command")),
+                    runId=run_id(args.get("runId")),
+                    timeout=timeout,
+                )
             return Bash(
                 text(args.get("command")),
                 timeout,
                 tuple(tool_path(path) for path in paths),
             )
+        case "readonly_cancel":
+            return CancelReadonly(run_id(args.get("runId")))
         case "recovery_list":
             offset = args.get("offset", 0)
             if isinstance(offset, bool) or not isinstance(offset, int) or offset < 0:
@@ -129,13 +162,13 @@ def parse_request(value: object) -> Request:
             raise ValueError("Unsupported controller tool")
 
 
-def worker_request(request: Write | Edit | Bash):
+def worker_request(request: Command):
     match request:
         case Write():
             tool = "write"
         case Edit():
             tool = "edit"
-        case Bash():
+        case Bash() | ReadonlyBash():
             tool = "bash"
         case _ as unreachable:
             assert_never(unreachable)
@@ -147,9 +180,7 @@ class Controller:
         self,
         recovery: Recovery,
         *,
-        run: Callable[
-            [Write | Edit | Bash, threading.Event, int], Iterator[Mapping[str, object]]
-        ],
+        run: Callable[[Command, threading.Event, int], Iterator[Mapping[str, object]]],
         recoveries: Sequence[Recovery] = (),
         cwd: Path | None = None,
     ):
@@ -162,6 +193,47 @@ class Controller:
         self._active = set()
         self._guard = threading.Condition()
         self._closed = False
+        self._readonly: dict[RunId, threading.Event] = {}
+        self._cancelled: set[RunId] = set()
+
+    def cancel_readonly(self, run_id: RunId):
+        with self._guard:
+            # Retain cancelled admissions until shutdown: eviction could let a
+            # delayed HTTP request start after its cancellation was acknowledged.
+            if len(self._cancelled) < 1024:
+                self._cancelled.add(run_id)
+            stop = self._readonly.get(run_id)
+            if stop is not None:
+                stop.set()
+            while run_id in self._readonly:
+                self._guard.wait(timeout=0.1)
+
+    @contextlib.contextmanager
+    def readonly_operation(self, request: ReadonlyBash, stop: threading.Event):
+        with self._guard:
+            if self._closed or request.runId in self._cancelled or stop.is_set():
+                raise RuntimeError("Read-only operation cancelled")
+            if len(self._cancelled) >= 1024:
+                raise RuntimeError(
+                    "Read-only cancellation budget exhausted; restart Pi"
+                )
+            if request.runId in self._readonly:
+                raise ValueError("Duplicate read-only run ID")
+            if len(self._readonly) >= 4:
+                raise RuntimeError(
+                    "At most four read-only commands may run concurrently"
+                )
+            self._readonly[request.runId] = stop
+            self._active.add(stop)
+        try:
+            # The supervisor expects a retained descriptor; this is not a lock.
+            with open(os.devnull, "rb") as descriptor:
+                yield descriptor.fileno()
+        finally:
+            with self._guard:
+                self._readonly.pop(request.runId)
+                self._active.discard(stop)
+                self._guard.notify_all()
 
     def close(self):
         with self._guard:
@@ -246,6 +318,22 @@ class Controller:
             ]
 
     def execute(self, request: Request, stop: threading.Event):
+        if isinstance(request, CancelReadonly):
+            self.cancel_readonly(request.runId)
+            yield {"type": "result", "result": {"cancelled": True}}
+            return
+        if isinstance(request, ReadonlyBash):
+            result = None
+            with self.readonly_operation(request, stop) as descriptor:
+                for message in self.run(request, stop, descriptor):
+                    if message.get("type") == "result":
+                        result = message
+                    else:
+                        yield message
+            if result is None:
+                raise RuntimeError("Read-only command stopped before completing")
+            yield result
+            return
         with self.operation(stop) as lock_fd:
             match request:
                 case ListRecovery():
@@ -330,9 +418,7 @@ class Worker:
         self.environment = environment
         self.repo = repo
 
-    def __call__(
-        self, request: Write | Edit | Bash, stop: threading.Event, lock_fd: int
-    ):
+    def __call__(self, request: Command, stop: threading.Event, lock_fd: int):
         reader, writer = os.pipe()
         process = None
         try:
@@ -360,7 +446,11 @@ class Worker:
             result_seen = False
             deadline = (
                 time.monotonic()
-                + (request.timeout if isinstance(request, Bash) else 300)
+                + (
+                    request.timeout
+                    if isinstance(request, (Bash, ReadonlyBash))
+                    else 300
+                )
                 + 30
             )
             try:

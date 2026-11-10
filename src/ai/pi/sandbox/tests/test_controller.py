@@ -7,8 +7,162 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from controller import Controller, parse_request
+from controller import Bash, Controller, parse_request
 from recovery import Recovery
+
+
+def test_current_directory_paths_resolve_inside_repo_and_traversal_stays_blocked():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        (repo / "nested").mkdir(parents=True)
+        controller = Controller(
+            Recovery(root / "private", repo=repo), run=lambda *args: iter(())
+        )
+        for spelling, expected in (
+            (".", repo),
+            ("./", repo),
+            ("./nested", repo / "nested"),
+        ):
+            request = parse_request(
+                {
+                    "tool": "bash",
+                    "args": {
+                        "command": "find . -maxdepth 2",
+                        "writablePaths": [spelling],
+                    },
+                }
+            )
+            assert isinstance(request, Bash)
+            assert controller.target(request.writablePaths[0])[1] == expected
+        for spelling in ("../outside", "./../outside", "nested/../../outside"):
+            with pytest.raises(ValueError, match="without traversal"):
+                parse_request(
+                    {
+                        "tool": "bash",
+                        "args": {"command": "find .", "writablePaths": [spelling]},
+                    }
+                )
+
+
+def test_mutations_in_different_sessions_wait_for_the_shared_operation_lock():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repos = (root / "first", root / "second")
+        for repo in repos:
+            repo.mkdir()
+        first_entered = threading.Event()
+        second_started = threading.Event()
+        second_entered = threading.Event()
+        release_first = threading.Event()
+        failures = []
+        completed = []
+
+        def run(request, stop, lock_fd):
+            if request.command == "first":
+                first_entered.set()
+                if not release_first.wait(5):
+                    raise RuntimeError("First worker was not released")
+            else:
+                second_entered.set()
+            yield {"type": "result", "result": {"content": []}}
+
+        controllers = tuple(
+            Controller(Recovery(root / "private", repo=repo), run=run) for repo in repos
+        )
+
+        def execute(index):
+            try:
+                name = ("first", "second")[index]
+                if index == 1:
+                    second_started.set()
+                list(
+                    controllers[index].execute(
+                        parse_request({"tool": "bash", "args": {"command": name}}),
+                        threading.Event(),
+                    )
+                )
+                completed.append(name)
+            except Exception as error:
+                failures.append(error)
+
+        threads = tuple(threading.Thread(target=execute, args=(i,)) for i in (0, 1))
+        try:
+            threads[0].start()
+            assert first_entered.wait(5)
+            threads[1].start()
+            assert second_started.wait(5)
+            assert second_entered.wait(0.3) is False
+            release_first.set()
+            for thread in threads:
+                thread.join(5)
+                assert not thread.is_alive()
+            assert failures == []
+            assert completed == ["first", "second"]
+            assert second_entered.is_set()
+        finally:
+            release_first.set()
+            for thread in threads:
+                if thread.ident is not None:
+                    thread.join(5)
+            for controller in controllers:
+                controller.close()
+
+
+def test_readonly_commands_limit_concurrency_and_reuse_released_slots():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        entered = tuple(threading.Event() for _ in range(4))
+        release = threading.Event()
+        failures = []
+        completed = []
+        expected = {"type": "result", "result": {"content": []}}
+
+        def run(request, stop, lock_fd):
+            if request.command in ("0", "1", "2", "3"):
+                entered[int(request.command)].set()
+                if not release.wait(5):
+                    raise RuntimeError("Read-only worker was not released")
+            yield expected
+
+        controller = Controller(Recovery(root / "private", repo=repo), run=run)
+
+        def request(name):
+            return parse_request(
+                {"tool": "readonly_bash", "args": {"command": name, "runId": name}}
+            )
+
+        def execute(index):
+            try:
+                completed.append(
+                    list(controller.execute(request(str(index)), threading.Event()))
+                )
+            except Exception as error:
+                failures.append(error)
+
+        threads = tuple(threading.Thread(target=execute, args=(i,)) for i in range(4))
+        try:
+            for thread in threads:
+                thread.start()
+            assert all(event.wait(5) for event in entered)
+            with pytest.raises(RuntimeError, match="At most four"):
+                list(controller.execute(request("fifth"), threading.Event()))
+            release.set()
+            for thread in threads:
+                thread.join(5)
+                assert not thread.is_alive()
+            assert failures == []
+            assert completed == [[expected]] * 4
+            assert list(controller.execute(request("fresh"), threading.Event())) == [
+                expected
+            ]
+        finally:
+            release.set()
+            for thread in threads:
+                thread.join(5)
+            controller.close()
 
 
 def test_checkpoint_failure_prevents_worker_and_foreign_paths_are_rejected():
@@ -59,7 +213,12 @@ def test_failed_worker_retains_checkpoint_and_recovery_exports_host_conflict():
         with pytest.raises(RuntimeError, match="interrupted"):
             list(
                 controller.execute(
-                    parse_request({"tool": "bash", "args": {"command": "false"}}),
+                    parse_request(
+                        {
+                            "tool": "bash",
+                            "args": {"command": "false", "writablePaths": ["./"]},
+                        }
+                    ),
                     threading.Event(),
                 )
             )

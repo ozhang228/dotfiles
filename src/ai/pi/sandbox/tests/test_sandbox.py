@@ -218,17 +218,35 @@ def test_launcher_refuses_unavailable_boundary_and_changed_provider():
         (project / ".pi/nested/.env").touch()
         (project / "nested").mkdir()
         (project / "nested/.env").touch()
-        assert list(launcher.credential_paths(project)) == [
+        (project / ".git").mkdir()
+        (project / ".git/.env").touch()
+        (project / "nested/.git").write_text("gitdir: elsewhere")
+        protections = launcher.repository_protections(project)
+        assert set(protections.credentials) == {
             project / ".pi",
             project / "nested/.env",
-        ]
+            project / ".git/.env",
+        }
+        assert set(protections.git_metadata) == {
+            project / ".git",
+            project / "nested/.git",
+        }
         (project / ".env.link").symlink_to(root / "outside")
         try:
-            list(launcher.credential_paths(project))
+            launcher.repository_protections(project)
         except RuntimeError as error:
             assert str(error) == "Sandbox refuses project .pi or dotenv symlinks"
         else:
             raise AssertionError("Credential symlink was accepted")
+        (project / ".env.link").unlink()
+        (project / "nested/.git").unlink()
+        (project / "nested/.git").symlink_to(root / "outside")
+        with pytest.raises(RuntimeError, match="Git metadata symlinks"):
+            launcher.repository_protections(project)
+        assert (
+            launcher.repository_protections(project, include_git=False).git_metadata
+            == ()
+        )
 
 
 def test_real_pi_streams_through_authenticated_srt_proxy_without_host_auth():

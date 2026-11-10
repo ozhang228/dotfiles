@@ -7,21 +7,31 @@ import hashlib
 import json
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
 import tempfile
 import threading
+from collections.abc import Mapping
+from dataclasses import dataclass
 from pathlib import Path
 
 from broker import Broker
-from controller import Controller, Edit, Worker, Write
+from controller import Controller, Edit, ReadonlyBash, Worker, Write
 from recovery import Recovery
-from runtime import agent_dir, find_runtime, provider_source, runtime_roots
+from preferences import persist_preferences
+from runtime import (
+    agent_dir,
+    find_runtime,
+    installed_tools,
+    provider_source,
+    runtime_roots,
+)
 
 RUNTIME_VERSION = "0.0.81"
 GATEWAY = "http://pi-gateway.invalid"
-PLUGINS = ("compact-tools", "cozy-prompt", "minimal-command-menu")
+PLUGINS = ("compact-tools", "cozy-prompt", "minimal-command-menu", "subagents")
 
 
 def assets_root():
@@ -64,7 +74,7 @@ def snapshot_config(config: Path, *, assets: Path, cli: Path, roots=()):
         raise TypeError("Invalid sandbox settings")
     settings.update(
         {
-            "defaultTools": ["read", "grep", "find", "ls"],
+            "defaultTools": ["read", "grep", "find", "ls", "subagent", "subagent_log"],
             "defaultProjectTrust": "never",
             "transport": "sse",
             "packages": [],
@@ -171,16 +181,36 @@ def private_state(project: Path):
     return root
 
 
-def credential_paths(project: Path):
-    for directory, directories, files in os.walk(project, followlinks=False):
-        for name in (*directories, *files):
-            if name == ".pi" or name == ".env" or name.startswith(".env."):
-                path = Path(directory) / name
-                if path.is_symlink():
-                    raise RuntimeError("Sandbox refuses project .pi or dotenv symlinks")
-                yield path
-                if name in directories:
-                    directories.remove(name)
+@dataclass(frozen=True)
+class RepositoryProtections:
+    credentials: tuple[Path, ...]
+    git_metadata: tuple[Path, ...]
+
+
+def repository_protections(project: Path, *, include_git=True):
+    credentials = []
+    git_metadata = []
+    directories = [os.fspath(project)]
+    while directories:
+        with os.scandir(directories.pop()) as entries:
+            for entry in entries:
+                name = entry.name
+                if name in {".pi", ".env"} or name.startswith(".env."):
+                    if entry.is_symlink():
+                        raise RuntimeError(
+                            "Sandbox refuses project .pi or dotenv symlinks"
+                        )
+                    credentials.append(Path(entry.path))
+                    continue
+                if include_git and name == ".git":
+                    if entry.is_symlink():
+                        raise RuntimeError(
+                            "Git metadata symlinks are not supported for writable projects"
+                        )
+                    git_metadata.append(Path(entry.path))
+                if entry.is_dir(follow_symlinks=False):
+                    directories.append(entry.path)
+    return RepositoryProtections(tuple(credentials), tuple(git_metadata))
 
 
 def approved_repositories(project: Path):
@@ -236,13 +266,22 @@ def sandbox_prefix(
     write_paths=None,
     writable=False,
     protected=(),
+    credentials=None,
 ):
     roots = tuple(roots) or (project,)
     write_paths = roots if write_paths is None else tuple(write_paths)
+    if credentials is None:
+        credentials = tuple(
+            path
+            for root in roots
+            for path in repository_protections(root, include_git=False).credentials
+        )
     modules, package = sandbox_runtime()
+    tools = installed_tools()
     sources = (
         *runtime_roots(node=node, cli=cli),
         modules,
+        *tools.values(),
         project,
         *roots,
         temporary / "config",
@@ -251,7 +290,7 @@ def sandbox_prefix(
         *[assets / name for name in ("rules", "skills", "_shared")],
     )
     host_protected = (agent_dir(), state)
-    for source in (*sources[:3], project, *roots):
+    for source in (*sources[:3], *tools.values(), project, *roots):
         if Path.home().resolve().is_relative_to(source) or any(
             path.is_relative_to(source) or source.is_relative_to(state)
             for path in host_protected
@@ -278,7 +317,7 @@ def sandbox_prefix(
             "denyRead": [
                 "/",
                 "/sys",
-                *[literal(path) for root in roots for path in credential_paths(root)],
+                *map(literal, credentials),
             ],
             "allowRead": [
                 *[
@@ -300,7 +339,13 @@ def sandbox_prefix(
                 )
             ),
             "denyWrite": list(
-                map(literal, protected if writable else (project, *roots))
+                map(
+                    literal,
+                    (
+                        *tools.values(),
+                        *(protected if writable else (project, *roots)),
+                    ),
+                )
             ),
         },
         "enableWeakerNestedSandbox": False,
@@ -326,6 +371,7 @@ def sandbox_prefix(
                 (
                     *runtime_roots(node=node, cli=cli),
                     modules,
+                    *tools.values(),
                     project,
                     *roots,
                     temporary / "config",
@@ -346,14 +392,34 @@ def sandbox_prefix(
 
 
 def sandbox_environment(*, node: Path, temporary: Path):
+    tools = installed_tools()
+    for alias, source in tools.items():
+        destination = temporary / "home" / alias
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.symlink_to(source, target_is_directory=source.is_dir())
+    binaries = [temporary / "home" / alias for alias in tools if alias.name == "bin"]
+    mason = temporary / "home/.local/share/nvim/mason/bin"
+    if mason.is_dir():
+        binaries.append(mason)
     environment = {
         "HOME": str(temporary / "home"),
-        "PATH": f"{node.parent}:/usr/bin:/bin",
+        "PATH": os.pathsep.join(
+            map(str, (node.parent, *binaries, "/usr/local/bin", "/usr/bin", "/bin"))
+        ),
         "PI_CODING_AGENT_DIR": str(temporary / "config"),
         "PORTKEY_API_KEY": "local-broker",
         "NODE_USE_ENV_PROXY": "1",
         "XDG_CACHE_HOME": str((temporary / "cache").resolve()),
         "TMPDIR": str(temporary / "scratch"),
+        "PYTHONPYCACHEPREFIX": str(temporary / "scratch/pycache"),
+        "UV_CACHE_DIR": str(temporary / "scratch/uv"),
+        "UV_PYTHON_INSTALL_DIR": str(temporary / "home/.local/share/uv/python"),
+        "UV_PYTHON_DOWNLOADS": "never",
+        "npm_config_cache": str(temporary / "scratch/npm"),
+        "CARGO_HOME": str(temporary / "scratch/cargo"),
+        "PYTEST_ADDOPTS": shlex.join(
+            ["-o", f"cache_dir={temporary / 'scratch/pytest'}"]
+        ),
         # SRT overrides TMPDIR from this variable when filesystem isolation is enabled.
         "CLAUDE_CODE_TMPDIR": str(temporary / "scratch"),
         "LANG": "C.UTF-8",
@@ -364,33 +430,34 @@ def sandbox_environment(*, node: Path, temporary: Path):
     return environment
 
 
-def protected_git_paths(project: Path):
-    for directory, directories, files in os.walk(project, followlinks=False):
-        if ".git" in (*directories, *files):
-            path = Path(directory) / ".git"
-            if path.is_symlink():
-                raise RuntimeError(
-                    "Git metadata symlinks are not supported for writable projects"
-                )
-            yield path
-            if ".git" in directories:
-                directories.remove(".git")
-
-
 def editing_controller(
-    *, node: Path, cli: Path, project: Path, state: Path, assets: Path, roots=()
+    *,
+    node: Path,
+    cli: Path,
+    project: Path,
+    state: Path,
+    assets: Path,
+    roots=(),
+    protections: Mapping[Path, RepositoryProtections] | None = None,
 ):
     if not roots and not is_repository_root(project):
         return None
     roots = tuple(roots) or (project,)
+    if protections is None:
+        protections = {root: repository_protections(root) for root in roots}
     controller_sources = (Path(__file__).resolve().parent, assets / "pi/sandbox")
+    read_roots = (
+        roots
+        if any(project.is_relative_to(root) for root in roots)
+        else (*roots, project)
+    )
     recoveries = tuple(
         Recovery(
             state.parent / "recovery",
             repo=root,
             protected=[
-                *protected_git_paths(root),
-                *credential_paths(root),
+                *protections[root].git_metadata,
+                *protections[root].credentials,
                 *controller_sources,
             ],
         )
@@ -417,6 +484,8 @@ def editing_controller(
             targets = (
                 (request.path,)
                 if isinstance(request, (Write, Edit))
+                else ()
+                if isinstance(request, ReadonlyBash)
                 else request.writablePaths
             )
             for value in targets:
@@ -428,8 +497,16 @@ def editing_controller(
                 while not writable.exists():
                     writable = writable.parent
                 write_paths = (writable,)
+            elif isinstance(request, ReadonlyBash):
+                write_paths = ()
             else:
                 write_paths = tuple(Path(path) for path in request.writablePaths)
+            protections = {
+                root: repository_protections(
+                    root, include_git=not isinstance(request, ReadonlyBash)
+                )
+                for root in read_roots
+            }
             sandbox_prefix(
                 node=node,
                 cli=cli,
@@ -440,14 +517,19 @@ def editing_controller(
                 roots=roots,
                 write_paths=write_paths,
                 writable=True,
-                protected=[
+                credentials=tuple(
+                    path for scan in protections.values() for path in scan.credentials
+                ),
+                protected=[]
+                if isinstance(request, ReadonlyBash)
+                else [
                     *controller_sources,
                     *[
                         path
                         for store in recoveries
                         for path in (
-                            *protected_git_paths(store.repo),
-                            *credential_paths(store.repo),
+                            *protections[store.repo].git_metadata,
+                            *protections[store.repo].credentials,
                             *store.shared_paths(paths=selections.get(store.repo, [])),
                         )
                     ],
@@ -541,6 +623,15 @@ def main():
             ],
             environment=environment,
         )
+        read_roots = (
+            roots
+            if any(project.is_relative_to(root) for root in roots)
+            else (*roots, project)
+        )
+        protections = {
+            root: repository_protections(root, include_git=root in roots)
+            for root in read_roots
+        }
         command = sandbox_prefix(
             node=node,
             cli=cli,
@@ -549,10 +640,19 @@ def main():
             temporary=temporary,
             assets=assets,
             roots=roots,
+            credentials=tuple(
+                path for scan in protections.values() for path in scan.credentials
+            ),
         )
         check_boundary([*command, "/usr/bin/true"], environment=environment)
         controller = editing_controller(
-            node=node, cli=cli, project=project, state=state, assets=assets, roots=roots
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            assets=assets,
+            roots=roots,
+            protections=protections,
         )
         if controller is not None:
             environment["PI_SANDBOX_CONTROL"] = "1"
@@ -568,28 +668,38 @@ def main():
                 "bash",
                 "recovery_list",
                 "recovery_restore",
+                "subagent",
+                "subagent_log",
             ]
             settings_path.write_text(json.dumps(settings))
         with Broker(
-            temporary / "gateway.sock", key=credential(), controller=controller
+            temporary / "gateway.sock",
+            key=credential(),
+            controller=controller,
+            catalog_cache=state.parent / "catalog",
         ) as broker:
             thread = threading.Thread(target=broker.serve_forever, daemon=True)
             thread.start()
             try:
-                status = subprocess.run(
-                    [
-                        *command,
-                        str(node),
-                        str(cli),
-                        *sys.argv[1:],
-                        "--no-mcp",
-                        "--no-approve",
-                        "--session-dir",
-                        str(state / "sessions"),
-                    ],
-                    check=False,
-                    env=environment,
-                ).returncode
+                with persist_preferences(
+                    snapshot=temporary / "config/settings.json",
+                    source=assets / "pi/settings.json",
+                    lock=state.parent / "preferences.lock",
+                ):
+                    status = subprocess.run(
+                        [
+                            *command,
+                            str(node),
+                            str(cli),
+                            *sys.argv[1:],
+                            "--no-mcp",
+                            "--no-approve",
+                            "--session-dir",
+                            str(state / "sessions"),
+                        ],
+                        check=False,
+                        env=environment,
+                    ).returncode
             finally:
                 if controller is not None:
                     controller.close()

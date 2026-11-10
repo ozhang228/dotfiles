@@ -130,6 +130,33 @@ def provider_source(cli: Path):
     )
 
 
+def installed_tools():
+    home = Path.home()
+    data = Path(os.environ.get("XDG_DATA_HOME", home / ".local/share")).expanduser()
+    candidates = {
+        Path(".local/bin"): home / ".local/bin",
+        Path(".cargo/bin"): home / ".cargo/bin",
+        Path(".rustup/toolchains"): home / ".rustup/toolchains",
+        Path(".rustup/settings.toml"): home / ".rustup/settings.toml",
+        Path(".bun/bin"): home / ".bun/bin",
+        **{
+            Path(".local/share") / name: data / name
+            for name in (
+                "nvim/mason",
+                "uv/tools",
+                "uv/python",
+                "pipx/venvs",
+                "pypoetry/venv",
+            )
+        },
+    }
+    return {
+        alias: source.resolve()
+        for alias, source in candidates.items()
+        if source.exists()
+    }
+
+
 def runtime_roots(*, node: Path, cli: Path):
     node_root = node.parent.parent
     if (

@@ -1,6 +1,6 @@
 # Pi Harness
 
-Replace Claude Code and Codex with Pi while preserving the workflows I actually use. Focus mode, sandboxing, and recoverable changes are required before switching.
+Replace Claude Code and Codex with Pi while preserving the workflows I actually use. Sandboxing and recoverable changes are required before switching.
 
 ## Required before switching
 
@@ -33,15 +33,6 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Define recovery for writes made after a launch command returns; do not silently bypass the checkpoint guarantee
   - [ ] Reuse the same controller boundary for statically configured extra repos, with separate scope and recovery accounting
   - [ ] Verify recovery and process cleanup for background jobs and future subagents
-- [ ] Add focus mode
-  - [ ] Add a command and shortcut to toggle focus mode and remember the preference
-  - [ ] Hide tool call headers, arguments, streaming output, results, images produced by tools, and subagent tool chatter from the visible transcript
-  - [ ] Keep user messages, assistant progress/answers, a compact running/waiting indicator, and required approval requests visible
-  - [ ] Report actionable failures concisely without dumping raw tool output
-  - [ ] Preserve full tool events and results for model context, local history, debugging, and later inspection; hiding is presentation-only
-  - [ ] Allow revealing the complete transcript during or after work, including after resume
-  - [ ] Try Pi's global tool-renderer extension API first; verify whether it can remove outer spacing and all tool images, and make a narrow TUI change only if needed
-  - [ ] Verify in the actual Neovim Snacks terminal and tmux, including streaming, failures, approval prompts, cancellation, and resumed sessions
 - [ ] Preserve worktree and editor integration
   - [ ] Switch AI_CLI_CMD to ai-resume --agent pi when ready; keep the existing Snacks terminal toggle on ai-resume --agent codex --no-daemon for now
   - [ ] Verify the current @file:line and @file:start-end mappings; translate references if Pi does not resolve their existing syntax correctly
@@ -64,12 +55,6 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Support interactive stdin or PTY sessions where required; verify whether existing Pi facilities cover each case before adding a tool
   - [ ] Bind local development servers to 0.0.0.0 and preserve the existing tmux process-cleanup behavior
   - [ ] Keep jobs and their writable paths inside the sandbox; define what survives harness exit and what must stop
-- [ ] Add subagent support
-  - [ ] Start from Pi's bundled subagent example or an existing package; add only the coordination behavior used by the existing skills
-  - [ ] Support spawn, task delivery, results, status, follow-up work, wait, interruption, and messages between parent and workers
-  - [ ] Preserve explicit model/effort selection where skills require it and inherit the parent's sandbox and authorization limits
-  - [ ] Make shared-workspace edit ownership explicit and verify actual tests after delegated edits
-  - [ ] Surface concise worker status in focus mode and preserve full worker logs for inspection
 - [ ] Rethink the memory and debugging system beyond Anvil
   - [ ] Define what is missing from keeping notebooks and postmortems in one place: finding previous work, resuming investigations, rerunning evidence, or recalling useful findings
   - [ ] Decide where investigations, reproducible notebooks, postmortems, reusable helpers, and durable knowledge belong and how they connect
@@ -142,7 +127,7 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
   - [ ] Review [pi-interactive-shell](https://github.com/nicobailon/pi-interactive-shell) for managed jobs and PTYs
     - [ ] Source version 0.18.0 provides stable session IDs, input, status, background dispatch, and user takeover; verify build/test/server workflows inside the sandbox
     - [ ] Disable automatic quiet-close for servers; its kill result can mean supervision ended without confirmed process exit, so verify actual process-tree termination
-    - [ ] Review its default 24-hour saved-log cleanup and overlay behavior against recoverability and focus mode
+    - [ ] Review its default 24-hour saved-log cleanup and overlay behavior against recoverability and the compact tool display
   - [ ] Review [@gotgenes/pi-permission-system](https://github.com/gotgenes/pi-packages/tree/main/packages/pi-permission-system) for action approvals
     - [ ] Source version 42.0.0 declares Pi >=1.0.0; review allow/ask/deny policies, canonical paths, fail-closed gate errors, unknown shell commands, and MCP access
     - [ ] Use the current monorepo; the old standalone repository is archived because it moved
@@ -206,7 +191,7 @@ These are candidates, not an approved install set. Reviewed repository READMEs, 
   - [ ] Verify the combined load order and tool replacements, especially bash, edit/write, permission hooks, codemode, detached jobs, and subagents
   - [ ] Reject a required safety component if installation/loading fails or the sandbox is unavailable; Pi's ordinary package-loading behavior can warn and continue without a failed package
   - [ ] Recheck isolation and recovery with selected plugins loaded; verify they cannot bypass the controller or access recovery storage
-  - [ ] Exercise gateway/MCP reads, delegated edits, long tests, interactive shells, cancellation, compaction/resume, and focus-mode approvals through the actual editor workflow
+  - [ ] Exercise gateway/MCP reads, delegated edits, long tests, interactive shells, cancellation, compaction/resume, and approval prompts through the actual editor workflow
   - [ ] Resolve remaining integration gaps before making Pi the editor default
 
 Discovery sources: [Pi package gallery](https://pi.dev/packages) and each repository linked above. Repository inspection identified specific limits; no plugin has been certified safe or compatible end to end. General npm search was unavailable during discovery, so exact publication/install verification remains a checklist item.
@@ -219,6 +204,6 @@ Claude history contains 70 /code-review, 31 /brainstorm, 113 /model, 162 /clear,
 
 Current Codex configuration uses Portkey with the Responses API, enabled memory, disabled web search, and unrestricted local permissions. Those unrestricted permissions describe the current setup; the requested Pi sandbox is a stronger requirement. Old hook trust records exist, but the referenced global hooks file was absent during this audit.
 
-Pi behavior was checked against source/docs for released v1.5.0 and current documentation. Pi already supports MCP, skills, context files, sessions, steering, compaction, model settings, and codemode. Its security documentation explicitly says project trust does not sandbox tools. Focus mode, gateway/MCP integration, and sandbox verification on other machines remain pending.
+Pi behavior was checked against source/docs for released v1.5.0 and current documentation. Pi already supports MCP, skills, context files, sessions, steering, compaction, model settings, and codemode. Its security documentation explicitly says project trust does not sandbox tools. Gateway/MCP integration and sandbox verification on other machines remain pending.
 
 Sources: [Pi v1.5.0](https://github.com/earendil-works/pi/releases/tag/v1.5.0), [security](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/security.md), [MCP](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/mcp.md), [extensions](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/extensions.md), [skills](https://github.com/earendil-works/pi/blob/v1.5.0/packages/coding-agent/docs/skills.md), and [official OpenAI documentation](https://learn.chatgpt.com/docs/developer-commands).

@@ -13,6 +13,7 @@ def runtime_module():
     spec = importlib.util.spec_from_file_location(
         "runtime", Path(__file__).parents[1] / "runtime.py"
     )
+    assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -23,6 +24,27 @@ def executable(path, content):
     path.write_text(content)
     path.chmod(0o755)
     return path
+
+
+def test_installed_tools_follow_home_and_xdg_data_without_exposing_host_caches():
+    runtime = runtime_module()
+    with tempfile.TemporaryDirectory() as directory:
+        home = Path(directory) / "home"
+        data = Path(directory) / "data"
+        binaries = home / ".local/bin"
+        mason = data / "nvim/mason"
+        python = data / "uv/python"
+        cache = home / ".cache/uv"
+        for path in (binaries, mason, python, cache):
+            path.mkdir(parents=True)
+        with patch.dict(
+            os.environ, {"HOME": str(home), "XDG_DATA_HOME": str(data)}, clear=True
+        ):
+            assert runtime.installed_tools() == {
+                Path(".local/bin"): binaries,
+                Path(".local/share/nvim/mason"): mason,
+                Path(".local/share/uv/python"): python,
+            }
 
 
 def package(modules):
@@ -68,7 +90,9 @@ def test_setup_refuses_missing_npm_without_creating_runtime():
         binaries = root / "bin"
         binaries.mkdir()
         for name in ("dirname", "readlink", "uname", "python3"):
-            (binaries / name).symlink_to(shutil.which(name))
+            executable_path = shutil.which(name)
+            assert executable_path is not None
+            (binaries / name).symlink_to(executable_path)
         result = subprocess.run(
             ["/bin/sh", str(script)],
             env={"HOME": str(root), "PATH": str(binaries)},

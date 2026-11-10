@@ -6,6 +6,7 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { Type, type TSchema } from "typebox";
 import { Value } from "typebox/value";
+import { randomUUID } from "node:crypto";
 
 const messageSchema = Type.Union([
   Type.Object({
@@ -59,6 +60,8 @@ const bashResult = Type.Object({
   ),
 });
 
+class ControllerFailure extends Error {}
+
 async function request<T extends TSchema>(
   tool: string,
   args: unknown,
@@ -108,7 +111,7 @@ async function request<T extends TSchema>(
         if (newline > 262144) throw new Error("Sandbox result exceeds transport limit");
         const message = Value.Parse(messageSchema, JSON.parse(pending.slice(0, newline)));
         pending = pending.slice(newline + 1);
-        if (message.type === "error") throw new Error(message.error);
+        if (message.type === "error") throw new ControllerFailure(message.error);
         const result = Value.Parse(schema, message.result);
         if (message.type === "result") return result;
         update?.(result);
@@ -153,7 +156,7 @@ export function sandboxBash(cwd: string) {
         minItems: 1,
         maxItems: 50,
         description:
-          "Existing directories this command may change (absolute, ~/ or relative). All approved repositories remain readable. Defaults to the working directory. Choose the smallest directories needed so recovery stays fast and bounded; other directories stay read-only for this command.",
+          "Existing directories inside approved repositories this command may change (absolute, ~/ or relative). Defaults to the working directory. Choose the smallest directories needed for bounded recovery. Never request /tmp, host home, ~/.cache, or tool installation directories. $TMPDIR, $XDG_CACHE_HOME, $UV_CACHE_DIR, and npm's cache already point into writable disposable sandbox storage; installed tools are read-only.",
       }),
     ),
   });
@@ -165,6 +168,65 @@ export function sandboxBash(cwd: string) {
         update?.({ ...partial, details: partial.details }),
       );
       return { ...result, details: result.details };
+    },
+  } satisfies typeof native;
+}
+
+export function sandboxReadonlyBash(cwd: string) {
+  const native = createBashToolDefinition(cwd);
+  return {
+    ...native,
+    description:
+      "Run a command with read-only repositories, no network or credentials, and writable disposable scratch. Use $TMPDIR and $XDG_CACHE_HOME for scripts, caches, and reports. Checkout-writing tests fail; never retry with write access. Output is bounded and scratch is removed after command-tree exit.",
+    execute: async function execute(_id, args, signal, update, _ctx) {
+      signal?.throwIfAborted();
+      const runId = randomUUID();
+      let cancellation: Promise<unknown> | undefined;
+      let failure: { error: unknown } | undefined;
+      function cancel() {
+        cancellation = request(
+          "readonly_cancel",
+          { runId },
+          Type.Object({ cancelled: Type.Boolean() }),
+        );
+        // The finally block observes failures after the command response settles.
+        void cancellation.catch(() => {});
+      }
+      signal?.addEventListener("abort", cancel, { once: true });
+      async function executeCommand() {
+        try {
+          const result = await request(
+            "readonly_bash",
+            { command: args.command, timeout: args.timeout, runId },
+            bashResult,
+            undefined,
+            (partial) => update?.({ ...partial, details: partial.details }),
+          );
+          signal?.throwIfAborted();
+          return { ...result, details: result.details };
+        } catch (error: unknown) {
+          failure = { error };
+          if (!cancellation && !(error instanceof ControllerFailure)) cancel();
+          throw error;
+        }
+      }
+      return executeCommand().finally(async function acknowledgeCancellation() {
+        signal?.removeEventListener("abort", cancel);
+        try {
+          await cancellation;
+        } catch (error: unknown) {
+          if (failure) {
+            const original =
+              failure.error instanceof Error ? failure.error.message : String(failure.error);
+            const cleanup = error instanceof Error ? error.message : String(error);
+            throw new AggregateError(
+              [failure.error, error],
+              `Read-only command failed (${original}); cancellation acknowledgement failed (${cleanup})`,
+            );
+          }
+          throw error;
+        }
+      });
     },
   } satisfies typeof native;
 }

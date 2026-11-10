@@ -1,13 +1,21 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, realpathSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
-const piCli = realpathSync(
-  execFileSync("sh", ["-c", "command -v pi"], { encoding: "utf8" }).trim(),
-);
+const sandbox = fileURLToPath(new URL("../../sandbox", import.meta.url));
+const piCli = execFileSync(
+  "python3",
+  [
+    "-c",
+    "import sys;sys.path.insert(0,sys.argv[1]);from runtime import find_runtime;print(find_runtime()[1])",
+    sandbox,
+  ],
+  { encoding: "utf8" },
+).trim();
 let piAgent = dirname(piCli);
 while (!existsSync(`${piAgent}/package.json`)) piAgent = dirname(piAgent);
 const piAgentRequire = createRequire(`${piAgent}/package.json`);
@@ -19,7 +27,7 @@ const jiti = createJiti(import.meta.url, {
     "@earendil-works/pi-tui": piTuiEntry,
   },
 });
-const { CozyEditor } = await jiti.import("./index.ts");
+const { CozyEditor, default: cozyPrompt } = await jiti.import("./index.ts");
 const { KeybindingsManager } = await jiti.import(`${piAgent}/dist/core/keybindings.js`);
 const { CombinedAutocompleteProvider, visibleWidth } = await jiti.import(piTuiEntry);
 
@@ -82,4 +90,51 @@ test("the decorated slash menu keeps mouse selection and native completion align
   });
   editor.handleInput("\t");
   assert.equal(editor.getText(), "/skill:debug ");
+});
+
+test("Ctrl+C aborts a busy session through the public runtime action", function abortBusySession() {
+  let input;
+  let footer;
+  const stop = new AbortController();
+  cozyPrompt({
+    on(_name, start) {
+      start(
+        {},
+        {
+          hasUI: true,
+          isIdle() {
+            return false;
+          },
+          abort() {
+            stop.abort();
+          },
+          ui: {
+            setFooter(factory) {
+              footer = factory(
+                { requestRender() {} },
+                {},
+                {
+                  onBranchChange() {
+                    return () => {};
+                  },
+                },
+              );
+            },
+            onTerminalInput(handler) {
+              input = handler;
+              return () => {};
+            },
+            setWidget() {},
+            setEditorComponent() {},
+          },
+        },
+      );
+    },
+  });
+  try {
+    assert.deepEqual(input("\x03"), { consume: true });
+    assert.equal(stop.signal.aborted, true);
+  } finally {
+    footer.dispose();
+  }
 });

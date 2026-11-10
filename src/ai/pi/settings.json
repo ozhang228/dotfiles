@@ -1,11 +1,23 @@
 {
   "$schema": "https://pi.dev/schemas/settings.schema.json",
   "defaultProvider": "drw",
-  "defaultModel": "@azure/gpt-5.6-sol",
+  "defaultModel": "@vertex-ai/anthropic.claude-opus-5-5",
   "defaultThinkingLevel": "medium",
-  "defaultTools": ["read", "grep", "find", "ls"],
-  "skills": ["!skills/**", "~/dotfiles/src/ai/skills"],
-  "prompts": ["!**"],
+  "defaultTools": [
+    "read",
+    "grep",
+    "find",
+    "ls",
+    "subagent",
+    "subagent_log"
+  ],
+  "skills": [
+    "!skills/**",
+    "~/dotfiles/src/ai/skills"
+  ],
+  "prompts": [
+    "!**"
+  ],
   "packages": [],
   "extensions": [
     "!**",
@@ -15,9 +27,13 @@
     "+extensions/minimal-command-menu/index.ts",
     "+extensions/cozy-prompt/index.ts",
     "+extensions/compact-tools/index.ts",
+    "+extensions/subagents/index.ts",
     "+extensions/portkey-provider.ts"
   ],
-  "themes": ["!**", "+themes/catppuccin-macchiato.json"],
+  "themes": [
+    "!**",
+    "+themes/catppuccin-macchiato.json"
+  ],
   "theme": "catppuccin-macchiato",
   "enableSkillCommands": true,
   "tuiMode": "regular",

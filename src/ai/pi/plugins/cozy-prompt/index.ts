@@ -96,7 +96,10 @@ export default function cozyPrompt(pi: ExtensionAPI) {
       resizeWatcher?.unref();
       const unsubscribe = footerData.onBranchChange(() => tui.requestRender());
       const unsubscribeInput = ctx.ui.onTerminalInput((data) => {
-        if (matchesKey(data, "ctrl+c") && !ctx.isIdle()) return { data: "\x1b" };
+        if (matchesKey(data, "ctrl+c") && !ctx.isIdle()) {
+          ctx.abort();
+          return { consume: true };
+        }
         return undefined;
       });
       ctx.ui.setWidget("cozy-prompt-toolbar", undefined);

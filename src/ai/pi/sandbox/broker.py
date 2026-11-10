@@ -10,6 +10,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from controller import Controller, parse_request
+from catalog import CatalogCache
 
 MAX_BODY_BYTES = 8 * 1024 * 1024
 IDLE_TIMEOUT = 60
@@ -44,11 +45,17 @@ class Broker(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
         key: str,
         connect=None,
         controller: Controller | None = None,
+        catalog_cache: Path | None = None,
     ):
         self.controller = controller
         self.key = key
         self.connect = connect or (
             lambda host: http.client.HTTPSConnection(host, timeout=IDLE_TIMEOUT)
+        )
+        self.catalog = (
+            CatalogCache(catalog_cache, key=key, connect=self.connect)
+            if catalog_cache is not None
+            else None
         )
         super().__init__(str(path), GatewayHandler)
         path.chmod(0o600)
@@ -75,9 +82,9 @@ class GatewayHandler(BaseHTTPRequestHandler):
     def send_error(self, code, message=None, explain=None):
         self.reply(code, b"Gateway request denied\n")
 
-    def reply(self, status: int, body: bytes):
+    def reply(self, status: int, body: bytes, *, content_type="text/plain"):
         self.send_response(status)
-        self.send_header("Content-Type", "text/plain")
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -199,6 +206,14 @@ class GatewayHandler(BaseHTTPRequestHandler):
             self.reply(413, b"Gateway request denied\n")
             return
         host, path = target
+        if self.command == "GET" and self.gateway.catalog is not None:
+            status, body = self.gateway.catalog.get(host=host, path=path)
+            self.reply(
+                status,
+                body,
+                content_type="application/json" if status == 200 else "text/plain",
+            )
+            return
         headers = {
             "Content-Type": "application/json",
             "Accept": "text/event-stream, application/json",
