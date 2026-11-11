@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { Socket } from "node:net";
-import { readFileSync } from "node:fs";
+import { lstatSync, readFileSync } from "node:fs";
+import { dirname } from "node:path";
 import { once } from "node:events";
 import { createInterface } from "node:readline";
 import { pathToFileURL } from "node:url";
@@ -85,6 +86,23 @@ async function supervise(runtimePath, policyPath, lifelineFd, modulePath, lockFd
   try {
     await SandboxManager.initialize(JSON.parse(readFileSync(policyPath, "utf8")));
     if (disconnected) throw new Error("Controller disconnected");
+    const { linuxGetCwdMandatoryDenyPaths } = await import(
+      new URL("./sandbox/linux-sandbox-utils.js", pathToFileURL(runtimePath)).href
+    );
+    const missing = new Set();
+    for (const denied of linuxGetCwdMandatoryDenyPaths()) {
+      let candidate;
+      for (let path = denied; path !== dirname(path); path = dirname(path)) {
+        try {
+          lstatSync(path);
+          break;
+        } catch (error) {
+          if (error.code !== "ENOENT" && error.code !== "ENOTDIR") throw error;
+          candidate = path;
+        }
+      }
+      if (candidate) missing.add(candidate);
+    }
     const command = [process.execPath, import.meta.filename, "native", modulePath]
       .map(quote)
       .join(" ");
@@ -99,7 +117,11 @@ async function supervise(runtimePath, policyPath, lifelineFd, modulePath, lockFd
     child = spawn(`exec ${wrapped}`, {
       shell: "/bin/sh",
       stdio: ["inherit", "inherit", "inherit", Number(lockFd)],
-      env: { ...process.env, PI_SANDBOX_LOCK_FD: "3" },
+      env: {
+        ...process.env,
+        PI_SANDBOX_LOCK_FD: "3",
+        PI_SANDBOX_MISSING_PATHS: JSON.stringify([...missing]),
+      },
     });
     const [code, signal] = await once(child, "exit");
     process.exitCode = disconnected || signal ? 1 : (code ?? 1);

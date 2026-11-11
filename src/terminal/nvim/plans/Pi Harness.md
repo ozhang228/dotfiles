@@ -4,8 +4,6 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Required before switching
 
-- [ ] Verify installation, symlinks, and native isolation/recovery smoke tests on remaining Ubuntu and Manjaro machines
-- [ ] Keep synthetic protected filenames out of file listings without weakening their write guards; broad formatter scans already work
 - [ ] Add explicitly scoped worker network and external capabilities
   - [ ] Start with an explicit domain allowlist for documentation and project package registries; keep other destinations blocked
   - [ ] Give workers private dependency caches and repo-local virtual environments/node_modules; keep shared host caches protected
@@ -18,11 +16,9 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Support read-only Git inspection in linked worktrees whose metadata is outside the launch repo
   - [ ] Add explicitly requested local commits later; keep Git metadata read-only until then
   - [ ] Add push and draft PR creation only with explicit approval and scoped authentication
-- [ ] Preserve worktree and editor integration
-  - [ ] Switch AI_CLI_CMD to ai-resume --agent pi when ready; keep the existing Snacks terminal toggle on ai-resume --agent codex --no-daemon for now
-  - [ ] Check Neovim/tmux startup, resume, Ctrl+C, resize, scrollback, and immediate LazyGit changes
-  - [ ] Verify @file:line and @file:start-end references through Pi
-  - [ ] Verify linked-worktree separation and moved session directories
+- [ ] Finish editor and session handoff
+  - [ ] Confirm terminal scrollback in Neovim/tmux
+  - [ ] Resume existing conversations after moving a repository; session storage currently depends on its absolute path
 - [ ] Verify remaining instruction and skill integration
   - [ ] Verify ancestor/project AGENTS.md and CLAUDE.md discovery
   - [ ] Verify brainstorm, debug, postmortem, and applauncher-use through Pi

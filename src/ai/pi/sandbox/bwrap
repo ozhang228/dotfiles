@@ -1,12 +1,19 @@
 #!/usr/bin/python3
+import json
 import os
 import sys
 import tempfile
 
 
-def regular_masks(arguments, empty):
+def regular_masks(arguments, empty, missing, hidden):
     result = list(arguments)
     for index in range(len(result) - 2):
+        if result[index] == "--ro-bind" and result[index + 2] in missing:
+            source = result[index + 1]
+            if source == "/dev/null" or os.path.basename(source).startswith(
+                "claude-empty-"
+            ):
+                hidden.add(result[index + 2])
         if (
             result[index] == "--ro-bind"
             and result[index + 1] == "/dev/null"
@@ -18,6 +25,13 @@ def regular_masks(arguments, empty):
 
 arguments = sys.argv[1:]
 profiles = []
+missing = json.loads(os.environ.pop("PI_SANDBOX_MISSING_PATHS", "[]"))
+if not isinstance(missing, list) or not all(
+    isinstance(path, str) and os.path.isabs(path) for path in missing
+):
+    raise RuntimeError("Invalid missing mount paths")
+hidden = set()
+record = os.environ.pop("PI_SANDBOX_MASK_RECORD", None)
 empty = os.environ.pop("PI_SANDBOX_EMPTY_MASK", None)
 if empty is not None:
     # SRT spills large mount lists into a NUL-delimited --args descriptor.
@@ -26,14 +40,21 @@ if empty is not None:
             profile = os.pread(int(arguments[index + 1]), 2 * 1024 * 1024 + 1, 0)
             if len(profile) > 2 * 1024 * 1024 or not profile.endswith(b"\0"):
                 raise RuntimeError("Invalid sandbox mount profile")
-            words = regular_masks(map(os.fsdecode, profile.split(b"\0")[:-1]), empty)
+            words = regular_masks(
+                map(os.fsdecode, profile.split(b"\0")[:-1]), empty, missing, hidden
+            )
             output = tempfile.TemporaryFile(dir=os.path.dirname(empty))
             output.write(b"\0".join(map(os.fsencode, words)) + b"\0")
             output.seek(0)
             os.set_inheritable(output.fileno(), True)
             profiles.append(output)
             arguments[index + 1] = str(output.fileno())
-    arguments = regular_masks(arguments, empty)
+    arguments = regular_masks(arguments, empty, missing, hidden)
+if record is not None:
+    pending = record + ".pending"
+    with open(pending, "x", encoding="utf-8") as output:
+        json.dump(sorted(hidden), output)
+    os.rename(pending, record)
 if os.environ.pop("PI_SANDBOX_LOCK_FD", None) == "3":
     arguments = ["--sync-fd", "3", *arguments]
 # SRT isolates user/mount/PID/network; retain IPC and hostname isolation too.

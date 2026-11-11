@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 
 const require = createRequire(import.meta.url);
@@ -65,6 +68,58 @@ function context(args, options = {}) {
     ...options,
   };
 }
+
+test("sandbox listings hide synthetic mounts and preserve real protected files", async function listings() {
+  const directory = mkdtempSync(join(tmpdir(), "pi-listings-"));
+  const previousControl = process.env.PI_SANDBOX_CONTROL;
+  const previousMounts = process.env.PI_SANDBOX_HIDDEN_MOUNTS;
+  try {
+    const repo = join(directory, "repo");
+    const mounts = join(directory, "mounts");
+    mkdirSync(repo);
+    mkdirSync(mounts);
+    mkdirSync(join(repo, ".aws"));
+    mkdirSync(join(repo, ".claude"));
+    writeFileSync(join(repo, ".aws/hidden"), "synthetic subtree");
+    writeFileSync(join(repo, ".mcp.json"), "");
+    writeFileSync(join(repo, ".zprofile"), "");
+    writeFileSync(join(repo, ".claude/settings.json"), "{}");
+    writeFileSync(join(repo, "visible.txt"), "real");
+    const alias = join(directory, "alias");
+    symlinkSync(repo, alias);
+    writeFileSync(
+      join(mounts, "worker.json"),
+      JSON.stringify([join(repo, ".aws"), join(repo, ".mcp.json")]),
+    );
+    process.env.PI_SANDBOX_CONTROL = "1";
+    process.env.PI_SANDBOX_HIDDEN_MOUNTS = mounts;
+    const { tools } = plugin();
+    const ls = tools.get("ls");
+    const find = tools.get("find");
+    const execute = (tool, args) =>
+      tool.execute("list", args, undefined, undefined, { cwd: alias });
+    const listed = await execute(ls, {});
+    assert.equal(listed.content[0].text, ".claude/\n.zprofile\nvisible.txt");
+    const limited = await execute(ls, { limit: 2 });
+    assert.deepEqual(limited.content[0].text.split("\n").slice(0, 2), [".claude/", ".zprofile"]);
+    assert.equal(limited.details.entryLimitReached, 2);
+    const found = await execute(find, { pattern: "*" });
+    assert.deepEqual(found.content[0].text.split("\n").sort(), [
+      ".claude/",
+      ".claude/settings.json",
+      ".zprofile",
+      "visible.txt",
+    ]);
+    const synthetic = await execute(find, { pattern: ".mcp.json" });
+    assert.equal(synthetic.content[0].text, "No files found matching pattern");
+  } finally {
+    if (previousControl === undefined) delete process.env.PI_SANDBOX_CONTROL;
+    else process.env.PI_SANDBOX_CONTROL = previousControl;
+    if (previousMounts === undefined) delete process.env.PI_SANDBOX_HIDDEN_MOUNTS;
+    else process.env.PI_SANDBOX_HIDDEN_MOUNTS = previousMounts;
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 
 test("read cards hide content and continuation notices until native output is expanded", function readCard() {
   const { renderer } = plugin();

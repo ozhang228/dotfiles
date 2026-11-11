@@ -1,9 +1,5 @@
-import {
-  sandboxBash,
-  sandboxEdit,
-  sandboxWrite,
-  registerRecovery,
-} from "../../sandbox/tools.ts";
+import { sandboxBash, sandboxEdit, sandboxWrite, registerRecovery } from "../../sandbox/tools.ts";
+import { sandboxFind, sandboxLs } from "../../sandbox/listing-tools.ts";
 import {
   createBashToolDefinition,
   defineTool,
@@ -320,8 +316,12 @@ export default function compactTools(pi: ExtensionAPI) {
     }),
   );
   pi.registerTool(withSummary(createGrepToolDefinition(process.cwd())));
-  pi.registerTool(withSummary(createFindToolDefinition(process.cwd())));
-  pi.registerTool(withSummary(createLsToolDefinition(process.cwd())));
+  pi.registerTool(
+    withSummary(sandboxed ? sandboxFind(process.cwd()) : createFindToolDefinition(process.cwd())),
+  );
+  pi.registerTool(
+    withSummary(sandboxed ? sandboxLs(process.cwd()) : createLsToolDefinition(process.cwd())),
+  );
   pi.registerTool(
     withSummary(sandboxed ? sandboxEdit(process.cwd()) : createEditToolDefinition(process.cwd())),
   );

@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess
 import sys
@@ -20,6 +21,7 @@ def test_native_json_mask_is_readable_but_cannot_be_changed(profile):
         existing.write_text('{"keep": true}')
         empty = root / "empty-mask"
         empty.touch(mode=0o400)
+        record = root / "mounts.json"
         mounts = [
             "--unshare-user",
             "--unshare-pid",
@@ -73,7 +75,11 @@ def test_native_json_mask_is_readable_but_cannot_be_changed(profile):
                     source,
                     str(repo),
                 ],
-                env={"PI_SANDBOX_EMPTY_MASK": str(empty)},
+                env={
+                    "PI_SANDBOX_EMPTY_MASK": str(empty),
+                    "PI_SANDBOX_MISSING_PATHS": json.dumps([str(placeholder)]),
+                    "PI_SANDBOX_MASK_RECORD": str(record),
+                },
                 pass_fds=(descriptor,),
                 capture_output=True,
                 text=True,
@@ -82,6 +88,7 @@ def test_native_json_mask_is_readable_but_cannot_be_changed(profile):
             )
         assert result.returncode == 0, result.stderr
         assert result.stdout == "protected\n"
+        assert json.loads(record.read_text()) == [str(placeholder)]
         assert placeholder.read_bytes() == b""
         assert existing.read_text() == '{"keep": true}'
         assert (repo / "new").read_text() == "allowed write"

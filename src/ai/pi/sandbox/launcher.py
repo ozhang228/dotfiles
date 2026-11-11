@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import uuid
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -101,7 +102,8 @@ def snapshot_config(config: Path, *, assets: Path, cli: Path, roots=()):
     for name in PLUGINS:
         shutil.copytree(assets / "pi/plugins" / name, extensions / name)
     (config / "sandbox").mkdir()
-    shutil.copyfile(assets / "pi/sandbox/tools.ts", config / "sandbox/tools.ts")
+    for name in ("tools.ts", "listing-tools.ts"):
+        shutil.copyfile(assets / "pi/sandbox" / name, config / "sandbox" / name)
     (extensions / "portkey-provider.ts").write_text(
         adapt_provider(provider_source(cli))
     )
@@ -287,6 +289,7 @@ def sandbox_prefix(
         temporary / "config",
         temporary / "home",
         temporary / "scratch",
+        *([temporary / "mounts"] if (temporary / "mounts").is_dir() else []),
         *[assets / name for name in ("rules", "skills", "_shared")],
     )
     host_protected = (agent_dir(), state)
@@ -457,6 +460,7 @@ def editing_controller(
     assets: Path,
     roots=(),
     protections: Mapping[Path, RepositoryProtections] | None = None,
+    mount_records: Path | None = None,
 ):
     if not roots and not is_repository_root(project):
         return None
@@ -555,6 +559,11 @@ def editing_controller(
             )
             environment = sandbox_environment(node=node, temporary=temporary)
             environment.pop("PORTKEY_API_KEY")
+            record = (
+                mount_records / f"{uuid.uuid4().hex}.json" if mount_records else None
+            )
+            if record:
+                environment["PI_SANDBOX_MASK_RECORD"] = str(record)
             from runtime import module_root
 
             native = (
@@ -575,9 +584,14 @@ def editing_controller(
                     str(lock_fd),
                 ]
 
-            yield from Worker(command=command, environment=environment, repo=project)(
-                request, stop, lock_fd
-            )
+            try:
+                yield from Worker(
+                    command=command, environment=environment, repo=project
+                )(request, stop, lock_fd)
+            finally:
+                if record:
+                    record.unlink(missing_ok=True)
+                    record.with_suffix(".json.pending").unlink(missing_ok=True)
 
     return Controller(recoveries[0], run=run, recoveries=recoveries, cwd=project)
 
@@ -614,6 +628,8 @@ def main():
             )
         (temporary / "scratch").mkdir()
         (temporary / "home").mkdir()
+        mount_records = temporary / "mounts"
+        mount_records.mkdir()
         for root in roots:
             if root.parent == home:
                 (temporary / "home" / root.name).symlink_to(
@@ -622,6 +638,7 @@ def main():
         (temporary / "cache").symlink_to(state / "cache", target_is_directory=True)
         snapshot_config(temporary / "config", assets=assets, cli=cli, roots=roots)
         environment = sandbox_environment(node=node, temporary=temporary)
+        environment["PI_SANDBOX_HIDDEN_MOUNTS"] = str(mount_records)
         # Refuse unsupported proxy support or degraded isolation before loading credentials.
         dependency_check = (
             "const {SandboxManager}=await import(process.argv[1]);"
@@ -671,6 +688,7 @@ def main():
             assets=assets,
             roots=roots,
             protections=protections,
+            mount_records=mount_records,
         )
         if controller is not None:
             environment["PI_SANDBOX_CONTROL"] = "1"

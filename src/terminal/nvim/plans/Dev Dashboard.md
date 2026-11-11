@@ -2,12 +2,8 @@
 
 - [ ] Make the PR list useful day to day
   - [ ] Paginate PR results and lazy-load additional pages as needed
-  - [ ] Add PR filters
+  - [-] Add PR filters
     - [-] Add a repository filter, defaulting to all repositories
-- [ ] Optimize PR GraphQL query patterns where measurements justify it
-  - [ ] Compare the current filtered query with a broader batched query and client-side filtering at a 10-PR page size; measure latency, response size, filter correctness, and GraphQL cost
-    - [ ] Evaluate splitting essential row data from additional data such as status checks into parallel requests; compare time to first render and total latency with one request
-  - [ ] Prefetch likely next filter views if the measurements show a benefit
 - [ ] Make the PR list keyboard navigable
   - [ ] Select and open PRs from the keyboard
     - [ ] Select PRs across repository groups with `j`/`k`, arrows, and count prefixes; keep selection visible and stable across refreshes
