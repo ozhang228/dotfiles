@@ -270,29 +270,47 @@ why the remaining identity/order/transaction state is still trustworthy.
 Use real failure modes and observed/designed handling. Do not infer that
 partial recovery is safe merely because the implementation attempts it.
 
-## Rendered Mermaid diagrams (brainstorm and code-review)
+## HTML diagrams with inline SVG (brainstorm and code-review)
 
-Prefer Mermaid when the reader needs to understand relationships, ordering,
-ownership, dependencies, or state. Use flowcharts for data/call paths, sequence
-diagrams for interactions over time, and state diagrams for lifecycle changes.
+Author explanatory diagrams directly as inline SVG in self-contained HTML.
+Use flow layouts for data/call paths, lanes for interactions over time, and
+explicit states and transitions for lifecycle changes.
 Static comparisons still fit `columns` or tables. Add diagrams for distinct
 questions, not to meet a count; split an unreadable overview into focused views.
 
+- Use the card-and-arrow style: a bordered HTML section with a short heading
+  and explanation, generous padding, rounded rectangular SVG nodes, and a
+  short takeaway below the diagram. Separate the node title from its smaller
+  responsibility or detail text. Keep node titles around 15–17px and details
+  around 13px at the displayed size; wrap long labels instead of letting them
+  escape the node.
+- Preserve the shared Catppuccin Macchiato palette. Use `var(--surface)` and
+  `var(--surface-2)` for cards/nodes, `var(--ink)` and `var(--muted)` for text,
+  and `var(--line)` or `var(--accent)` for borders and arrows. Use
+  `var(--accent-soft)` to distinguish relevant groups or changed nodes. Keep
+  green/red reserved for success/addition and failure/removal, not decorative
+  categories. Change geometry and spacing without replacing the skill theme.
+- Draw explicit arrowheads with SVG markers. Prefer clear right-angle paths
+  with enough space for labels; avoid routing through nodes or text. Use solid
+  and dashed paths only when they communicate distinct relationships, and
+  explain those meanings in the labels or a compact legend. Use separate
+  labeled rows or lanes for different processes, identities, or lifecycles.
 - Ground nodes and edges in source or the explicitly labeled proposed design.
   Define unfamiliar terms first, label arrows with their meaning, distinguish
   current from proposed behavior, and state each diagram's takeaway in prose.
-- Render locally with installed `mmdc`, keep editable `.mmd` sources beside the
-  artifact, and embed the SVG inline. Include the Mermaid source in the Markdown
-  fallback. Match the shared palette; do not use a CDN or runtime Mermaid script.
-- If `mmdc` is unavailable, keep the source and a readable text explanation,
-  report the rendering limitation, and continue the authorized work without
-  installing or fetching tools merely to render it.
+- The inline SVG is the editable source. Describe the same nodes and edges in
+  the Markdown fallback; a separate `.mmd` file is unnecessary. Do not require
+  `mmdc`, a CDN, runtime Mermaid, or another diagram library for this path.
+  Keep CSS and SVG inside the HTML so opening the file works offline.
 - When embedding multiple SVGs, give each diagram's IDs a unique prefix and
-  update their CSS selectors, marker references, and internal links together.
-  Preserve links to document sections. Check for duplicate IDs and broken links.
+  use a `viewBox`, `role="img"`, and linked `<title>`/`<desc>` elements. Scope
+  diagram CSS so it cannot alter other blocks. Preserve links to document
+  sections. Check for duplicate IDs, missing marker references, and broken links.
 - Inspect rendered labels, arrow meaning, contrast, and narrow-screen behavior
-  in a browser. Use scrolling or focused diagrams to keep labels readable rather
-  than shrinking a dense graph into illegible text.
+  in a browser. Put wide diagrams in a horizontally scrollable wrapper with
+  enough minimum width to keep labels readable; do not shrink a dense graph
+  into illegible text. If a browser is unavailable, retain the SVG and report
+  that verification boundary; no renderer installation is needed.
 - Use a small interactive mode/scenario explorer when it makes alternatives or
   dependencies easier to understand. Label simulated behavior as illustrative;
   it is an explanation, not runtime verification.
@@ -607,7 +625,7 @@ block: a reader who trusts it may skip the exact thing it got wrong.
 | API / action / route change or proposal | `api-endpoint` with request/response examples |
 | Structured before/after (schema/contract shape) | `columns`, not stacked cards |
 | Different failure handling scopes | `boundary-matrix` with failure, scope, and safety rationale |
-| Architecture, data flow, dependency, interaction, or state transition | rendered Mermaid with meaningful edges; two-panel/swimlane `diagram` for simple comparisons |
+| Architecture, data flow, dependency, interaction, or state transition | inline SVG in an HTML diagram card with meaningful edges; two-panel/swimlane `diagram` for simple comparisons |
 | First-viewport ask/outcome summary | `summary-card` |
 | Non-negotiable constraint or unresolved risk | `callout` |
 | 3+ real alternatives before committing to an approach | `options-compare` |

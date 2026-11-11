@@ -13,7 +13,7 @@ When explaining a function in a reading tour or recap, show a concise signature 
 
 - Assume Oscar has no prior knowledge of the repository, domain, or earlier discussion. Define the concepts needed to understand the change; do not assume a file list or identifier explains its role.
 - Establish the current behavior, its consumers, and a concrete trigger and consequence for the problem or unmet need. Then distinguish what already existed from what the PR changes and trace the resulting behavior through the system.
-- Use rendered Mermaid diagrams wherever they clarify the mechanism: ownership, before/after flow, caller-to-internal translations, dependencies, state transitions, and failure paths. The required file map is orientation, not a substitute for explaining behavior. Prefer several focused diagrams over a crowded map, and explain each diagram's takeaway. Skip extra diagrams when they add no understanding.
+- Use self-contained HTML diagrams drawn with inline SVG wherever they clarify the mechanism: ownership, before/after flow, caller-to-internal translations, dependencies, state transitions, and failure paths. Use rounded node cards, readable labels, and explicit labeled arrows in the existing shared palette. The required file map is orientation, not a substitute for explaining behavior. Prefer several focused diagrams over a crowded map, and explain each diagram's takeaway. Skip extra diagrams when they add no understanding.
 
 **No diff to review?** Same skill, pointed at an existing system/feature/concept instead of a PR ("explain how X works", "walk me through the auth flow"). Skip merge-base resolution, the architecture gate, focused review passes, and the Bugs/Testing/Performance/Simplification sections. Identify prerequisites (invariants, vocabulary, abstractions the code assumes), write `## Prerequisites` then `## Reading Tour` with ordered `file:line` stops, each explaining what to look for, with opinions inline (confusing naming, whether files live under their conceptual owner, a better structure, why it's built this way). End by inviting the user to read and come back with questions. Push toward a verdict ("does this design make sense to you?", "what would you do differently?"), not just comprehension. Length follows the concept: 3 stops or 12. Give `file:line` anchors, not large pasted snippets.
 
@@ -116,7 +116,7 @@ When the work is the reverse — you're the author addressing comments on your o
 
 Use a self-contained local visual recap as the primary review surface. Read `references/visual-recap.md` in full. It owns the self-contained contract, causal explanation, final understanding quiz, structured-blocks component library, canonical shape/budgets, and validation and serving steps.
 
-Every HTML review must include a Mermaid diagram rendered with `mmdc` that explains how the relevant files fit together. Embed the rendered SVG in the HTML and retain the editable `.mmd` source. Follow the file-map guidance in `references/visual-recap.md`.
+Every HTML review must include an inline SVG diagram that explains how the relevant files fit together. The SVG inside the HTML is the editable diagram source; no Mermaid renderer or `.mmd` file is required. Follow the file-map guidance in `references/visual-recap.md`.
 
 ## Output Format
 

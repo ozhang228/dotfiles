@@ -16,8 +16,8 @@ Build `plan.html` from the component library in `references/structured-blocks.md
 in full before authoring `plan.html`; never hand-roll a block from memory.
 
 Brainstorm reaches for: `summary-card`, `callout`, `options-compare`,
-`assumption-list`, `api-endpoint`, `columns`, `boundary-matrix`, and rendered
-Mermaid diagrams. Copy only
+`assumption-list`, `api-endpoint`, `columns`, `boundary-matrix`, and inline
+SVG diagrams. Copy only
 the CSS for the blocks actually used into `plan.html`'s own `<style>` tag. End
 every plan with the shared `quiz` block.
 Use a compact `section-nav` when a substantial plan has more than five
@@ -42,9 +42,9 @@ sections; include the Quiz anchor. Short plans read linearly.
 - **Final understanding check** → `quiz`, with 3–5 scored questions and answer
   rationales.
 - **Architecture, ownership, data flow, dependency, or state transition** →
-  rendered Mermaid diagram plus a short explanation. Show current and proposed
+  inline SVG diagram plus a short explanation. Show current and proposed
   behavior separately when their difference motivates the design. Use the
-  shared Mermaid guidance in `references/structured-blocks.md`; `columns`
+  shared HTML/SVG guidance in `references/structured-blocks.md`; `columns`
   still fit comparisons of static contract shapes.
 - **A proposed code change to an existing or new file** → describe it in
   prose with the file path and the concrete before/after behavior; this
@@ -144,10 +144,10 @@ The implementation plan in `tmp/PLAN.md` does not need to repeat the quiz.
 Before handoff:
 
 - Confirm `plan.html` and `plan.md` exist.
-- For each diagram, retain its `.mmd` source, embed the locally rendered SVG,
-  include the source in `plan.md`, and validate it using the shared Mermaid
-  guidance. If rendering is unavailable, keep the plan useful and report the
-  specific limitation rather than silently omitting the diagrams.
+- For each diagram, keep its editable SVG inline in `plan.html`, describe the
+  same nodes and relationships in `plan.md`, and validate it using the shared
+  HTML/SVG guidance. If browser verification is unavailable, retain the diagram
+  and report that verification boundary.
 - Read the generated files enough to catch placeholders, stale claims,
   contradictions, broken anchors, or missing expected sections.
 - Open `plan.html` mentally against `references/structured-blocks.md`'s

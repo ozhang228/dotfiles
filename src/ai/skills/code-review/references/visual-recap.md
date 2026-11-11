@@ -6,7 +6,7 @@ review.
 ## Self-Contained Contract
 
 - Use the shared Catppuccin Macchiato tokens and components from
-  `references/structured-blocks.md`, including matching colors for Mermaid
+  `references/structured-blocks.md`, including matching colors for inline SVG
   diagrams. Keep palette changes in the shared tokens rather than inventing
   a theme in each artifact, unless the user requests a different appearance.
 
@@ -27,20 +27,20 @@ review.
 
 ## Required file map
 
-Every HTML review includes a Mermaid diagram rendered locally with `mmdc`.
+Every HTML review includes a diagram authored directly as inline SVG.
 Place it near the opening explanation so the reader can orient themselves
 before reading individual files. Label nodes with real file paths and the
 important symbol or responsibility; label arrows to distinguish calls, data
-flow, and schema dependencies. Use subgraphs to show ownership or process
-boundaries. Ground every relationship in the current source.
+flow, and schema dependencies. Use labeled groups or lanes to show ownership
+or process boundaries. Ground every relationship in the current source.
 
-Keep the editable `.mmd` source beside the recap and embed the generated SVG
-inline in `index.html`, so the HTML works without Mermaid JavaScript or a
-network connection. Include the Mermaid source in the Markdown fallback.
+The inline SVG in `index.html` is the editable source, so the HTML works
+without a diagram renderer, JavaScript, or a network connection. Describe the
+same nodes and relationships in the Markdown fallback.
 When there is a reading tour, number its stops and diagram nodes consistently
 and link nodes to the corresponding in-page explanations. Explain how to use
 the diagram and tour. Check label legibility, links, and narrow-screen behavior
-in a browser. If `mmdc` is unavailable, report the rendering blocker explicitly.
+in a browser. If browser verification is unavailable, report that boundary.
 
 ## Explain behavior with diagrams
 
@@ -48,12 +48,12 @@ Assume the reader has no prior repository or domain context. Explain the
 existing system and the concrete problem before the new mechanism. Mark
 existing behavior, changed behavior, and proposed behavior distinctly.
 
-Use Mermaid beyond the file map whenever a visual makes the explanation
+Use inline SVG beyond the file map whenever a visual makes the explanation
 clearer: before/after paths, caller-to-internal translations, required inputs,
 dependent calculations, state transitions, or success and failure paths.
 Place each diagram beside the explanation it supports and give its takeaway
 in a sentence. Split crowded diagrams by concept rather than forcing every
-relationship into one map. Follow the shared Mermaid rendering and validation
+relationship into one map. Follow the shared HTML/SVG rendering and validation
 guidance in `references/structured-blocks.md`.
 
 ## Structured blocks, not text-on-a-page
@@ -87,8 +87,8 @@ the short version:
   one-sided diff.
 - **Structured before/after** (schema/contract shape) → `columns`, not two
   stacked cards.
-- **Architecture or data-flow shift** → the required `mmdc` file map, with
-  subgraphs for ownership/process boundaries or before/after states.
+- **Architecture or data-flow shift** → the required inline SVG file map, with
+  labeled groups for ownership/process boundaries or before/after states.
 - **Different failure handling scopes** → `boundary-matrix`, with one row per
   failure naming the handling scope and why partial recovery is safe.
 - **Final understanding check** → `quiz`, with 3–5 scored questions and answer
@@ -199,8 +199,8 @@ answer, and targeted feedback for every choice.
 Before handoff:
 
 - Confirm `index.html` and `review.md` exist.
-- Confirm the required diagram was rendered with `mmdc`, its SVG is embedded
-  in the HTML, and its `.mmd` source and relationships match the current code.
+- Confirm the required diagram is editable inline SVG in the HTML, its
+  relationships match the current code, and its Markdown explanation agrees.
 - Read the generated files enough to catch placeholders, stale claims,
   contradictions, broken anchors, or missing expected sections.
 - Open `index.html` mentally against `references/structured-blocks.md`'s
