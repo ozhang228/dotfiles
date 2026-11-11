@@ -20,8 +20,8 @@ set -gx pnpm_config_registry https://npm.drwholdings.com/repository/npm/
 set -gx pnpm_config_lockfile_include_tarball_url false
 
 # >>> conda initialize >>>
-if status is-interactive; and test -f /home/ozhang/miniconda3/bin/conda
-    eval /home/ozhang/miniconda3/bin/conda "shell.fish" "hook" $argv | source
+if status is-interactive; and test -f "$HOME/miniconda3/etc/fish/conf.d/conda.fish"
+    source "$HOME/miniconda3/etc/fish/conf.d/conda.fish"
 end
 # <<< conda initialize <<<
 
