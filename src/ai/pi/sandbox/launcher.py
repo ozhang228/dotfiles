@@ -406,6 +406,8 @@ def sandbox_prefix(
 
 
 def sandbox_environment(*, node: Path, temporary: Path):
+    empty_mask = temporary / "empty-mask"
+    empty_mask.touch(mode=0o400)
     tools = installed_tools()
     for alias, source in tools.items():
         destination = temporary / "home" / alias
@@ -425,6 +427,7 @@ def sandbox_environment(*, node: Path, temporary: Path):
         "NODE_USE_ENV_PROXY": "1",
         "XDG_CACHE_HOME": str((temporary / "cache").resolve()),
         "TMPDIR": str(temporary / "scratch"),
+        "PI_SANDBOX_EMPTY_MASK": str(empty_mask),
         "PYTHONPYCACHEPREFIX": str(temporary / "scratch/pycache"),
         "GIT_DISCOVERY_ACROSS_FILESYSTEM": "1",
         "UV_CACHE_DIR": str(temporary / "scratch/uv"),

@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -31,6 +32,72 @@ def interrupt_export(root, repo, checkpoint):
 
     with patch("recovery.os.fdopen", interrupted_output):
         Recovery(root, repo=repo).restore(checkpoint, ["file"])
+
+
+def interrupt_checkpoint(root, repo):
+    with patch("recovery.sync_filesystem", side_effect=lambda _: os._exit(23)):
+        Recovery(root, repo=repo).checkpoint("bash")
+
+
+@pytest.mark.parametrize("failure", ["io-error", "legacy-io-error", "crash"])
+def test_failed_durability_barrier_preserves_previous_checkpoint(failure):
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "file").write_bytes(b"original")
+        store = Recovery(root / "private", repo=repo)
+        previous = store.checkpoint("bash")
+        store.complete(previous)
+        (repo / "file").write_bytes(b"replacement")
+        (repo / "ignored").write_bytes(b"new ignored bytes")
+        if failure in {"io-error", "legacy-io-error"}:
+            kernel = os.uname()
+            reported_kernel = (
+                os.uname_result(
+                    (
+                        kernel.sysname,
+                        kernel.nodename,
+                        "5.4.0",
+                        kernel.version,
+                        kernel.machine,
+                    )
+                )
+                if failure == "legacy-io-error"
+                else kernel
+            )
+            barrier = "os.fsync" if failure == "legacy-io-error" else "sync_filesystem"
+            with (
+                patch("recovery.os.uname", return_value=reported_kernel),
+                patch(f"recovery.{barrier}", side_effect=OSError("disk failure")),
+            ):
+                with pytest.raises(OSError, match="disk failure"):
+                    store.checkpoint("bash")
+        else:
+            process = multiprocessing.get_context("spawn").Process(
+                target=interrupt_checkpoint, args=(root / "private", repo)
+            )
+            process.start()
+            try:
+                process.join(timeout=10)
+                assert process.exitcode == 23
+            finally:
+                if process.is_alive():
+                    process.kill()
+                    process.join(timeout=5)
+                process.close()
+        restarted = Recovery(root / "private", repo=repo)
+        assert [entry["checkpoint"] for entry in restarted.list()] == [previous]
+        restored = restarted.restore(previous, ["file"])
+        assert (repo / restored[0]).read_bytes() == b"original"
+        assert (repo / "file").read_bytes() == b"replacement"
+        replacement = restarted.checkpoint("bash")
+        restarted.complete(replacement)
+        (repo / "file").unlink()
+        (repo / "ignored").unlink()
+        restarted.restore(replacement, ["file", "ignored"])
+        assert (repo / "file").read_bytes() == b"replacement"
+        assert (repo / "ignored").read_bytes() == b"new ignored bytes"
 
 
 def test_interrupted_export_retains_partial_bytes_and_recovers_complete_sibling():
@@ -64,6 +131,50 @@ def test_interrupted_export_retains_partial_bytes_and_recovers_complete_sibling(
         assert (repo / restored[0]).read_bytes() == original
         assert (repo / "file").read_bytes() == original[:BUFFER]
         assert restarted.list()[0]["status"] == "completed"
+
+
+def test_delayed_allocation_counts_saved_bytes_and_refuses_oversized_capture():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "original").write_bytes(b"original")
+        store = Recovery(root / "private", repo=repo, repo_limit=40000)
+        previous = store.checkpoint("bash")
+        store.complete(previous)
+        (repo / "first").write_bytes(b"a" * 16384)
+        fstat, fsync = os.fstat, os.fsync
+        persisted = set()
+
+        def delayed_blocks(descriptor):
+            info = fstat(descriptor)
+            path = Path(os.readlink(f"/proc/self/fd/{descriptor}"))
+            if (
+                path.parent == root / "private/blobs"
+                and path.name.startswith(".")
+                and info.st_ino not in persisted
+            ):
+                return SimpleNamespace(st_blocks=0)
+            return info
+
+        def persist(descriptor):
+            fsync(descriptor)
+            persisted.add(fstat(descriptor).st_ino)
+
+        with (
+            patch("recovery.os.fstat", delayed_blocks),
+            patch("recovery.os.fsync", persist),
+        ):
+            latest = store.checkpoint("bash")
+            store.complete(latest)
+            (repo / "second").write_bytes(b"b" * 16384)
+            with pytest.raises(RuntimeError, match="storage limit"):
+                store.checkpoint("bash")
+        assert store.list()[0]["checkpoint"] == latest
+        (repo / "first").unlink()
+        store.restore(latest, ["first"])
+        assert (repo / "first").read_bytes() == b"a" * 16384
+        assert (repo / "second").read_bytes() == b"b" * 16384
 
 
 @pytest.mark.parametrize("phase", ["hash", "copy"])

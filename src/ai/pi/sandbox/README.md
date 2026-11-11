@@ -48,6 +48,9 @@ private Pi state, shared hardlinks, and sandbox/controller code stay protected.
 Pi itself remains read-only. Workers have no network access; supervised servers
 and watchers are later stages.
 
+Synthetic `.mcp.json` guards appear as empty read-only files so broad formatter
+scans can read them; creating, editing, moving, and deleting those paths stays blocked.
+
 Never request `/tmp`, host home/cache, or tool installations in `writablePaths`.
 Use `$TMPDIR` for scripts/reports; UV, npm, and Python bytecode caches point into
 disposable scratch. Network-dependent installs and nested sandbox tests remain
@@ -67,6 +70,9 @@ and 5 GiB total: oldest completed checkpoints are pruned automatically; active
 and newest checkpoints remain protected until replacement is durable. Oversized
 checkpoints or disk/I/O failures stop new writes. Retention limits cannot repair
 an exhausted underlying filesystem.
+New blob contents and renames are persisted together with Linux `syncfs` before
+the journal exposes the checkpoint, avoiding a separate disk barrier per file.
+Kernels older than 5.8 retain per-file flushes for reliable I/O error reporting.
 
 The gateway holds the host DRW key and exposes only fixed model routes and the
 scoped controller. Network/Unix-socket restrictions, private namespaces, and

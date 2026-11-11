@@ -5,8 +5,7 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 ## Required before switching
 
 - [ ] Verify installation, symlinks, and native isolation/recovery smoke tests on remaining Ubuntu and Manjaro machines
-- [ ] Reduce cold whole-repository checkpoint cost in dependency-heavy repositories without losing recovery coverage
-- [ ] Keep sandbox-generated protected config placeholders out of broad formatter/file scans
+- [ ] Keep synthetic protected filenames out of file listings without weakening their write guards; broad formatter scans already work
 - [ ] Add explicitly scoped worker network and external capabilities
   - [ ] Start with an explicit domain allowlist for documentation and project package registries; keep other destinations blocked
   - [ ] Give workers private dependency caches and repo-local virtual environments/node_modules; keep shared host caches protected

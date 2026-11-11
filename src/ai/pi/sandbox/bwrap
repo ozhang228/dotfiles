@@ -1,7 +1,40 @@
-#!/bin/sh
-# SRT isolates user/mount/PID/network; retain our IPC and hostname isolation too.
-if [ "${PI_SANDBOX_LOCK_FD-}" = 3 ]; then
-    set -- --sync-fd 3 "$@"
-fi
-unset PI_SANDBOX_LOCK_FD
-exec /usr/bin/bwrap --unshare-ipc --unshare-uts "$@"
+#!/usr/bin/python3
+import os
+import sys
+import tempfile
+
+
+def regular_masks(arguments, empty):
+    result = list(arguments)
+    for index in range(len(result) - 2):
+        if (
+            result[index] == "--ro-bind"
+            and result[index + 1] == "/dev/null"
+            and result[index + 2].endswith("/.mcp.json")
+        ):
+            result[index + 1] = empty
+    return result
+
+
+arguments = sys.argv[1:]
+profiles = []
+empty = os.environ.pop("PI_SANDBOX_EMPTY_MASK", None)
+if empty is not None:
+    # SRT spills large mount lists into a NUL-delimited --args descriptor.
+    for index, argument in enumerate(arguments[:-1]):
+        if argument == "--args":
+            profile = os.pread(int(arguments[index + 1]), 2 * 1024 * 1024 + 1, 0)
+            if len(profile) > 2 * 1024 * 1024 or not profile.endswith(b"\0"):
+                raise RuntimeError("Invalid sandbox mount profile")
+            words = regular_masks(map(os.fsdecode, profile.split(b"\0")[:-1]), empty)
+            output = tempfile.TemporaryFile(dir=os.path.dirname(empty))
+            output.write(b"\0".join(map(os.fsencode, words)) + b"\0")
+            output.seek(0)
+            os.set_inheritable(output.fileno(), True)
+            profiles.append(output)
+            arguments[index + 1] = str(output.fileno())
+    arguments = regular_masks(arguments, empty)
+if os.environ.pop("PI_SANDBOX_LOCK_FD", None) == "3":
+    arguments = ["--sync-fd", "3", *arguments]
+# SRT isolates user/mount/PID/network; retain IPC and hostname isolation too.
+os.execv("/usr/bin/bwrap", ["bwrap", "--unshare-ipc", "--unshare-uts", *arguments])

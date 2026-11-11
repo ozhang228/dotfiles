@@ -182,6 +182,10 @@ def test_native_scoped_worker_keeps_nested_writes_and_protects_parent_and_creden
                         done
                         if { printf damage > ../readable; } 2>/dev/null; then exit 11; fi
                         if { printf damage > .gitconfig; } 2>/dev/null; then exit 12; fi
+                        test -f .mcp.json && test ! -s .mcp.json
+                        if { printf damage > .mcp.json; } 2>/dev/null; then exit 13; fi
+                        if rm .mcp.json 2>/dev/null; then exit 14; fi
+                        if mv .mcp.json moved 2>/dev/null; then exit 15; fi
                         printf protected
                     """
                     ),
@@ -197,6 +201,7 @@ def test_native_scoped_worker_keeps_nested_writes_and_protects_parent_and_creden
             assert (project / ".env").read_text() == "nested credential"
             assert (root / "outside").read_text() == "outside secret"
             assert not (project / ".gitconfig").exists()
+            assert not (project / ".mcp.json").exists()
         finally:
             controller.close()
 

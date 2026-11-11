@@ -1,6 +1,7 @@
 """Host-only, streamed recovery records. Never mount this store into a worker."""
 
 import contextlib
+import ctypes
 import fcntl
 import hashlib
 import os
@@ -38,6 +39,16 @@ def sync_directory(path: Path):
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
+
+
+def sync_filesystem(descriptor: int):
+    # Linux syncfs persists blob contents and renames before the journal exposes them.
+    syncfs = ctypes.CDLL(None, use_errno=True).syncfs
+    syncfs.argtypes = [ctypes.c_int]
+    syncfs.restype = ctypes.c_int
+    if syncfs(descriptor) != 0:
+        error = ctypes.get_errno()
+        raise OSError(error, os.strerror(error))
 
 
 @dataclass(frozen=True)
@@ -347,7 +358,12 @@ class Recovery:
 
     def checkpoint(self, label: str, *, paths: Sequence[Path] | None = None):
         identifier = uuid.uuid4().hex
-        with self.locked() as database:
+        version = re.match(r"(\d+)\.(\d+)", os.uname().release)
+        batch_sync = version is not None and tuple(map(int, version.groups())) >= (5, 8)
+        with self.locked() as database, contextlib.ExitStack() as descriptors:
+            # syncfs reports errors since this descriptor opened, not since the flush.
+            sync_fd = os.open(self.root / "blobs", os.O_RDONLY | os.O_DIRECTORY)
+            descriptors.callback(os.close, sync_fd)
             # A creator holds this global lock until staging becomes active.
             # Any staging record visible here belongs to a dead creator, in any repo.
             database.execute(
@@ -372,6 +388,7 @@ class Recovery:
                     _blob_bytes=accounted._blob_bytes,
                 )
                 fragment = os.statvfs(self.root / "blobs").f_frsize
+                new_blobs = False
                 for path, kind, mode, file, target, size in self.files(paths=paths):
                     cost = 512 + len(path.encode()) + len(target.encode())
                     digest = ""
@@ -425,6 +442,7 @@ class Recovery:
                         accounted=accounted,
                     )
                     if new_blob:
+                        new_blobs = True
                         staging = self.root / "blobs" / f".{identifier}"
                         os.lseek(file, 0, os.SEEK_SET)
                         copied = 0
@@ -449,7 +467,13 @@ class Recovery:
                                         staging=staging.name,
                                         accounted=accounted,
                                     )
-                            os.fsync(output.fileno())
+                            # Resolve delayed allocation before releasing its reservation.
+                            if (
+                                not batch_sync
+                                or os.fstat(output.fileno()).st_blocks * 512
+                                < allocation
+                            ):
+                                os.fsync(output.fileno())
                             allocation = os.fstat(output.fileno()).st_blocks * 512
                             accounted = self.make_room(
                                 database,
@@ -463,7 +487,8 @@ class Recovery:
                         if hasher.hexdigest() != digest or copied != size:
                             raise RuntimeError("File changed during checkpoint")
                         staging.rename(self.root / "blobs" / digest)
-                        sync_directory(staging.parent)
+                        if not batch_sync:
+                            sync_directory(staging.parent)
                         database.execute(
                             "INSERT INTO blobs VALUES(?,?)", (digest, allocation)
                         )
@@ -485,6 +510,33 @@ class Recovery:
                         _blob_bytes=accounted._blob_bytes
                         + (allocation if new_blob else 0),
                     )
+                if new_blobs and batch_sync:
+                    sync_filesystem(sync_fd)
+                digest = ""
+                while new_blobs and (
+                    row := database.execute(
+                        "SELECT b.digest,b.bytes FROM blobs b WHERE b.digest>? AND EXISTS(SELECT 1 FROM entries e WHERE e.digest=b.digest AND e.checkpoint=?) ORDER BY b.digest LIMIT 1",
+                        (digest, identifier),
+                    ).fetchone()
+                ):
+                    digest, reserved = row
+                    allocated = (self.root / "blobs" / digest).stat().st_blocks * 512
+                    difference = allocated - reserved
+                    if difference:
+                        accounted = self.make_room(
+                            database,
+                            repo_bytes=max(0, difference),
+                            total_bytes=max(0, difference),
+                            accounted=accounted,
+                        )
+                        database.execute(
+                            "UPDATE blobs SET bytes=? WHERE digest=?",
+                            (allocated, digest),
+                        )
+                        accounted = CheckpointUsage(
+                            _repo_bytes=accounted._repo_bytes + difference,
+                            _blob_bytes=accounted._blob_bytes + difference,
+                        )
                 database.execute(
                     'UPDATE checkpoints SET status="active" WHERE id=?', (identifier,)
                 )
