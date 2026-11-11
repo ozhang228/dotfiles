@@ -86,6 +86,13 @@ def probe():
     cached = Path(os.environ["XDG_CACHE_HOME"]) / f"cache-{mode}"
     cached.write_text("private cache\n")
     require(cached.read_text() == "private cache\n", "Private cache failed")
+    tool_config = Path(os.environ["XDG_CONFIG_HOME"])
+    tool_config.mkdir(parents=True, exist_ok=True)
+    (tool_config / "probe").write_text("private tool configuration\n")
+    require(
+        tool_config.is_relative_to(Path(os.environ["TMPDIR"])),
+        "Tool config escaped scratch",
+    )
     config = Path(os.environ["PI_CODING_AGENT_DIR"])
     settings = config / f"settings-{mode}.json"
     settings.write_text("{}")

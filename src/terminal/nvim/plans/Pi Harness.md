@@ -17,13 +17,10 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
   - [ ] Add explicitly requested local commits later; keep Git metadata read-only until then
   - [ ] Add push and draft PR creation only with explicit approval and scoped authentication
 - [ ] Finish editor and session handoff
-  - [ ] Confirm terminal scrollback in Neovim/tmux
   - [ ] Resume existing conversations after moving a repository; session storage currently depends on its absolute path
-- [ ] Verify remaining instruction and skill integration
-  - [ ] Verify ancestor/project AGENTS.md and CLAUDE.md discovery
-  - [ ] Verify brainstorm, debug, postmortem, and applauncher-use through Pi
-  - [ ] Audit skill assumptions about tool names, delegation, model routing, questions, and local artifacts; adapt only incompatible harness contracts
-  - [ ] Verify rule loading stays scoped; adapt debug/postmortem to the investigation workflow chosen below
+- [ ] Verify live skill workflows
+  - [ ] Verify applauncher-use's real Splunk calls after MCP migration
+  - [ ] Exercise debug/postmortem on a real investigation after worker network and managed notebook-server support; adapt them to the wiki workflow chosen below
 - [ ] Configure the MCP tools I use
   - [ ] Migrate developer, Slack read-only, Polaris, Grafana, Splunk, and OpenAI documentation servers to Pi's native MCP configuration
   - [ ] Preserve per-tool exposure restrictions, authentication, timeouts, and useful server descriptions

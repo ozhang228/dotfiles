@@ -3,21 +3,9 @@
   "defaultProvider": "drw",
   "defaultModel": "@vertex-ai/anthropic.claude-opus-5-5",
   "defaultThinkingLevel": "medium",
-  "defaultTools": [
-    "read",
-    "grep",
-    "find",
-    "ls",
-    "subagent",
-    "subagent_log"
-  ],
-  "skills": [
-    "!skills/**",
-    "~/dotfiles/src/ai/skills"
-  ],
-  "prompts": [
-    "!**"
-  ],
+  "defaultTools": ["read", "grep", "find", "ls", "subagent", "subagent_log"],
+  "skills": ["!skills/**", "~/dotfiles/src/ai/skills", "~/anvil/skills"],
+  "prompts": ["!**"],
   "packages": [],
   "extensions": [
     "!**",
@@ -30,10 +18,7 @@
     "+extensions/subagents/index.ts",
     "+extensions/portkey-provider.ts"
   ],
-  "themes": [
-    "!**",
-    "+themes/catppuccin-macchiato.json"
-  ],
+  "themes": ["!**", "+themes/catppuccin-macchiato.json"],
   "theme": "catppuccin-macchiato",
   "enableSkillCommands": true,
   "tuiMode": "regular",

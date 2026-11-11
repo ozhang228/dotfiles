@@ -96,7 +96,7 @@ The Result section is required before finishing. Write it into the notebook afte
 6. Fix the target repository and add focused regression tests there.
 7. Re-run the notebook against the fixed behavior or record why verification must differ.
 8. Complete the Root cause, Resolution, and Result sections.
-9. Validate from `/home/ozhang/anvil`:
+9. Validate from `~/anvil`:
 
 ```bash
 uv run marimo check --strict notebooks/<name>.py

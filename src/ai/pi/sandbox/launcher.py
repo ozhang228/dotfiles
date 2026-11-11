@@ -73,6 +73,12 @@ def snapshot_config(config: Path, *, assets: Path, cli: Path, roots=()):
     settings = json.loads((assets / "pi/settings.json").read_text())
     if not isinstance(settings, dict):
         raise TypeError("Invalid sandbox settings")
+    skill_paths = settings.get("skills", ["!skills/**", str(assets / "skills")])
+    if not isinstance(skill_paths, list) or not all(
+        isinstance(path, str) for path in skill_paths
+    ):
+        raise TypeError("Sandbox skills must be a list of paths")
+    settings["skills"] = [os.path.expanduser(path) for path in skill_paths]
     settings.update(
         {
             "defaultTools": ["read", "grep", "find", "ls", "subagent", "subagent_log"],
@@ -86,7 +92,6 @@ def snapshot_config(config: Path, *, assets: Path, cli: Path, roots=()):
                 *[f"+{config}/extensions/{name}/index.ts" for name in PLUGINS],
                 f"+{config}/extensions/portkey-provider.ts",
             ],
-            "skills": ["!skills/**", str(assets / "skills")],
             "prompts": ["!**"],
             "themes": ["!**", f"+{config}/themes/catppuccin-macchiato.json"],
         }
@@ -429,6 +434,7 @@ def sandbox_environment(*, node: Path, temporary: Path):
         "PORTKEY_API_KEY": "local-broker",
         "NODE_USE_ENV_PROXY": "1",
         "XDG_CACHE_HOME": str((temporary / "cache").resolve()),
+        "XDG_CONFIG_HOME": str(temporary / "scratch/config"),
         "TMPDIR": str(temporary / "scratch"),
         "PI_SANDBOX_EMPTY_MASK": str(empty_mask),
         "PYTHONPYCACHEPREFIX": str(temporary / "scratch/pycache"),

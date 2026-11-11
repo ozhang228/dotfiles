@@ -45,7 +45,7 @@ Follow these phases in order:
 
 - Keep discovery, grilling, design, behavior contracts, plan authoring, and plan review in the primary thread on the user's selected model and reasoning effort. Do not delegate planning to a cheaper model.
 - After design approval, delegate nontrivial implementation to one implementation-focused subagent on the host's faster implementation-tier model (inherit the primary model when the host offers no cheaper tier) with high reasoning effort. Give it the approved visual plan, implementation plan when present, exact behavior contract, and instruction to edit the working tree and run the relevant tests.
-- Keep a clearly mechanical edit in the primary thread when spawning an agent would cost more than the work. If delegation is unavailable, implement in the primary thread rather than blocking.
+- Keep a clearly mechanical edit in the primary thread when spawning an agent would cost more than the work. If delegation is unavailable or subagents cannot write, implement in the primary thread; use read-only subagents only for focused review or verification.
 - The primary thread owns acceptance: inspect the worker's complete diff, verify it implemented the approved design, run the test suite and static checks, and send defects back to the same worker when practical. Do not accept a worker's summary as verification.
 
 - Explore project context - check files. Look for sibling/reference implementations in user repos. Do not accept them at face value, for each pattern you'd borrow, ask "why did they do it that way, and does that reason apply here?" If the answer is "because X does it this way," that's not a justification. Expect to argue the pattern's merits before adopting it.
