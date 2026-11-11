@@ -43,18 +43,19 @@ function emit(type, result) {
 }
 
 async function executeNative(modulePath) {
-  const tools = await import(pathToFileURL(modulePath).href);
   const lines = createInterface({ input: process.stdin });
   const [line] = await once(lines, "line");
   lines.close();
   const request = JSON.parse(line);
   const factories = {
-    edit: tools.createEditToolDefinition,
-    write: tools.createWriteToolDefinition,
-    bash: tools.createBashToolDefinition,
+    edit: "createEditToolDefinition",
+    write: "createWriteToolDefinition",
+    bash: "createBashToolDefinition",
   };
-  const factory = factories[request.tool];
-  if (!factory) throw new Error("Unsupported worker tool");
+  if (!Object.hasOwn(factories, request.tool)) throw new Error("Unsupported worker tool");
+  const tools = await import(new URL(`./${request.tool}.js`, pathToFileURL(modulePath)).href);
+  const factory = tools[factories[request.tool]];
+  if (typeof factory !== "function") throw new Error("Unsupported Pi tool module");
   const tool = factory(process.cwd());
   const result = await tool.execute(
     "sandbox",

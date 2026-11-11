@@ -12,6 +12,7 @@ import time
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
+from itertools import islice
 from pathlib import Path
 
 BUFFER = 1024 * 1024
@@ -272,7 +273,7 @@ class Recovery:
             (repo,),
         ).fetchone()[0]
         blobs = database.execute(
-            "SELECT coalesce(sum(bytes),0) FROM blobs b WHERE EXISTS (SELECT 1 FROM entries e JOIN checkpoints c ON c.id=e.checkpoint WHERE c.repo=? AND e.digest=b.digest)",
+            "SELECT coalesce(sum(bytes),0) FROM blobs WHERE digest IN (SELECT digest FROM entries WHERE checkpoint IN (SELECT id FROM checkpoints WHERE repo=?))",
             (repo,),
         ).fetchone()[0]
         records = database.execute(
@@ -302,13 +303,19 @@ class Recovery:
                 continue
             (self.root / "blobs" / digest).unlink(missing_ok=True)
             database.execute("DELETE FROM blobs WHERE digest=?", (digest,))
-        for path in (self.root / "blobs").iterdir():
-            if path.name == staging:
-                continue
-            if not database.execute(
-                "SELECT 1 FROM blobs WHERE digest=?", (path.name,)
-            ).fetchone():
-                path.unlink()
+        paths = (self.root / "blobs").iterdir()
+        while batch := tuple(islice(paths, 256)):
+            placeholders = ",".join("?" for _ in batch)
+            stored = {
+                digest
+                for (digest,) in database.execute(
+                    f"SELECT digest FROM blobs WHERE digest IN ({placeholders})",
+                    tuple(path.name for path in batch),
+                )
+            }
+            for path in batch:
+                if path.name != staging and path.name not in stored:
+                    path.unlink()
 
     def make_room(
         self,

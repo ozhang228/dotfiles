@@ -303,6 +303,29 @@ def test_snapshot_saves_hardlinks_and_restore_rejects_external_symlink():
         assert list(outside.iterdir()) == []
 
 
+def test_checkpoint_collects_orphans_across_multiple_lookup_batches():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        for index in range(257):
+            (repo / f"file-{index}").write_text(f"saved-{index}")
+        store = Recovery(root / "private", repo=repo)
+        first = store.checkpoint("write")
+        store.complete(first)
+        orphans = [store.root / "blobs" / name for name in (".crashed-a", ".crashed-b")]
+        for path in orphans:
+            path.write_text("unfinished capture")
+        latest = store.checkpoint("write")
+        store.complete(latest)
+        assert all(not path.exists() for path in orphans)
+        for name in ("file-0", "file-256"):
+            (repo / name).unlink()
+        assert store.restore(latest, ["file-0", "file-256"]) == ["file-0", "file-256"]
+        assert (repo / "file-0").read_text() == "saved-0"
+        assert (repo / "file-256").read_text() == "saved-256"
+
+
 def test_unchanged_large_content_is_stored_once_across_checkpoints():
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
