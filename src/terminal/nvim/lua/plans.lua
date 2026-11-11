@@ -4,9 +4,7 @@ local viewer
 local url
 local active_path
 
-local function directory()
-  return vim.fn.stdpath("config") .. "/plans"
-end
+local function directory() return vim.fn.stdpath("config") .. "/plans" end
 
 function M.current_path()
   local path = vim.uv.fs_realpath(vim.api.nvim_buf_get_name(0))
@@ -39,8 +37,8 @@ function M.open_diagram()
     return
   end
   if viewer then viewer:kill(15) end
-  if vim.fn.executable("node") == 0 or vim.fn.executable("mmdc") == 0 then
-    vim.notify("Plan diagram requires node and mermaid-cli (mmdc)", vim.log.levels.ERROR)
+  if vim.fn.executable("node") == 0 then
+    vim.notify("Plan diagram requires node", vim.log.levels.ERROR)
     return
   end
 
@@ -50,7 +48,7 @@ function M.open_diagram()
   active_path = path
   url = nil
   local process
-  process = vim.system({ "node", script, path, vim.fn.exepath("mmdc") }, {
+  process = vim.system({ "node", script, path }, {
     text = true,
     stdout = function(_, data)
       if not data then return end
@@ -122,9 +120,7 @@ local function buffers_for_path(path)
   local buffers = {}
   if not real_path then return buffers end
   for _, buffer in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.uv.fs_realpath(vim.api.nvim_buf_get_name(buffer)) == real_path then
-      buffers[#buffers + 1] = buffer
-    end
+    if vim.uv.fs_realpath(vim.api.nvim_buf_get_name(buffer)) == real_path then buffers[#buffers + 1] = buffer end
   end
   return buffers
 end
@@ -215,7 +211,7 @@ function M.setup()
       vim.keymap.set("n", "<CR>", toggle_task, { buffer = args.buf, desc = "Cycle plan task state" })
       vim.keymap.set("n", "<leader>dm", M.open_diagram, {
         buffer = args.buf,
-        desc = "Plan Mermaid diagram",
+        desc = "Plan task diagram",
       })
       vim.keymap.set("n", "<leader>dM", M.stop_diagram, {
         buffer = args.buf,

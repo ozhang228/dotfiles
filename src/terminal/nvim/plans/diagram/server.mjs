@@ -1,17 +1,12 @@
 import { createServer } from "node:http";
-import { readFile, realpath } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import { createRequire } from "node:module";
-import { diagramsFromMarkdown } from "./parse.mjs";
+import { readFile } from "node:fs/promises";
+import { tasksFromMarkdown } from "./parse.mjs";
 
-const [planPath, rendererPath] = process.argv.slice(2);
-if (!planPath || !rendererPath) throw new Error("Expected plan file and mmdc executable");
-const renderer = await realpath(rendererPath);
-const require = createRequire(renderer);
-const mermaidPath = resolve(dirname(require.resolve("mermaid")), "mermaid.min.js");
-const [page, mermaid] = await Promise.all([
+const [planPath] = process.argv.slice(2);
+if (!planPath) throw new Error("Expected plan file");
+const [page, renderer] = await Promise.all([
   readFile(new URL("./index.html", import.meta.url)),
-  readFile(mermaidPath),
+  readFile(new URL("./render.mjs", import.meta.url)),
 ]);
 
 const server = createServer(async (request, response) => {
@@ -20,13 +15,13 @@ const server = createServer(async (request, response) => {
     if (request.url === "/") {
       response.setHeader("Content-Type", "text/html; charset=utf-8");
       response.end(page);
-    } else if (request.url === "/mermaid.js") {
+    } else if (request.url === "/render.mjs") {
       response.setHeader("Content-Type", "text/javascript; charset=utf-8");
-      response.end(mermaid);
+      response.end(renderer);
     } else if (request.url === "/diagram") {
-      const sources = diagramsFromMarkdown(await readFile(planPath, "utf8"));
+      const roots = tasksFromMarkdown(await readFile(planPath, "utf8"));
       response.setHeader("Content-Type", "application/json");
-      response.end(JSON.stringify({ sources }));
+      response.end(JSON.stringify({ roots }));
     } else {
       response.writeHead(404).end();
     }

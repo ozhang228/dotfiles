@@ -4,13 +4,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Plan diagram</title>
   <style>
+    :root {
+      color-scheme: dark;
+      --bg: #24273a;
+      --surface: #363a4f;
+      --surface-2: #494d64;
+      --line: #5b6078;
+      --ink: #cad3f5;
+      --muted: #b8c0e0;
+      --accent: #8aadf4;
+      --pending: var(--accent);
+      --progress: #eed49f;
+      --done: #a6da95;
+    }
     * {
       box-sizing: border-box;
     }
     body {
       margin: 0;
-      background: #24273a;
-      color: #cad3f5;
+      background: var(--bg);
+      color: var(--ink);
       font:
         15px system-ui,
         sans-serif;
@@ -19,15 +32,17 @@
       position: sticky;
       top: 0;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 18px;
       padding: 14px 24px;
-      background: #24273a;
-      border-bottom: 1px solid #494d64;
+      background: var(--bg);
+      border-bottom: 1px solid var(--surface-2);
       z-index: 1;
     }
     header strong {
       margin-right: auto;
+      color: var(--accent);
     }
     .legend {
       display: flex;
@@ -36,28 +51,32 @@
     }
     .legend span {
       padding: 4px 8px;
-      border-radius: 5px;
+      border: 1.5px solid;
+      border-radius: 6px;
     }
-    .pending {
-      background: #363a4f;
+    .legend .pending {
+      color: var(--pending);
     }
-    .progress {
-      background: #504d50;
+    .legend .progress {
+      color: var(--progress);
     }
-    .done {
-      background: #3e4b4c;
+    .legend .done {
+      color: var(--done);
     }
     button {
-      background: #363a4f;
+      background: var(--surface);
       color: inherit;
-      border: 1px solid #5b6078;
+      border: 1px solid var(--line);
       border-radius: 5px;
       padding: 5px 10px;
       cursor: pointer;
     }
+    button:hover {
+      border-color: var(--accent);
+    }
     #status {
       font-size: 12px;
-      color: #939ab7;
+      color: var(--muted);
       padding: 8px 24px;
     }
     #viewport {
@@ -68,11 +87,16 @@
     #diagram {
       display: flex;
       flex-wrap: wrap;
+      justify-content: safe center;
       align-items: flex-start;
       gap: 32px;
     }
     #diagram svg {
-      max-width: none !important;
+      display: block;
+      max-width: none;
+    }
+    #diagram section {
+      flex: none;
     }
   </style>
   <header>
@@ -86,32 +110,37 @@
   </header>
   <div id="status">Loading…</div>
   <main id="viewport"><div id="diagram"></div></main>
-  <script src="/mermaid.js"></script>
-  <script>
+  <script type="module">
+    import { renderTaskTree } from "/render.mjs";
+
     const diagram = document.getElementById("diagram");
     const status = document.getElementById("status");
     const viewport = document.getElementById("viewport");
     let lastSource;
+    let updatedAt;
     let scale = 1;
-    let sequence = 0;
     let trees = [];
-    mermaid.initialize({
-      startOnLoad: false,
-      securityLevel: "strict",
-      theme: "base",
-      themeVariables: {
-        background: "#24273a",
-        primaryColor: "#363a4f",
-        primaryTextColor: "#cad3f5",
-        primaryBorderColor: "#939ab7",
-        lineColor: "#939ab7",
-        fontFamily: "system-ui, sans-serif",
-      },
-      flowchart: { htmlLabels: false, wrappingWidth: 1000, curve: "basis", useMaxWidth: false },
-    });
+    const context = document.createElement("canvas").getContext("2d");
+    if (!context) throw new Error("Text measurement is unavailable");
+    context.font = "500 16px system-ui, sans-serif";
+
+    function measureText(text) {
+      return context.measureText(text).width;
+    }
+
+    function renderTree(root) {
+      const { svg, width, height } = renderTaskTree(root, measureText);
+      const parsed = new DOMParser().parseFromString(svg, "image/svg+xml");
+      if (parsed.querySelector("parsererror")) throw new Error("Unable to render task tree");
+      const section = document.createElement("section");
+      const element = document.importNode(parsed.documentElement, true);
+      section.append(element);
+      return { section, svg: element, width, height };
+    }
 
     function resizeDiagram() {
-      for (const { svg, width, height } of trees) {
+      for (const { section, svg, width, height } of trees) {
+        section.style.width = `${width * scale}px`;
         svg.style.width = `${width * scale}px`;
         svg.style.height = `${height * scale}px`;
       }
@@ -119,7 +148,7 @@
     function fitDiagram() {
       if (trees.length === 0) return;
       const widest = Math.max(...trees.map((tree) => tree.width));
-      scale = Math.min(1, (viewport.clientWidth - 40) / widest);
+      scale = Math.max(0.8, Math.min(1, (viewport.clientWidth - 40) / widest));
       resizeDiagram();
     }
     function zoomIn() {
@@ -139,27 +168,20 @@
         const response = await fetch("/diagram", { cache: "no-store" });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error);
-        const key = JSON.stringify(result.sources);
+        const key = JSON.stringify(result.roots);
         if (key !== lastSource) {
           const first = lastSource === undefined;
-          const rendered = [];
-          for (const source of result.sources) {
-            rendered.push(await mermaid.render(`plan-${sequence++}`, source));
-          }
-          diagram.replaceChildren();
-          trees = rendered.map(({ svg }) => {
-            const holder = document.createElement("div");
-            holder.innerHTML = svg;
-            diagram.append(holder);
-            const element = holder.querySelector("svg");
-            const box = element.viewBox.baseVal;
-            return { svg: element, width: box.width, height: box.height };
-          });
+          const rendered = result.roots.map(renderTree);
+          diagram.replaceChildren(...rendered.map((tree) => tree.section));
+          trees = rendered;
           lastSource = key;
+          updatedAt = Date.now();
           if (first) fitDiagram();
           else resizeDiagram();
         }
-        status.textContent = "Live · updates after save";
+        status.textContent = trees.length
+          ? `Updated ${Math.floor((Date.now() - updatedAt) / 1000)}s ago`
+          : "No checklist tasks";
       } catch (error) {
         status.textContent = `Unable to refresh: ${error.message}`;
       }
