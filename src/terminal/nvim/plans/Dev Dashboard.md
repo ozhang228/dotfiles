@@ -30,7 +30,7 @@
   - [ ] Add private review comments that can be exported to AI and we should be able to export comments with line numbers to ai easily
   # can think of review as two separate stages right, looking at diff, and looking at the file
   - [ ] File Drilldown (lsp enabled
-  - [ ] Explore an import-dependency diagram for changed files
+  - [ ] Explore an import-dependency diagram for changed files and a graph view of functions in a particular file
 - [ ] Add PR actions
   - [ ] Close and draft or undraft PRs with confirmation
   - [ ] Approve PRs authored by someone else
