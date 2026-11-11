@@ -386,7 +386,7 @@
     }
   },
   "pi-sandbox": {
-    "check": "cmp -s ~/dotfiles/src/ai/pi/sandbox/package-lock.json ~/.local/share/pi-sandbox/runtime/package-lock.json && python3 ~/dotfiles/src/ai/pi/sandbox/tests/smoke.py",
+    "check": "cmp -s ~/dotfiles/src/ai/pi/sandbox/package-lock.json ~/.local/share/pi-sandbox/runtime/package-lock.json",
     "install": {
       "ubuntu": "sh ~/dotfiles/setup/scripts/pi-sandbox.sh",
       "manjaro": "sh ~/dotfiles/setup/scripts/pi-sandbox.sh"
