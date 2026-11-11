@@ -11,7 +11,7 @@ import stat
 import time
 import uuid
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 BUFFER = 1024 * 1024
@@ -55,6 +55,8 @@ def sync_filesystem(descriptor: int):
 class CheckpointUsage:
     _repo_bytes: int
     _blob_bytes: int
+    _page_size: int
+    _directory_bytes: int
 
 
 class Recovery:
@@ -237,16 +239,25 @@ class Recovery:
             protected.add(self.repo / relative)
         return tuple(sorted(protected))
 
-    def overhead(self, database):
+    def directory_usage(self):
+        return sum(
+            path.stat().st_blocks * 512 for path in (self.root, self.root / "blobs")
+        )
+
+    def overhead(self, database, accounted: CheckpointUsage | None = None):
         # Reserve a complete rollback journal and VACUUM copy alongside the database.
         pages = database.execute("PRAGMA page_count").fetchone()[0]
-        page_size = database.execute("PRAGMA page_size").fetchone()[0]
+        page_size = (
+            accounted._page_size
+            if accounted
+            else database.execute("PRAGMA page_size").fetchone()[0]
+        )
         database_bytes = max(
             pages * page_size,
             (self.root / "recovery.sqlite").stat().st_blocks * 512,
         )
-        directories = sum(
-            path.stat().st_blocks * 512 for path in (self.root, self.root / "blobs")
+        directories = (
+            accounted._directory_bytes if accounted else self.directory_usage()
         )
         return database_bytes * 3 + directories
 
@@ -279,6 +290,8 @@ class Recovery:
             _blob_bytes=database.execute(
                 "SELECT coalesce(sum(bytes),0) FROM blobs"
             ).fetchone()[0],
+            _page_size=database.execute("PRAGMA page_size").fetchone()[0],
+            _directory_bytes=self.directory_usage(),
         )
 
     def collect(self, database, *, pinned_digest="", staging=""):
@@ -310,6 +323,8 @@ class Recovery:
     ):
         if accounted is None:
             accounted = self.checkpoint_usage(database)
+        elif staging:
+            accounted = replace(accounted, _directory_bytes=self.directory_usage())
         while True:
             repo_blob = (
                 size
@@ -329,7 +344,7 @@ class Recovery:
                 else 0
             )
             repo_full = accounted._repo_bytes + repo_bytes + repo_blob > self.repo_limit
-            total_usage = accounted._blob_bytes + self.overhead(database)
+            total_usage = accounted._blob_bytes + self.overhead(database, accounted)
             if (
                 not repo_full
                 and total_usage + total_bytes + total_blob <= self.total_limit
@@ -383,9 +398,9 @@ class Recovery:
                     "INSERT INTO checkpoints VALUES(?,?,?,?,?)",
                     (identifier, self.repo_id, time.time_ns(), label[:120], "staging"),
                 )
-                accounted = CheckpointUsage(
+                accounted = replace(
+                    accounted,
                     _repo_bytes=accounted._repo_bytes + RECORD_BYTES,
-                    _blob_bytes=accounted._blob_bytes,
                 )
                 fragment = os.statvfs(self.root / "blobs").f_frsize
                 new_blobs = False
@@ -505,10 +520,14 @@ class Recovery:
                         "INSERT INTO entries VALUES(?,?,?,?,?,?,?)",
                         (identifier, path, kind, mode, digest, target, size),
                     )
-                    accounted = CheckpointUsage(
+                    accounted = replace(
+                        accounted,
                         _repo_bytes=accounted._repo_bytes + cost + repo_blob,
                         _blob_bytes=accounted._blob_bytes
                         + (allocation if new_blob else 0),
+                        _directory_bytes=self.directory_usage()
+                        if new_blob
+                        else accounted._directory_bytes,
                     )
                 if new_blobs and batch_sync:
                     sync_filesystem(sync_fd)
@@ -533,10 +552,19 @@ class Recovery:
                             "UPDATE blobs SET bytes=? WHERE digest=?",
                             (allocated, digest),
                         )
-                        accounted = CheckpointUsage(
+                        accounted = replace(
+                            accounted,
                             _repo_bytes=accounted._repo_bytes + difference,
                             _blob_bytes=accounted._blob_bytes + difference,
                         )
+                self.make_room(
+                    database,
+                    repo_bytes=0,
+                    total_bytes=0,
+                    accounted=replace(
+                        accounted, _directory_bytes=self.directory_usage()
+                    ),
+                )
                 database.execute(
                     'UPDATE checkpoints SET status="active" WHERE id=?', (identifier,)
                 )

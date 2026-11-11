@@ -417,6 +417,29 @@ def test_tiny_distinct_files_are_charged_for_allocated_blocks():
         assert allocated <= 3_000_000
 
 
+def test_deduplicated_files_still_enforce_global_metadata_limit():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "original").write_text("saved")
+        store = Recovery(root / "private", repo=repo, total_limit=300000)
+        latest = store.checkpoint("bash")
+        store.complete(latest)
+        for index in range(1000):
+            (repo / f"duplicate-{index}").write_text("same")
+        with pytest.raises(RuntimeError, match="storage limit"):
+            store.checkpoint("bash")
+        assert [entry["checkpoint"] for entry in store.list()] == [latest]
+        (repo / "original").unlink()
+        assert store.restore(latest, ["original"]) == ["original"]
+        assert (repo / "original").read_text() == "saved"
+        allocated = (root / "private").stat().st_blocks * 512 + sum(
+            path.stat().st_blocks * 512 for path in (root / "private").rglob("*")
+        )
+        assert allocated <= 300000
+
+
 def test_legacy_store_migrates_quota_without_changing_saved_file_lengths():
     import sqlite3
 
