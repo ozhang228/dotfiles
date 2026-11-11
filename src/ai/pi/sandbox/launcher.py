@@ -15,6 +15,7 @@ import tempfile
 import threading
 import uuid
 from collections.abc import Mapping
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -479,10 +480,10 @@ def editing_controller(
         if any(project.is_relative_to(root) for root in roots)
         else (*roots, project)
     )
+    store = Recovery(state.parent / "recovery", repo=roots[0])
     recoveries = tuple(
-        Recovery(
-            state.parent / "recovery",
-            repo=root,
+        store.for_repository(
+            root,
             protected=[
                 *protections[root].git_metadata,
                 *protections[root].credentials,
@@ -654,25 +655,28 @@ def main():
             "issues.push('Node needs --use-env-proxy support');"
             "if(issues.length){console.error(issues.join('\\n'));process.exit(1)}"
         )
-        check_boundary(
-            [
-                str(node),
-                "--input-type=module",
-                "--eval",
-                dependency_check,
-                (package / "dist/index.js").as_uri(),
-            ],
-            environment=environment,
-        )
         read_roots = (
             roots
             if any(project.is_relative_to(root) for root in roots)
             else (*roots, project)
         )
-        protections = {
-            root: repository_protections(root, include_git=root in roots)
-            for root in read_roots
-        }
+        with ThreadPoolExecutor(max_workers=1) as startup:
+            dependency = startup.submit(
+                check_boundary,
+                [
+                    str(node),
+                    "--input-type=module",
+                    "--eval",
+                    dependency_check,
+                    (package / "dist/index.js").as_uri(),
+                ],
+                environment=environment,
+            )
+            protections = {
+                root: repository_protections(root, include_git=root in roots)
+                for root in read_roots
+            }
+            dependency.result()
         command = sandbox_prefix(
             node=node,
             cli=cli,

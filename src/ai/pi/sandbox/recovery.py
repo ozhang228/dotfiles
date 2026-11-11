@@ -1,6 +1,7 @@
 """Host-only, streamed recovery records. Never mount this store into a worker."""
 
 import contextlib
+import copy
 import ctypes
 import fcntl
 import hashlib
@@ -61,6 +62,20 @@ class CheckpointUsage:
 
 
 class Recovery:
+    def _bind_repository(self, repo: Path, *, protected: Sequence[Path]):
+        self.repo = repo.resolve(strict=True)
+        self.protected = tuple(
+            path.relative_to(self.repo)
+            for path in protected
+            if path.is_relative_to(self.repo)
+        ) + (Path(".git"),)
+        self.repo_id = hashlib.sha256(os.fsencode(self.repo)).hexdigest()
+
+    def for_repository(self, repo: Path, *, protected: Sequence[Path] = ()):
+        recovery = copy.copy(self)
+        recovery._bind_repository(repo, protected=protected)
+        return recovery
+
     def __init__(
         self,
         root: Path,
@@ -71,13 +86,7 @@ class Recovery:
         total_limit=TOTAL_LIMIT,
     ):
         self.root = root
-        self.repo = repo.resolve(strict=True)
-        self.protected = tuple(
-            path.relative_to(self.repo)
-            for path in protected
-            if path.is_relative_to(self.repo)
-        ) + (Path(".git"),)
-        self.repo_id = hashlib.sha256(os.fsencode(self.repo)).hexdigest()
+        self._bind_repository(repo, protected=protected)
         self.repo_limit = repo_limit
         self.total_limit = total_limit
         for path in (root, root / "blobs"):

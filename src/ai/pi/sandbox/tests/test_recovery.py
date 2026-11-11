@@ -1,6 +1,7 @@
 import contextlib
 import multiprocessing
 import os
+import sqlite3
 import sys
 import tempfile
 from pathlib import Path
@@ -11,6 +12,34 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from recovery import BUFFER, Recovery
+
+
+def test_shared_store_keeps_repository_history_and_protection_separate():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        first = root / "first"
+        second = root / "second"
+        for repo in (first, second):
+            repo.mkdir()
+            (repo / "saved").write_text(repo.name)
+            (repo / f"{repo.name}-private").write_text("private")
+        original = Recovery(
+            root / "private", repo=first, protected=[first / "first-private"]
+        )
+        other = original.for_repository(second, protected=[second / "second-private"])
+        first_checkpoint = original.checkpoint("first")
+        second_checkpoint = other.checkpoint("second")
+        assert [item["checkpoint"] for item in original.list()] == [first_checkpoint]
+        assert [item["checkpoint"] for item in other.list()] == [second_checkpoint]
+        assert [item["path"] for item in original.paths(first_checkpoint)] == ["saved"]
+        assert [item["path"] for item in other.paths(second_checkpoint)] == ["saved"]
+        (second / "saved").unlink()
+        assert other.restore(second_checkpoint, ["saved"]) == ["saved"]
+        assert (second / "saved").read_text() == "second"
+        assert (first / "saved").read_text() == "first"
+        (root / "private/recovery.sqlite").write_bytes(b"corrupt journal")
+        with pytest.raises(sqlite3.DatabaseError):
+            other.list()
 
 
 def interrupt_export(root, repo, checkpoint):

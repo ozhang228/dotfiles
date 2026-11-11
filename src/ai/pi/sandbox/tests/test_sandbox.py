@@ -249,6 +249,48 @@ def test_launcher_refuses_unavailable_boundary_and_changed_provider():
         )
 
 
+@pytest.mark.parametrize("failure", ["dependency", "protection scan"])
+def test_failed_parallel_preflight_never_loads_host_credentials(failure):
+    launcher = load_module("launcher")
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        project = root / "repo"
+        project.mkdir()
+        with (
+            patch.object(launcher.Path, "cwd", return_value=project),
+            patch.object(launcher, "approved_repositories", return_value=(project,)),
+            patch.object(
+                launcher, "find_runtime", return_value=(root / "node", root / "cli")
+            ),
+            patch.object(launcher, "sandbox_runtime", return_value=(root, root)),
+            patch.object(launcher, "assets_root", return_value=root / "assets"),
+            patch.object(
+                launcher, "private_state", return_value=root / "private/session"
+            ),
+            patch.object(launcher, "snapshot_config"),
+            patch.object(launcher, "sandbox_environment", return_value={}),
+            patch.object(
+                launcher,
+                "check_boundary",
+                side_effect=RuntimeError("dependency failed")
+                if failure == "dependency"
+                else None,
+            ),
+            patch.object(
+                launcher,
+                "repository_protections",
+                return_value=launcher.RepositoryProtections((), ()),
+                side_effect=RuntimeError("protection scan failed")
+                if failure == "protection scan"
+                else None,
+            ),
+            patch.object(launcher, "credential") as credential,
+        ):
+            with pytest.raises(RuntimeError, match=f"{failure} failed"):
+                launcher.main()
+            credential.assert_not_called()
+
+
 def test_real_pi_streams_through_authenticated_srt_proxy_without_host_auth():
     launcher = load_module("launcher")
     broker = load_module("broker")
