@@ -361,25 +361,39 @@ def sandbox_prefix(
         policy["filesystem"]["allowWrite"] = list(
             map(literal, (*write_paths, temporary / "scratch"))
         )
-        policy["filesystem"]["allowRead"] = [
-            literal(Path(path).resolve())
+        readable = tuple(
+            Path(path).resolve()
             for path in ("/usr", "/lib", "/lib64", "/etc/hosts")
             if Path(path).exists()
-        ] + list(
-            map(
-                literal,
-                (
-                    *runtime_roots(node=node, cli=cli),
-                    modules,
-                    *tools.values(),
-                    project,
-                    *roots,
-                    temporary / "config",
-                    temporary / "home",
-                    temporary / "scratch",
-                ),
-            )
+        ) + (
+            *runtime_roots(node=node, cli=cli),
+            modules,
+            *tools.values(),
+            project,
+            *roots,
+            temporary / "config",
+            temporary / "home",
+            temporary / "scratch",
         )
+        # SRT restores read binds after writes; an ancestor would hide the write mount.
+        pending = list(readable)
+        read_paths = []
+        while pending:
+            path = pending.pop()
+            if any(
+                path != target and target.is_relative_to(path) for target in write_paths
+            ):
+                for child in path.iterdir():
+                    resolved = child.resolve()
+                    if any(
+                        resolved.is_relative_to(root) for root in readable
+                    ) and not any(
+                        resolved.is_relative_to(secret) for secret in credentials
+                    ):
+                        pending.append(child)
+            else:
+                read_paths.append(path)
+        policy["filesystem"]["allowRead"] = list(map(literal, read_paths))
     settings = temporary / "sandbox.json"
     settings.write_text(json.dumps(policy))
     return [
@@ -412,6 +426,7 @@ def sandbox_environment(*, node: Path, temporary: Path):
         "XDG_CACHE_HOME": str((temporary / "cache").resolve()),
         "TMPDIR": str(temporary / "scratch"),
         "PYTHONPYCACHEPREFIX": str(temporary / "scratch/pycache"),
+        "GIT_DISCOVERY_ACROSS_FILESYSTEM": "1",
         "UV_CACHE_DIR": str(temporary / "scratch/uv"),
         "UV_PYTHON_INSTALL_DIR": str(temporary / "home/.local/share/uv/python"),
         "UV_PYTHON_DOWNLOADS": "never",

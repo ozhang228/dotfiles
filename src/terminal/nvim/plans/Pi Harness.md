@@ -4,12 +4,9 @@ Replace Claude Code and Codex with Pi while preserving the workflows I actually 
 
 ## Required before switching
 
-- [ ] Verify the existing model gateway
-  - [ ] Verify reasoning levels, usage reporting, and provider errors through the gateway
-  - [ ] Support switching between the Claude and OpenAI models I use without losing the active conversation
 - [ ] Verify installation, symlinks, and native isolation/recovery smoke tests on remaining Ubuntu and Manjaro machines
-- [ ] Exercise real builds and formatters in larger repositories; measure checkpoint cost beyond dotfiles
-- [ ] Extend recovery tests to interrupted exports, host edits during checkpoint capture, and host-controller death while a worker holds the repo operation lock
+- [ ] Reduce cold whole-repository checkpoint cost in dependency-heavy repositories without losing recovery coverage
+- [ ] Keep sandbox-generated protected config placeholders out of broad formatter/file scans
 - [ ] Add explicitly scoped worker network and external capabilities
   - [ ] Start with an explicit domain allowlist for documentation and project package registries; keep other destinations blocked
   - [ ] Give workers private dependency caches and repo-local virtual environments/node_modules; keep shared host caches protected

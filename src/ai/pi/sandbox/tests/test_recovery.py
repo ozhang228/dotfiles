@@ -1,11 +1,117 @@
+import contextlib
+import multiprocessing
+import os
 import sys
 import tempfile
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from recovery import Recovery
+from recovery import BUFFER, Recovery
+
+
+def interrupt_export(root, repo, checkpoint):
+    fdopen = os.fdopen
+
+    @contextlib.contextmanager
+    def interrupted_output(descriptor, mode):
+        with fdopen(descriptor, mode) as output:
+            write = output.write
+
+            def write_and_exit(chunk):
+                write(chunk)
+                output.flush()
+                os.fsync(output.fileno())
+                os._exit(23)
+
+            with patch.object(output, "write", side_effect=write_and_exit):
+                yield output
+
+    with patch("recovery.os.fdopen", interrupted_output):
+        Recovery(root, repo=repo).restore(checkpoint, ["file"])
+
+
+def test_interrupted_export_retains_partial_bytes_and_recovers_complete_sibling():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        original = b"original" * (BUFFER // 4)
+        (repo / "file").write_bytes(original)
+        store = Recovery(root / "private", repo=repo)
+        checkpoint = store.checkpoint("bash")
+        store.complete(checkpoint)
+        (repo / "file").unlink()
+        process = multiprocessing.get_context("spawn").Process(
+            target=interrupt_export, args=(root / "private", repo, checkpoint)
+        )
+        process.start()
+        try:
+            process.join(timeout=10)
+            assert process.exitcode == 23
+        finally:
+            if process.is_alive():
+                process.kill()
+                process.join(timeout=5)
+            process.close()
+        assert (repo / "file").read_bytes() == original[:BUFFER]
+        restarted = Recovery(root / "private", repo=repo)
+        assert restarted.list()[0]["last_recovery"] == "interrupted"
+        restored = restarted.restore(checkpoint, ["file"])
+        assert restored[0].startswith("file.recovered-")
+        assert (repo / restored[0]).read_bytes() == original
+        assert (repo / "file").read_bytes() == original[:BUFFER]
+        assert restarted.list()[0]["status"] == "completed"
+
+
+@pytest.mark.parametrize("phase", ["hash", "copy"])
+def test_host_edit_during_capture_refuses_checkpoint_and_preserves_previous(phase):
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        target = repo / "file"
+        original = b"a" * (BUFFER * 2)
+        target.write_bytes(original)
+        store = Recovery(root / "private", repo=repo)
+        checkpoint = store.checkpoint("bash")
+        store.complete(checkpoint)
+        target.write_bytes(b"b" * len(original))
+        host_bytes = b"c" * len(original)
+        read = os.read
+        seek = os.lseek
+        edited = False
+
+        def edit_during_read(descriptor, size):
+            nonlocal edited
+            chunk = read(descriptor, size)
+            if chunk and not edited:
+                edited = True
+                target.write_bytes(host_bytes)
+            return chunk
+
+        def edit_before_copy(descriptor, offset, whence):
+            target.write_bytes(host_bytes)
+            return seek(descriptor, offset, whence)
+
+        boundary = "os.read" if phase == "hash" else "os.lseek"
+        race = edit_during_read if phase == "hash" else edit_before_copy
+        with patch(f"recovery.{boundary}", race):
+            with pytest.raises(RuntimeError, match="File changed during checkpoint"):
+                store.checkpoint("bash")
+        restarted = Recovery(root / "private", repo=repo)
+        assert [entry["checkpoint"] for entry in restarted.list()] == [checkpoint]
+        assert target.read_bytes() == host_bytes
+        restored = restarted.restore(checkpoint, ["file"])
+        assert (repo / restored[0]).read_bytes() == original
+        assert target.read_bytes() == host_bytes
+        replacement = restarted.checkpoint("bash")
+        restarted.complete(replacement)
+        target.unlink()
+        restarted.restore(replacement, ["file"])
+        assert target.read_bytes() == host_bytes
 
 
 def test_interrupted_command_preserves_ignored_untracked_and_uncommitted_bytes():

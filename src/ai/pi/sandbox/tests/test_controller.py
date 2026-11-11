@@ -1,6 +1,13 @@
+import contextlib
+import fcntl
+import multiprocessing
+import os
+import signal
+import subprocess
 import sys
 import tempfile
 import threading
+import time
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -9,6 +16,189 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from controller import Bash, Controller, parse_request
 from recovery import Recovery
+
+
+def run_controller_until_killed(root):
+    from launcher import assets_root, editing_controller
+    from runtime import find_runtime
+
+    tempfile.tempdir = str(root / "workers")
+    node, cli = find_runtime()
+    controller = editing_controller(
+        node=node,
+        cli=cli,
+        project=root / "repo",
+        state=root / "private/project",
+        assets=assets_root(),
+        roots=(root / "repo",),
+    )
+    list(
+        controller.execute(
+            Bash(
+                command='setsid sh -c "while :; do echo tick >> ticks; sleep 0.05; done" & wait',
+                timeout=30,
+            ),
+            threading.Event(),
+        )
+    )
+
+
+def test_native_controller_death_keeps_worker_lock_until_cancellation_and_recovery():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (root / "workers").mkdir()
+        (root / "private/project").mkdir(parents=True)
+        (repo / "original").write_bytes(b"precious uncommitted bytes")
+        process = multiprocessing.get_context("spawn").Process(
+            target=run_controller_until_killed, args=(root,)
+        )
+        supervisor = None
+        resumed = threading.Event()
+        waiter = None
+        failures = []
+        messages = []
+        process.start()
+        try:
+            deadline = time.monotonic() + 15
+            while not (repo / "ticks").exists() and time.monotonic() < deadline:
+                assert process.is_alive(), "Controller failed before starting worker"
+                time.sleep(0.05)
+            assert (repo / "ticks").exists(), "Worker never started"
+            children = Path(f"/proc/{process.pid}/task/{process.pid}/children")
+            supervisor = next(
+                int(pid)
+                for pid in children.read_text().split()
+                if b"supervise"
+                in Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
+            )
+            os.kill(supervisor, signal.SIGSTOP)
+            deadline = time.monotonic() + 5
+            while "State:\tT" not in Path(f"/proc/{supervisor}/status").read_text():
+                assert time.monotonic() < deadline, "Supervisor did not stop"
+                time.sleep(0.01)
+            process.kill()
+            process.join(timeout=5)
+            assert process.exitcode == -signal.SIGKILL
+            recovery = Recovery(root / "private/recovery", repo=repo)
+            checkpoint = recovery.list()[0]["checkpoint"]
+            with (recovery.root / "operation.lock").open("a+b") as lock:
+                with pytest.raises(BlockingIOError):
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            restarted = Controller(recovery, run=lambda *args: iter(()))
+
+            def recover():
+                try:
+                    messages.extend(
+                        restarted.execute(
+                            parse_request({"tool": "recovery_list", "args": {}}),
+                            resumed,
+                        )
+                    )
+                except Exception as error:
+                    failures.append(error)
+
+            waiter = threading.Thread(target=recover)
+            waiter.start()
+            waiter.join(timeout=0.2)
+            assert waiter.is_alive(), "Recovery raced the surviving worker"
+            assert recovery.list()[0]["status"] == "active"
+            os.kill(supervisor, signal.SIGCONT)
+            waiter.join(timeout=10)
+            assert not waiter.is_alive() and not failures
+            assert messages[0]["result"]["entries"][0]["status"] == "interrupted"
+            size = (repo / "ticks").stat().st_size
+            time.sleep(0.3)
+            assert (repo / "ticks").stat().st_size == size
+            restored = list(
+                restarted.execute(
+                    parse_request(
+                        {
+                            "tool": "recovery_restore",
+                            "args": {"checkpoint": checkpoint, "paths": ["original"]},
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )[0]["result"]["paths"]
+            assert (repo / restored[0]).read_bytes() == b"precious uncommitted bytes"
+            assert (repo / "original").read_bytes() == b"precious uncommitted bytes"
+        finally:
+            if supervisor is not None:
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(supervisor, signal.SIGCONT)
+                    os.killpg(supervisor, signal.SIGKILL)
+            if process.is_alive():
+                process.kill()
+            process.join(timeout=5)
+            process.close()
+            resumed.set()
+            if waiter is not None:
+                waiter.join(timeout=5)
+
+
+def test_native_scoped_worker_keeps_nested_writes_and_protects_parent_and_credentials():
+    from launcher import assets_root, editing_controller
+    from runtime import find_runtime
+
+    node, cli = find_runtime()
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        project = repo / "nested"
+        project.mkdir(parents=True)
+        (repo / "readable").write_text("safe")
+        (repo / "alias").symlink_to("readable")
+        (root / "outside").write_text("outside secret")
+        (repo / "escape").symlink_to(root / "outside")
+        (repo / ".env").write_text("parent credential")
+        (repo / "credential-alias").symlink_to(".env")
+        (project / ".env").write_text("nested credential")
+        (project / "file").write_text("before")
+        subprocess.run(["/usr/bin/git", "init", "-q", str(repo)], check=True)
+        state = root / "private/project"
+        state.mkdir(parents=True)
+        controller = editing_controller(
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            assets=assets_root(),
+            roots=(repo,),
+        )
+        try:
+            messages = list(
+                controller.execute(
+                    Bash(
+                        command="""
+                        set -eu
+                        printf after > file
+                        test "$(cat ../readable)" = safe
+                        test "$(cat ../alias)" = safe
+                        test "$(git rev-parse --is-inside-work-tree)" = true
+                        for path in .env ../.env ../credential-alias ../escape; do
+                            if cat "$path" 2>/dev/null; then exit 10; fi
+                        done
+                        if { printf damage > ../readable; } 2>/dev/null; then exit 11; fi
+                        if { printf damage > .gitconfig; } 2>/dev/null; then exit 12; fi
+                        printf protected
+                    """
+                    ),
+                    threading.Event(),
+                )
+            )
+            assert messages[-1]["result"]["content"] == [
+                {"type": "text", "text": "protected"}
+            ]
+            assert (project / "file").read_text() == "after"
+            assert (repo / "readable").read_text() == "safe"
+            assert (repo / ".env").read_text() == "parent credential"
+            assert (project / ".env").read_text() == "nested credential"
+            assert (root / "outside").read_text() == "outside secret"
+            assert not (project / ".gitconfig").exists()
+        finally:
+            controller.close()
 
 
 def test_current_directory_paths_resolve_inside_repo_and_traversal_stays_blocked():
