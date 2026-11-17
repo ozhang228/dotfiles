@@ -58,3 +58,7 @@
 [ai_assistant_waiting]
     summary = "AI Assistant (waiting)"
     script = ~/.config/dunst/play_sound_permission.sh
+
+[screen_locked]
+    enabled = false
+    skip_display = true

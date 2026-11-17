@@ -10,15 +10,18 @@ if command -v systemctl >/dev/null; then
     done < <(systemctl --user show-environment 2>/dev/null)
 fi
 
-paused=
+rule_enabled=
 cleanup() {
-    if [[ -n $paused ]]; then dunstctl set-paused "$paused"; fi
+    if [[ -n $rule_enabled ]]; then
+        dunstctl rule screen_locked disable
+    fi
 }
 trap cleanup EXIT
 
 if command -v dunstctl >/dev/null; then
-    paused=$(dunstctl is-paused)
-    dunstctl set-paused true
+    dunstctl rule screen_locked enable
+    rule_enabled=true
+    dunstctl close-all
 fi
 
 i3lock --nofork --color=24273a "$@"
