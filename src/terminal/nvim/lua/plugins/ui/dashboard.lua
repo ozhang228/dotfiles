@@ -1,0 +1,31 @@
+return {
+  "folke/snacks.nvim",
+  lazy = false,
+  priority = 1000,
+  opts = {
+    dashboard = {
+      enabled = true,
+
+      preset = {
+        header = [[
+███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
+████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
+██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║
+██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║
+██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║
+╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝]],
+      },
+      sections = {
+        { section = "header" },
+        {
+          section = "terminal",
+          cmd = "cat ~/dotfiles/imgs/corviknight_ascii.txt; sleep .1",
+          height = 22,
+          padding = 1,
+          indent = 6,
+        },
+        { section = "startup" },
+      },
+    },
+  },
+}

@@ -1,0 +1,77 @@
+-- Reopening a hidden snacks terminal can leave libvterm's cursor row off by
+-- one (the child process keeps writing to the PTY while the window is
+-- closed, and Neovim's resync on reopen sometimes mis-tracks the row). A
+-- real PTY resize (SIGWINCH) makes the child fully repaint, which is a more
+-- reliable fix than Ctrl-L since some TUIs treat Ctrl-L as their own keybind.
+local function nudge_terminal_resize(self)
+  local channel = vim.bo[self.buf].channel
+  if channel == 0 then return end
+  local width = vim.api.nvim_win_get_width(self.win)
+  local height = vim.api.nvim_win_get_height(self.win)
+  if height <= 1 then return end
+  pcall(vim.fn.jobresize, channel, width, height - 1)
+  vim.schedule(function() pcall(vim.fn.jobresize, channel, width, height) end)
+end
+
+local resize_scheduled = false
+local function resize_terminals()
+  if resize_scheduled then return end
+  resize_scheduled = true
+
+  vim.schedule(function()
+    resize_scheduled = false
+    for _, terminal in ipairs(require("snacks").terminal.list()) do
+      if terminal:win_valid() then
+        terminal:on_resize()
+        nudge_terminal_resize(terminal)
+      end
+    end
+  end)
+end
+
+return {
+  "folke/snacks.nvim",
+  lazy = false,
+  priority = 1000,
+  init = function()
+    vim.api.nvim_create_autocmd("VimResized", {
+      group = vim.api.nvim_create_augroup("snacks_terminal_resize", { clear = true }),
+      callback = resize_terminals,
+    })
+  end,
+  opts = {
+    terminal = {
+      enabled = true,
+      win = {
+        style = "float",
+        border = "rounded",
+        backdrop = false,
+        width = 0,
+        height = 0,
+        on_win = nudge_terminal_resize,
+        wo = {
+          winhighlight = "Normal:Normal,NormalNC:Normal,WinBar:SnacksWinBar,WinBarNC:SnacksWinBarNC,FloatTitle:SnacksTitle,FloatFooter:SnacksFooter,WinSeparator:SnacksWinSeparator",
+        },
+        keys = {
+          term_normal = {
+            "<leader><esc>",
+            function(self) vim.cmd("stopinsert") end,
+            mode = "t",
+            desc = "Exit to normal mode",
+          },
+          to_vsplit = {
+            "<leader>|",
+            function(self)
+              local buf = self.buf
+              self:hide()
+              vim.cmd("vertical sbuffer " .. buf)
+              vim.cmd("startinsert")
+            end,
+            mode = "t",
+            desc = "Move to vertical split",
+          },
+        },
+      },
+    },
+  },
+}

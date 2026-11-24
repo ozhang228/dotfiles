@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# autorandr 1.14 shrinks the framebuffer before moving the third output.
+position="$(
+    awk '
+        $1 == "output" { output = $2 }
+        output == "DP-4" && $1 == "pos" { print $2; exit }
+    ' "$AUTORANDR_PROFILE_FOLDER/config"
+)"
+
+test -n "$position"
+xrandr --output DP-4 --pos "$position"

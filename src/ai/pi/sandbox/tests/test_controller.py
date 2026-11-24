@@ -1,0 +1,784 @@
+import contextlib
+import fcntl
+import multiprocessing
+import os
+import signal
+import subprocess
+import sys
+import tempfile
+import threading
+import time
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from controller import Bash, Controller, parse_request
+from recovery import Recovery
+
+
+def run_controller_until_killed(root):
+    from launcher import assets_root, editing_controller
+    from runtime import find_runtime
+
+    tempfile.tempdir = str(root / "workers")
+    node, cli = find_runtime()
+    controller = editing_controller(
+        node=node,
+        cli=cli,
+        project=root / "repo",
+        state=root / "private/project",
+        assets=assets_root(),
+        roots=(root / "repo",),
+    )
+    list(
+        controller.execute(
+            Bash(
+                command='setsid sh -c "while :; do echo tick >> ticks; sleep 0.05; done" & wait',
+                timeout=30,
+            ),
+            threading.Event(),
+        )
+    )
+
+
+def test_native_controller_death_keeps_worker_lock_until_cancellation_and_recovery():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (root / "workers").mkdir()
+        (root / "private/project").mkdir(parents=True)
+        (repo / "original").write_bytes(b"precious uncommitted bytes")
+        process = multiprocessing.get_context("spawn").Process(
+            target=run_controller_until_killed, args=(root,)
+        )
+        supervisor = None
+        resumed = threading.Event()
+        waiter = None
+        failures = []
+        messages = []
+        process.start()
+        try:
+            deadline = time.monotonic() + 15
+            while not (repo / "ticks").exists() and time.monotonic() < deadline:
+                assert process.is_alive(), "Controller failed before starting worker"
+                time.sleep(0.05)
+            assert (repo / "ticks").exists(), "Worker never started"
+            children = Path(f"/proc/{process.pid}/task/{process.pid}/children")
+            supervisor = next(
+                int(pid)
+                for pid in children.read_text().split()
+                if b"supervise"
+                in Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
+            )
+            os.kill(supervisor, signal.SIGSTOP)
+            deadline = time.monotonic() + 5
+            while "State:\tT" not in Path(f"/proc/{supervisor}/status").read_text():
+                assert time.monotonic() < deadline, "Supervisor did not stop"
+                time.sleep(0.01)
+            process.kill()
+            process.join(timeout=5)
+            assert process.exitcode == -signal.SIGKILL
+            recovery = Recovery(root / "private/recovery", repo=repo)
+            checkpoint = recovery.list()[0]["checkpoint"]
+            with (recovery.root / "operation.lock").open("a+b") as lock:
+                with pytest.raises(BlockingIOError):
+                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            restarted = Controller(recovery, run=lambda *args: iter(()))
+
+            def recover():
+                try:
+                    messages.extend(
+                        restarted.execute(
+                            parse_request({"tool": "recovery_list", "args": {}}),
+                            resumed,
+                        )
+                    )
+                except Exception as error:
+                    failures.append(error)
+
+            waiter = threading.Thread(target=recover)
+            waiter.start()
+            waiter.join(timeout=0.2)
+            assert waiter.is_alive(), "Recovery raced the surviving worker"
+            assert recovery.list()[0]["status"] == "active"
+            os.kill(supervisor, signal.SIGCONT)
+            waiter.join(timeout=10)
+            assert not waiter.is_alive() and not failures
+            assert messages[0]["result"]["entries"][0]["status"] == "interrupted"
+            size = (repo / "ticks").stat().st_size
+            time.sleep(0.3)
+            assert (repo / "ticks").stat().st_size == size
+            restored = list(
+                restarted.execute(
+                    parse_request(
+                        {
+                            "tool": "recovery_restore",
+                            "args": {"checkpoint": checkpoint, "paths": ["original"]},
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )[0]["result"]["paths"]
+            assert (repo / restored[0]).read_bytes() == b"precious uncommitted bytes"
+            assert (repo / "original").read_bytes() == b"precious uncommitted bytes"
+        finally:
+            if supervisor is not None:
+                with contextlib.suppress(ProcessLookupError):
+                    os.kill(supervisor, signal.SIGCONT)
+                    os.killpg(supervisor, signal.SIGKILL)
+            if process.is_alive():
+                process.kill()
+            process.join(timeout=5)
+            process.close()
+            resumed.set()
+            if waiter is not None:
+                waiter.join(timeout=5)
+
+
+def test_native_scoped_worker_keeps_nested_writes_and_protects_parent_and_credentials():
+    from launcher import assets_root, editing_controller
+    from runtime import find_runtime
+
+    node, cli = find_runtime()
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        project = repo / "nested"
+        project.mkdir(parents=True)
+        (repo / "readable").write_text("safe")
+        (repo / "alias").symlink_to("readable")
+        (root / "outside").write_text("outside secret")
+        (repo / "escape").symlink_to(root / "outside")
+        (repo / ".env").write_text("parent credential")
+        (repo / "credential-alias").symlink_to(".env")
+        (project / ".env").write_text("nested credential")
+        (project / "file").write_text("before")
+        subprocess.run(["/usr/bin/git", "init", "-q", str(repo)], check=True)
+        state = root / "private/project"
+        state.mkdir(parents=True)
+        controller = editing_controller(
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            assets=assets_root(),
+            roots=(repo,),
+        )
+        try:
+            messages = list(
+                controller.execute(
+                    Bash(
+                        command="""
+                        set -eu
+                        printf after > file
+                        test "$(cat ../readable)" = safe
+                        test "$(cat ../alias)" = safe
+                        test "$(git rev-parse --is-inside-work-tree)" = true
+                        for path in .env ../.env ../credential-alias ../escape; do
+                            if cat "$path" 2>/dev/null; then exit 10; fi
+                        done
+                        if { printf damage > ../readable; } 2>/dev/null; then exit 11; fi
+                        if { printf damage > .gitconfig; } 2>/dev/null; then exit 12; fi
+                        test -f .mcp.json && test ! -s .mcp.json
+                        if { printf damage > .mcp.json; } 2>/dev/null; then exit 13; fi
+                        if rm .mcp.json 2>/dev/null; then exit 14; fi
+                        if mv .mcp.json moved 2>/dev/null; then exit 15; fi
+                        printf protected
+                    """
+                    ),
+                    threading.Event(),
+                )
+            )
+            assert messages[-1]["result"]["content"] == [
+                {"type": "text", "text": "protected"}
+            ]
+            assert (project / "file").read_text() == "after"
+            assert (repo / "readable").read_text() == "safe"
+            assert (repo / ".env").read_text() == "parent credential"
+            assert (project / ".env").read_text() == "nested credential"
+            assert (root / "outside").read_text() == "outside secret"
+            assert not (project / ".gitconfig").exists()
+            assert not (project / ".mcp.json").exists()
+        finally:
+            controller.close()
+
+
+def test_current_directory_paths_resolve_inside_repo_and_traversal_stays_blocked():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        (repo / "nested").mkdir(parents=True)
+        controller = Controller(
+            Recovery(root / "private", repo=repo), run=lambda *args: iter(())
+        )
+        for spelling, expected in (
+            (".", repo),
+            ("./", repo),
+            ("./nested", repo / "nested"),
+        ):
+            request = parse_request(
+                {
+                    "tool": "bash",
+                    "args": {
+                        "command": "find . -maxdepth 2",
+                        "writablePaths": [spelling],
+                    },
+                }
+            )
+            assert isinstance(request, Bash)
+            assert controller.target(request.writablePaths[0])[1] == expected
+        for spelling in ("../outside", "./../outside", "nested/../../outside"):
+            with pytest.raises(ValueError, match="without traversal"):
+                parse_request(
+                    {
+                        "tool": "bash",
+                        "args": {"command": "find .", "writablePaths": [spelling]},
+                    }
+                )
+
+
+def test_mutations_in_different_sessions_wait_for_the_shared_operation_lock():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repos = (root / "first", root / "second")
+        for repo in repos:
+            repo.mkdir()
+        first_entered = threading.Event()
+        second_started = threading.Event()
+        second_entered = threading.Event()
+        release_first = threading.Event()
+        failures = []
+        completed = []
+
+        def run(request, stop, lock_fd):
+            if request.command == "first":
+                first_entered.set()
+                if not release_first.wait(5):
+                    raise RuntimeError("First worker was not released")
+            else:
+                second_entered.set()
+            yield {"type": "result", "result": {"content": []}}
+
+        controllers = tuple(
+            Controller(Recovery(root / "private", repo=repo), run=run) for repo in repos
+        )
+
+        def execute(index):
+            try:
+                name = ("first", "second")[index]
+                if index == 1:
+                    second_started.set()
+                list(
+                    controllers[index].execute(
+                        parse_request({"tool": "bash", "args": {"command": name}}),
+                        threading.Event(),
+                    )
+                )
+                completed.append(name)
+            except Exception as error:
+                failures.append(error)
+
+        threads = tuple(threading.Thread(target=execute, args=(i,)) for i in (0, 1))
+        try:
+            threads[0].start()
+            assert first_entered.wait(5)
+            threads[1].start()
+            assert second_started.wait(5)
+            assert second_entered.wait(0.3) is False
+            release_first.set()
+            for thread in threads:
+                thread.join(5)
+                assert not thread.is_alive()
+            assert failures == []
+            assert completed == ["first", "second"]
+            assert second_entered.is_set()
+        finally:
+            release_first.set()
+            for thread in threads:
+                if thread.ident is not None:
+                    thread.join(5)
+            for controller in controllers:
+                controller.close()
+
+
+def test_readonly_commands_limit_concurrency_and_reuse_released_slots():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        entered = tuple(threading.Event() for _ in range(4))
+        release = threading.Event()
+        failures = []
+        completed = []
+        expected = {"type": "result", "result": {"content": []}}
+
+        def run(request, stop, lock_fd):
+            if request.command in ("0", "1", "2", "3"):
+                entered[int(request.command)].set()
+                if not release.wait(5):
+                    raise RuntimeError("Read-only worker was not released")
+            yield expected
+
+        controller = Controller(Recovery(root / "private", repo=repo), run=run)
+
+        def request(name):
+            return parse_request(
+                {"tool": "readonly_bash", "args": {"command": name, "runId": name}}
+            )
+
+        def execute(index):
+            try:
+                completed.append(
+                    list(controller.execute(request(str(index)), threading.Event()))
+                )
+            except Exception as error:
+                failures.append(error)
+
+        threads = tuple(threading.Thread(target=execute, args=(i,)) for i in range(4))
+        try:
+            for thread in threads:
+                thread.start()
+            assert all(event.wait(5) for event in entered)
+            with pytest.raises(RuntimeError, match="At most four"):
+                list(controller.execute(request("fifth"), threading.Event()))
+            release.set()
+            for thread in threads:
+                thread.join(5)
+                assert not thread.is_alive()
+            assert failures == []
+            assert completed == [[expected]] * 4
+            assert list(controller.execute(request("fresh"), threading.Event())) == [
+                expected
+            ]
+        finally:
+            release.set()
+            for thread in threads:
+                thread.join(5)
+            controller.close()
+
+
+def test_checkpoint_failure_prevents_worker_and_foreign_paths_are_rejected():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "file").write_text("protected content")
+        calls = []
+
+        def run(request, stop, lock_fd):
+            calls.append(request)
+            (repo / "file").write_text("damaged")
+            yield {"type": "result", "result": {"content": []}}
+
+        controller = Controller(
+            Recovery(root / "private", repo=repo, repo_limit=10, total_limit=10),
+            run=run,
+        )
+        with pytest.raises(RuntimeError, match="limit"):
+            list(
+                controller.execute(
+                    parse_request({"tool": "bash", "args": {"command": "rm file"}}),
+                    threading.Event(),
+                )
+            )
+        assert calls == []
+        assert (repo / "file").read_text() == "protected content"
+        with pytest.raises(ValueError, match="relative"):
+            parse_request(
+                {"tool": "write", "args": {"path": "../outside", "content": "bad"}}
+            )
+
+
+def test_failed_worker_retains_checkpoint_and_recovery_exports_host_conflict():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repo = root / "repo"
+        repo.mkdir()
+        (repo / "file").write_text("original")
+
+        def run(request, stop, lock_fd):
+            (repo / "file").write_text("partial damage")
+            raise RuntimeError("worker interrupted")
+            yield
+
+        controller = Controller(Recovery(root / "private", repo=repo), run=run)
+        with pytest.raises(RuntimeError, match="interrupted"):
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "bash",
+                            "args": {"command": "false", "writablePaths": ["./"]},
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+        checkpoint = controller.recovery.list()[0]
+        assert checkpoint["status"] == "interrupted"
+        (repo / "file").write_text("new Neovim edit")
+        results = list(
+            controller.execute(
+                parse_request(
+                    {
+                        "tool": "recovery_restore",
+                        "args": {
+                            "checkpoint": checkpoint["checkpoint"],
+                            "paths": ["file"],
+                        },
+                    }
+                ),
+                threading.Event(),
+            )
+        )
+        result = results[0]
+        recovered = result["result"]["paths"][0]
+        assert (repo / recovered).read_text() == "original"
+        assert (repo / "file").read_text() == "new Neovim edit"
+
+
+def test_shared_repositories_support_absolute_paths_and_recovery_without_escape():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        launch = root / "launch"
+        launch.mkdir()
+        repos = tuple(root / name for name in ("dotfiles", "anvil", "forge"))
+        for repo in repos:
+            repo.mkdir()
+            (repo / "file").write_text(repo.name)
+        stores = tuple(Recovery(root / "private", repo=repo) for repo in repos)
+        (repos[1] / "large-cache").write_bytes(b"cache" * 10000)
+
+        def run(request, stop, lock_fd):
+            if hasattr(request, "path"):
+                Path(request.path).write_text(request.content)
+            else:
+                for repo in repos:
+                    (repo / "file").unlink()
+            yield {"type": "result", "result": {"content": []}}
+
+        controller = Controller(stores[0], run=run, recoveries=stores, cwd=launch)
+        (repos[0] / "knowledge").symlink_to(repos[1] / "file")
+        list(
+            controller.execute(
+                parse_request(
+                    {
+                        "tool": "write",
+                        "args": {
+                            "path": str(repos[0] / "knowledge"),
+                            "content": "updated knowledge",
+                        },
+                    }
+                ),
+                threading.Event(),
+            )
+        )
+        assert (repos[1] / "file").read_text() == "updated knowledge"
+        assert stores[0].list() == []
+        assert len(stores[1].list()) == 1
+        assert [
+            entry["path"]
+            for entry in stores[1].paths(stores[1].list()[0]["checkpoint"])
+        ] == ["file"]
+
+        (repos[0] / "escape").symlink_to(launch / "outside")
+        for target in (
+            launch / "outside",
+            repos[0] / "escape",
+            repos[2] / ".git/config",
+        ):
+            with pytest.raises(ValueError, match="approved|protected"):
+                list(
+                    controller.execute(
+                        parse_request(
+                            {
+                                "tool": "write",
+                                "args": {
+                                    "path": str(target),
+                                    "content": "bad",
+                                },
+                            }
+                        ),
+                        threading.Event(),
+                    )
+                )
+        assert not (launch / "outside").exists()
+
+        list(
+            controller.execute(
+                parse_request(
+                    {
+                        "tool": "bash",
+                        "args": {
+                            "command": "delete files in all approved repositories",
+                            "writablePaths": [str(repo) for repo in repos],
+                        },
+                    }
+                ),
+                threading.Event(),
+            )
+        )
+        history = list(
+            controller.execute(
+                parse_request({"tool": "recovery_list", "args": {}}), threading.Event()
+            )
+        )[0]["result"]["entries"]
+        assert {entry["repo"] for entry in history} == {str(repo) for repo in repos}
+        for repo in repos:
+            checkpoint = next(
+                entry["checkpoint"] for entry in history if entry["repo"] == str(repo)
+            )
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "recovery_restore",
+                            "args": {
+                                "checkpoint": checkpoint,
+                                "paths": ["file"],
+                            },
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+        assert [(repo / "file").read_text() for repo in repos] == [
+            "dotfiles",
+            "updated knowledge",
+            "forge",
+        ]
+
+
+def test_failed_shared_checkpoint_blocks_bash_before_any_repository_changes():
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        repos = (root / "first", root / "second")
+        for repo in repos:
+            repo.mkdir()
+            (repo / "file").write_text("original")
+        stores = (
+            Recovery(root / "private", repo=repos[0]),
+            Recovery(root / "private", repo=repos[1], repo_limit=10),
+        )
+        calls = []
+
+        def run(request, stop, lock_fd):
+            calls.append(request)
+            yield {"type": "result", "result": {"content": []}}
+
+        controller = Controller(stores[0], run=run, recoveries=stores)
+        with pytest.raises(RuntimeError, match="limit"):
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "bash",
+                            "args": {
+                                "command": "rm file",
+                                "writablePaths": [str(repo) for repo in repos],
+                            },
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+        assert calls == []
+        assert stores[0].list()[0]["status"] == "interrupted"
+        assert [(repo / "file").read_text() for repo in repos] == [
+            "original",
+            "original",
+        ]
+
+
+def test_sandboxed_control_bridge_cancels_worker_on_abort():
+    import subprocess
+
+    from broker import Broker
+    from launcher import (
+        approved_repositories,
+        assets_root,
+        editing_controller,
+        sandbox_environment,
+        sandbox_prefix,
+        snapshot_config,
+    )
+    from runtime import find_runtime
+
+    @contextlib.contextmanager
+    def serve(server):
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            yield server
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join()
+
+    node, cli = find_runtime()
+    with tempfile.TemporaryDirectory(prefix="pi-control-bridge-") as directory:
+        root = Path(directory)
+        project = root / "repo"
+        project.mkdir()
+        subprocess.run(["/usr/bin/git", "init", "-q", str(project)], check=True)
+        state = root / "private/project"
+        for name in ("sessions", "cache"):
+            (state / name).mkdir(parents=True)
+        temporary = root / "temporary"
+        for name in ("home", "scratch"):
+            (temporary / name).mkdir(parents=True)
+        (temporary / "cache").symlink_to(state / "cache", target_is_directory=True)
+        snapshot_config(
+            temporary / "config",
+            assets=assets_root(),
+            roots=approved_repositories(project),
+        )
+        environment = sandbox_environment(node=node, temporary=temporary)
+        environment["PI_SANDBOX_CONTROL"] = "1"
+        controller = editing_controller(
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            assets=assets_root(),
+            roots=(project,),
+        )
+        command = sandbox_prefix(
+            node=node,
+            cli=cli,
+            project=project,
+            state=state,
+            temporary=temporary,
+            assets=assets_root(),
+            roots=(project,),
+        )
+        with serve(Broker(temporary / "gateway.sock", controller=controller)):
+            try:
+                abort_source = r"""
+                    import { existsSync } from 'node:fs';
+                    const controller = new AbortController();
+                    const deadline = setTimeout(() => controller.abort(), 10000);
+                    const watcher = setInterval(() => {
+                        if (existsSync('bridge-ticks')) controller.abort();
+                    }, 50);
+                    try {
+                        const response = await fetch('http://pi-gateway.invalid/control', {
+                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ tool: 'bash', args: {
+                                command: 'setsid sh -c "while :; do echo tick >> bridge-ticks; sleep 0.05; done" & wait',
+                                timeout: 30,
+                            }}), signal: controller.signal,
+                        });
+                        for await (const chunk of response.body) {}
+                    } catch (error) {
+                        console.log(error.name);
+                    } finally {
+                        clearInterval(watcher);
+                        clearTimeout(deadline);
+                    }
+                """
+                aborted = subprocess.run(
+                    [
+                        *command,
+                        str(node),
+                        "--input-type=module",
+                        "--eval",
+                        abort_source,
+                    ],
+                    cwd=project,
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                    check=False,
+                )
+                assert aborted.stdout.strip() == "AbortError", aborted.stderr
+                time.sleep(0.5)
+                size = (project / "bridge-ticks").stat().st_size
+                time.sleep(0.3)
+                assert (project / "bridge-ticks").stat().st_size == size
+            finally:
+                controller.close()
+
+
+def test_native_worker_protects_shared_aliases_and_leaves_source_writable():
+    import subprocess
+
+    from launcher import assets_root, editing_controller
+    from runtime import find_runtime
+
+    node, cli = find_runtime()
+    with tempfile.TemporaryDirectory(prefix="pi-shared-files-") as directory:
+        root = Path(directory)
+        project = root / "repo"
+        project.mkdir()
+        subprocess.run(["/usr/bin/git", "init", "-q", str(project)], check=True)
+        sentinel = root / "cache"
+        sentinel.write_text("cached package")
+        sentinel.chmod(0o644)
+        dependencies = project / "setup/.venv/lib"
+        dependencies.mkdir(parents=True)
+        (dependencies / "package.py").hardlink_to(sentinel)
+        (dependencies / "second.py").hardlink_to(sentinel)
+        (project / "shared.py").hardlink_to(sentinel)
+        (project / "alias.py").symlink_to("shared.py")
+        state = root / "private/project"
+        for name in ("sessions", "cache"):
+            (state / name).mkdir(parents=True)
+        controller = editing_controller(
+            node=node, cli=cli, project=project, state=state, assets=assets_root()
+        )
+        try:
+            list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "write",
+                            "args": {"path": "source.py", "content": "first"},
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+            (project / "late.py").hardlink_to(sentinel)
+            messages = list(
+                controller.execute(
+                    parse_request(
+                        {
+                            "tool": "bash",
+                            "args": {
+                                "command": """
+                    set -eu
+                    printf fresh > source.py
+                    for path in setup/.venv/lib/package.py setup/.venv/lib/second.py shared.py late.py; do
+                        if { printf damaged >> "$path"; } 2>/dev/null; then exit 10; fi
+                        if chmod 600 "$path" 2>/dev/null; then exit 11; fi
+                        if ln "$path" bypass.py 2>/dev/null; then exit 12; fi
+                        if mv "$path" moved.py 2>/dev/null; then exit 13; fi
+                    done
+                    if { printf damaged >> alias.py; } 2>/dev/null; then exit 14; fi
+                    if chmod 600 alias.py 2>/dev/null; then exit 15; fi
+                    if ln -L alias.py bypass.py 2>/dev/null; then exit 16; fi
+                    printf protected
+                """
+                            },
+                        }
+                    ),
+                    threading.Event(),
+                )
+            )
+            assert messages[-1]["result"]["content"] == [
+                {"type": "text", "text": "protected"}
+            ]
+            assert (project / "source.py").read_text() == "fresh"
+            assert sentinel.read_text() == "cached package"
+            assert sentinel.stat().st_mode & 0o777 == 0o644
+            assert (dependencies / "package.py").stat().st_nlink == 5
+            checkpoint = controller.recovery.list()[0]["checkpoint"]
+            restored = controller.recovery.restore(checkpoint, ["shared.py"])
+            assert (project / restored[0]).read_text() == "cached package"
+            assert sentinel.read_text() == "cached package"
+        finally:
+            controller.close()

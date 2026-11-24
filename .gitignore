@@ -1,0 +1,15 @@
+dist/unix/hypr/hyprpaper.conf
+/core/Dygma/Backups/Defy
+__pycache__/
+/src/terminal/nvim/spell/*.spl
+/Dygma/Backups/Defy/bf4cf3be2591348e
+/src/terminal/shell/fish/fish_variables
+/src/terminal/copyq/copyq-monitor.ini
+/src/terminal/copyq/copyq-filter.ini
+/src/terminal/copyq/copyq-commands.ini
+/src/terminal/copyq/copyq.lock
+/src/terminal/copyq/copyq_geometry.ini
+/src/terminal/copyq/copyq_tab_JmNsaXBib2FyZA==.dat
+/src/terminal/copyq/copyq_tabs.ini
+tmp
+/src/ai/rules/work-knowledge.md

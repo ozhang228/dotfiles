@@ -1,0 +1,96 @@
+gui:
+  scrollPastBottom: true
+  mouseEvents: true
+  sidePanelWidth: 0.2
+  expandFocusedSidePanel: true
+  shrinkSidePanelsToContent: true
+  sidePanels:
+    - [files, commits, reflog, stash]
+    - [branches, remotes, worktrees, submodules, tags]
+  theme:
+    activeBorderColor:
+      - "#8aadf4"
+      - bold
+    inactiveBorderColor:
+      - "#939ab7"
+    searchingActiveBorderColor:
+      - "#f5a97f"
+      - bold
+    optionsTextColor:
+      - "#8bd5ca"
+    selectedLineBgColor:
+      - "#494d64"
+    inactiveViewSelectedLineBgColor:
+      - "#363a4f"
+      - bold
+    cherryPickedCommitFgColor:
+      - "#24273a"
+    cherryPickedCommitBgColor:
+      - "#f5a97f"
+    markedBaseCommitFgColor:
+      - "#24273a"
+    markedBaseCommitBgColor:
+      - "#eed49f"
+    unstagedChangesColor:
+      - "#ee99a0"
+    defaultFgColor:
+      - "#cad3f5"
+  showNumstatInFilesView: true
+  showRandomTip: false
+  nerdFontsVersion: "3"
+  showDivergenceFromBaseBranch: "arrowAndNumber"
+  filterMode: fuzzy
+  spinner:
+    rate: 100
+git:
+  localBranchSortOrder: recency
+  branchLogCmd: "bash -c '$HOME/.config/lazygit/branch-log.sh $0' {{branchName}}"
+  diffRenderers:
+    - colorArg: always
+      command: "delta --side-by-side --paging=never"
+  parseEmoji: true
+os:
+  editPreset: nvim
+notARepository: quit
+quitOnTopLevelReturn: true
+keybinding:
+  universal:
+    return: <c-q>
+customCommands:
+  - key: "M"
+    context: "localBranches"
+    description: "Merge into current branch"
+    prompts:
+      - type: "confirm"
+        title: "Confirm merge"
+        body: "Merge {{if .SelectedLocalBranch.Head}}latest master/main{{else}}{{.SelectedLocalBranch.Name}}{{end}} into {{.CheckedOutBranch.Name}}?"
+    command: "bash ~/.config/lazygit/merge-branch.sh {{.SelectedLocalBranch.Name | quote}} {{.CheckedOutBranch.Name | quote}}"
+    loadingText: "Fetching and merging branch..."
+  - key: "W"
+    context: "localBranches"
+    command: "~/.config/lazygit/create-worktree.sh existing {{.SelectedLocalBranch.Name | quote}}"
+    description: "Create sibling worktree"
+    loadingText: "Creating worktree..."
+  - key: "N"
+    context: "localBranches"
+    prompts:
+      - type: "input"
+        title: "New branch name"
+        key: "BranchName"
+    command: "~/.config/lazygit/create-worktree.sh new {{.Form.BranchName | quote}} {{.SelectedLocalBranch.Name | quote}}"
+    description: "Create branch and sibling worktree"
+    loadingText: "Creating branch and worktree..."
+  - key: "D"
+    context: "localBranches"
+    prompts:
+      - type: "confirm"
+        title: "Remove worktree and branch"
+        body: "Remove {{.SelectedLocalBranch.Name}}? Its session and running processes will be stopped on Linux. Uncommitted, untracked, and ignored files in its worktree will be deleted."
+    command: "LAZYGIT_CLEANUP_CONFIRMED=1 ~/.config/lazygit/cleanup-worktree.sh {{.SelectedLocalBranch.Name | quote}}"
+    description: "Remove worktree and local branch"
+    loadingText: "Removing worktree and branch..."
+  - key: "W"
+    context: "remoteBranches"
+    command: "~/.config/lazygit/create-worktree.sh remote {{.SelectedRemoteBranch.RemoteName | quote}} {{.SelectedRemoteBranch.Name | quote}} && ~/.config/lazygit/focus-local-branches.sh"
+    description: "Pull as worktree"
+    loadingText: "Pulling branch into worktree..."

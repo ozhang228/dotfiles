@@ -1,0 +1,43 @@
+return {
+  {
+    "mason-org/mason.nvim",
+    opts = { ui = { backdrop = 100 } },
+  },
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    opts = {
+      auto_update = true,
+      ensure_installed = {
+        "tsc",
+        "vtsls",
+        "eslint_d",
+        "oxlint",
+
+        "oxfmt",
+        "prettierd",
+        "prettier",
+
+        "basedpyright",
+        "ty",
+        "ruff",
+
+        "clangd",
+        "clang-format",
+        "codelldb",
+
+        "lua-language-server",
+        "luacheck",
+        "stylua",
+
+        "rust-analyzer",
+
+        "astro-language-server",
+        "mdx-analyzer",
+
+        "jq",
+        "checkmake",
+        "marksman",
+      },
+    },
+  },
+}

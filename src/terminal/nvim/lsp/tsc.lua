@@ -1,0 +1,61 @@
+local root_markers = {
+  "tsconfig.json",
+  "jsconfig.json",
+  "package.json",
+  "tsconfig.base.json",
+}
+
+---@type vim.lsp.Config
+return {
+  cmd = { "tsc", "--lsp", "--stdio" },
+  capabilities = { experimental = { hoverVerbosityLevel = true } },
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+  },
+  settings = {
+    typescript = {
+      preferGoToSourceDefinition = true,
+      tsserver = {
+        maxTsServerMemory = 4096,
+      },
+      preferences = {
+        useAliasesForRenames = false, -- important for renaming object keys
+      },
+      inlayHints = {
+        parameterNames = { enabled = "all" },
+        parameterTypes = { enabled = true },
+        variableTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        functionLikeReturnTypes = { enabled = true },
+        enumMemberValues = { enabled = true },
+      },
+    },
+
+    javascript = {
+      preferGoToSourceDefinition = true,
+      preferences = {
+        useAliasesForRenames = false,
+      },
+      inlayHints = {
+        parameterNames = { enabled = "all" },
+        parameterTypes = { enabled = true },
+        variableTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        functionLikeReturnTypes = { enabled = true },
+        enumMemberValues = { enabled = true },
+      },
+    },
+  },
+  root_dir = function(bufnr, on_dir)
+    local markers = { root_markers, { ".git" } }
+    local deno_root = vim.fs.root(bufnr, { "deno.json", "deno.jsonc" })
+    local deno_lock_root = vim.fs.root(bufnr, { "deno.lock" })
+    local project_root = vim.fs.root(bufnr, markers)
+    if deno_lock_root and (not project_root or #deno_lock_root > #project_root) then return end
+    if deno_root and (not project_root or #deno_root >= #project_root) then return end
+    on_dir(project_root or vim.fn.getcwd())
+  end,
+}

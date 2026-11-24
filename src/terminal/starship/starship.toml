@@ -1,0 +1,185 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+scan_timeout = 500
+
+format = """
+$username\
+$directory\
+$git_branch\
+$git_metrics\
+$git_status\
+$fill\
+$c\
+$elixir\
+$elm\
+$golang\
+$haskell\
+$java\
+$julia\
+$nodejs\
+$nim\
+$rust\
+$scala\
+$conda\
+$python\
+$time\
+$line_break\
+$character"""
+
+palette = "catppuccin-macchiato"
+
+[palettes.catppuccin-macchiato]
+bg_alt = '#363a4f'
+red = '#ed8796'
+red_bright = '#ee99a0'
+yellow = '#eed49f'
+orange = '#f5a97f'
+green = '#a6da95'
+accent = '#8aadf4'
+purple = '#c6a0f6'
+
+[username]
+disabled = false
+format = "[](fg:bg_alt)[ 󰧱 $user ](bg:bg_alt fg:purple)[](fg:bg_alt) "
+show_always = true
+style_root = "bg:bg_alt fg:purple"
+style_user = "bg:bg_alt fg:purple"
+
+[directory]
+format = "[](fg:bg_alt)[ 󰉋 $path ](bg:bg_alt fg:yellow)[](fg:bg_alt) "
+style = "bg:bg_alt fg:green"
+truncation_length = 3
+truncation_symbol = "…/"
+truncate_to_repo = true
+read_only = "󰌾"
+home_symbol = "~"
+
+[directory.substitutions]
+Documents = "󰈙"
+Downloads = " "
+Music = " "
+Pictures = " "
+
+[fill]
+style = "fg:bg_alt"
+symbol = " "
+
+[git_branch]
+format = "[](fg:bg_alt)[  $branch ](bg:bg_alt fg:accent)"
+style = "bg:bg_alt fg:accent"
+symbol = ""
+
+[git_status]
+disabled = false
+format = '[](fg:bg_alt) '
+up_to_date = ''
+untracked = ''
+stashed = ''
+modified = ''
+renamed = ''
+deleted = ''
+staged = ''
+ahead = ''
+behind = ''
+diverged = ''
+
+[git_metrics]
+disabled = false
+added_style = "bg:bg_alt fg:accent"
+deleted_style = "bg:bg_alt fg:red"
+format = "([+$added ]($added_style)[-$deleted ]($deleted_style))"
+
+[time]
+disabled = false
+format = " [](fg:bg_alt)[ $time 󰴈 ](bg:bg_alt fg:orange)[](fg:bg_alt)"
+style = "bg:bg_alt fg:orange"
+time_format = "%I:%M%P"
+use_12hr = true
+
+[character]
+disabled = false
+success_symbol = '[󱞪](bold fg:purple)'
+error_symbol = '[󱞪](bold fg:red_bright)'
+
+[line_break]
+disabled = false
+
+# -- Languages --
+
+[c]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[elixir]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[elm]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[golang]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[haskell]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[java]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[julia]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[nodejs]
+disabled = false
+symbol = "󰎙 "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[nim]
+disabled = false
+symbol = "󰆥 "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[rust]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[scala]
+disabled = false
+symbol = " "
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[python]
+disabled = false
+symbol = ' '
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$version( $virtualenv) ](bg:bg_alt fg:green)[](fg:bg_alt)"
+
+[conda]
+disabled = false
+symbol = '🅒 '
+style = "bg:bg_alt fg:green"
+format = " [](fg:bg_alt)[ $symbol$environment ](bg:bg_alt fg:green)[](fg:bg_alt)"

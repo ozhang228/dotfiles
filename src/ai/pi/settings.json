@@ -1,0 +1,57 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "defaultThinkingLevel": "medium",
+  "defaultTools": ["read", "grep", "find", "ls", "subagent", "subagent_log"],
+  "skills": ["!skills/**", "~/dotfiles/src/ai/skills", "~/anvil/skills"],
+  "prompts": ["!**"],
+  "packages": [],
+  "extensions": [
+    "!**",
+    "+builtin:mcp",
+    "+builtin:codemode",
+    "+builtin:tool-search",
+    "+extensions/minimal-command-menu/index.ts",
+    "+extensions/cozy-prompt/index.ts",
+    "+extensions/compact-tools/index.ts",
+    "+extensions/subagents/index.ts"
+  ],
+  "themes": ["!**", "+themes/catppuccin-macchiato.json"],
+  "theme": "catppuccin-macchiato",
+  "enableSkillCommands": true,
+  "tuiMode": "regular",
+  "hideThinkingBlock": true,
+  "quietStartup": true,
+  "doubleEscapeAction": "none",
+  "markdown": {
+    "mermaid": "streaming"
+  },
+  "terminal": {
+    "showImages": true,
+    "images": "auto",
+    "showTerminalProgress": false,
+    "hyperlinks": "auto"
+  },
+  "images": {
+    "blockImages": false
+  },
+  "showCacheMissNotices": false,
+  "compaction": {
+    "enabled": true
+  },
+  "branchSummary": {
+    "skipPrompt": true
+  },
+  "cacheWarming": "off",
+  "retry": {
+    "enabled": true,
+    "maxRetries": 3,
+    "provider": {
+      "maxRetries": 0
+    }
+  },
+  "defaultProjectTrust": "ask",
+  "enableInstallTelemetry": false,
+  "enableAnalytics": false,
+  "modelThinkingLevels": {},
+  "lastChangelogVersion": "1.5.0"
+}

@@ -1,0 +1,55 @@
+[user]
+    name = Oscar Zhang
+    email = oscarzhang228@gmail.com
+
+[push]
+    autoSetupRemote = true
+
+[core]
+    pager = "delta --side-by-side --paging=never"
+    excludesfile = ~/dotfiles/src/git/.gitignore_global
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    # use n and N to move between diff sections
+    navigate = true
+    dark = true
+    syntax-theme = ansi
+    plus-style = "syntax #2d3440"
+    plus-emph-style = "syntax #364047"
+    minus-style = "syntax #322e40"
+    minus-emph-style = "syntax #403447"
+    line-numbers-zero-style = "#939ab7"
+    line-numbers-left-style = "#939ab7"
+    line-numbers-right-style = "#939ab7"
+    line-numbers-plus-style ="#a6da95"
+    line-numbers-minus-style = "#ed8796"
+
+[pull]
+    rebase = false
+
+[fetch]
+    prune = true
+
+[rerere]
+    enabled = true
+
+[diff]
+    algorithm = histogram
+
+[merge]
+    conflictStyle = zdiff3
+
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://github.gatech.edu"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[init]
+	defaultBranch = main

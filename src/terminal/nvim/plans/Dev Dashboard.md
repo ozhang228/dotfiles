@@ -1,0 +1,37 @@
+# Dev Dashboard
+
+- [ ] Make the PR list useful day to day
+  - [ ] Paginate PR results and lazy-load additional pages as needed
+  - [-] Add PR filters
+    - [-] Add a repository filter, defaulting to all repositories
+- [ ] Make the PR list keyboard navigable
+  - [ ] Select and open PRs from the keyboard
+    - [ ] Select PRs across repository groups with `j`/`k`, arrows, and count prefixes; keep selection visible and stable across refreshes
+      - [ ] Show a focus ring on the selected row
+    - [ ] Open the selected PR on GitHub with `Shift+Enter`
+    - [ ] open status checks
+  - [ ] Filter PRs from the keyboard
+    - [ ] Add sequence support for status (`s` then `o`/`d`/`m`/`c`) and author (`a` then `m`/`r`/`s`) filters
+    - [ ] Focus the specific-author input after `a` then `s`
+    - [ ] Show the shortcuts beside filter labels
+  - [ ] Show a shortcut cheat sheet with `?`
+- [ ] Build the in-app PR review page
+  - [ ] Open selected PRs in-app
+    - [ ] Implement the PR detail route
+    - [ ] Open the selected PR there with `Enter`
+  - [ ] Show and navigate changed files
+    - [ ] Add a backend interface for changed files
+    - [ ] Render changed files with `@pierre/diffs` and a file tree
+    - [ ] Add file-tree navigation and foldable functions
+  - [ ] Add private review comments that can be exported to AI and we should be able to export comments with line numbers to ai easily
+  # can think of review as two separate stages right, looking at diff, and looking at the file
+  - [ ] File Drilldown (lsp enabled
+  - [ ] Explore an import-dependency diagram for changed files and a graph view of functions in a particular file
+    - can think about doing it as a go-to-definition shows as a left to right tree
+    - import dependency would be about file dependency and then can do go to definition as the function explorer. wonder if i can just do "explore chain" and have it pull the entire chain up with this part highlighted but might be too much, can have it truncated
+- [ ] Add PR actions
+  - [ ] Close and draft or undraft PRs with confirmation
+  - [ ] Approve PRs authored by someone else
+- [ ] Implement the launcher page
+- [ ] implement TODO list widget, integrated with local, shared with life dashboard
+- [ ] Email / better reminders widget

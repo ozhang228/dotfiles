@@ -1,0 +1,64 @@
+[global]
+    follow = mouse
+    origin = top-right
+    offset = 5x5
+
+    width = 900
+
+    progress_bar_min_width = 880
+    progress_bar_max_width = 880
+    progress_bar_corner_radius = 2
+
+    padding = 10
+    horizontal_padding = 10
+    frame_width = 1
+    gap_size = 3
+    font = "JetBrainsMono Nerd Font 14"
+
+    icon_position = off
+    corner_radius = 2
+
+    background = "#24273a"
+    foreground = "#cad3f5"
+
+    markup = full
+    word_wrap = yes
+
+    mouse_left_click = close_current
+    mouse_right_click = do_action, close_current
+
+[urgency_low]
+    background = "#363a4f"
+    highlight = "#a6da95"
+    frame_color = "#a6da95"
+    default_icon = "dialog-information"
+    format = "<b><span foreground='#a6da95'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
+    timeout = 6
+
+[urgency_normal]
+    background = "#363a4f"
+    highlight = "#eed49f"
+    frame_color = "#eed49f"
+    default_icon = "dialog-warning"
+    format = "<b><span foreground='#eed49f'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
+    timeout = 9
+
+[urgency_critical]
+    background = "#363a4f"
+    highlight = "#ed8796"
+    frame_color = "#ed8796"
+    default_icon = "dialog-error"
+    format = "<b><span foreground='#ed8796'>[%a] %s</span></b>\n<span size='13312'>%b</span>"
+    timeout = 0
+
+[ai_assistant]
+    summary = "AI Assistant"
+    script = ~/.config/dunst/play_sound.sh
+
+[ai_assistant_waiting]
+    summary = "AI Assistant (waiting)"
+    script = ~/.config/dunst/play_sound_permission.sh
+
+[screen_locked]
+    enabled = false
+    skip_display = true
