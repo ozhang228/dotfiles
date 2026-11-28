@@ -16,4 +16,19 @@
   - [ ] Import Instagram saved posts via "Download your information" JSON; no API for saves
   - [ ] Fallback without a key: Foursquare OS Places / Overture for search, Google Maps link per place for reviews
 - [ ] Fundamentals Trading / Crypto trading apps
-- [ ] open whisper
+- [ ] Hosting: life instance on an always-on server (Lightsail 1 GB or similar), private over Tailscale
+  - [ ] Build locally and deploy artifacts; add swap
+  - [ ] Backups: app commits + pushes Markdown data to a private repo after ~30s of no edits
+  - [ ] Store photos and attachments in object storage (Cloudflare R2 / S3), linked from Markdown, never in git
+  - All edits go through the app (web UI or AI tools); git is backup only, nothing syncs back in. A local clone is read-only (`git pull` to browse in nvim)
+  - Heavy compute (Whisper, big Monte Carlo runs) stays on the desktop
+- [ ] Let AI act on the dashboards
+  - open question: phone AI through the Claude app (needs a public HTTPS MCP endpoint, e.g. Tailscale Funnel + OAuth) or a chat box inside the dashboard that calls the Claude API server-side (stays private on Tailscale)?
+  - [ ] Expose dashboard actions as one tool layer: add/complete/reschedule task, list today, search and append to notes, add place to trip
+  - [ ] Serve that tool layer as an MCP server so Claude Code / Claude desktop can use it
+  - [ ] Phone entry point (see open question)
+  - [ ] Confirm before destructive actions (delete, bulk reschedule)
+- [ ] Voice input with Whisper (speech-to-text model; runs locally, no API needed)
+  - [ ] Desktop dictation: Hyprland push-to-talk key → record → whisper.cpp or faster-whisper on GPU → type into focused window
+  - [ ] Phone voice notes: record in the dashboard PWA → server queues audio → desktop transcribes when on (or a paid transcription API)
+  - [ ] Pipe transcripts into the AI layer ("add dentist friday 3pm" → task)

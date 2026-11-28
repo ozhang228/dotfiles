@@ -34,4 +34,14 @@
   - [ ] Approve PRs authored by someone else
 - [ ] Implement the launcher page
 - [ ] implement TODO list widget, integrated with local, shared with life dashboard
+    - similar to what I have now with nvim plans, also take inspiration from todoist with daily tasks, project view, and how i use notion for things. can build similar version of this if needed honestly if they're that diffretn. need to figure out my exact usecase. will need this to be always on and be readonly when offline which at that point might be worth paying for a server
+    - Data is Markdown files (nvim plans upstream as-is), written only by the app; backed up to git (see Life Dashboard hosting)
+    - [ ] One core app, two instances: dev (work data, stays on work machine) and life (personal server)
+    - [ ] Server is the single source of truth and the only writer; no sync or conflict handling
+    - [ ] Offline is read-only: PWA service worker caches the last loaded views and notes
+    - [ ] Todoist-style tasks: today view, project view, due dates, priorities, recurring tasks, natural-language quick add (`chrono-node`)
+    - [ ] Each task can link to a deep-dive Markdown note page (replaces Notion); good rendering first, mobile editing later
+    - [ ] Upstream nvim plans: same task syntax readable/editable in nvim and the web (`[ ]`/`[-]`/`[x]`, nesting, `{depends: ...}`)
+    - [ ] Host life instance on an always-on box (Lightsail ~$5/mo or similar) and reach it over Tailscale instead of exposing ports
+    - [ ] Optional phone reminders via self-hosted ntfy
 - [ ] Email / better reminders widget
