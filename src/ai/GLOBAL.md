@@ -21,7 +21,6 @@ Language and task conventions live in these canonical files:
 - `~/dotfiles/src/ai/rules/cpp.md`
 - `~/dotfiles/src/ai/rules/marimo.md`
 - `~/dotfiles/src/ai/rules/testing.md`
-- `~/dotfiles/src/ai/rules/work-knowledge.md`
 
 Read and apply only files whose declared scope matches the current task. Do not read all rule files by default. Tell the user which rule files you read.
 
@@ -111,8 +110,8 @@ Avoid shotgun parsing: finish parsing before acting on input, and push the burde
 ### Branch and worktree names
 
 - Before creating a worktree, inspect the current branch and `git worktree list`. Reuse the current checkout or an existing worktree when it fits the task. A fresh worktree already created by Oscar or an earlier session satisfies the task's isolation requirement; do not automatically create another. Ask Oscar before creating another worktree unless he explicitly requested one for this task, even when isolation or a different branch/base would be useful.
-- Prefix AI-created Git branch names with `ai-` (for example, `ai-risk-attribution`) unless Oscar supplies a branch name or a task-specific branch naming rule applies.
-- Do not add `ai-` to worktree directory names. Use `<repository>-<task>` (for example, `desk-tools-risk-attribution`). If Oscar supplies a worktree directory name, use it exactly. Branch names and worktree directory names are independent.
+- Prefix AI-created Git branch names with `ai-` (for example, `ai-lib-ui-release`) unless Oscar supplies a branch name or a task-specific branch naming rule applies.
+- Do not add `ai-` to worktree directory names. Use `<repository>-<task>` (for example, `forge-lib-ui-release`). If Oscar supplies a worktree directory name, use it exactly. Branch names and worktree directory names are independent.
 
 ### Protected default branches
 
