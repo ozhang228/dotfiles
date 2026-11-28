@@ -141,6 +141,12 @@
       "manjaro": "yay -S hyprshot"
     }
   },
+  "handy": {
+    "check": "command -v handy && command -v wtype && command -v wl-copy",
+    "install": {
+      "manjaro": "sudo pacman -S --needed wtype wl-clipboard && yay -S --needed handy-bin"
+    }
+  },
   "hyprpolkitagent": {
     "check": "pacman -Q hyprpolkitagent",
     "install": {
