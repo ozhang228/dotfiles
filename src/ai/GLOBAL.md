@@ -21,6 +21,7 @@ Language and task conventions live in these canonical files:
 - `~/dotfiles/src/ai/rules/cpp.md`
 - `~/dotfiles/src/ai/rules/marimo.md`
 - `~/dotfiles/src/ai/rules/testing.md`
+- Any files in `~/dotfiles/src/ai/rules/local/`, which machine-specific repos link in (gitignored; absent on most machines)
 
 Read and apply only files whose declared scope matches the current task. Do not read all rule files by default. Tell the user which rule files you read.
 

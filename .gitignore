@@ -13,3 +13,4 @@ __pycache__/
 /src/terminal/copyq/copyq_tabs.ini
 tmp
 /src/terminal/copyq/copyq_geometry.ini.lock
+/src/ai/rules/local/
